@@ -2,7 +2,7 @@
   description = "NixOS configuration";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/c2c0d57339c436744471b1337f362810ae8de340";
     home-manager.url = "github:nix-community/home-manager";
   };
 
@@ -15,7 +15,7 @@
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = false;
+            home-manager.useUserPackages = true;
             home-manager.users.tibor = import ./home-manager/home.nix;
           }
         ];
