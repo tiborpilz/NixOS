@@ -4,6 +4,7 @@ let
 
   ## UI Elements
   plugins = with pkgs.vimPlugins; ([
+    ale
     The_NERD_tree
     vim-gitgutter
     vim-airline
@@ -19,7 +20,7 @@ let
     vim-devicons
     ## Language Features / Editing help
     vim-autoformat
-    nerdcommenter
+    tcomment_vim
     vim-markdown
     colorizer
     vim-surround
@@ -76,8 +77,8 @@ in {
       let g:ale_sign_column_always=1
       let g:airline#extensions#ale#enabled = 1
       let base16colorspace=256
-      au BufWrite * :Autoformat
-      set termguicolors
+
+      au BufNewFile,BufRead *.agda setf agda
     '';
   };
 }

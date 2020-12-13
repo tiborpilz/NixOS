@@ -2,14 +2,16 @@
 {
   programs.zsh = {
     enable = true;
+    enableVteIntegration = true;
+    defaultKeymap = "vicmd";
 
-    prezto = {
+    zplug = {
       enable = true;
 
-      editor.keymap = "vi";
-      terminal = {
-        autoTitle = true;
-      };
+      plugins = [
+        { name = "zsh-users/zaw"; }
+        { name = "junkblocker/calibre-zaw-source"; }
+      ];
     };
   };
 }

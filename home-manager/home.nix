@@ -11,6 +11,8 @@
     username = "tibor";
     homeDirectory = "/home/tibor";
     packages = with pkgs; [
+      thefuck
+      nerdfonts
       asciinema
       nushell
       htop
@@ -21,6 +23,7 @@
       firefox
       dmenu
       direnv
+      haskellPackages.Agda
     ];
   };
 
@@ -30,7 +33,23 @@
       userName = "Tibor Pilz";
       userEmail = "tibor@pilz.berlin";
     };
-  };
 
-  #home.stateVersion = "20.09";
+    tmux = {
+      enable = true;
+      baseIndex = 1;
+      escapeTime = 250;
+      historyLimit  = 10000;
+      keyMode = "vi";
+      newSession = true;
+
+      plugins = with pkgs; [
+        tmuxPlugins.continuum
+        tmuxPlugins.resurrect
+        tmuxPlugins.yank
+      ];
+
+      tmuxp.enable = true;
+    };
+  };
+  home.stateVersion = "20.09";
 }
