@@ -34,6 +34,7 @@
     wget
     tmux
     hwinfo
+    nixops.thefuck
   ];
 
   programs = {
