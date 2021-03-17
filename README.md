@@ -1,2 +1,2 @@
 # NixOS
-NixOS &amp; Declarative, immutable os configuration
+Declarative, immutable os configuration
