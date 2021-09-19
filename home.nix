@@ -39,5 +39,5 @@
     enable = true;
   };
   
-  xdg.configFile."nvim.init.vim".source = ./dotfiles/neovim/.config/nvim/init.vim;
+  xdg.configFile."nvim/init.vim".source = ./dotfiles/neovim/.config/nvim/init.vim;
 }
