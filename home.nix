@@ -38,9 +38,14 @@
   programs.neovim = {
     enable = true;
   };
+
+  home.file.".config/nvim" = {
+    source = ./dotfiles/neovim;
+    recurse = true;
+  };
   
-  xdg.configFile."nvim/init.vim".source = ./dotfiles/neovim/.config/nvim/init.vim;
-  xdg.configFile."nvim/look-and-feel.vim".source = ./dotfiles/neovim/.config/nvim/look-and-feel.vim;
-  xdg.configFile."nvim/plugins.vim".source = ./dotfiles/neovim/.config/nvim/plugins.vim;
-  xdg.configFile."nvim/autoload/plug.vim".source = ./dotfiles/neovim/.local/share/nvim/site/autoload/plug.vim;
+  /* xdg.configFile."nvim/init.vim".source = ./dotfiles/neovim/.config/nvim/init.vim; */
+  /* xdg.configFile."nvim/look-and-feel.vim".source = ./dotfiles/neovim/.config/nvim/look-and-feel.vim; */
+  /* xdg.configFile."nvim/plugins.vim".source = ./dotfiles/neovim/.config/nvim/plugins.vim; */
+  /* xdg.configFile."nvim/autoload/plug.vim".source = ./dotfiles/neovim/.config/nvim/autoload/plug.vim; */
 }
