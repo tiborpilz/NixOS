@@ -1,11 +1,14 @@
 { config, pkgs, ...}:
-{
+
+let
+  unstable = import <nixos-unstable> { config = { allowUnfree = true; }; };
+
+in {
   home.packages = with pkgs; [
     direnv
     git
     gnupg
     silver-searcher
-    stow
   ];
 
   programs.home-manager.enable = true;
@@ -30,18 +33,19 @@
 
   programs.tmux = {
     enable = true;
-    clock24 = true;
-    keyMode = "vi";
-    secureSocket = false;
+  };
+
+  home.file.".tmux.conf" = {
+    source = ./dotfiles/tmux/.tmux.conf;
   };
 
   programs.neovim = {
     enable = true;
   };
 
-  home.file.".config/nvim" = {
-    source = ./dotfiles/neovim;
-    recurse = true;
+  xdg.configFile.nvim = {
+    source = ./dotfiles/neovim/.config/nvim;
+    recursive = true;
   };
   
   /* xdg.configFile."nvim/init.vim".source = ./dotfiles/neovim/.config/nvim/init.vim; */

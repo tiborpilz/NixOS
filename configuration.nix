@@ -45,6 +45,10 @@
 
   # Enable the Plasma 5 Desktop Environment.
 
+  fonts.fonts = with pkgs; [
+    (nerdfonts.override { fonts = [ "FiraCode" ]; })
+  ];
+
   services = {
     xserver = {
       enable = true;
@@ -93,7 +97,12 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    wget vim
+    nodejs
+    python3
+    unzip
+    wget
+    vim
+    xclip
   ];
 
   nix = {
