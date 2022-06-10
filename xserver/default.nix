@@ -13,7 +13,7 @@
       xfce.enable = true;
     };
     displayManager = {
-      defaultSession = "plasma5+bspwm";
+      defaultSession = "plasma5";
     };
   };
 }

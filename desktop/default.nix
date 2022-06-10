@@ -6,11 +6,8 @@
     desktopManager = {
       plasma5.enable = true;
     };
-    windowManager = {
-      bspwm.enable = true;
-    };
     displayManager = {
-      defaultSession = "none+bspwm";
+      defaultSession = "plasma5";
     };
   };
 }
