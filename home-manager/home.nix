@@ -11,7 +11,6 @@
     username = "tibor";
     homeDirectory = "/home/tibor";
     packages = with pkgs; [
-      thefuck
       nerdfonts
       asciinema
       nushell
