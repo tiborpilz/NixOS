@@ -1,10 +1,10 @@
-{ pkgs, lib, config, ...}:
+{ pkgs, lib, config, modulesPath, ...}:
 
 with lib;
 {
   imports = [
-    <nixpkgs/nixos/modules/profiles/qemu-guest.nix>
-    <nixpkgs/nixos/modules/virtualisation/qemu-vm.nix>
+    # (modulesPath + "/nixos/modules/profiles/qemu-guest.nix")
+    # (modulesPath + "/nixos/modules/virtualisation/qemu-vm.nix")
     ./services/tandoor.nix
     ./services/paperless-ng.nix
     ./services/media/media.nix
@@ -44,5 +44,6 @@ with lib;
     };
 
     virtualisation.oci-containers.backend = "podman";
+    system.stateVersion = "22.05";
   };
 }

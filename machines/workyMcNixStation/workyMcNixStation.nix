@@ -3,7 +3,7 @@
 {
   time.timeZone = "Europe/Berlin";
   imports = [
-    ../../xserver/default.nix
+    ../../desktop/default.nix
     ./hardware-configuration.nix
   ];
 
@@ -71,6 +71,21 @@
     hwinfo
   ];
 
+  programs = {
+    dconf.enable = true;
+    tmux = {
+      enable = true;
+      newSession = true;
+      terminal = "screen-256color";
+    };
+    zsh = {
+      enable = true;
+      enableBashCompletion = true;
+      enableCompletion = true;
+    };
+  };
+
+
   networking.hostName = "workyMcNixStation";
   networking.useDHCP = true;
 
@@ -80,5 +95,5 @@
   nix.extraOptions = ''
     experimental-features = nix-command flakes
   '';
-  system.stateVersion = "20.09";
+  system.stateVersion = "21.05";
 }
