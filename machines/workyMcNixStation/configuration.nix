@@ -7,6 +7,9 @@
     ./hardware-configuration.nix
   ];
 
+  virtualisation.memorySize = 32768;
+  virtualisation.cores = 8;
+  virtualisation.diskSize = 32768;
   # Use the systemd-boot EFI boot loader.
   boot = {
     consoleLogLevel = 0;
