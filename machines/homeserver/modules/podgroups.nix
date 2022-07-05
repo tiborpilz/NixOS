@@ -19,19 +19,8 @@ let
           example = "80:8080";
         };
 
-#         db = mkOption {
-#           default = {
-#             user = "postgres";
-#             password = "postgres";
-#             db = "postgres";
-#             enable = false;
-#           };
-#           # type = types.attrsOf (types.submodule dbContainer);
-#         };
-
         containers = mkOption {
           default = {};
-          # type = types.attrsOf ( config.oci-containers.containers );
           description = "containers";
         };
       };
