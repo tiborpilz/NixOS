@@ -6,6 +6,7 @@
     home-manager.url = "github:nix-community/home-manager";
   };
   outputs = { home-manager, nixpkgs, ... }: {
+    formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;
     nixosConfigurations = {
       workyMcNixStation = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";

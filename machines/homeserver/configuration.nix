@@ -1,4 +1,4 @@
-{ pkgs, lib, config, modulesPath, ...}:
+{ pkgs, lib, config, modulesPath, ... }:
 
 with lib;
 {
@@ -16,7 +16,7 @@ with lib;
     virtualisation.diskSize = 32768;
 
     virtualisation.qemu = {
-      networkingOptions = ["-nic bridge,br=virbr0,model=virtio-net-pci"];
+      networkingOptions = [ "-nic bridge,br=virbr0,model=virtio-net-pci" ];
     };
 
     boot.loader.grub.enable = true;

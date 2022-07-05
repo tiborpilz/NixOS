@@ -1,4 +1,4 @@
-{ pkgs, ...}:
+{ pkgs, ... }:
 let
   ## Define Plugins as list Nix packages
 
@@ -60,7 +60,8 @@ let
     ultisnips
     fugitive
   ]);
-in {
+in
+{
   # Install Vim itself
   programs.vim = {
     enable = true;
