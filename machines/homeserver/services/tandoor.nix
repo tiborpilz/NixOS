@@ -31,13 +31,13 @@ in
       containers.tandoor = {
         image = "vabene1111/recipes:1.2.6";
         environment = {
-          "SECRET_KEY"="secretkey";
-          "DB_ENGINE"="django.db.backends.postgresql";
-          "POSTGRES_HOST"="localhost";
-          "POSTGRES_PORT"="5432";
-          "POSTGRES_USER"=db_user;
-          "POSTGRES_PASSWORD"=db_password;
-          "POSTGRES_DB"=db_db;
+          "SECRET_KEY" = "secretkey";
+          "DB_ENGINE" = "django.db.backends.postgresql";
+          "POSTGRES_HOST" = "localhost";
+          "POSTGRES_PORT" = "5432";
+          "POSTGRES_USER" = db_user;
+          "POSTGRES_PASSWORD" = db_password;
+          "POSTGRES_DB" = db_db;
         };
         volumes = [
           "/var/lib/tandoor/staticfiles:/opt/recipes/staticfiles"

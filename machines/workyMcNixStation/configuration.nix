@@ -21,7 +21,7 @@
       grub = {
         enable = true;
         device = "nodev";
-        efiSupport= true;
+        efiSupport = true;
         version = 2;
         gfxmodeEfi = "1920x1080";
         gfxpayloadEfi = "keep";
@@ -29,8 +29,8 @@
 
     };
 
-    kernelModules = ["kvm-amd"];
-    kernelParams = ["amd_iommu=on"];
+    kernelModules = [ "kvm-amd" ];
+    kernelParams = [ "amd_iommu=on" ];
   };
 
   virtualisation = {

@@ -1,4 +1,4 @@
 { ... }:
 {
-  imports = [./python.nix];
+  imports = [ ./python.nix ];
 }

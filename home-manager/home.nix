@@ -36,7 +36,7 @@
       enable = true;
       baseIndex = 1;
       escapeTime = 250;
-      historyLimit  = 10000;
+      historyLimit = 10000;
       keyMode = "vi";
       newSession = true;
 

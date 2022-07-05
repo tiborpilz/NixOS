@@ -1,8 +1,8 @@
-{ config, lib, pkgs, ...}:
+{ config, lib, pkgs, ... }:
 
 {
   xsession = {
-    enable =true;
+    enable = true;
 
     initExtra = ''
       ${pkgs.sxhkd}/bin/sxhkd &
@@ -13,9 +13,9 @@
       command = "${pkgs.bspwm}/bspwm &";
       bspwm = {
         extraConfig = ''
-            bspc subscribe all > ~/bspc-report.log &
+          bspc subscribe all > ~/bspc-report.log &
         '';
-        startupPrograms = ["${pkgs.polybar}/bin/polybar top &" "${pkgs.sxhkd}/sxhkd &"];
+        startupPrograms = [ "${pkgs.polybar}/bin/polybar top &" "${pkgs.sxhkd}/sxhkd &" ];
         monitors = {
           "" = [ "web" "terminal" "III" "IV" ];
         };
