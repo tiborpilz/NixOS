@@ -22,7 +22,6 @@
       firefox
       dmenu
       direnv
-      haskellPackages.Agda
     ];
   };
 
