@@ -7,6 +7,7 @@ with lib;
     # (modulesPath + "/nixos/modules/virtualisation/qemu-vm.nix")
     ./services/tandoor.nix
     ./services/paperless-ng.nix
+    ./services/homeassistant.nix
     ./services/media/media.nix
   ];
 
