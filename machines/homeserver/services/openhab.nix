@@ -4,19 +4,8 @@ let
   port = "8080";
   root_dir = "/var/lib/openhab";
 
-
-
-
-  flattenAttrset = set: prefix: separator:
-    let
-      flattenOuter = list: foldr (curr: acc: curr // acc) {} list;
-      flattenInner = set: foldr (curr: acc: curr // acc) {} set;
-      innerMapper = n: v: path: { "${path}${separator}${n}" = v; };
-      outerMapper = outer_n: outer_v: flattenInner (mapAttrsToList (n: v: innerMapper n v "${prefix}${outer_n}") outer_v);
-    in
-      flattenOuter (mapAttrsToList outerMapper set);
-
-
+  prefix = "org.openhab.";
+  separator = ".";
 
   generateConfigScript = cfg:
   let
@@ -57,6 +46,10 @@ let
       };
       runtime = {
         "org.openhab.i18n:language" = "en";
+        "org.openhab.i18n:region" = "DE";
+        "org.openhab.i18n:timezone" = "Europe/Berlin";
+        "org.openhab.i18n:location" = "52.51412793706504,13.479124903678896[52]";
+        "org.openhab.i18n:measurementSystem" = "Metric";
       };
     };
   };

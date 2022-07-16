@@ -7,10 +7,10 @@ with lib;
     # (modulesPath + "/nixos/modules/profiles/qemu-guest.nix")
     # (modulesPath + "/nixos/modules/virtualisation/qemu-vm.nix")
     # ./services/tandoor.nix
-    ./services/paperless-ng.nix
+    # ./services/paperless-ng.nix
     # ./services/homeassistant.nix
     ./services/openhab.nix
-    ./services/media/media.nix
+    # ./services/media/media.nix
   ];
 
   config = {
