@@ -14,13 +14,6 @@ with lib;
   ];
 
   config = {
-    # virtualisation.memorySize = 32768;
-    # virtualisation.cores = 8;
-    # virtualisation.diskSize = 32768;
-
-    # virtualisation.qemu = {
-    #   networkingOptions = [ "-nic bridge,br=virbr0,model=virtio-net-pci" ];
-    # };
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
 
