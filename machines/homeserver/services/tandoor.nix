@@ -16,7 +16,7 @@ in
     '';
 
     podgroups.pods.tandoor = {
-      port = "8080:8080";
+      port = "8285:8080";
 
       containers.db = {
         image = "postgres:13";

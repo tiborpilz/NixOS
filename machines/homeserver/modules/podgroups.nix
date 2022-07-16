@@ -92,6 +92,5 @@ in
     {
       virtualisation.oci-containers.containers = (mkContainers cfg.pods);
     }
-    # { virtualisation.oci-containers.containers = (mkContainers cfg.pods); }
   ]);
 }
