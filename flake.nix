@@ -25,9 +25,15 @@
       homeserver = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          (builtins.toPath "${nixpkgs}/nixos/modules/profiles/qemu-guest.nix")
-          (builtins.toPath "${nixpkgs}/nixos/modules/virtualisation/qemu-vm.nix")
+          # (builtins.toPath "${nixpkgs}/nixos/modules/profiles/qemu-guest.nix")
+          # (builtins.toPath "${nixpkgs}/nixos/modules/virtualisation/qemu-vm.nix")
           ./machines/homeserver/configuration.nix
+        ];
+      };
+      ideapad = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./machines/ideapad/configuration.nix
         ];
       };
     };
