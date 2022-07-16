@@ -4,31 +4,49 @@ let
   port = "8080";
   root_dir = "/var/lib/openhab";
 
-  serialize_list = list: seperator: concatStrings (intersperse seperator list);
-  serialize_value = v:
-    if isList v then serialize_list v ", " else
-    if isString v then v else
-    throw "invalid value type";
-  serialize_entry = k: v: "${k} = ${serialize_value v}";
-  serialize_set = set: concatStrings (intersperse "\n" (mapAttrsToList (k: v: serialize_entry k v) set));
-  get_files = folder: mapAttrsToList (k: v: { name = "${k}.cfg"; content = (serialize_set v); }) folder;
-  get_folders = cfg: mapAttrsToList (k: v: { name = "${k}"; files = (get_files v); }) cfg;
 
-  file_script = file: target: ''
-    echo '${file.content}' > '${target}/${file.name}'
-  '';
 
-  folder_script = folder:
-    let target = "${root_dir}/conf/${folder.name}";
+
+  flattenAttrset = set: prefix: separator:
+    let
+      flattenOuter = list: foldr (curr: acc: curr // acc) {} list;
+      flattenInner = set: foldr (curr: acc: curr // acc) {} set;
+      innerMapper = n: v: path: { "${path}${separator}${n}" = v; };
+      outerMapper = outer_n: outer_v: flattenInner (mapAttrsToList (n: v: innerMapper n v "${prefix}${outer_n}") outer_v);
+    in
+      flattenOuter (mapAttrsToList outerMapper set);
+
+
+
+  generateConfigScript = cfg:
+  let
+    serialize_list = list: seperator: concatStrings (intersperse seperator list);
+
+    serialize_value = v:
+      if isList v then serialize_list v ", " else
+      if isString v then v else
+      throw "invalid value type";
+
+    serialize_entry = k: v: "${k} = ${serialize_value v}";
+    serialize_set = set: concatStrings (intersperse "\n" (mapAttrsToList (k: v: serialize_entry k v) set));
+    get_files = folder: mapAttrsToList (k: v: { name = "${k}.cfg"; content = (serialize_set v); }) folder;
+    get_folders = cfg: mapAttrsToList (k: v: { name = "${k}"; files = (get_files v); }) cfg;
+
+    file_script = file: target: ''
+      echo '${file.content}' > '${target}/${file.name}'
+    '';
+
+    folder_script = folder:
+      let target = "${root_dir}/conf/${folder.name}";
+      in
+      ''
+        mkdir -p ${target}
+        ${serialize_list (map (file: file_script file target) folder.files) "\n"}
+      '';
   in
-  ''
-    mkdir -p ${target}
-    ${serialize_list (map (file: file_script file target) folder.files) "\n"}
-  '';
-
-  config_script = cfg: ''
-    ${serialize_list (map (folder: folder_script folder) (get_folders cfg)) "\n"}
-  '';
+    ''
+      ${serialize_list (map (folder: folder_script folder) (get_folders cfg)) "\n"}
+    '';
 
   openhab_cfg = {
     services = {
@@ -44,7 +62,7 @@ let
   };
 in
 {
-  system.activationScripts.createOpenhabConfig = stringAfter [ "var" ] (config_script openhab_cfg);
+  system.activationScripts.createOpenhabConfig = stringAfter [ "var" ] (generateConfigScript openhab_cfg);
   virtualisation.oci-containers.containers.openhab = {
     ports = [  "${port}:${port}" ];
     image = "openhab/openhab";
