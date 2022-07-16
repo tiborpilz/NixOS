@@ -11,10 +11,6 @@ in
   ];
 
   config = {
-    system.activationScripts.makeTandoorDir = stringAfter [ "var" ] ''
-      mkdir -p /var/lib/paperless/{staticfiles,mediafiles}
-    '';
-
     podgroups.pods.paperless = {
       port = "8010:8000";
 
@@ -35,6 +31,10 @@ in
       containers.webserver = {
         image = "jonaswinkler/paperless-ng:latest";
         dependsOn = [ "db" "broker" ];
+        volumes = [
+          "paperless_data:/usr/src/paperless/data"
+          "paperless_media:/usr/src/paperless/media"
+        ];
         environment = {
           "PAPERLESS_REDIS" = "redis://localhost:6379";
           "PAPERLESS_DBHOST" = "localhost";
