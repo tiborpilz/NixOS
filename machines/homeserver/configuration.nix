@@ -16,16 +16,12 @@ with lib;
   ];
 
   config = {
-    sops.defaultSopsFile = "../../secrets/pia.yaml";
+    sops.defaultSopsFile = secrets/example.yaml;
     sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-    sops.secrets.pia_user = {
-      format = "yaml";
-      sopsFile = ../../secrets/pia.yaml;
-    };
-    sops.secrets.pia_password = {
-      format = "yaml";
-      sopsFile = ../../secrets/pia.yaml;
-    };
+    sops.age.keyFile = "/var/lib/sops-nix/key.txt";
+    sops.age.generateKey = true;
+    sops.secrets.pia_user = {};
+    sops.secrets.pia_pass = {};
 
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
