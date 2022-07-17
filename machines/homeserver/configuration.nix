@@ -4,10 +4,12 @@ with lib;
 {
   imports = [
     ./hardware-configuration.nix
+    ./wireguard.nix
     # (modulesPath + "/nixos/modules/profiles/qemu-guest.nix")
     # (modulesPath + "/nixos/modules/virtualisation/qemu-vm.nix")
-    # ./services/tandoor.nix
-    ./services/openhab.nix
+    # ./modules/argoWeb.nix
+    ./services/tandoor.nix
+    # ./services/openhab.nix
     ./services/paperless-ng.nix
     # ./services/homeassistant.nix
     ./services/media/media.nix
@@ -23,9 +25,37 @@ with lib;
     networking.useDHCP = false;
     networking.interfaces.enp3s0.useDHCP = false;
     networking.interfaces.wlp4s0.useDHCP = false;
+
+    # services.xserver.enable = true;
+
+    # services.xserver.displayManager.sddm.enable = true;
+    # services.xserver.desktopManager.plasma5.enable = true;
+
+    networking.interfaces.wlp4s0.ipv4.addresses = [ {
+      address = "192.168.2.66";
+      prefixLength = 24;
+    } ];
+
+    networking.wg-quick.interfaces = {
+      wg0 = {
+        address = [ "10.0.0.2/24" "fdc9:281f:04d7:9ee9::2/64" ];
+        dns = [ "10.0.0.1" "fdc9:281f:04d7:9ee9::1" ];
+        privateKeyFile = "/var/lib/wireguard/private.key";
+
+        peers = [
+          {
+            publicKey = "QzJm9puVez50UZbCUAJYZnqBdW19o1tBU0Q/WXZsbyw=";
+            allowedIPs = [ "0.0.0.0/0" "::/0" ];
+            endpoint = "159.69.194.44:51820";
+            persistentKeepalive = 25;
+          }
+        ];
+      };
+    };
+
     networking.useNetworkd = false;
 
-    networking.firewall.enable = false;
+    # networking.firewall.enable = false;
 
     networking.networkmanager.enable = true;
 
@@ -63,6 +93,10 @@ with lib;
     environment.systemPackages = with pkgs; [
       tmux
       vim
+      wireguard-tools
+      partition-manager
+      gparted
+      hdparm
     ];
 
     users.extraUsers.root.password = "";
@@ -77,6 +111,14 @@ with lib;
 
     virtualisation.oci-containers.backend = "podman";
     system.stateVersion = "22.05";
+    nixpkgs.config.allowUnfree = true;
+
+    services.caddy = {
+      enable = true;
+      virtualHosts."tandoor.tiborpilz.xyz".extraConfig = ''
+        reverse_proxy http://localhost:8285
+      '';
+    };
 
   };
 }
