@@ -61,9 +61,15 @@
 
 
   # Enable the Plasma 5 Desktop Environment.
-  # services.xserver.displayManager.sddm.enable = true;
-  # services.xserver.desktopManager.plasma5.enable = true;
-  
+  services.xserver.displayManager.sddm.enable = true;
+  services.xserver.desktopManager.plasma5.enable = true;
+
+  users.users.tibor = {
+    uid = 1000;
+    extraGroups = [ "wheel" ];
+    isNormalUser = true;
+    password = "password";
+  };
 
   # Configure keymap in X11
   # services.xserver.layout = "us";
@@ -93,6 +99,8 @@
     firefox
     k3s
     tmux
+    gparted
+    partition-manager
   ];
 
   virtualisation.docker.enable = true;

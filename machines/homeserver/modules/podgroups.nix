@@ -26,15 +26,16 @@ let
   recursiveMergeAttrs = listOfAttrsets:
     lib.fold (attrset: acc: lib.recursiveUpdate attrset acc) { } listOfAttrsets;
 
-  mkDb = db: {
-    image = "postgres";
-    environment = {
-      "POSTGRES_USER" = if hasAttr "user" db then db.user else "postgres";
-      "POSTGRES_PASSWORD" =
-        if hasAttr "password" db then db.password else "postgres";
-      "POSTGRES_DB" = if hasAttr "db" db then db.db else "postgres";
-    };
-  };
+  # TODO: Decide whether to use db-as-option for podgroups
+  # mkDb = db: {
+  #   image = "postgres";
+  #   environment = {
+  #     "POSTGRES_USER" = if hasAttr "user" db then db.user else "postgres";
+  #     "POSTGRES_PASSWORD" =
+  #       if hasAttr "password" db then db.password else "postgres";
+  #     "POSTGRES_DB" = if hasAttr "db" db then db.db else "postgres";
+  #   };
+  # };
 
   mkService = name: pod: {
     serviceConfig.Type = "oneshot";
