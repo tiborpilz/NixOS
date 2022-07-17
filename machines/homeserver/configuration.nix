@@ -1,9 +1,8 @@
 { pkgs, lib, config, modulesPath, ... }:
-
 with lib;
 {
   imports = [
-    <sops-nix/modules/sops>
+    # <sops-nix/modules/sops>
     ./hardware-configuration.nix
     ./wireguard.nix
     # (modulesPath + "/nixos/modules/profiles/qemu-guest.nix")
@@ -17,9 +16,13 @@ with lib;
   ];
 
   config = {
-    sops.defaultSopsFile = "../../secrets/sops.yaml";
+    sops.defaultSopsFile = "../../secrets/pia.yaml";
     sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-    sops.secrets.pia = {
+    sops.secrets.pia_user = {
+      format = "yaml";
+      sopsFile = ../../secrets/pia.yaml;
+    };
+    sops.secrets.pia_password = {
       format = "yaml";
       sopsFile = ../../secrets/pia.yaml;
     };
