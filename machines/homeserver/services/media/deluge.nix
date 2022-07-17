@@ -23,8 +23,8 @@ in
     ];
     environment = {
       "VPN_ENABLED" = "yes";
-      "VPN_USER" = "p4147401";
-      "VPN_PASS" = "D!0n4r4p23";
+      "VPN_USER" = config.sops.secrets.pia.user;
+      "VPN_PASS" = config.sops.secrets.pia.password;
       "VPN_PROV" = "pia";
       "VPN_CLIENT" = "wireguard";
       "STRICT_PORT_FORWARD" = "yes";
