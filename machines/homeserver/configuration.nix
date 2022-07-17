@@ -3,6 +3,7 @@
 with lib;
 {
   imports = [
+    <sops-nix/modules/sops>
     ./hardware-configuration.nix
     ./wireguard.nix
     # (modulesPath + "/nixos/modules/profiles/qemu-guest.nix")
@@ -16,6 +17,13 @@ with lib;
   ];
 
   config = {
+    sops.defaultSopsFile = "../../secrets/sops.yaml";
+    sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    sops.secrets.pia = {
+      format = "yaml";
+      sopsFile = ../../secrets/pia.yaml;
+    };
+
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
 
@@ -31,10 +39,10 @@ with lib;
     # services.xserver.displayManager.sddm.enable = true;
     # services.xserver.desktopManager.plasma5.enable = true;
 
-    networking.interfaces.wlp4s0.ipv4.addresses = [ {
+    networking.interfaces.wlp4s0.ipv4.addresses = [{
       address = "192.168.2.66";
       prefixLength = 24;
-    } ];
+    }];
 
     networking.wg-quick.interfaces = {
       wg0 = {

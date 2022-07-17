@@ -1,0 +1,11 @@
+keys:
+  - &tibor age1gzf883y8p0wfy5yjn5l3l2axnqxdgtw2zdcp8jqsrk65m7gf6y6qzgkf63
+  - &server_homeserver age1xjx03xm8yqmnykcy6hdgtpxadhurtgd4r8vhtwsf2pks3zxsgafsycs5tq
+  - &server_edge age1lqnlkxfkrfgctj22aj7qy02eyl696rtkaautwsuzwtp96ryp290s3drpx2
+creation_rules:
+  - path_regex: secrets/[^/]+\.yaml$
+    key_groups:
+      - age:
+          - *tibor
+          - *server_homeserver
+          - *server_edge
