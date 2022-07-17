@@ -16,7 +16,7 @@ in
 
       containers.db = {
         image = "postgres:13";
-        volumes = [ "pgdata:/var/lib/postgresql/data" ];
+        volumes = [ "paperless-pgdata:/var/lib/postgresql/data" ];
         environment = {
           "POSTGRES_DB" = db_db;
           "POSTGRES_USER" = db_user;

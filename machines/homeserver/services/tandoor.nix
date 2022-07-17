@@ -20,7 +20,7 @@ in
 
       containers.db = {
         image = "postgres:13";
-        volumes = [ "pgdata:/var/lib/postgresql/data" ];
+        volumes = [ "tandoor-pgdata:/var/lib/postgresql/data" ];
         environment = {
           "POSTGRES_DB" = db_db;
           "POSTGRES_USER" = db_user;
@@ -29,7 +29,7 @@ in
       };
 
       containers.tandoor = {
-        image = "vabene1111/recipes:1.2.6";
+        image = "vabene1111/recipes:1.3.2";
         environment = {
           "SECRET_KEY" = "secretkey";
           "DB_ENGINE" = "django.db.backends.postgresql";
