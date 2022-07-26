@@ -5,6 +5,14 @@
   ];
 
   boot.cleanTmpDir = true;
+
+  boot.kernelModules = [
+    "iptable_nat"
+    "iptable_filter"
+    "xt_nat"
+    "ipt_dnat"
+  ];
+
   zramSwap.enable = true;
   networking.hostName = "nix-edge";
   services.openssh.enable = true;
@@ -21,19 +29,28 @@
   nixpkgs.config.allowUnfree = true;
 
 
-  # Enable NAT
-  # networking.nat = {
-  #   enable = true;
-  #   enableIPv6 = true;
-  #   externalInterface = "eth0";
-  #   internalInterfaces = [ "wg0" ];
-  # };
+  #Enable NAT
+  networking.nat = {
+    enable = true;
+    enableIPv6 = true;
+    externalInterface = "enp1s0";
+    internalInterfaces = [ "wg0" ];
+    forwardPorts = [
+      { sourcePort = 80; destination = "10.0.0.2:8285"; proto = "tcp"; }
+      # { sourcePort = 443; destination = "10.0.0.2:8285"; proto = "tcp"; }
+    ];
+    internalIPs = [ "10.0.0.1/24" ];
+  };
   # Open ports in the firewall
-  networking.firewall.enable = false;
-  # networking.firewall = {
-  #   allowedTCPPorts = [ 53 80 ];
-  #   allowedUDPPorts = [ 53 51820 ];
-  # };
+  networking.firewall = {
+    enable = true;
+    allowPing = true;
+    logRefusedConnections = true;
+    rejectPackets = false;
+    allowedTCPPorts = [ 53 80 ];
+    allowedUDPPorts = [ 53 51820 ];
+    trustedInterfaces = [ "wg0" ];
+  };
   networking.wg-quick.interfaces = {
     # "wg0" is the network interface name. You can name the interface arbitrarily.
     wg0 = {
@@ -45,20 +62,20 @@
       privateKeyFile = "/var/lib/wireguard/private.key";
 
       # This allows the wireguard server to route your traffic to the internet and hence be like a VPN
-      # postUp = ''
-      #   ${pkgs.iptables}/bin/iptables -A FORWARD -i wg0 -j ACCEPT
-      #   ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 10.0.0.1/24 -o eth0 -j MASQUERADE
-      #   ${pkgs.iptables}/bin/ip6tables -A FORWARD -i wg0 -j ACCEPT
-      #   ${pkgs.iptables}/bin/ip6tables -t nat -A POSTROUTING -s fdc9:281f:04d7:9ee9::1/64 -o eth0 -j MASQUERADE
-      # '';
+      postUp = ''
+        ${pkgs.iptables}/bin/iptables -A FORWARD -i wg0 -j ACCEPT
+        ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 10.0.0.1/24 -o enp1s0 -j MASQUERADE
+        ${pkgs.iptables}/bin/ip6tables -A FORWARD -i wg0 -j ACCEPT
+        ${pkgs.iptables}/bin/ip6tables -t nat -A POSTROUTING -s fdc9:281f:04d7:9ee9::1/64 -o enp1s0 -j MASQUERADE
+      '';
 
       # Undo the above
-      # preDown = ''
-      #   ${pkgs.iptables}/bin/iptables -D FORWARD -i wg0 -j ACCEPT
-      #   ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.0.0.1/24 -o eth0 -j MASQUERADE
-      #   ${pkgs.iptables}/bin/ip6tables -D FORWARD -i wg0 -j ACCEPT
-      #   ${pkgs.iptables}/bin/ip6tables -t nat -D POSTROUTING -s fdc9:281f:04d7:9ee9::1/64 -o eth0 -j MASQUERADE
-      # '';
+      preDown = ''
+        ${pkgs.iptables}/bin/iptables -D FORWARD -i wg0 -j ACCEPT
+        ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.0.0.1/24 -o enp1s0 -j MASQUERADE
+        ${pkgs.iptables}/bin/ip6tables -D FORWARD -i wg0 -j ACCEPT
+        ${pkgs.iptables}/bin/ip6tables -t nat -D POSTROUTING -s fdc9:281f:04d7:9ee9::1/64 -o enp1s0 -j MASQUERADE
+      '';
 
       peers = [
         { # peer0
@@ -76,10 +93,10 @@
     '';
   };
 
-  services.caddy = {
-    enable = true;
-    virtualHosts."*.tiborpilz.xyz".extraConfig = ''
-      reverse_proxy http://10.0.0.2:80
-    '';
-  };
+  # services.caddy = {
+  #   enable = true;
+  #   virtualHosts."*.tiborpilz.xyz".extraConfig = ''
+  #     reverse_proxy http://10.0.0.2:80
+  #   '';
+  # };
 }

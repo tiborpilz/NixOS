@@ -4,7 +4,6 @@ with lib;
   imports = [
     # <sops-nix/modules/sops>
     ./hardware-configuration.nix
-    ./wireguard.nix
     # (modulesPath + "/nixos/modules/profiles/qemu-guest.nix")
     # (modulesPath + "/nixos/modules/virtualisation/qemu-vm.nix")
     # ./modules/argoWeb.nix
@@ -13,10 +12,11 @@ with lib;
     ./services/paperless-ng.nix
     # ./services/homeassistant.nix
     ./services/media/media.nix
+    # ./services/samba.nix
   ];
 
   config = {
-    sops.defaultSopsFile = secrets/example.yaml;
+    sops.defaultSopsFile = secrets/secrets.yaml;
     sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
     sops.age.keyFile = "/var/lib/sops-nix/key.txt";
     sops.age.generateKey = true;
@@ -39,7 +39,7 @@ with lib;
     # services.xserver.desktopManager.plasma5.enable = true;
 
     networking.interfaces.wlp4s0.ipv4.addresses = [{
-      address = "192.168.2.66";
+      address = "192.168.2.68";
       prefixLength = 24;
     }];
 
@@ -60,7 +60,7 @@ with lib;
       };
     };
 
-    networking.useNetworkd = false;
+    # networking.useNetworkd = false;
 
     # networking.firewall.enable = false;
 
@@ -104,6 +104,7 @@ with lib;
       partition-manager
       gparted
       hdparm
+      python3
     ];
 
     users.extraUsers.root.password = "";
