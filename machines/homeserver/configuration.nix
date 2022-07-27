@@ -11,7 +11,7 @@ with lib;
     ./services/paperless-ng.nix
     # ./services/homeassistant.nix
     # ./services/media/media.nix
-    # ./services/samba.nix
+    ./services/samba.nix
   ];
 
   config = {
