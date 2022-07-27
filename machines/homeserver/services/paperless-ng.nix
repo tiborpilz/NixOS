@@ -1,6 +1,7 @@
 { config, lib, pkgs, ... }:
 with lib;
 let
+  public_port = 8010;
   db_user = "paperless";
   db_password = "paperless";
   db_db = "paperless";
@@ -8,11 +9,12 @@ in
 {
   imports = [
     ../modules/podgroups.nix
+    ../modules/reverseProxy.nix
   ];
 
   config = {
     podgroups.pods.paperless = {
-      port = "8010:8000";
+      port = "${toString public_port}:8000";
 
       containers.db = {
         image = "postgres:13";
@@ -58,5 +60,6 @@ in
         image = "apache/tika";
       };
     };
+    reverseProxy.proxies.paperless.publicPort = public_port;
   };
 }

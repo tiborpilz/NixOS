@@ -3,13 +3,14 @@ with lib;
 {
   imports = [
     ./hardware-configuration.nix
+    ./modules/reverseProxy.nix
     # (modulesPath + "/nixos/modules/profiles/qemu-guest.nix")
     # (modulesPath + "/nixos/modules/virtualisation/qemu-vm.nix")
     ./services/tandoor.nix
     # ./services/openhab.nix
     ./services/paperless-ng.nix
     # ./services/homeassistant.nix
-    ./services/media/media.nix
+    # ./services/media/media.nix
     # ./services/samba.nix
   ];
 
@@ -115,12 +116,14 @@ with lib;
     system.stateVersion = "22.05";
     nixpkgs.config.allowUnfree = true;
 
-    services.caddy = {
-      enable = true;
+    # services.caddy = {
+    #   enable = true;
+    #   email = "tibor@pilz.berlin";
+    # };
+
+    reverseProxy = {
+      hostname = "tiborpilz.xyz";
       email = "tibor@pilz.berlin";
-      virtualHosts."tandoor.tiborpilz.xyz".extraConfig = ''
-        reverse_proxy http://localhost:8285
-      '';
     };
   };
 }

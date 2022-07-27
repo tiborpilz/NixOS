@@ -1,6 +1,7 @@
 { config, lib, pkgs, ... }:
 with lib;
 let
+  public_port = 8285;
   db_user = "tandoor";
   db_password = "tandoor";
   db_db = "tandoor";
@@ -8,6 +9,7 @@ in
 {
   imports = [
     ../modules/podgroups.nix
+    ../modules/reverseProxy.nix
   ];
 
   config = {
@@ -16,7 +18,7 @@ in
     '';
 
     podgroups.pods.tandoor = {
-      port = "8285:8080";
+      port = "${toString public_port}:8080";
 
       containers.db = {
         image = "postgres:13";
@@ -45,5 +47,6 @@ in
         ];
       };
     };
+    reverseProxy.proxies.tandoor.publicPort = public_port;
   };
 }
