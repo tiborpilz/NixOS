@@ -29,7 +29,7 @@ in
       };
 
       containers.tandoor = {
-        image = "vabene1111/recipes:1.3.2";
+        image = "vabene1111/recipes:0.16.8";
         environment = {
           "SECRET_KEY" = "secretkey";
           "DB_ENGINE" = "django.db.backends.postgresql";
