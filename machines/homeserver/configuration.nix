@@ -2,11 +2,9 @@
 with lib;
 {
   imports = [
-    # <sops-nix/modules/sops>
     ./hardware-configuration.nix
     # (modulesPath + "/nixos/modules/profiles/qemu-guest.nix")
     # (modulesPath + "/nixos/modules/virtualisation/qemu-vm.nix")
-    # ./modules/argoWeb.nix
     ./services/tandoor.nix
     # ./services/openhab.nix
     ./services/paperless-ng.nix
@@ -32,11 +30,6 @@ with lib;
     networking.useDHCP = false;
     networking.interfaces.enp3s0.useDHCP = false;
     networking.interfaces.wlp4s0.useDHCP = false;
-
-    # services.xserver.enable = true;
-
-    # services.xserver.displayManager.sddm.enable = true;
-    # services.xserver.desktopManager.plasma5.enable = true;
 
     networking.interfaces.wlp4s0.ipv4.addresses = [{
       address = "192.168.2.68";
