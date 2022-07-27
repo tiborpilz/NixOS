@@ -62,7 +62,7 @@ with lib;
 
     # networking.useNetworkd = false;
 
-    # networking.firewall.enable = false;
+    networking.firewall.enable = false;
 
     networking.networkmanager.enable = true;
 
@@ -92,6 +92,7 @@ with lib;
     fileSystems = {
       "/".label = "nixos-root";
     };
+
     services.qemuGuest.enable = true;
 
     services.openssh.enable = true;
@@ -123,10 +124,10 @@ with lib;
 
     services.caddy = {
       enable = true;
+      email = "tibor@pilz.berlin";
       virtualHosts."tandoor.tiborpilz.xyz".extraConfig = ''
         reverse_proxy http://localhost:8285
       '';
     };
-
   };
 }
