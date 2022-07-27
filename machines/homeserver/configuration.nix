@@ -10,7 +10,7 @@ with lib;
     # ./services/openhab.nix
     ./services/paperless-ng.nix
     # ./services/homeassistant.nix
-    # ./services/media/media.nix
+    ./services/media/media.nix
     ./services/samba.nix
   ];
 
@@ -19,8 +19,6 @@ with lib;
     sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
     sops.age.keyFile = "/var/lib/sops-nix/key.txt";
     sops.age.generateKey = true;
-    sops.secrets.pia_user = {};
-    sops.secrets.pia_pass = {};
 
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;

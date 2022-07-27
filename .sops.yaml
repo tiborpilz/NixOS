@@ -3,9 +3,15 @@ keys:
   - &server_homeserver age1xjx03xm8yqmnykcy6hdgtpxadhurtgd4r8vhtwsf2pks3zxsgafsycs5tq
   - &server_edge age1lqnlkxfkrfgctj22aj7qy02eyl696rtkaautwsuzwtp96ryp290s3drpx2
 creation_rules:
-  - path_regex: secrets/[^/]+\.yaml$
+  - path_regex: secrets/[^/]+$
     key_groups:
       - age:
           - *tibor
           - *server_homeserver
           - *server_edge
+  # - path_regex: secrets/[^/]+\.env$
+  #   key_groups:
+  #     - age:
+  #         - *tibor
+  #         - *server_homeserver
+  #         - *server_edge
