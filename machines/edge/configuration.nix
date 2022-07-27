@@ -36,8 +36,8 @@
     externalInterface = "enp1s0";
     internalInterfaces = [ "wg0" ];
     forwardPorts = [
-      { sourcePort = 80; destination = "10.0.0.2:8285"; proto = "tcp"; }
-      # { sourcePort = 443; destination = "10.0.0.2:8285"; proto = "tcp"; }
+      { sourcePort = 80; destination = "10.0.0.2:80"; proto = "tcp"; }
+      { sourcePort = 443; destination = "10.0.0.2:443"; proto = "tcp"; }
     ];
     internalIPs = [ "10.0.0.1/24" ];
   };
