@@ -7,6 +7,7 @@ with lib;
     ./plex.nix
     ./deluge.nix
     ./jackett.nix
+    ./flaresolverr.nix
   ];
 
   config = {
