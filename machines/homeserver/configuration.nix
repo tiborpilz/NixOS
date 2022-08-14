@@ -114,14 +114,14 @@ with lib;
     system.stateVersion = "22.05";
     nixpkgs.config.allowUnfree = true;
 
-    # services.caddy = {
-    #   enable = true;
-    #   email = "tibor@pilz.berlin";
-    # };
-
     reverseProxy = {
       hostname = "tiborpilz.xyz";
       email = "tibor@pilz.berlin";
+      basicAuth = {
+        enable = true;
+        username = "tibor";
+        password = "JDJhJDE0JDZBWFljZ3dkN1g4VDBMSk5NTEtxdnVibFhiNHg4UDRlL3JnOFdYLk9GWFkwb3Uwc2VKWkpP";
+      };
     };
   };
 }
