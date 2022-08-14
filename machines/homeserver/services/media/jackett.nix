@@ -3,6 +3,7 @@ with lib;
 
 let
   jackettConfigDir = "/var/lib/jackett/config";
+  publicPort = 9117;
 in
 {
   system.activationScripts.makejackettDir = stringAfter [ "var" ] ''
@@ -11,7 +12,7 @@ in
 
   virtualisation.oci-containers.containers.jackett = {
     image = "lscr.io/linuxserver/jackett:latest";
-    ports = [ "9117:9117" ];
+    ports = [ "${toString publicPort}:9117" ];
     volumes = [
       "${jackettConfigDir}:/config"
       "/data/media/tv:/tv"
@@ -21,4 +22,5 @@ in
       "TZ" = "Europe/Berlin";
     };
   };
+  reverseProxy.proxies.jackett.publicPort = publicPort;
 }

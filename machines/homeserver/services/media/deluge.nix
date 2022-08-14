@@ -3,6 +3,7 @@ with lib;
 
 let
   delugeConfigDir = "/var/lib/deluge/config";
+  publicPort = 8112;
 in
 {
   system.activationScripts.makeDelugeDir = stringAfter [ "var" ] ''
@@ -26,7 +27,7 @@ in
   virtualisation.oci-containers.containers.deluge = {
     image = "binhex/arch-delugevpn:latest";
     ports = [
-      "8112:8112"
+      "${toString publicPort}:8112"
       "8118:8118"
       "58846:58846"
       "59846:58946"
@@ -55,4 +56,5 @@ in
       "--privileged=true"
     ];
   };
+  reverseProxy.proxies.deluge.publicPort = publicPort;
 }

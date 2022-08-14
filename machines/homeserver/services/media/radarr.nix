@@ -3,6 +3,7 @@ with lib;
 
 let
   radarrConfigDir = "/var/lib/radarr/config";
+  publicPort = 7878;
 in
 {
   system.activationScripts.makeradarrDir = stringAfter [ "var" ] ''
@@ -11,7 +12,7 @@ in
 
   virtualisation.oci-containers.containers.radarr = {
     image = "lscr.io/linuxserver/radarr:latest";
-    ports = [ "7878:7878" ];
+    ports = [ "${toString publicPort}:7878" ];
     volumes = [
       "${radarrConfigDir}:/config"
       "/data/media/movies:/movies"
@@ -23,4 +24,5 @@ in
       "PGID" = "0";
     };
   };
+  reverseProxy.proxies.radarr.publicPort = publicPort;
 }
