@@ -33,7 +33,7 @@ in
       "59846:58946"
     ];
     volumes = [
-      "/data/downloads:/data"
+      "/data/downloads:/downloads"
       "${delugeConfigDir}:/config"
     ];
     environment = {
