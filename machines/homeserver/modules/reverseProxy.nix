@@ -11,6 +11,12 @@ let
         description = "Public port";
         example = 8001;
       };
+      auth = mkOption {
+        type = types.bool;
+        description = "Enable authentication";
+        example = true;
+        default = true;
+      };
     };
   };
 
@@ -35,7 +41,8 @@ let
     };
   };
 
-  mkProxyConfig = port: enableauth: username: password: {
+  mkProxyConfig = port: enableauth: username: password: host: {
+    serverAliases = [ "http://${host}" ];
     extraConfig = if enableauth then ''
       reverse_proxy http://localhost:${toString port}
       basicauth /* bcrypt {
@@ -87,10 +94,13 @@ in
     services.caddy = mkIf (cfg.proxies != { }) (mkMerge [
       {
         virtualHosts = mapAttrs'
-          (n: v: nameValuePair "${n}.${cfg.hostname}" (mkProxyConfig v.publicPort cfg.basicAuth.enable cfg.basicAuth.username cfg.basicAuth.password))
+          (n: v: nameValuePair "${n}.${cfg.hostname}" (mkProxyConfig v.publicPort (cfg.basicAuth.enable && v.auth) cfg.basicAuth.username cfg.basicAuth.password "${n}.${cfg.hostname}"))
           cfg.proxies;
         enable = true;
         email = cfg.email;
+        globalConfig = ''
+          auto_https disable_redirects
+        '';
       }
     ]);
   };
