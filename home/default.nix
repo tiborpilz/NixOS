@@ -20,4 +20,6 @@ with lib.my;
   modules.shell.gnupg.enable = true;
   modules.shell.git.enable = true;
   modules.shell.direnv.enable = true;
+
+  modules.editors.neovim.enable = true;
 }
