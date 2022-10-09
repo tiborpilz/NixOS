@@ -1,4 +1,7 @@
 { config, lib, pkgs, ... }:
+let
+  cfg = config.services.samba;
+in
 {
   networking.firewall.allowedTCPPorts = [ 5357 ];
   networking.firewall.allowedUDPPorts = [ 3702 ];

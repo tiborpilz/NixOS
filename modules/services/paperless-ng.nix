@@ -1,14 +1,20 @@
 { config, lib, pkgs, ... }:
 with lib;
+with lib.my;
 let
   publicPort = 8010;
   db_user = "paperless";
   db_password = "paperless";
   db_db = "paperless";
+  cfg = config.services.paperless;
 in
 {
-  config = {
-    podgroups.pods.paperless = {
+  options.services.paperless-ng = {
+    enable = mkBoolOpt false;
+  };
+
+  config = mkIf cfg.enable {
+    podgroups.pods.paperless-ng = {
       port = "${toString publicPort}:8000";
 
       containers.db = {
