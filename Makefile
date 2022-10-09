@@ -3,3 +3,6 @@ deploy_homeserver:
 
 deploy_edge:
 	nix run nixpkgs#nixos-rebuild -- switch --flake .#edge --target-host root@159.69.194.44 --build-host localhost
+
+homemanager:
+	home-manager switch --flake .#tibor

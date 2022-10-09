@@ -5,14 +5,6 @@ with lib.my;
 
 {
   imports = mapModulesRec' (toString ./modules) import;
-  #   (
-  #     import ./editors/emacs.nix (
-  #       args
-  #       // { inherit inputs; }
-  #     )
-  #   )
-  #   ./shell/zsh.nix
-  # ];
 
   home.username = "tibor";
   home.homeDirectory = "/home/tibor";
@@ -24,4 +16,5 @@ with lib.my;
   programs.man.enable = false;
 
   modules.shell.zsh.enable = true;
+  modules.shell.tmux.enable = true;
 }
