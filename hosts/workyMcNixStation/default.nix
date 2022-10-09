@@ -42,21 +42,12 @@
     };
   };
 
-  users = {
-    users = {
-      root.hashedPassword = "$1$randomsa$.3CDKHCqAQfgg3uJ4Ra600";
-      tibor = {
-        isNormalUser = true;
-        hashedPassword = "$1$randomsa$.3CDKHCqAQfgg3uJ4Ra600";
-        home = "/home/tibor";
-        createHome = true;
-        extraGroups = [
-          "wheel"
-          "libvirtd"
-        ];
-        shell = pkgs.zsh;
-      };
-    };
+  users.extraUsers.root.password = "";
+  users.users.tibor = {
+    uid = 1000;
+    extraGroups = [ "wheel" ];
+    isNormalUser = true;
+    password = "password";
   };
 
   console = {
@@ -95,10 +86,12 @@
   networking.useDHCP = true;
 
   nix.package = pkgs.nixUnstable;
-  nix.allowedUsers = [ "@wheel" ];
-  nix.useSandbox = false;
+  nix.settings.allowed-users = [ "@wheel" ];
+  nix.settings.sandbox = false;
   nix.extraOptions = ''
     experimental-features = nix-command flakes
   '';
   system.stateVersion = "22.05";
+
+  modules.services.media.deluge.enable = false;
 }

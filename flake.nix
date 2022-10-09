@@ -107,7 +107,7 @@
         inherit pkgs;
 
         modules = [
-          ./home.nix
+          ./home
           { _module.args.inputs = inputs; }
         ];
       };

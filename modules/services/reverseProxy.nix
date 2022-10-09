@@ -55,6 +55,7 @@ let
 in
 {
   options.modules.services.reverseProxy = {
+    enable = mkBoolOpt false;
     hostname = mkOption {
       default = "";
       type = types.str;
@@ -91,7 +92,7 @@ in
     };
   };
 
-  config = {
+  config = mkIf cfg.enable {
     services.caddy = mkIf (cfg.proxies != { }) (mkMerge [
       {
         virtualHosts = mapAttrs'

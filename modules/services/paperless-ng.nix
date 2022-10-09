@@ -14,7 +14,7 @@ in
   };
 
   config = mkIf cfg.enable {
-    podgroups.pods.paperless-ng = {
+    modules.podgroups.pods.paperless-ng = {
       port = "${toString publicPort}:8000";
 
       containers.db = {
@@ -61,6 +61,6 @@ in
         image = "apache/tika";
       };
     };
-    services.reverseProxy.proxies.paperless.publicPort = publicPort;
+    modules.services.reverseProxy.proxies.paperless.publicPort = publicPort;
   };
 }
