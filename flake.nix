@@ -105,10 +105,13 @@
 
       homeConfigurations.tibor = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
+        inherit lib;
 
         modules = [
           ./home
-          { _module.args.inputs = inputs; }
+          {
+            _module.args.inputs = inputs;
+          }
         ];
       };
     };

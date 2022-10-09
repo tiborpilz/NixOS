@@ -1,14 +1,18 @@
-args@{ inputs, pkgs, ... }:
+args@{ inputs, pkgs, lib, ... }:
+
+with lib;
+with lib.my;
 
 {
-  imports = [
-    (
-      import ./editors/emacs.nix (
-        args
-        // { inherit inputs; }
-      )
-    )
-  ];
+  imports = mapModulesRec' (toString ./modules) import;
+  #   (
+  #     import ./editors/emacs.nix (
+  #       args
+  #       // { inherit inputs; }
+  #     )
+  #   )
+  #   ./shell/zsh.nix
+  # ];
 
   home.username = "tibor";
   home.homeDirectory = "/home/tibor";
@@ -19,4 +23,5 @@ args@{ inputs, pkgs, ... }:
   programs.home-manager.enable = true;
   programs.man.enable = false;
 
+  modules.shell.zsh.enable = true;
 }

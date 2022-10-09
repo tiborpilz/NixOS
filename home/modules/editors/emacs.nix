@@ -46,7 +46,7 @@ with lib;
       emacs-all-the-icons-fonts
     ];
 
-    home.sessionPath = [ ".config/emacs/bin" ];
+    home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
 
     # modules.shell.zsh.rcFiles = [ "${config.xdg.configHome}/emacs/aliases.zsh" ];
 
