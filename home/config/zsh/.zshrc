@@ -96,12 +96,6 @@ export GPG_TTY=$(tty)
 
 if type gfind >/dev/null; then alias find=gfind; fi
 
-# Activate direnv, if it exists
-if command -v direnv &> /dev/null
-then
-  eval "$(direnv hook zsh)"
-fi
-
 # source $HOME/.antigen/bundles/jscutlery/nx-completion-main/nx-completion.plugin.zsh
 # load nvm
 export NVM_DIR="$HOME/.nvm"
