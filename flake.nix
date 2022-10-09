@@ -27,23 +27,23 @@
         config.allowUnfree = true;
         overlays = extraOverlays ++ (lib.attrValues self.overlays);
       };
-      pkgs  = mkPkgs nixpkgs [ self.overlay ];
+      pkgs  = mkPkgs nixpkgs [ self.overlays.default ];
       pkgs' = mkPkgs nixpkgs-unstable [];
 
     in {
       lib = lib.my;
 
-      overlay =
-        final: prev: {
-          unstable = pkgs';
-          my = self.packages."${system}";
+      overlays =
+        (mapModules ./overlays import) // {
+          default = final: prev: {
+            unstable = pkgs';
+            my = self.packages."${system}";
+          };
         };
 
-      overlays =
-        mapModules ./overlays import;
-
       packages."${system}" =
-        mapModules ./packages (p: pkgs.callPackage p {});
+        (mapModules ./packages (p: pkgs.callPackage p {}))
+        // { default = pkgs.hello; };
 
       nixosModules =
         { dotfiles = import ./.; } // mapModulesRec ./modules import;
@@ -51,7 +51,7 @@
       nixosConfigurations =
         mapHosts ./hosts {};
 
-      devShell."${system}" =
+      devShells."${system}".default =
         import ./shell.nix { inherit pkgs; };
 
       # formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;
@@ -61,7 +61,7 @@
       #     modules = [
       #       (builtins.toPath "${nixpkgs}/nixos/modules/profiles/qemu-guest.nix")
       #       (builtins.toPath "${nixpkgs}/nixos/modules/virtualisation/qemu-vm.nix")
-      #       ./machines/workyMcNixStation/configuration.nix
+      #       ./hosts/workyMcNixStation
       #       home-manager.nixosModules.home-manager
       #       {
       #         home-manager.useGlobalPkgs = true;
@@ -74,21 +74,21 @@
       #   homeserver = nixpkgs.lib.nixosSystem {
       #     system = "x86_64-linux";
       #     modules = [
-      #       ./machines/homeserver/configuration.nix
+      #       ./hosts/homeserver
       #       sops-nix.nixosModules.sops
       #     ];
       #   };
       #   edge = nixpkgs.lib.nixosSystem {
       #     system = "x86_64-linux";
       #     modules = [
-      #       ./machines/edge/configuration.nix
+      #       ./hosts/edge
       #       sops-nix.nixosModules.sops
       #     ];
       #   };
       #   ideapad = nixpkgs.lib.nixosSystem {
       #     system = "x86_64-linux";
       #     modules = [
-      #       ./machines/ideapad/configuration.nix
+      #       ./hosts/ideapad
       #       sops-nix.nixosModules.sops
       #     ];
       #   };
@@ -97,7 +97,7 @@
       #     modules = [
       #       (builtins.toPath "${nixpkgs}/nixos/modules/profiles/qemu-guest.nix")
       #       (builtins.toPath "${nixpkgs}/nixos/modules/virtualisation/qemu-vm.nix")
-      #       ./machines/homeserver/configuration.nix
+      #       ./hosts/homeserver
       #       sops-nix.nixosModules.sops
       #     ];
       #   };

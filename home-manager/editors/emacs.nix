@@ -4,7 +4,7 @@
 
 { lib, pkgs, inputs, ... }:
 with lib;
-
+with import <home-manager/modules/lib/dag.nix> { inherit lib; };
 
 {
   # config = mkIf cfg.enable {

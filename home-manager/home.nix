@@ -3,7 +3,6 @@
 {
   imports = [
     ./development/default.nix
-    ./vim/default.nix
     ./zsh.nix
   ];
 

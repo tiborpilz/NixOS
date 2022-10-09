@@ -24,5 +24,5 @@ in
       "PGID" = "0";
     };
   };
-  reverseProxy.proxies.readarr.publicPort = publicPort;
+  services.reverseProxy.proxies.readarr.publicPort = publicPort;
 }

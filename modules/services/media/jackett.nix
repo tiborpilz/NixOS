@@ -22,5 +22,5 @@ in
       "TZ" = "Europe/Berlin";
     };
   };
-  reverseProxy.proxies.jackett.publicPort = publicPort;
+  services.reverseProxy.proxies.jackett.publicPort = publicPort;
 }

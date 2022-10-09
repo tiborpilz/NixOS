@@ -24,5 +24,5 @@ in
       "PGID" = "0";
     };
   };
-  reverseProxy.proxies.sonarr.publicPort = publicPort;
+  services.reverseProxy.proxies.sonarr.publicPort = publicPort;
 }
