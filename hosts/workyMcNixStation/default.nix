@@ -3,7 +3,7 @@
 {
   time.timeZone = "Europe/Berlin";
   imports = [
-    ../../desktop/default.nix
+    # ../../desktop/default.nix
     ./hardware-configuration.nix
   ];
 
