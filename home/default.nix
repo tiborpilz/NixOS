@@ -17,4 +17,6 @@ with lib.my;
 
   modules.shell.zsh.enable = true;
   modules.shell.tmux.enable = true;
+  modules.shell.gnupg.enable = true;
+  modules.shell.git.enable = true;
 }
