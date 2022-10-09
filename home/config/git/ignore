@@ -1,0 +1,3 @@
+.log/
+.gitlab-ci-local
+**/.DS_Store
