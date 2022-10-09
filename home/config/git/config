@@ -1,0 +1,32 @@
+[user]
+	email = tibor.pilz@avenga.com
+	name = Tibor Pilz
+	signingKey = 864DE3D8314DF278D11AB8DBA21B15175ABFAE70
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[core]
+  editor = vim
+
+[merge]
+	tool = diffconflicts
+[mergetool]
+  keepBackup = false
+[mergetool "diffconflicts"]
+  cmd = vim -c DiffConflicts "$MERGED" "$BASE" "$LOCAL" "$REMOTE"
+  trustExitCode = true
+[mergetool "fugitive"]
+	cmd = vim -f -c "Gvdiffsplit" "$MERGED"
+  trustExitCode = true
+[gpg]
+	program = gpg
+[commit]
+	gpgSign = false
+[author]
+	email = tibor.pilz@avenga.com
+[push]
+	default = current
+[init]
+	defaultBranch = main
