@@ -7,11 +7,6 @@ let
   db_db = "paperless";
 in
 {
-  imports = [
-    ../modules/podgroups.nix
-    ../modules/reverseProxy.nix
-  ];
-
   config = {
     podgroups.pods.paperless = {
       port = "${toString publicPort}:8000";
@@ -60,6 +55,6 @@ in
         image = "apache/tika";
       };
     };
-    reverseProxy.proxies.paperless.publicPort = publicPort;
+    services.reverseProxy.proxies.paperless.publicPort = publicPort;
   };
 }

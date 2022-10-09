@@ -7,11 +7,6 @@ let
   db_db = "tandoor";
 in
 {
-  imports = [
-    ../modules/podgroups.nix
-    ../modules/reverseProxy.nix
-  ];
-
   config = {
     system.activationScripts.makeTandoorDir = stringAfter [ "var" ] ''
       mkdir -p /var/lib/tandoor/{staticfiles,mediafiles}
@@ -47,6 +42,6 @@ in
         ];
       };
     };
-    reverseProxy.proxies.tandoor.publicPort = publicPort;
+    services.reverseProxy.proxies.tandoor.publicPort = publicPort;
   };
 }

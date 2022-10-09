@@ -2,7 +2,7 @@
 
 with lib;
 let
-  cfg = config.reverseProxy;
+  cfg = config.services.reverseProxy;
 
   reverseProxyOptions = { ... }: {
     options = {
@@ -53,7 +53,7 @@ let
   };
 in
 {
-  options.reverseProxy = {
+  options.services.reverseProxy = {
     hostname = mkOption {
       default = "";
       type = types.str;

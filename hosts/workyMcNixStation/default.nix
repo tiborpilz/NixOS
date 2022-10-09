@@ -33,6 +33,8 @@
     kernelParams = [ "amd_iommu=on" ];
   };
 
+  security.polkit.enable = true;
+
   virtualisation = {
     libvirtd = {
       enable = true;
