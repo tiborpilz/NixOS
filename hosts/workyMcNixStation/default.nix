@@ -3,7 +3,6 @@
 {
   time.timeZone = "Europe/Berlin";
   imports = [
-    # ../../desktop/default.nix
     ./hardware-configuration.nix
   ];
 
@@ -57,10 +56,6 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    # Languages
-    nodejs
-    ruby
-    # Systemwide console tools
     direnv
     wget
     tmux
@@ -94,4 +89,5 @@
   system.stateVersion = "22.05";
 
   modules.services.media.deluge.enable = false;
+  modules.desktop.bspwm.enable = true;
 }
