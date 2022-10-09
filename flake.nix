@@ -29,7 +29,10 @@
       pkgs' = mkPkgs nixpkgs-unstable [];
 
       lib = nixpkgs.lib.extend
-        (self: super: { my = import ./lib { inherit pkgs inputs; lib = self; }; });
+        (self: super: {
+          my = import ./lib { inherit pkgs inputs; lib = self; };
+          hm = home-manager.lib;
+        });
 
     in {
       lib = lib.my;

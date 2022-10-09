@@ -3,8 +3,9 @@ args@{ inputs, pkgs, lib, ... }:
 with lib;
 with lib.my;
 
-{
-  imports = mapModulesRec' (toString ./modules) import;
+let mylib = import ../lib { inherit inputs lib pkgs; };
+in {
+  imports = mylib.mapModulesRec' (toString ./modules) import;
 
   home.username = "tibor";
   home.homeDirectory = "/home/tibor";

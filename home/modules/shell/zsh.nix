@@ -1,26 +1,26 @@
-{ config, options, pkgs, lib, ... }:
+{ inputs, config, options, pkgs, lib, ... }:
 
 with lib;
-with lib.my;
 let cfg = config.modules.shell.zsh;
+    mylib = import ../../../lib { inherit inputs lib pkgs; };
     configDir = ../../config;
 in {
   options.modules.shell.zsh = with types; {
-    enable = mkBoolOpt false;
+    enable = mylib.mkBoolOpt false;
 
-    aliases = mkOpt (attrsOf (either str path)) {};
+    aliases = mylib.mkOpt (attrsOf (either str path)) {};
 
-    rcInit = mkOpt' lines "" ''
+    rcInit = mylib.mkOpt' lines "" ''
       Zsh lines to be written to /home/tibor/.config/zsh/extra.zshrc and sourced by /home/tibor/.config/zsh/.zshrc
     '';
-    envInit = mkOpt' lines "" ''
+    envInit = mylib.mkOpt' lines "" ''
       Zsh lines to be written to /home/tibor/.config/zsh/extra.zshenv and sourced by /home/tibor/.config/zsh/.zshenv
     '';
 
-    rcFiles = mkOpt' (listOf (either str path)) [] ''
+    rcFiles = mylib.mkOpt' (listOf (either str path)) [] ''
       Zsh files to be sourced by /home/tibor/.config/zsh/.zshrc
     '';
-    envFiles = mkOpt' (listOf (either str path)) [] ''
+    envFiles = mylib.mkOpt' (listOf (either str path)) [] ''
       Zsh files to be sourced by /home/tibor/.config/zsh/.zshenv
     '';
   };
