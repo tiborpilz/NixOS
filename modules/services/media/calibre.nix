@@ -55,8 +55,8 @@ in
         "OAUTHLIB_RELAX_TOKEN_SCOPE" = "1";
       };
     };
-    services.reverseProxy.proxies.calibre.publicPort = guacamolePort;
-    services.reverseProxy.proxies.calibre-web.publicPort = calibreWebPort;
-    services.reverseProxy.proxies.calibre-web.auth = false;
+    modules.services.reverseProxy.proxies.calibre.publicPort = guacamolePort;
+    modules.services.reverseProxy.proxies.calibre-web.publicPort = calibreWebPort;
+    modules.services.reverseProxy.proxies.calibre-web.auth = false;
   };
 }

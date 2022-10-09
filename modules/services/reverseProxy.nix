@@ -3,7 +3,7 @@
 with lib;
 with lib.my;
 let
-  cfg = config.services.reverseProxy;
+  cfg = config.modules.services.reverseProxy;
 
   reverseProxyOptions = { ... }: {
     options = {
@@ -54,7 +54,7 @@ let
   };
 in
 {
-  options.services.reverseProxy = {
+  options.modules.services.reverseProxy = {
     hostname = mkOption {
       default = "";
       type = types.str;

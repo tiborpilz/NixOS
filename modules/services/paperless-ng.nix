@@ -6,10 +6,10 @@ let
   db_user = "paperless";
   db_password = "paperless";
   db_db = "paperless";
-  cfg = config.services.paperless;
+  cfg = config.modules.services.paperless;
 in
 {
-  options.services.paperless-ng = {
+  options.modules.services.paperless = {
     enable = mkBoolOpt false;
   };
 

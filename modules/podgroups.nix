@@ -2,7 +2,7 @@
 
 with lib;
 let
-  cfg = config.podgroups;
+  cfg = config.modules.podgroups;
   dbOptions = { ... }: { options = { enable = mkEnableOption "database"; }; };
 
   podOptions = { ... }: {
@@ -76,7 +76,7 @@ let
 
 in
 {
-  options.podgroups = {
+  options.modules.podgroups = {
     pods = mkOption {
       default = { };
       type = types.attrsOf (types.submodule podOptions);
