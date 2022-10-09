@@ -19,4 +19,5 @@ with lib.my;
   modules.shell.tmux.enable = true;
   modules.shell.gnupg.enable = true;
   modules.shell.git.enable = true;
+  modules.shell.direnv.enable = true;
 }
