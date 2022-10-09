@@ -18,7 +18,7 @@ in
         mkdir -p /var/lib/tandoor/{staticfiles,mediafiles}
       '';
 
-    podgroups.pods.tandoor = {
+    modules.podgroups.pods.tandoor = {
       port = "${toString publicPort}:8080";
 
       containers.db = {
@@ -48,6 +48,6 @@ in
         ];
       };
     };
-    services.reverseProxy.proxies.tandoor.publicPort = publicPort;
+    modules.services.reverseProxy.proxies.tandoor.publicPort = publicPort;
   };
 }

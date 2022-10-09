@@ -106,7 +106,7 @@ with lib;
     system.stateVersion = "22.05";
     nixpkgs.config.allowUnfree = true;
 
-    services.reverseProxy = {
+    modules.services.reverseProxy = {
       hostname = "tiborpilz.xyz";
       email = "tibor@pilz.berlin";
       basicAuth = {
@@ -115,5 +115,7 @@ with lib;
         password = "JDJhJDE0JDZBWFljZ3dkN1g4VDBMSk5NTEtxdnVibFhiNHg4UDRlL3JnOFdYLk9GWFkwb3Uwc2VKWkpP";
       };
     };
+
+    modules.services.media.calibre.enable = true;
   };
 }

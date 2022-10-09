@@ -10,7 +10,7 @@ let
 in
 {
   options.modules.services.media.deluge = {
-    enable = mkEnableOption "Deluge";
+    enable = mkBoolOpt false;
     sopsFile = mkOption {
       type = types.nullOr types.str;
       default = null;
