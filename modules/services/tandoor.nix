@@ -6,10 +6,10 @@ let
   db_user = "tandoor";
   db_password = "tandoor";
   db_db = "tandoor";
-  cfg = config.services.tandoor;
+  cfg = config.modules.services.tandoor;
 in
 {
-  options.services.tandoor = {
+  options.modules.services.tandoor = {
     enable = mkBoolOpt false;
   };
 

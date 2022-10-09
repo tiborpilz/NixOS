@@ -54,10 +54,10 @@ let
       };
     };
   };
-  cfg = config.modules.openhab;
+  cfg = config.modules.services.openhab;
 in
 {
-  options.modules.openhab = {
+  options.modules.services.openhab = {
     enable = mkBoolOpt false;
   };
 

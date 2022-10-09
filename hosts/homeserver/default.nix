@@ -4,16 +4,6 @@ with lib;
   imports = [
     ./hardware-configuration.nix
     ./samba.nix
-    # ./hardware-configuration.nix
-    # ./modules/reverseProxy.nix
-    # # (modulesPath + "/nixos/modules/profiles/qemu-guest.nix")
-    # # (modulesPath + "/nixos/modules/virtualisation/qemu-vm.nix")
-    # ./services/tandoor.nix
-    # # ./services/openhab.nix
-    # ./services/paperless-ng.nix
-    # # ./services/homeassistant.nix
-    # ./services/media/media.nix
-    # ./services/samba.nix
   ];
 
   config = {

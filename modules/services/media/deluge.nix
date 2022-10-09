@@ -6,10 +6,10 @@ let
   delugeConfigDir = "/var/lib/deluge/config";
   publicPort = 8112;
 
-  cfg = config.services.media.deluge;
+  cfg = config.modules.services.media.deluge;
 in
 {
-  options.services.media.deluge = {
+  options.modules.services.media.deluge = {
     enable = mkEnableOption "Deluge";
     sopsFile = mkOption {
       type = types.nullOr types.str;
@@ -73,6 +73,6 @@ in
         "--privileged=true"
       ];
     };
-    services.reverseProxy.proxies.deluge.publicPort = publicPort;
+   modules.services.reverseProxy.proxies.deluge.publicPort = publicPort;
   };
 }
