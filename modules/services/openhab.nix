@@ -1,5 +1,6 @@
 { config, lib, pkgs, ... }:
 with lib;
+with lib.my;
 let
   port = "8080";
   root_dir = "/var/lib/openhab";
@@ -53,21 +54,28 @@ let
       };
     };
   };
+  cfg = config.modules.openhab;
 in
 {
-  system.activationScripts.createOpenhabConfig = stringAfter [ "var" ] (generateConfigScript openhab_cfg);
-  virtualisation.oci-containers.containers.openhab = {
-    ports = [  "${port}:${port}" ];
-    image = "openhab/openhab";
-    volumes = [
-      # "/etc/localtime:/etc/localtime:ro"
-      # "/etc/timezone:/etc/timezone:ro"
-      "${root_dir}/conf:/openhab/conf"
-      "${root_dir}/userdata:/openhab/userdata"
-      "${root_dir}/addons:/openhab/addons"
-    ];
-    environment = {
-      "OPENHAB_HTTP_PORT" = "${port}";
+  options.modules.openhab = {
+    enable = mkBoolOpt false;
+  };
+
+  config = mkIf cfg.enable {
+    system.activationScripts.createOpenhabConfig = stringAfter [ "var" ] (generateConfigScript openhab_cfg);
+    virtualisation.oci-containers.containers.openhab = {
+      ports = [  "${port}:${port}" ];
+      image = "openhab/openhab";
+      volumes = [
+        # "/etc/localtime:/etc/localtime:ro"
+        # "/etc/timezone:/etc/timezone:ro"
+        "${root_dir}/conf:/openhab/conf"
+        "${root_dir}/userdata:/openhab/userdata"
+        "${root_dir}/addons:/openhab/addons"
+      ];
+      environment = {
+        "OPENHAB_HTTP_PORT" = "${port}";
+      };
     };
   };
 }

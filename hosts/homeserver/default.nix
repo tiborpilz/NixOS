@@ -2,6 +2,8 @@
 with lib;
 {
   imports = [
+    ./hardware-configuration.nix
+    ./samba.nix
     # ./hardware-configuration.nix
     # ./modules/reverseProxy.nix
     # # (modulesPath + "/nixos/modules/profiles/qemu-guest.nix")

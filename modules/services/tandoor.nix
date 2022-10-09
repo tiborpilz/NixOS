@@ -1,16 +1,22 @@
 { config, lib, pkgs, ... }:
 with lib;
+with lib.my;
 let
   publicPort = 8285;
   db_user = "tandoor";
   db_password = "tandoor";
   db_db = "tandoor";
+  cfg = config.services.tandoor;
 in
 {
-  config = {
+  options.services.tandoor = {
+    enable = mkBoolOpt false;
+  };
+
+  config = mkIf cfg.enable {
     system.activationScripts.makeTandoorDir = stringAfter [ "var" ] ''
-      mkdir -p /var/lib/tandoor/{staticfiles,mediafiles}
-    '';
+        mkdir -p /var/lib/tandoor/{staticfiles,mediafiles}
+      '';
 
     podgroups.pods.tandoor = {
       port = "${toString publicPort}:8080";

@@ -1,5 +1,6 @@
 { config, lib, pkgs, ... }:
 with lib;
+with lib.my;
 
 let
   homeassistant_cfg = {
@@ -25,19 +26,26 @@ let
   homeassistant_yaml = generators.toYAML {} homeassistant_cfg;
 
   homeassistant_config_dir = "/var/lib/homeassistant/config";
+  cfg = config.modules.services.homeassistant;
 in
 {
-  system.activationScripts.generateHomeassistantConfig = stringAfter [ "var" ] ''
-    mkdir -p ${homeassistant_config_dir}
-    echo '${homeassistant_yaml}' > ${homeassistant_config_dir}/configuration.yaml
-  '';
+  options.modules.services.homeassistant = {
+    enable = mkBoolOpt false;
+  };
 
-  virtualisation.oci-containers.containers.homeassistant = {
-    image = "ghcr.io/home-assistant/home-assistant:2020.1.0";
-    volumes = [ "${homeassistant_config_dir}:/config" ];
-    environment = { };
-    extraOptions = [
-      "--network=host"
-    ];
+  config = mkIf cfg.enable {
+    system.activationScripts.generateHomeassistantConfig = stringAfter [ "var" ] ''
+      mkdir -p ${homeassistant_config_dir}
+      echo '${homeassistant_yaml}' > ${homeassistant_config_dir}/configuration.yaml
+    '';
+
+    virtualisation.oci-containers.containers.homeassistant = {
+      image = "ghcr.io/home-assistant/home-assistant:2020.1.0";
+      volumes = [ "${homeassistant_config_dir}:/config" ];
+      environment = { };
+      extraOptions = [
+        "--network=host"
+      ];
+    };
   };
 }

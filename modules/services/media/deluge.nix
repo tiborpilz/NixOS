@@ -1,5 +1,6 @@
 { config, lib, pkgs, ... }:
 with lib;
+with lib.my;
 
 let
   delugeConfigDir = "/var/lib/deluge/config";

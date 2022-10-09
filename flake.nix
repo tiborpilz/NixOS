@@ -16,10 +16,7 @@
   };
   outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, sops-nix, ... }:
     let
-      lib = nixpkgs.lib.extend
-        (self: super: { my = import ./lib { inherit pkgs inputs; lib = self; }; });
       inherit (lib.my) mapModules mapModulesRec mapHosts;
-
       system = "x86_64-linux";
 
       mkPkgs = pkgs: extraOverlays: import pkgs {
@@ -29,6 +26,9 @@
       };
       pkgs  = mkPkgs nixpkgs [ self.overlays.default ];
       pkgs' = mkPkgs nixpkgs-unstable [];
+
+      lib = nixpkgs.lib.extend
+        (self: super: { my = import ./lib { inherit pkgs inputs; lib = self; }; });
 
     in {
       lib = lib.my;
