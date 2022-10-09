@@ -1,11 +1,11 @@
-{ config, options, lib, pkgs, ... }:
+{ inputs, config, options, lib, pkgs, ... }:
 
 with lib;
-with lib.my;
 let cfg = config.modules.editors.neovim;
+    mylib = import ../../../lib { inherit inputs lib pkgs; };
 in {
   options.modules.editors.neovim = {
-    enable = mkBoolOpt false;
+    enable = mylib.mkBoolOpt false;
   };
 
   config = mkIf cfg.enable {
