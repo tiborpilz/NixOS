@@ -7,9 +7,6 @@ let mylib = import ../lib { inherit inputs lib pkgs; };
 in {
   imports = mylib.mapModulesRec' (toString ./modules) import;
 
-  home.username = "tibor";
-  home.homeDirectory = "/home/tibor";
-
   home.stateVersion = "22.05";
 
   # Let Home Manager install and manage itself.
