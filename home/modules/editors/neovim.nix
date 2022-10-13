@@ -10,8 +10,8 @@ in {
 
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
-      editorconfig-core-c
-      unstable.neovim
+      # editorconfig-core-# c
+      neovim
     ];
 
     xdg.configFile."nvim" = { source = ../../config/neovim; recursive = true; };

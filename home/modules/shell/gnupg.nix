@@ -14,8 +14,6 @@ in {
 
     programs.gpg.enable = true;
 
-    home.packages = [ pkgs.tomb ];
-
     xdg.configFile."gnupg/gpg-agent.conf" = {
       text = ''
         default-cache-ttl ${toString cfg.cacheTTL}
