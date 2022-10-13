@@ -66,6 +66,9 @@
           ./home
           {
             _module.args.inputs = inputs;
+            home.username = "tibor";
+            home.homeDirectory = "/home/tibor";
+
           }
         ];
       };
@@ -86,6 +89,8 @@
           ./home
           {
             _module.args.inputs = inputs;
+            home.username = "tibor.pilz";
+            home.homeDirectory = "/Users/tibor.pilz";
           }
         ];
       };
