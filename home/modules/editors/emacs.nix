@@ -66,8 +66,7 @@ with lib;
             git pull
             cd -
         fi
-
-        .config/emacs/bin/doom sync
+        # .config/emacs/bin/doom sync
       '';
   };
 }
