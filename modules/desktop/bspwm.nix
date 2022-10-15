@@ -42,5 +42,13 @@ in {
       serviceConfig.RestartSec = 2;
       serviceConfig.ExecStart = "${pkgs.dunst}/bin/dunst";
     };
+
+    home-manager.users.tibor.xdg.configFile = {
+      "sxhkd".source = ../../home/config/sxhkd;
+      "bspwm" = {
+        source = ../../home/config/bspwm;
+        recursive = true;
+      };
+    };
   };
 }

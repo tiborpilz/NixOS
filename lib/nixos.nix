@@ -3,7 +3,6 @@
 with lib;
 with lib.my;
 let sys = "x86_64-linux";
-    # home-config = import ../home { inherit lib pkgs inputs; };
 in {
   mkHost = path: attrs @ { system ? sys, ... }:
     nixosSystem {

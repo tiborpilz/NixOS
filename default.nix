@@ -4,19 +4,19 @@ with lib;
 with lib.my;
 
 {
-  imports =
-    [
-      inputs.sops-nix.nixosModules.sops
-    ] ++ (mapModulesRec' (toString ./modules) import);
+    imports =
+        [
+            inputs.home-manager.nixosModules.home-manager
+            inputs.sops-nix.nixosModules.sops
+        ] ++ (mapModulesRec' (toString ./modules) import);
 
     sops.defaultSopsFile = secrets/secrets.yaml;
     sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
     sops.age.keyFile = "/var/lib/sops-nix/key.txt";
     sops.age.generateKey = true;
 
-    # home-manager.useGlobalPkgs = true;
-    # home-manager.useUserPackages = true;
-    # home-manager.users.tibor = import ./home;
+    system.configurationRevision = with inputs; mkIf (self ? rev) self.rev;
+
     #
     # home-manager = import ./home-manager; # ) // {
     # home-manager = {
