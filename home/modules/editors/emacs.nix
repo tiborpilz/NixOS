@@ -60,7 +60,7 @@ with lib;
         fi
 
         if [ ! -d ".config/doom" ]; then
-            git clone https://github.com/tiborpilz/doom-emacs-config ".config/doom"
+            git clone git@github.com:tiborpilz/doom-emacs-config ".config/doom"
         else
             cd ".config/doom"
             git pull
