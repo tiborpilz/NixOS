@@ -17,9 +17,9 @@ in {
   config = mkIf cfg.enable {
     home.packages = with pkgs; [ tmux ];
 
-    modules.shell.zsh = {
-      rcInit = "_cache tmuxifier init -";
-    };
+    # modules.shell.zsh = {
+    #   rcInit = "_cache tmuxifier init -";
+    # };
 
     xdg.configFile = {
       "tmux" = { source = ../../config/tmux; recursive = true; };

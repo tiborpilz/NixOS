@@ -14,6 +14,8 @@ in {
   programs.man.enable = false;
 
   modules.shell.zsh.enable = true;
+  modules.shell.zsh.aliases.ungron = "gron --ungron";
+
   modules.shell.tmux.enable = true;
   modules.shell.gnupg.enable = true;
   modules.shell.git.enable = true;
