@@ -9,6 +9,12 @@ in {
 
   home.stateVersion = "22.05";
 
+  fonts.fontconfig.enable = true;
+
+  home.packages = with pkgs; [
+    (nerdfonts.override { fonts = [ "FiraCode" ]; })
+  ];
+
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
   programs.man.enable = false;
