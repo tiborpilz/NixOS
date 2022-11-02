@@ -1,4 +1,3 @@
-source $HOME/.profile
 
 # Add custom scripts to Path
 PATH=$PATH:$HOME/bin
@@ -7,13 +6,13 @@ PATH=$PATH:$HOME/.npm-global/bin
 
 PATH=$PATH:$HOME/go/bin
 
-# Node Version Manager
-export NVM_DIR="$HOME/.nvm"
-[ -s "/usr/share/nvm/nvm.sh" ] && . "/usr/share/nvm/nvm.sh"  # This loads nvm
-[ -s "/usr/share/nvm/etc/bash_completion" ] && . "/usr/share/nvm/etc/bash_completion"  # This loads nvm bash_completion
-
 
 # Antigen nPlugin Manager
+if [[ ! -a $HOME/.antigen/antigen.zsh ]]; then
+  git clone --branch master git@github.com:zsh-users/antigen.git ~/.antigen
+  cd ~/.antigen && git checkout v2.2.3 && cd ~
+fi
+
 source $HOME/.antigen/antigen.zsh
 
 antigen use oh-my-zsh
@@ -40,6 +39,8 @@ antigen bundle jscutlery/nx-completion@main
 antigen bundle zsh-users/zsh-syntax-highlighting
 
 antigen bundle chisui/zsh-nix-shell
+
+antigen bundle lukechilds/zsh-nvm
 
 antigen apply
 
@@ -86,24 +87,18 @@ export PATH="/usr/local/opt/mysql-client/bin:$PATH"
 export PATH="/usr/local/opt/python@3.8/bin:$PATH"
 export PATH="/usr/local/bin:$PATH"
 
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/tibor.pilz/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/tibor.pilz/google-cloud-sdk/path.zsh.inc'; fi
-
-
 # add Pulumi to the PATH
 export PATH=$PATH:$HOME/.pulumi/bin
 export GPG_TTY=$(tty)
 
 if type gfind >/dev/null; then alias find=gfind; fi
 
-# source $HOME/.antigen/bundles/jscutlery/nx-completion-main/nx-completion.plugin.zsh
-# load nvm
-export NVM_DIR="$HOME/.nvm"
-[ -s "/usr/local/opt/nvm/nvm.sh" ] && \. "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-
 export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
 export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
+
+## Load NVM
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 ## Bootstrap interactive sessions
 

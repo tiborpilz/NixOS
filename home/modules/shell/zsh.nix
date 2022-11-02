@@ -11,17 +11,17 @@ in {
     aliases = mylib.mkOpt (attrsOf (either str path)) {};
 
     rcInit = mylib.mkOpt' lines "" ''
-      Zsh lines to be written to /home/tibor/.config/zsh/extra.zshrc and sourced by /home/tibor/.config/zsh/.zshrc
+      Zsh lines to be written to $XDG_CONFIG_HOME/zsh/extra.zshrc and sourced by $XDG_CONFIG_HOME/zsh/.zshrc
     '';
     envInit = mylib.mkOpt' lines "" ''
-      Zsh lines to be written to /home/tibor/.config/zsh/extra.zshenv and sourced by /home/tibor/.config/zsh/.zshenv
+      Zsh lines to be written to $XDG_CONFIG_HOME/zsh/extra.zshenv and sourced by $XDG_CONFIG_HOME/.config/zsh/.zshenv
     '';
 
     rcFiles = mylib.mkOpt' (listOf (either str path)) [] ''
-      Zsh files to be sourced by /home/tibor/.config/zsh/.zshrc
+      Zsh files to be sourced by $XDG_CONFIG_HOME/zsh/.zshrc
     '';
     envFiles = mylib.mkOpt' (listOf (either str path)) [] ''
-      Zsh files to be sourced by /home/tibor/.config/zsh/.zshenv
+      Zsh files to be sourced by $XDG_CONFIG_HOME/zsh/.zshenv
     '';
   };
 
@@ -48,6 +48,8 @@ in {
       ripgrep
       gron
       tldr
+      kubectl
+      nodejs
     ];
 
     home.sessionVariables.ZDOTDIR = "$XDG_CONFIG_HOME/zsh";
