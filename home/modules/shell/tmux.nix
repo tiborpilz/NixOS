@@ -5,7 +5,7 @@ let cfg = config.modules.shell.tmux;
     # Monkey-Patch tmux to use XDG_CONFIG_HOME
     tmux = (pkgs.writeScriptBin "tmux" ''
       #!${pkgs.stdenv.shell}
-      exec ${pkgs.tmux}/bin/tmux -f "$TMUX_HOME/config" "$@"
+      exec ${pkgs.tmux}/bin/tmux -f "$TMUX_HOME/tmux.conf" "$@"
     '');
     mylib = import ../../../lib { inherit inputs lib pkgs; };
 in {
@@ -35,9 +35,9 @@ in {
 
     home.sessionPath = [ "$TMUXIFIER/bin" ];
     home.sessionVariables = {
-      TMUX_HOME = "$XDG_CONFIG_HOME/tmux";
-      TMUXIFIER = "$XDG_DATA_HOME/tmuxifier";
-      TMUXIFIER_LAYOUT_PATH = "$XDG_DATA_HOME/tmuxifier";
+      TMUX_HOME = "${config.home.sessionVariables.XDG_CONFIG_HOME}/tmux";
+      TMUXIFIER = "${config.home.sessionVariables.XDG_CONFIG_HOME}/tmuxifier";
+      TMUXIFIER_LAYOUT_PATH = "${config.home.sessionVariables.XDG_CONFIG_HOME}/tmuxifier";
     };
   };
 }
