@@ -21,7 +21,7 @@ in
 
   };
 
-  config = {
+  config = mkIf cfg.enable {
     system.activationScripts.makeDelugeDir = stringAfter [ "var" ] ''
       mkdir -p ${delugeConfigDir}
     '';
