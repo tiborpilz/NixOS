@@ -9,7 +9,7 @@ PATH=$PATH:$HOME/go/bin
 
 # Antigen nPlugin Manager
 if [[ ! -a $HOME/.antigen/antigen.zsh ]]; then
-  git clone --branch master git@github.com:zsh-users/antigen.git ~/.antigen
+  git clone --branch master https://github.com/zsh-users/antigen.git ~/.antigen
   cd ~/.antigen && git checkout v2.2.3 && cd ~
 fi
 

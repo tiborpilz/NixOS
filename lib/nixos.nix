@@ -27,8 +27,8 @@ in {
         # ({ ... }: {
         #   home-manager.users.tibor = import ../home { inherit lib pkgs inputs; };
         # })
-        (builtins.toPath "${inputs.nixpkgs}/nixos/modules/profiles/qemu-guest.nix")
-        (builtins.toPath "${inputs.nixpkgs}/nixos/modules/virtualisation/qemu-vm.nix")
+        # (builtins.toPath "${inputs.nixpkgs}/nixos/modules/profiles/qemu-guest.nix")
+        # (builtins.toPath "${inputs.nixpkgs}/nixos/modules/virtualisation/qemu-vm.nix")
         (import path)
       ];
     };
