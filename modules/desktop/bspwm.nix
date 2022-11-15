@@ -14,6 +14,7 @@ in {
       lightdm
       dunst
       libnotify
+      rofi
       (polybar.override {
         pulseSupport = true;
         nlSupport = true;
@@ -63,11 +64,13 @@ in {
       enable = true;
       keybindings = {
         "super + b" = "${pkgs.firefox}/bin/firefox";
-        "super + return" = "${pkgs.xterm}/xterm";
+        "super + Return" = "${pkgs.xterm}/bin/xterm";
+        "super + e" = "${pkgs.emacs}/bin/emacs";
+        "super + space" = "${pkgs.rofi}/bin/rofi -show drun";
       };
       extraConfig = ''
-          super + {_, shift +} {1-9, 0}
-            bspc node focused --to-desktop {1-10}
+          super + {1-9, 0}
+            bspc --focus {1-10}
         '';
     };
     # xsession = {
