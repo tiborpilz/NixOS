@@ -13,9 +13,8 @@
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
-    devenv.url = "github:cachix/devenv/v0.2";
   };
-  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, sops-nix, devenv, ... }:
+  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, sops-nix, ... }:
     let
       inherit (lib.my) mapModules mapModulesRec mapHosts;
 
@@ -51,8 +50,8 @@
         (mapModules ./packages (p: pkgs.callPackage p {}))
         // { default = pkgs.hello; };
 
-      # nixosModules =
-      #   { dotfiles = import ./.; } // mapModulesRec ./modules import;
+      nixosModules =
+        { dotfiles = import ./.; } // mapModulesRec ./modules import;
 
       nixosConfigurations =
         mapHosts ./hosts {};
