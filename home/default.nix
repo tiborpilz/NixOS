@@ -7,7 +7,7 @@ let mylib = import ../lib { inherit inputs lib pkgs; };
 in {
   imports = mylib.mapModulesRec' (toString ./modules) import;
 
-  home.stateVersion = "22.05";
+  home.stateVersion = "22.11";
 
   fonts.fontconfig.enable = true;
 
