@@ -57,12 +57,10 @@
   services.logind.lidSwitch = "ignore";
 
   # Enable the X11 windowing system.
-  services.xserver.enable = true;
-
+  modules.desktop.bspwm.enable = true;
 
   # Enable the Plasma 5 Desktop Environment.
-  services.xserver.displayManager.sddm.enable = true;
-  services.xserver.desktopManager.plasma5.enable = true;
+  # services.xserver.desktopManager.plasma5.enable = true;
 
   users.users.tibor = {
     uid = 1000;

@@ -51,8 +51,8 @@
         (mapModules ./packages (p: pkgs.callPackage p {}))
         // { default = pkgs.hello; };
 
-      nixosModules =
-        { dotfiles = import ./.; } // mapModulesRec ./modules import;
+      # nixosModules =
+      #   { dotfiles = import ./.; } // mapModulesRec ./modules import;
 
       nixosConfigurations =
         mapHosts ./hosts {};

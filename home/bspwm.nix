@@ -48,7 +48,6 @@
       keybindings = {
         "super + b" = "${pkgs.firefox}/bin/firefox";
         "super + enter" = "xterm";
-        "a" = "xterm";
       };
       extraConfig = ''
         super + {_, shift +} {1-9, 0}

@@ -34,7 +34,6 @@ in {
     };
 
   mapHosts = dir: attrs @ { system ? system, ... }:
-
     mapModules dir
       (hostPath: mkHost hostPath attrs);
 }
