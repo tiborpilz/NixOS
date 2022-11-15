@@ -78,6 +78,10 @@ python-init() {
   pip install jupyter
 }
 
+gch() {
+  git checkout "$(git branch --all | fzf-tmux | tr -d '[:space:]')"
+}
+
 source <(kubectl completion zsh)
 alias k=kubectl
 # complete -F __start_kubectl k

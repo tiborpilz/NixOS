@@ -23,6 +23,11 @@ Plug 'kyazdani42/nvim-web-devicons'
 Plug 'preservim/nerdtree'
 nnoremap <leader>n :NERDTreeToggle<CR>
 
+" Fuzzy Finder
+Plug 'kien/ctrlp.vim'
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlP'
+
 " Which-Key
 Plug 'liuchengxu/vim-which-key'
 Plug 'AckslD/nvim-whichkey-setup.lua'
