@@ -9,7 +9,11 @@ in {
   };
 
   config = mkIf cfg.enable {
-    home.packages = [ pkgs.direnv ];
+    home.packages = [pkgs.direnv];
     modules.shell.zsh.rcInit = ''eval "$(direnv hook zsh)"'';
+    xdg.configFile."direnv/direnv.toml".text = ''
+      [global]
+      load_dotenv = true
+    '';
   };
 }

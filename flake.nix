@@ -50,14 +50,14 @@
         (mapModules ./packages (p: pkgs.callPackage p {}))
         // { default = pkgs.hello; };
 
+      devShells."${system}".default =
+        import ./shell.nix { inherit pkgs; };
+
       nixosModules =
         { dotfiles = import ./.; } // mapModulesRec ./modules import;
 
       nixosConfigurations =
         mapHosts ./hosts {};
-
-      devShells."${system}".default =
-        import ./shell.nix { inherit pkgs; };
 
       homeConfigurations.tibor = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
