@@ -1,21 +1,16 @@
-{ inputs, config, lib, pkgs, home-manager, ... }:
+{ inputs, config, lib, pkgs, ... }:
 
 with lib;
 with lib.my;
 
 {
-    imports =
-        [
-            inputs.home-manager.nixosModules.home-manager
-            inputs.sops-nix.nixosModules.sops
-        ] ++ (mapModulesRec' (toString ./modules) import);
+  imports =
+    [
+      inputs.sops-nix.nixosModules.sops
+      inputs.home-manager.nixosModules.home-manager
+    ] ++ (mapModulesRec' (toString ./modules) import);
 
-    # sops.defaultSopsFile = secrets/secrets.yaml;
-    # sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-    # sops.age.keyFile = "/var/lib/sops-nix/key.txt";
-    # sops.age.generateKey = true;
-
-    system.configurationRevision = with inputs; mkIf (self ? rev) self.rev;
+  system.configurationRevision = with inputs; mkIf (self ? rev) self.rev;
 
     #
     # home-manager = import ./home-manager; # ) // {
