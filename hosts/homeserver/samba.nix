@@ -47,4 +47,6 @@ in
     group = "samba";
     # password = "password";
   };
+
+  users.groups.samba = {};
 }
