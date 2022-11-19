@@ -14,21 +14,7 @@ in {
           networking.hostName = mkDefault (removeSuffix ".nix" (baseNameOf path));
         }
         (filterAttrs (n: v: !elem n [ "system" ]) attrs)
-
-        inputs.home-manager.nixosModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.users.tibor.imports = [
-            ../home
-          ];
-        }
-        ../.   # /default.nix
-        # ({ ... }: {
-        #   home-manager.users.tibor = import ../home { inherit lib pkgs inputs; };
-        # })
-        # (builtins.toPath "${inputs.nixpkgs}/nixos/modules/profiles/qemu-guest.nix")
-        # (builtins.toPath "${inputs.nixpkgs}/nixos/modules/virtualisation/qemu-vm.nix")
+        ../. # /default.nix
         (import path)
       ];
     };
