@@ -106,6 +106,8 @@ with lib;
     system.stateVersion = "22.05";
     nixpkgs.config.allowUnfree = true;
 
+    home.enable = false;
+
     modules.services.reverseProxy = {
       enable = true;
       hostname = "tiborpilz.xyz";
