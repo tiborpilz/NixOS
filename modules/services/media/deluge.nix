@@ -27,7 +27,7 @@ in
       mkdir -p ${delugeConfigDir}
     '';
 
-    system.activationScripts.generateSecretEnv = stringAfter [ "var" ] ''
+    system.activationScripts.generateSecretEnv = stringAfter [ "setupSecrets" ] ''
       echo VPN_USER=$(cat ${config.sops.secrets.deluge_vpn_user.path}) > ${envFile}
       echo VPN_PASS=$(cat ${config.sops.secrets.deluge_vpn_pass.path}) >> ${envFile}
       echo PASSWORD=$(cat ${config.sops.secrets.deluge_password.path}) >> ${envFile}
