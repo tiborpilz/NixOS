@@ -4,6 +4,7 @@ with lib.my;
 
 let
   delugeConfigDir = "/var/lib/deluge/config";
+  envFile = "${delugeConfigDir}/deluge.env";
   publicPort = 8112;
 
   cfg = config.modules.services.media.deluge;
@@ -27,9 +28,12 @@ in
     '';
 
     system.activationScripts.generateSecretEnv = stringAfter [ "var" ] ''
-      echo VPN_USER=$(cat ${config.sops.secrets.deluge_vpn_user.path}) > /tmp/deluge.env
-      echo VPN_PASS=$(cat ${config.sops.secrets.deluge_vpn_pass.path}) >> /tmp/deluge.env
-      echo PASSWORD=$(cat ${config.sops.secrets.deluge_password.path}) >> /tmp/deluge.env
+      echo VPN_USER=$(cat ${config.sops.secrets.deluge_vpn_user.path}) > ${envFile}
+      echo VPN_PASS=$(cat ${config.sops.secrets.deluge_vpn_pass.path}) >> ${envFile}
+      echo PASSWORD=$(cat ${config.sops.secrets.deluge_password.path}) >> ${envFile}
+      # ${config.sops.secrets.deluge_vpn_user.path}
+      # ${config.sops.secrets.deluge_vpn_pass.path}
+      # ${config.sops.secrets.deluge_password.path}
     '';
 
     sops.secrets.deluge-env = mkIf (cfg.sopsFile != null) {
@@ -66,7 +70,7 @@ in
         "DEBUG" = "false";
       };
       environmentFiles = [
-        /tmp/deluge.env
+        envFile
       ];
       extraOptions = [
         "--sysctl=\"net.ipv4.conf.all.src_valid_mark=1\""

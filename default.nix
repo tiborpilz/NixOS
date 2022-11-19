@@ -10,10 +10,10 @@ with lib.my;
             inputs.sops-nix.nixosModules.sops
         ] ++ (mapModulesRec' (toString ./modules) import);
 
-    sops.defaultSopsFile = secrets/secrets.yaml;
-    sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-    sops.age.keyFile = "/var/lib/sops-nix/key.txt";
-    sops.age.generateKey = true;
+    # sops.defaultSopsFile = secrets/secrets.yaml;
+    # sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    # sops.age.keyFile = "/var/lib/sops-nix/key.txt";
+    # sops.age.generateKey = true;
 
     system.configurationRevision = with inputs; mkIf (self ? rev) self.rev;
 

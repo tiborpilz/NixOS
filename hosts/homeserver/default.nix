@@ -107,15 +107,17 @@ with lib;
     nixpkgs.config.allowUnfree = true;
 
     modules.services.reverseProxy = {
+      enable = true;
       hostname = "tiborpilz.xyz";
       email = "tibor@pilz.berlin";
       basicAuth = {
-        enable = true;
+        enable = false;
         username = "tibor";
         password = "JDJhJDE0JDZBWFljZ3dkN1g4VDBMSk5NTEtxdnVibFhiNHg4UDRlL3JnOFdYLk9GWFkwb3Uwc2VKWkpP";
       };
     };
 
     modules.services.media.calibre.enable = true;
+    modules.services.media.deluge.enable = true;
   };
 }
