@@ -20,6 +20,8 @@ in {
     home-manager.useUserPackages = true;
     home-manager.users.tibor.imports = [ ../home ];
 
+    home-manager.users.tibor.modules.syncthing.service = true;
+
     home-manager.users.tibor.home.file = mkAliasDefinitions options.home.file;
     home-manager.users.tibor.xdg.configFile = mkAliasDefinitions options.home.configFile;
 

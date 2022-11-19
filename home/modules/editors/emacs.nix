@@ -38,6 +38,7 @@ with lib;
 
       # :tools lookup & :lang org +roam
       sqlite
+      gcc # for compiling emacs sqlite binary
 
       # :lang latex & :lang org (late previews)
       texlive.combined.scheme-medium
