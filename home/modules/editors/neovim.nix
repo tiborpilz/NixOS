@@ -15,9 +15,5 @@ in {
     ];
 
     xdg.configFile."nvim" = { source = ../../config/neovim; recursive = true; };
-
-    home.activation.installNeovimPlugins = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      ${pkgs.neovim}/bin/nvim +'PlugInstall --sync' +qall
-    '';
   };
 }
