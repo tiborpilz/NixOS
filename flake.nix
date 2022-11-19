@@ -13,8 +13,10 @@
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
+    darwin.url = "github:lnl7/nix-darwin/master";
+    darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
-  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, sops-nix, ... }:
+  outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, sops-nix, darwin, ... }:
     let
       inherit (lib.my) mapModules mapModulesRec mapHosts;
 
@@ -58,6 +60,37 @@
 
       nixosConfigurations =
         mapHosts ./hosts {};
+
+      darwinConfigurations = rec {
+        BigMac =
+          let pkgs = import inputs.nixpkgs-unstable {
+            system = "x86_64-darwin";
+            config.allowUnfree = true;
+            overlays = lib.attrValues {
+              default = final: prev: {
+                unstable = pkgs';
+              };
+            };
+          };
+          in  darwin.lib.darwinSystem {
+          system = "x86_64-darwin";
+          specialArgs = { inherit lib inputs pkgs; };
+          inputs = { inherit darwin pkgs; };
+          modules = [
+            home-manager.darwinModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users.tibor.imports = [ ./home ];
+              environment.systemPackages = with pkgs; [
+                syncthing
+                emacs
+              ];
+            }
+            # ./. # /default.nix
+          ];
+        };
+      };
 
       homeConfigurations.tibor = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
