@@ -12,11 +12,16 @@ in
   };
 
   config = mkIf cfg.enable {
-    syncthing = {
+    system.activationScripts.makeSyncthingDirs = stringAfter [ "var" ] ''
+      mkdir -p {/var/lib,data}/syncthing
+      chown -R syncthing:syncthing {/var/lib,data}/syncthing
+    '';
+
+    services.syncthing = {
       enable = true;
       dataDir = "/data/syncthing";
       configDir = "/var/lib/syncthing";
-      guiAddress = "0.0.0.0:${port}";
+      guiAddress = "0.0.0.0:${toString port}";
     };
 
     networking.firewall.allowedTCPPorts = [ port 22000 ];

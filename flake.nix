@@ -69,7 +69,7 @@
             _module.args.inputs = inputs;
             home.username = "tibor";
             home.homeDirectory = "/home/tibor";
-
+            modules.syncthing.enable = true;
           }
         ];
       };
