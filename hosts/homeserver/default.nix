@@ -119,7 +119,12 @@ with lib;
       };
     };
 
-    modules.services.media.calibre.enable = true;
-    modules.services.media.deluge.enable = true;
+    modules.services.syncthing.enable = true;
+    modules.services.tandoor.enable = true;
+
+    modules.services.media = {
+      calibre.enable = true;
+      deluge.enable = true;
+    };
   };
 }
