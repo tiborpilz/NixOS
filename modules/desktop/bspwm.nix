@@ -14,7 +14,6 @@ in {
       lightdm
       dunst
       libnotify
-      rofi
       (polybar.override {
         pulseSupport = true;
         nlSupport = true;
@@ -50,12 +49,27 @@ in {
       config = {
         "bar/top" = {
           monitor = "";
-          width = "80%";
+          width = "100%";
           height = 20;
-          offset-x = "10%";
-          offset-y = 20;
-          padding = 10;
+          # offset-y = 10;
+          # padding = 10;
           tray-position = "right";
+          modules-right = "date";
+          modules-left = "bspwm";
+        };
+        "module/date" = {
+          type = "internal/date";
+          internal = 5;
+          date = "%d.%m.%y";
+          time = "%H:%M";
+          label = "%time% %date%";
+        };
+        "module/bspwm" = {
+          type = "internal/bspwm";
+          pin-workspaces = true;
+          enable-click = true;
+          fuzzy-match = true;
+          # ws-icon-default = "♟";
         };
       };
     };
@@ -69,9 +83,32 @@ in {
         "super + space" = "${pkgs.rofi}/bin/rofi -show drun";
       };
       extraConfig = ''
-          super + {1-9, 0}
-            bspc --focus {1-10}
+          super + {1-5}
+            bspc desktop -f {1-5}
         '';
+    };
+
+    home-manager.users.tibor.programs.rofi = {
+      enable = true;
+      pass = {
+        enable = true;
+      };
+      plugins = [
+        pkgs.rofi-calc
+      ];
+    };
+    services.picom = {
+      enable = true;
+      fade = true;
+      fadeDelta = 1;
+      fadeSteps = [ 0.01 0.012 ];
+      shadow = true;
+      shadowOffsets = [ (-10) (-10) ];
+      shadowOpacity = 0.22;
+
+      settings = {
+        shadow-radius = 12;
+      };
     };
     # xsession = {
     #   enable = true;

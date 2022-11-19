@@ -12,6 +12,8 @@ with lib.my;
 
   system.configurationRevision = with inputs; mkIf (self ? rev) self.rev;
 
+    console.useXkbConfig = true;
+
     #
     # home-manager = import ./home-manager; # ) // {
     # home-manager = {
