@@ -29,6 +29,8 @@ in {
 
   modules.editors.neovim.enable = true;
 
+  modules.syncthing.enable = true;
+
   # Install MacOS applications to the user environment if the targetPlatform is Darwin
   # home.file."Applications/home-manager".source = let
   # apps = pkgs.buildEnv {
