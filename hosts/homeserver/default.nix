@@ -133,6 +133,9 @@ with lib;
       };
     };
 
+    # Seems like a bug in systemd, more info: https://github.com/NixOS/nixpkgs/issues/180175#issuecomment-1273827251
+    systemd.services.NetworkManager-wait-online.enable = false;
+
     modules.services.reverseProxy = {
       enable = true;
       hostname = "tiborpilz.xyz";
