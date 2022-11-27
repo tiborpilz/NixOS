@@ -4,19 +4,45 @@
 
 { lib, pkgs, inputs, ... }:
 with lib;
-
-
+let
+  emacs = pkgs.emacs.overrideAttrs (old: {
+    patches = (old.patches or []) ++ [
+      (pkgs.fetchpatch {
+        url = "https://github.com/emacs-mirror/emacs/commit/8b52d9f5f177ce76b9ebecadd70c6dbbf07a20c6.patch";
+        hash = "sha256-/W9yateE9UZ9a8CUjavQw0X7TgxigYzBuOvtAXdEsSA=";
+      })
+    ];
+  });
+in
 {
   # config = mkIf cfg.enable {
   config = {
-    nixpkgs.overlays = [ inputs.emacs-overlay.overlay ];
+    # nixpkgs.overlays = [
+    #   inputs.emacs-overlay.overlay
+    #   (self: super: {)
+    #   # (self: super: {
+    #   #   emacs = super.emacs.override {
+    #   #     nativeComp = true;
+    #   #     withXwidgets = true;
+    #   #     withGTK3 = true;
+    #   #   };
+    #   # })
+    # ];
 
     home.packages = with pkgs; [
       ## Emacs
       binutils # for native-comp
-      ## 28.2 + native-comp
-      ((emacsPackagesFor emacsNativeComp).emacsWithPackages
-        (epkgs: [ epkgs.vterm ]))
+      ## 28.2 + native-comp + xwidgets + gtk3
+      emacs
+      # ((emacsPackagesFor emacs).emacsWithPackages
+      #   (epkgs: [ epkgs.vterm ]))
+      # (emacsWithPackagesFromUsePackage {
+      #   package = (pkgs.emacsGit.override {
+      #     withXwidgets = true;
+      #   });
+      # })
+      # ((emacsPackagesFor emacsNativeComp).emacsWithPackages
+      #   (epkgs: [ epkgs.vterm ]))
 
       ## Doom dependencies
       git
@@ -46,13 +72,20 @@ with lib;
       nil
 
       # vue3 language server
-      my."@volar/server"
+      my."@volar/vue-language-server"
+      my."@volar/vue-typescript"
+      my."@volar-plugins/vetur"
+
+      # typescript language server
+      nodePackages.typescript-language-server
 
       # Fonts
       emacs-all-the-icons-fonts
     ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
+
+    xdg.dataFile."volar-plugins/vetur" = { source = "${pkgs.my."@volar-plugins/vetur"}/lib/node_modules/@volar-plugins/vetur/out"; };
 
     # modules.shell.zsh.rcFiles = [ "${config.xdg.configHome}/emacs/aliases.zsh" ];
 
