@@ -20,7 +20,11 @@ function get_pwd(){
   echo $prompt_short_dir
 }
 
-PROMPT=' $ret_status %{$fg[white]%}$(get_pwd) $(git_prompt_info)%{$reset_color%}%{$reset_color%} '
+function nix_shell_prompt() {
+  echo ${IN_NIX_SHELL+"(nix-shell) "}
+}
+
+PROMPT=' $(nix_shell_prompt)$ret_status %{$fg[white]%}$(get_pwd) $(git_prompt_info)%{$reset_color%}%{$reset_color%} '
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[white]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
