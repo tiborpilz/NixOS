@@ -5,7 +5,7 @@
 { lib, pkgs, inputs, ... }:
 with lib;
 let
-  emacs = pkgs.emacs.overrideAttrs (old: {
+  patchedEmacs = pkgs.emacs.overrideAttrs (old: {
     patches = (old.patches or []) ++ [
       (pkgs.fetchpatch {
         url = "https://github.com/emacs-mirror/emacs/commit/8b52d9f5f177ce76b9ebecadd70c6dbbf07a20c6.patch";
@@ -13,13 +13,15 @@ let
       })
     ];
   });
+  emacsWithNativeComp = patchedEmacs.override {
+    nativeComp = true;
+  };
 in
 {
   # config = mkIf cfg.enable {
   config = {
     # nixpkgs.overlays = [
     #   inputs.emacs-overlay.overlay
-    #   (self: super: {)
     #   # (self: super: {
     #   #   emacs = super.emacs.override {
     #   #     nativeComp = true;
@@ -33,7 +35,8 @@ in
       ## Emacs
       binutils # for native-comp
       ## 28.2 + native-comp + xwidgets + gtk3
-      emacs
+      ((emacsPackagesFor emacsWithNativeComp).emacsWithPackages
+        (epkgs: [ epkgs.vterm ]))
       # ((emacsPackagesFor emacs).emacsWithPackages
       #   (epkgs: [ epkgs.vterm ]))
       # (emacsWithPackagesFromUsePackage {
