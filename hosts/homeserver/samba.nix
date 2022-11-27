@@ -16,8 +16,7 @@ in
       security = user
       #use sendfile = yes
       #max protocol = smb2
-      hosts allow = 192.168.2. 127.0.0.1 localhost
-      hosts deny = 0.0.0.0/0
+      hosts allow = 0.0.0.0/0 192.168.2. 127.0.0.1 localhost
       guest account = nobody
     '';
     shares = {
