@@ -1,4 +1,4 @@
-args@{ inputs, pkgs, lib, ... }:
+{ inputs, pkgs, lib, ... }:
 
 with lib;
 with lib.my;
@@ -23,7 +23,7 @@ in {
   modules.shell.zsh.aliases.ungron = "gron --ungron";
 
   modules.shell.tmux.enable = true;
-  modules.shell.gnupg.enable = true;
+  modules.shell.gnupg.enable = false;
   modules.shell.git.enable = true;
   modules.shell.direnv.enable = true;
 
