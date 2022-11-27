@@ -51,27 +51,27 @@ with lib;
     networking.networkmanager.enable = true;
 
     i18n.defaultLocale = "en_US.UTF-8";
-    console = {
-      font = "Lat2-Terminus16";
-      keyMap = "us";
-    };
+    # console = {
+    #   font = "Lat2-Terminus16";
+    #   keyMap = "us";
+    # };
 
     services.logind.lidSwitch = "ignore";
 
-    services.avahi = {
-      nssmdns = true;
-      enable = true;
-      ipv4 = true;
-      ipv6 = true;
-      publish = {
-        enable = true;
-        addresses = true;
-        domain = true;
-        hinfo = true;
-        userServices = true;
-        workstation = true;
-      };
-    };
+    # services.avahi = {
+    #   nssmdns = true;
+    #   enable = true;
+    #   ipv4 = true;
+    #   ipv6 = true;
+    #   publish = {
+    #     enable = true;
+    #     addresses = true;
+    #     domain = true;
+    #     hinfo = true;
+    #     userServices = true;
+    #     workstation = true;
+    #   };
+    # };
 
     fileSystems = {
       "/".label = "nixos-root";
@@ -108,6 +108,31 @@ with lib;
 
     home.enable = false;
 
+    services.avahi = {
+      enable = true;
+      publish = {
+        enable = true;
+        addresses = true;
+        workstation = true;
+        hinfo = true;
+        domain = true;
+        userServices = true;
+      };
+      extraServiceFiles = {
+        smb = ''
+          <?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+          <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+          <service-group>
+            <name replace-wildcards="yes">%h</name>
+            <service>
+              <type>_smb._tcp</type>
+              <port>445</port>
+            </service>
+          </service-group>
+        '';
+      };
+    };
+
     modules.services.reverseProxy = {
       enable = true;
       hostname = "tiborpilz.xyz";
@@ -115,7 +140,7 @@ with lib;
       basicAuth = {
         enable = false;
         username = "tibor";
-        password = "JDJhJDE0JDZBWFljZ3dkN1g4VDBMSk5NTEtxdnVibFhiNHg4UDRlL3JnOFdYLk9GWFkwb3Uwc2VKWkpP";
+        password = "$2y$05$hchzpHMV8QabeLBTgSjIa.3Nqc7uqblFiQ8WTLKq4xSl4ZmR9rDGu";
       };
     };
 
@@ -125,6 +150,7 @@ with lib;
     modules.services.media = {
       calibre.enable = true;
       deluge.enable = true;
+      komga.enable = true;
     };
   };
 }
