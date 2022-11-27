@@ -76,8 +76,8 @@ in
 
       # vue3 language server
       my."@volar/vue-language-server"
-      my."@volar/vue-typescript"
-      my."@volar-plugins/vetur"
+      # my."@volar/vue-typescript"
+      # my."@volar-plugins/vetur"
 
       # typescript language server
       nodePackages.typescript-language-server
