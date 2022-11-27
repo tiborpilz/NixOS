@@ -4,19 +4,48 @@
 
 { lib, pkgs, inputs, ... }:
 with lib;
-
-
+let
+  patchedEmacs = pkgs.emacs.overrideAttrs (old: {
+    patches = (old.patches or []) ++ [
+      (pkgs.fetchpatch {
+        url = "https://github.com/emacs-mirror/emacs/commit/8b52d9f5f177ce76b9ebecadd70c6dbbf07a20c6.patch";
+        hash = "sha256-/W9yateE9UZ9a8CUjavQw0X7TgxigYzBuOvtAXdEsSA=";
+      })
+    ];
+  });
+  emacsWithNativeComp = patchedEmacs.override {
+    nativeComp = true;
+  };
+in
 {
   # config = mkIf cfg.enable {
   config = {
-    nixpkgs.overlays = [ inputs.emacs-overlay.overlay ];
+    # nixpkgs.overlays = [
+    #   inputs.emacs-overlay.overlay
+    #   # (self: super: {
+    #   #   emacs = super.emacs.override {
+    #   #     nativeComp = true;
+    #   #     withXwidgets = true;
+    #   #     withGTK3 = true;
+    #   #   };
+    #   # })
+    # ];
 
     home.packages = with pkgs; [
       ## Emacs
       binutils # for native-comp
-      ## 28.2 + native-comp
-      ((emacsPackagesFor emacsNativeComp).emacsWithPackages
+      ## 28.2 + native-comp + xwidgets + gtk3
+      ((emacsPackagesFor emacsWithNativeComp).emacsWithPackages
         (epkgs: [ epkgs.vterm ]))
+      # ((emacsPackagesFor emacs).emacsWithPackages
+      #   (epkgs: [ epkgs.vterm ]))
+      # (emacsWithPackagesFromUsePackage {
+      #   package = (pkgs.emacsGit.override {
+      #     withXwidgets = true;
+      #   });
+      # })
+      # ((emacsPackagesFor emacsNativeComp).emacsWithPackages
+      #   (epkgs: [ epkgs.vterm ]))
 
       ## Doom dependencies
       git
@@ -42,29 +71,34 @@ with lib;
       # :lang latex & :lang org (late previews)
       texlive.combined.scheme-medium
 
+      # alternative lsp server for nix
+      nil
+
+      # vue3 language server
+      my."@volar/vue-language-server"
+      my."@volar/vue-typescript"
+      my."@volar-plugins/vetur"
+
+      # typescript language server
+      nodePackages.typescript-language-server
+
       # Fonts
       emacs-all-the-icons-fonts
     ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
 
+    xdg.dataFile."volar-plugins/vetur" = { source = "${pkgs.my."@volar-plugins/vetur"}/lib/node_modules/@volar-plugins/vetur/out"; };
+
     # modules.shell.zsh.rcFiles = [ "${config.xdg.configHome}/emacs/aliases.zsh" ];
 
     home.activation.installDoomEmacs = lib.hm.dag.entryAfter ["WriteBoundary"] ''
         if [ ! -d ".config/emacs" ]; then
             git clone --depth=1 --single-branch https://github.com/doomemacs/doomemacs ".config/emacs"
-        else
-            cd ".config/emacs"
-            git pull
-            cd -
         fi
 
         if [ ! -d ".config/doom" ]; then
             git clone https://github.com/tiborpilz/doom-emacs-config ".config/doom"
-        else
-            cd ".config/doom"
-            git pull
-            cd -
         fi
         # .config/emacs/bin/doom sync
       '';
