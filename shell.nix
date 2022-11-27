@@ -10,6 +10,7 @@ in mkShell {
     git
     nix-zsh-completions
     node2nix
+    nixos-rebuild
   ];
   shellHook = ''
     export FLAKE="$PWD"
