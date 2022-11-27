@@ -88,8 +88,6 @@ in
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
 
-    xdg.dataFile."volar-plugins/vetur" = { source = "${pkgs.my."@volar-plugins/vetur"}/lib/node_modules/@volar-plugins/vetur/out"; };
-
     # modules.shell.zsh.rcFiles = [ "${config.xdg.configHome}/emacs/aliases.zsh" ];
 
     home.activation.installDoomEmacs = lib.hm.dag.entryAfter ["WriteBoundary"] ''
