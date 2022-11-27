@@ -9,6 +9,7 @@ in mkShell {
   buildInputs = [
     git
     nix-zsh-completions
+    node2nix
   ];
   shellHook = ''
     export FLAKE="$PWD"

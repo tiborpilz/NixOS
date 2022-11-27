@@ -2,18 +2,18 @@
   description = "NixOS and Home-Manager configurations";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "nixpkgs/nixos-22.11";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
-    home-manager.url = "github:nix-community/home-manager/master";
+    home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     emacs-overlay.url = "github:nix-community/emacs-overlay";
 
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
-
   };
+
   outputs = inputs @ { self, nixpkgs, nixpkgs-unstable, home-manager, sops-nix, ... }:
     let
       inherit (lib.my) mapModules mapModulesRec mapHosts;
@@ -46,9 +46,13 @@
           };
         };
 
-      packages."${system}" =
-        (mapModules ./packages (p: pkgs.callPackage p {}))
-        // { default = pkgs.hello; };
+      packages."${system}" = {
+        default = pkgs.hello;
+      } // import ./packages/node/default.nix {
+        inherit pkgs system;
+      };
+        # (mapModules ./packages (p: pkgs.callPackage p {}))
+        # // { default = pkgs.hello; };
 
       devShells."${system}".default =
         import ./shell.nix { inherit pkgs; };

@@ -42,6 +42,12 @@ with lib;
       # :lang latex & :lang org (late previews)
       texlive.combined.scheme-medium
 
+      # alternative lsp server for nix
+      nil
+
+      # vue3 language server
+      my."@volar/server"
+
       # Fonts
       emacs-all-the-icons-fonts
     ];
@@ -53,18 +59,10 @@ with lib;
     home.activation.installDoomEmacs = lib.hm.dag.entryAfter ["WriteBoundary"] ''
         if [ ! -d ".config/emacs" ]; then
             git clone --depth=1 --single-branch https://github.com/doomemacs/doomemacs ".config/emacs"
-        else
-            cd ".config/emacs"
-            git pull
-            cd -
         fi
 
         if [ ! -d ".config/doom" ]; then
             git clone https://github.com/tiborpilz/doom-emacs-config ".config/doom"
-        else
-            cd ".config/doom"
-            git pull
-            cd -
         fi
         # .config/emacs/bin/doom sync
       '';
