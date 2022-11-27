@@ -37,6 +37,7 @@ Plug 'tpope/vim-fugitive'
 
 " Folds
 Plug 'scr1pt0r/crease.vim'
+
 " Statusline
 if !exists('g:started_by_firenvim')
   Plug 'vim-airline/vim-airline'
@@ -59,6 +60,9 @@ Plug 'hashivim/vim-terraform'
 
 "" Nix
 Plug 'LnL7/vim-nix'
+
+"" Org
+Plug 'nvim-orgmode/orgmode'
 
 " LSP
 Plug 'neovim/nvim-lspconfig'
@@ -152,6 +156,9 @@ lua require('lsp-signature')
 
 " Iron repl config
 lua require('iron-config')
+
+" Orgmode setup
+lua require('orgmode')
 
 " Dashboard settings
 let g:dashboard_custom_header = [

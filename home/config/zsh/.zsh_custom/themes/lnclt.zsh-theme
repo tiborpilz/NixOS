@@ -21,7 +21,8 @@ function get_pwd(){
 }
 
 function nix_shell_prompt() {
-  echo ${IN_NIX_SHELL+"(nix-shell) "}
+  nix_indicator="%{$fg[blue]%} %{$reset_color%}"
+  echo ${IN_NIX_SHELL+"$nix_indicator"}
 }
 
 PROMPT=' $(nix_shell_prompt)$ret_status %{$fg[white]%}$(get_pwd) $(git_prompt_info)%{$reset_color%}%{$reset_color%} '
