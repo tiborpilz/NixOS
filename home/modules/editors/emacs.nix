@@ -76,8 +76,8 @@ in
 
       # vue3 language server
       my."@volar/vue-language-server"
-      my."@volar/vue-typescript"
-      my."@volar-plugins/vetur"
+      # my."@volar/vue-typescript"
+      # my."@volar-plugins/vetur"
 
       # typescript language server
       nodePackages.typescript-language-server
@@ -87,8 +87,6 @@ in
     ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
-
-    xdg.dataFile."volar-plugins/vetur" = { source = "${pkgs.my."@volar-plugins/vetur"}/lib/node_modules/@volar-plugins/vetur/out"; };
 
     # modules.shell.zsh.rcFiles = [ "${config.xdg.configHome}/emacs/aliases.zsh" ];
 

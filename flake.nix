@@ -51,6 +51,22 @@
       } // import ./packages/node/default.nix {
         inherit pkgs system;
       };
+
+      packages.x86_64-darwin = {
+        default = pkgs.hello;
+      } // import ./packages/node/default.nix {
+        pkgs = import inputs.nixpkgs-unstable {
+          system = "x86_64-darwin";
+          config.allowUnfree = true;
+          overlays = lib.attrValues {
+            default = final: prev: {
+              unstable = pkgs';
+              my = self.packages.x86_64-darwin;
+            };
+          };
+        };
+        system = "x86_64-darwin";
+      };
         # (mapModules ./packages (p: pkgs.callPackage p {}))
         # // { default = pkgs.hello; };
 
@@ -85,6 +101,7 @@
           overlays = lib.attrValues {
             default = final: prev: {
               unstable = pkgs';
+              my = self.packages.x86_64-darwin;
             };
           };
         };
