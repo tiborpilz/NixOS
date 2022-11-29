@@ -1,5 +1,3 @@
 [
-    "@volar/vue-language-server",
-    "@volar/vue-typescript",
-    "@volar-plugins/vetur"
+    "@volar/vue-language-server"
 ]
