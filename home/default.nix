@@ -13,6 +13,9 @@ in {
 
   home.packages = with pkgs; [
     (nerdfonts.override { fonts = [ "FiraCode" ]; })
+
+    # Need later version of bash for nix-shell to work correctly on macos
+    bash
   ];
 
   # Let Home Manager install and manage itself.
