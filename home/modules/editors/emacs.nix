@@ -72,16 +72,5 @@ in
     ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
-
-    home.activation.installDoomEmacs = lib.hm.dag.entryAfter ["WriteBoundary"] ''
-        if [ ! -d ".config/emacs" ]; then
-            git clone --depth=1 --single-branch https://github.com/doomemacs/doomemacs ".config/emacs"
-        fi
-
-        if [ ! -d ".config/doom" ]; then
-            git clone https://github.com/tiborpilz/doom-emacs-config ".config/doom"
-        fi
-        # .config/emacs/bin/doom sync
-      '';
   };
 }
