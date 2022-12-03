@@ -2,13 +2,14 @@
   description = "NixOS and Home-Manager configurations";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "nixpkgs/nixos-22.11";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     emacs-overlay.url = "github:nix-community/emacs-overlay";
+
 
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
@@ -18,6 +19,8 @@
 
     flake-utils.url = "github:numtide/flake-utils";
     flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
+
+    digga.url = "github:divnix/digga";
   };
 
   outputs = {
@@ -28,29 +31,47 @@
     sops-nix,
     flake-utils,
     flake-utils-plus,
+    digga,
     ...
   } @ inputs:
     let
-      inherit (builtins) removeAttrs;
+      supportedSystems = [ "x86_64-linux" "x86_64-darwin" ];
       lib = nixpkgs.lib.extend
         (self: super: {
           my = import ./lib { inherit inputs; lib = self; pkgs = nixpkgs; };
           hm = home-manager.lib;
         });
-      inherit (lib.my) mapModules mapModulesRec mapHosts;
+      inherit (lib.my) mapModules;
 
       pkgs = self.pkgs.x86_64-linux.nixpkgs;
 
     in flake-utils-plus.lib.mkFlake {
-      inherit self inputs;
-      supportedSystems = [ "x86_64-linux" "x86_64-darwin" ];
+      inherit self inputs supportedSystems;
 
-      channels.unstable.input = nixpkgs-unstable;
+      channels.nixpkgs-unstable.config = { allowUnfree = true; };
+      channels.nixpkgs.config = { allowUnfree = true; };
+
+      hostDefaults = {
+        channelName = "nixpkgs";
+        modules = [
+          ./.
+        ];
+      };
+
+      sharedOverlays = [
+        (final: prev: {
+          unstable = import nixpkgs-unstable {
+            system = prev.system;
+            config.allowUnfree = true;
+          };
+          my = self.packages."${prev.system}";
+        })
+      ];
+
+      hosts = mapModules ./hosts (hostPath: lib.my.mkHostAttrs hostPath { });
 
       outputsBuilder = channels: {
-        # packages = { inherit (channels.unstable) hello; } // (import ./packages { pkgs = channels.unstable; });
-        packages = lib.foldAttrs (item: acc: item) {} (lib.attrValues (mapModules ./packages (p: import p { pkgs = channels.unstable; })));
-        overlays = (mapModules ./overlays import);
+        packages = lib.foldAttrs (item: acc: item) {} (lib.attrValues (mapModules ./packages (p: import p { pkgs = channels.nixpkgs; })));
 
         apps.repl = flake-utils.lib.mkApp {
           drv = pkgs.writeShellScriptBin "repl" ''
@@ -60,50 +81,28 @@
             nix repl $confnix
           '';
         };
+
       };
 
-      overlays.default = final: prev: {
-        unstable = nixpkgs-unstable;
-        my = self.packages;
-      };
+      homeConfigurations = (lib.my.mergeAttrs (lib.forEach supportedSystems (system: {
+        "tibor-${system}" = home-manager.lib.homeManagerConfiguration {
+          inherit lib;
+          pkgs = self.pkgs;
+
+          modules = [
+            ./home
+            {
+              _module.args.inputs = inputs;
+              home.username = "tibor";
+              home.homeDirectory = "/home/tibor";
+              modules.syncthing.service = true;
+            }
+          ];
+        };
+      })));
 
       inherit lib;
     };
-
-
-      # mkPkgs = pkgs: extraOverlays: system: import pkgs {
-      #   inherit system;
-      #   config.allowUnfree = true;
-      #   overlays = extraOverlays;
-      # };
-    # in {
-    #   packages = eachSystem systems (system:
-    #     let
-    #       pkgs = mkPkgs nixpkgs [] system;
-    #     in {
-    #       default = pkgs.hello;
-    #     });
-
-    #   overlays = eachSystem systems(system: (mapModules ./overlays import));
-    # };
-}
-
-      # mkPkgs = pkgs: extraOverlays: system: import pkgs {
-      #   inherit system;
-      #   config.allowUnfree = true;
-      #   overlays = extraOverlays ++ (lib.attrValues self.overlays);
-      # };
-
-      # pkgs = mkPkgs nixpkgs [ self.overlays.default ];
-
-
-      # overlays = eachSystem systems (system:
-      #   (mapModules ./overlays import) // {
-      #     default = final: prev: {
-      #       unstable = mkPkgs nixpkgs-unstable;
-      #       my = self.packages."${system}";
-      #     };
-      #   });
 
       # lib = nixpkgs.lib.extend
       #   (self: super: {
