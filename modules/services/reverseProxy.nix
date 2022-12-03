@@ -14,7 +14,7 @@ let
       };
       auth = mkOption {
         type = types.bool;
-        description = "Enable authentication";
+        description = "Enable authentication (per Service)";
         example = true;
         default = true;
       };
@@ -25,7 +25,7 @@ let
     options = {
       enable = mkOption {
         type = types.bool;
-        description = "Enable basic auth";
+        description = "Enable basic auth (globally)";
         example = true;
         default = false;
       };

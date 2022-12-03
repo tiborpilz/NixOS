@@ -26,6 +26,9 @@ in
         "${dataDir}:/data"
       ];
     };
-    modules.services.reverseProxy.proxies.komga.publicPort = publicPort;
+    modules.services.reverseProxy.proxies.komga = {
+      publicPort = publicPort;
+      auth = false;
+    };
   };
 }
