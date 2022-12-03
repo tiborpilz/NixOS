@@ -1,0 +1,1296 @@
+* Base Settings
+** Personal data
+Set Name and mail adress
+#+begin_src elisp
+(setq user-full-name "Tibor Pilz"
+      user-mail-address "tibor@pilz.berlin")
+#+end_src
+
+** Add checks for different machines
+Although I would like to keep the differences between my development
+environments as low as possible - also to counteract configuration drift, there
+are some settings that need to be specific to some of my machines - e.g. the
+font-size. So, I define some basic functions to check which machine is curently
+running this config, and adjust certain settings accordingly.
+
+#+begin_src elisp
+(defun is-mac ()
+  (string-equal system-type "darwin"))
+
+(defun is-linux ()
+  (string-equal system-type "gnu/linux"))
+
+(defun is-workstation ()
+  (string-equal (system-name) "archyMcArchstation"))
+#+end_src
+
+** Font selection
+Instead of setting the fonts twice, I'll define a scaling factor depending on
+the macine I'm running on, and then use that to set the font size.
+#+begin_src elisp
+(setq font-scale-factor (if (is-workstation) 1.1 1.0))
+
+(defun scale-font (size)
+  (round (* size font-scale-factor)))
+#+end_src
+
+I'm a big fan of ligatures, and I've been using FiraCode for as long as I can remember.
+#+begin_src elisp
+(when (is-mac) (setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14))) nil)
+;; (setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 16) :weight 'light)
+;;       doom-big-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 24))
+;;       doom-variable-pitch-font (font-spec :family "Open Sans" :size (scale-font 16))
+;;       doom-serif-font (font-spec :family "FreeSerif" :weight 'light))
+#+end_src
+
+#+RESULTS:
+
+** Line numbers
+Since I'm using Evil/vim-keybindings, I prefer relative line numbers as default.
+
+#+begin_src elisp
+(setq display-line-numbers-type 'relative)
+#+end_src
+
+** Tab width
+2 spaces, suck it k&r
+#+begin_src elisp
+(setq tab-width 2)
+#+end_src
+
+** Fix straight.el
+https://github.com/doomemacs/doomemacs/issues/6960#issuecomment-1327514660
+
+#+begin_src elisp :tangle packages.el
+(package! straight :pin "3eca39d")
+#+end_src
+* Org Mode
+** Base Settings
+#+begin_src elisp
+(setq org-directory "~/org/")
+(setq org-agenda-files (list org-directory))
+
+(setq org-use-property-inheritance t)
+(setq org-log-done 'time) ; Log time when task completes
+(setq org-list-allow-alphabetical t)       ; a, A, a) A) list bullets)
+(setq org-catch-invisible-edits 'smart) ; don't treat lone _ / ^ as sub/superscripts, require _{} / ^{})
+
+
+(setq org-return-follows-link 1)
+(setq calendar-week-start-day 1) ;; start on monday
+(setq org-agenda-include-diary t)
+#+end_src
+
+** Visual improvements
+*** mixed pitch & org-pretty-mode
+#+begin_src elisp
+(add-hook 'org-mode-hook #'+org-pretty-mode)
+#+end_src
+
+*** Show passed deadlines as error
+#+begin_src elisp
+(setq org-agenda-deadline-faces
+      '((1.001 . error)
+        (1.0 . org-warning)
+        (0.5 . org-upcoming-deadline)
+        (0.0 . org-upcoming-distant-deadline)))
+#+end_src
+
+*** Show quote blocks in italic
+#+begin_src elisp
+(setq org-fontify-quote-and-verse-blocks t)
+#+end_src
+
+*** Defer font-lock
+For a more responsive editing experience
+#+begin_src elisp
+(defun locally-defer-font-lock ()
+  "Set jit-lock defer and stealth, when buffer is over a certain size."
+  (when (> (buffer-size) 50000)
+    (setq-local jit-lock-defer-time 0.05
+                jit-lock-stealth-time 1)))
+#+end_src
+
+*** Symbols
+#+begin_src elisp
+(after! org-superstar
+  (setq org-superstar-headline-bullets-list '("◉" "○" "✸" "✿" "✤" "✜" "◆" "▶")
+        org-superstar-prettify-item-bullets t ))
+
+(setq org-ellipsis " ▾ "
+      org-hide-leading-stars t
+      org-priority-highest ?A
+      org-priority-lowest ?E
+      org-priority-faces
+      '((?A . 'all-the-icons-red)
+        (?B . 'all-the-icons-orange)
+        (?C . 'all-the-icons-yellow)
+        (?D . 'all-the-icons-green)
+         (?E . 'all-the-icons-blue)))
+#+end_src
+
+** Babel
+*** HTTP requests via babel
+#+begin_src elisp
+(use-package! ob-http
+  :commands org-babel-execute:http)
+#+end_src
+
+*** Babel header args
+See https://org-babel.readthedocs.io/en/latest/header-args/
+
+#+begin_src elisp
+(setq org-babel-default-header-args
+      '((:session . "none")
+        (:results . "replace")
+        (:exports . "code")
+        (:cache . "no")
+        (:noeweb . "no")
+        (:hlines . "no")
+        (:tangle . "no")
+        (:comments . "link")))
+#+end_src
+*** LSP in org-babel src blocks
+#+begin_src elisp
+(cl-defmacro lsp-org-babel-enable (lang)
+  "Support LANG in org source code block."
+  (setq centaur-lsp 'lsp-mode)
+  (cl-check-type lang stringp)
+  (let* ((edit-pre (intern (format "org-babel-edit-prep:%s" lang)))
+         (intern-pre (intern (format "lsp--%s" (symbol-name edit-pre)))))
+    `(progn
+       (defun ,intern-pre (info)
+         (let ((file-name (->> info caddr (alist-get :file))))
+           (unless file-name
+             (setq file-name (make-temp-file "babel-lsp-")))
+           (setq buffer-file-name fie)
+           (lsp-deferred)))
+       (put ',intern-pre 'function-documentation
+            (format "Enable lsp-mode in the buffer of org source block (%s)."
+                    (upcase ,lang)))
+       (if (fboundp ',edit-pre)
+           (advice-add ',edit-pre :after ',intern-pre)
+         (progn
+           (defun ,edit-pre (info)
+             (,intern-pre info))
+           (put ',edit-pre 'function-documentation
+                (format "Prepare local buffer environment for org source block (%s)."
+                        (upcase ,lang))))))))
+(defvar org-babel-lang-list
+  '("go" "python" "ipython" "bash" "sh" "ditaa"))
+(dolist (lang org-babel-lang-list)
+  (eval `(lsp-org-babel-enable ,lang)))
+#+end_src
+
+** Import/Export
+*** View exported file
+#+begin_src elisp
+(map! :map org-mode-map
+      :localleader
+      :desc "View exported file" "v" #'org-view-output-file)
+
+(defun org-view-output-file (&optional org-file-path)
+  "Visit buffer open on the first output file (if any) found, using `org-view-output-file-extensions'"
+  (interactive)
+  (let* ((org-file-path (or org-file-path (buffer-file-name) ""))
+         (dir (file-name-directory org-file-path))
+         (basename (file-name-base org-file-path))
+         (output-file nil))
+    (dolist (ext org-view-output-file-extensions)
+      (unless output-file
+        (when (file-exists-p
+               (concat dir basename "." ext))
+          (setq output-file (concat dir basename "." ext)))))
+    (if output-file
+        (if (member (file-name-extension output-file) org-view-external-file-extensions)
+            (browse-url-xdg-open output-file)
+          (pop-to-buffer (or (find-buffer-visiting output-file)
+                             (find-file-noselect output-file))))
+      (message "No exported file found"))))
+
+(defvar org-view-output-file-extensions '("pdf" "md" "rst" "txt" "tex" "html")
+  "Search for output files with these extensions, in order, viewing the first that matches")
+(defvar org-view-external-file-extensions '("html")
+  "File formats that should be opened externally.")
+
+#+end_src
+
+*** use github markdown
+#+begin_src elisp
+(use-package! ox-gfm :after ox)
+#+end_src
+
+*** Export headings up to five levels deep
+#+begin_src elisp
+(setq org-export-headline-levels 5)
+#+end_src
+
+*** Ignore tag
+Add `:ignore:` tag to headings, so only the headings will be ignored for an export
+#+begin_src elisp
+;(require 'ox-extra)
+;(ox-extras-activate '(ignore-headlines))
+#+end_src
+
+*** automatic latex rendering
+#+begin_src elisp
+(use-package! org-fragtog
+  :hook (org-mode . org-fragtog-mode))
+#+end_src
+
+*** Latex fragments
+#+begin_src elisp
+(setq org-highlight-latex-and-related '(native script entities))
+#+end_src
+
+*** Presentation
+**** Export to Reveal.js
+#+begin_src elisp
+;(use-package! org-re-reveal)
+#+end_src
+**** org-present
+#+begin_src elisp :tangle packages.el
+(package! org-present)
+#+end_src
+
+** Extensions
+*** Roam
+*** Use the same directory as org
+#+begin_src elisp
+(setq org-roam-directory "~/org")
+#+end_src
+
+*** Add Org-Roam UI
+Org-Roam UI is a web-based interface for Org-roam. It is a separate package -
+and it also needs the websocket package as dependency.
+
+The closest comparison to org-roam-ui is Obsidian.
+
+#+begin_src elisp :tangle packages.el
+(unpin! org-roam)
+(package! org-roam-ui)
+(package! websocket :pin "fda4455333309545c0787a79d73c19ddbeb57980") ; dependency of `org-roam-ui'
+#+end_src
+
+#+begin_src elisp
+(use-package! websocket
+  :after org-roam)
+
+(use-package! org-roam-ui
+  :after org-roam
+  :commands org-roam-ui-open
+  :hook (org-roam . org-roam-ui-mode)
+  :config
+  (require 'org-roam) ; in case autoloaded
+  (defun org-roam-ui-open ()
+    "Ensure the server is active, then open the roam graph."
+    (interactive    )
+    (unless org-roam-ui-mode (org-roam-ui-mode 1))
+    (browse-url-xdg-open (format "http://localhost:%d" org-roam-ui-port))))
+
+(setq org-roam-ui-open-on-start nil)
+#+end_src
+
+*** Google Calendar integration
+#+begin_src elisp :tangle packages.el
+(package! org-gcal)
+#+end_src
+
+#+begin_src elisp
+(use-package! org-gcal
+  :config
+  (setq org-gcal-client-id "CLIENT_ID"
+        org-gcal-client-secret "CLIENT_SECRET"
+        org-gcal-fetch-file-alit '(("tbrpilz@googlemail.com" . "~/org/schedule.org"))))
+#+end_src
+
+** Fixes and miscellanious improvements
+*** Visual-line-mode messes with with plaintext (markdow, latex)
+#+begin_src elisp
+(remove-hook 'text-mode-hook #'visual-line-mode)
+(add-hook 'text-mode-hook #'auto-fill-mode)
+#+end_src
+
+*** Prevent org-block face for latex fragments, since they look weird
+#+begin_src elisp
+(require 'org-src)
+(add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t)))
+#+end_src
+
+*** Function to create an org buffer
+#+begin_src elisp
+(evil-define-command evil-buffer-org-new (count file)
+  "creates a new ORG buffer replacing the current window, optionally
+   editing a certain FILE"
+  :repeat nil
+  (interactive "P<f>")
+  (if file
+      (evil-edit file)
+    (let ((buffer (generate-new-buffer "*new org*")))
+      (set-window-buffer nil buffer)
+      (with-current-buffer buffer
+        (org-mode)))))
+(map! :leader
+      (:prefix "b"
+       :desc "new empty ORG buffer" "o" #'evil-buffer-org-new))
+#+end_src
+
+*** Insert cdlatex enviornments and edit immediately
+#+begin_src elisp
+(add-hook 'org-mode-hook 'turn-on-org-cdlatex)
+
+(defadvice! org-edit-latex-env-after-insert ()
+  :after #'org-cdlatex-environment-indent
+  (org-edit-latex-environment))
+#+end_src
+
+*** Disable auto-fill-mode
+Auto-fill-mode automatically adds line breaks while typing in markdown and org files.
+Since those files are going to be exported to pdf or html, which take care of proper formatting, I'm disabling this.
+
+For Markdown, add a hook setting auto-fill-mode to -1.
+#+begin_src elisp
+(add-hook! markdown-mode (auto-fill-mode -1))
+#+end_src
+
+#+begin_src elisp
+
+(use-package! org-appear
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autoemphasis t
+        org-appear-autosubmarkers t
+        org-appear-autolinks nil)
+  ;; for proper first-time setup, `org-appear--set-elements'
+  ;; needs to be run after other hooks have acted.
+  (run-at-time nil nil #'org-appear--set-elements))
+#+end_src
+
+* Projectile
+** Project Search Path
+#+begin_src elisp
+(setq projectile-project-search-path '(("~/Code/" . 1)))
+#+end_src
+* Development
+** Language-Specific Settings
+*** Web Dev (JS/TS/CSS)
+**** Testing
+***** Jest Test Mode
+Jest-Test-Mode.el is a minor mode for running jest via npx.
+
+#+begin_src elisp :tangle packages.el
+(package! jest-test-mode)
+#+end_src
+
+#+begin_src elisp
+(use-package! jest-test-mode
+  :commands jest-test-mode
+  :hook (typescript-mode js-mode typescript-tsx-mode))
+#+end_src
+
+**** Svelte
+#+begin_src elisp :tangle packages.el
+(package! svelte-mode)
+#+end_src
+
+#+begin_src elisp
+(use-package! svelte-mode
+    :mode "\\.svelte\\'")
+#+end_src
+
+**** Vue
+***** LSP
+The package lsp-mode has an issue with volar in version 8.0.0, so until the
+issues are in the next release of lsp-mode (and doom), I'm unpinning the
+package.
+
+#+begin_src elisp :tangle packages.el
+(unpin! lsp-mode)
+#+end_src
+
+To get lsp support working, there needs to be a ~.volarrc~ file in the project's
+root directory.
+
+***** Formatting
+
+Remove 1 space padding from <script> tags
+
+#+begin_src elisp
+(with-eval-after-load 'web-mode
+  (setq web-mode-script-padding 0))
+#+end_src
+**** Tailwind
+Add the tailwind lsp package
+#+begin_src elisp :tangle packages.el
+(package! lsp-tailwindcss
+  :recipe (:host github
+           :repo "merrickluo/lsp-tailwindcss"))
+#+end_src
+
+...and use it
+#+begin_src elisp
+(use-package! lsp-tailwindcss
+  :init
+  (setq lsp-tailwindcss-add-on-mode t))
+#+end_src
+
+**** Code formatting
+Set typescript file indentation to be 2 levels by default.
+#+begin_src elisp
+(setq typescript-indent-level 2)
+#+end_src
+
+*** Nix
+**** nix-mode
+#+begin_src elisp
+(use-package! nix-mode
+  :mode "\\.nix\\'")
+#+end_src
+
+*** Python
+**** Poetry
+After years of frustration, I'm finally content with setting up and managing
+projects in the Python ecosystem, thanks to Poetry. It's a great tool, and
+luckily, there is excellent integration with Emacs.
+
+#+begin_src elisp :tangle packages.el
+(package! poetry)
+#+end_src
+
+**** Run pytest in virtualenv
+python-pytest does not use the virtualenv's binary by default. As a fix, I'm
+adding a hook to python-mode to set the correct executable - since python-mode
+plays nicely with direnv.
+
+#+begin_src elisp
+(add-hook! python-mode
+  (advice-add 'python-pytest-file :before
+              (lambda (&rest args)
+                (setq-local python-pytest-executable
+                            (executable-find "pytest")))))
+#+end_src
+
+*** Markdown
+**** Code blocks
+To set up code-highlighting in markdown code blocks, I need multiple major modes in one buffer. The package polymode promises to allow that:
+#+begin_src elisp
+(use-package! polymode)
+(use-package! poly-markdown)
+#+end_src
+
+** Tools
+*** Code Completion
+Since it's already integrated into Doom Emacs, I'm using company for code
+completion.
+
+**** Handling
+I don't want any delay in showing suggestions, unless I'm writing a string or a
+comment, then I want company to not show any suggestions at all.
+#+begin_src elisp
+(setq company-idle-delay
+      (lambda () (if (company-in-string-or-comment) nil 0.01)))
+#+end_src
+
+
+I also want to get suggestions after the first typed character, to remove
+unnecessary delay.
+#+begin_src elisp
+(setq company-minimum-prefix-length 1)
+#+end_src
+
+I want the suggestions to wrap around.
+#+begin_src elisp
+(setq company-selection-wrap-around t)
+#+end_src
+
+**** Backends
+A backend is responsible for providing the completion suggestions. As I'm using
+LSP where possible, and I don't want to use snippets in that way, I'm going to
+keep the list of backends very short.
+
+#+begin_src elisp
+(setq company-backends '((company-capf company-dabbrev-code)))
+#+end_src
+
+**** Looks
+For the icons, I'm using VSCode icons. The nomenclature is a little confusing,
+to determine, what to put in the margin, company has to execute a function. So
+using the function ~company-vscode-dark-icons-margin~ here means just setting
+those icons as what's being displayed.
+
+#+begin_src elisp
+(setq company-format-margin-function #'company-vscode-dark-icons-margin)
+#+end_src
+
+*** Copilot
+Currently, this plugin only works with an older version of node (16) installed,
+which is handled via nvm. Since I'm using this concept on multiple machines, it
+makes sense to get the nvm version's path programatically.
+
+In the future I could implement installing node 16 if it's missing.
+
+**** TODO Load via nix somehow
+#+begin_src elisp :tangle packages.el
+;; (package! copilot
+;;   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+#+end_src
+
+#+begin_src elisp
+;; (setq copilot-node-executable
+;;       (replace-regexp-in-string "\n" "" (shell-command-to-string ". $XDG_CONFIG_HOME/zsh/.zshrc; nvm which 16")))
+
+;; (use-package! copilot
+;;   :bind (("<backtab>" . 'copilot-accept-completion)))
+#+end_src
+
+*** Debugging
+Doom Emacs has a debugger module which uses ~dap-mode~ under the hood.
+
+**** Language-Specific Debugger settings
+***** Python
+
+I'm using debugpy for python.
+
+#+begin_src elisp
+(setq dap-python-debugger 'debugpy)
+#+end_src
+
+**** Fixes
+***** Fix Doom "+debugger/start"
+
+By default, ~+debugger/start~ will look for the last configuration set in the
+project's doom-store - which has to be cleared manually to reset. This function
+will remove the debugger configuration from the doom-store.
+
+#+begin_src elisp
+;;;###autoload
+(defun +debugger/clear ()
+  "Clear the debugger configuration from the doom-store."
+  (interactive)
+  (doom-store-rem (doom-project-root) "+debugger"))
+#+end_src
+
+The old function is renamed to ~+debugger/repeat~.
+
+#+begin_src elisp
+(setq debugger-start-copy (symbol-function '+debugger/start))
+
+;;;###autoload
+(defun +debugger/repeat (arg)
+  "Start the debugger."
+  (interactive)
+  (funcall debugger-start-copy arg))
+#+end_src
+
+And ~+debugger/start~  is redefined to clear the configuration before starting.
+
+#+begin_src elisp
+;;;###autoload
+(defun +debugger/start (arg)
+  "Launch a debugger session.
+Launches the last used debugger, if one exists. Otherwise, you will be prompted
+for what debugger to use. If the prefix ARG is set, prompt anyway."
+  (interactive "P")
+  (message arg)
+  (+debugger--set-config (+debugger-completing-read))
+  (+debugger/start-last))
+#+end_src
+
+***** Missing fringes in dap-mode
+When running the dap-mode debugger, for some reason, the code window's fringes
+get set to 0 width. This can be fixed with a workaround by setting the window's
+buffer again via ~set-window-buffer~. Since this only should happen on windows
+with file buffers, we need some helper functions to get the correct window.
+
+****** Get the window containing a file buffer
+
+Since there's only one window with a file buffer when running the debugger, this
+can be kept fairly simple.
+
+#+begin_src elisp
+(defun get-window-with-file-buffer ()
+  "Get the window with a file buffer."
+  (seq-find (lambda (window)
+              (buffer-file-name (window-buffer window)))
+            (window-list)))
+#+end_src
+
+****** Reset file buffer window
+
+Using the helper function, we can reset the file window's buffer.
+
+#+begin_src elisp
+(defun reset-file-window-buffer ()
+  "Reset the file window's buffer."
+  (let ((window (get-window-with-file-buffer)))
+    (when window
+      (set-window-buffer window (window-buffer window)))))
+
+#+end_src
+
+****** Add reset to window configuration change hook
+
+Having tried multiple dap hooks to no avail, I've resigned to just resetting the
+file window's buffer on every window configuration change. This can be achieved
+with the ~window-configuration-change-hook~. Here, I only want to have the hook
+active when in a dap session, so I'm adding the reset function after the dap
+session has been created and removing it when the session is terminated.
+
+#+begin_src elisp
+(defun add-reset-file-window-buffer-hook (&rest args)
+  "Add the reset-file-window-buffer function to the window-configuration-change-hook."
+  (add-hook 'window-configuration-change-hook 'reset-file-window-buffer))
+
+(defun remove-reset-file-window-buffer-hook (&rest args)
+    "Remove the reset-file-window-buffer function from the window-configuration-change-hook."
+    (remove-hook 'window-configuration-change-hook 'reset-file-window-buffer))
+
+(add-hook 'dap-mode-hook 'add-reset-file-window-buffer-hook)
+#+end_src
+
+**** Keybindings
+#+begin_src elisp
+(map! :leader
+      (:prefix-map ("d" . "debugger")
+       :desc "Debug" "d" #'dap-debug
+       :desc "Next" "n" #'dap-next
+       :desc "Step in" "i" #'dap-step-in
+       :desc "Step out" "o" #'dap-step-out
+       :desc "Continue" "c" #'dap-continue
+       :desc "Restart" "r" #'dap-restart-frame
+       :desc "Disconnect" "D" #'dap-disconnect
+       :desc "Evaluate" "e" #'dap-eval
+       :desc "Add Expression" "a" #'dap-ui-expressions-add
+       (:prefix ("b" . "breakpoints")
+        :desc "Toggle" "t" #'dap-breakpoint-toggle
+        :desc "Add" "a" #'dap-breakpoint-add
+        :desc "Delete" "d" #'dap-breakpoint-delete
+        :desc "Set condition" "c" #'dap-breakpoint-condition
+        :desc "Set log message" "m" #'dap-breakpoint-log-message
+        :desc "Set hit condition" "h" #'dap-breakpoint-hit-condition)))
+
+#+end_src
+*** Syntax Checking
+For some reason, flycheck - especially when checking web files - is really slow.
+To alleviate, it should only check the syntax on file-save.
+
+#+begin_src elisp
+(setq flycheck-syntax-automatically '(save-mode-enable))
+#+end_src
+
+*** LSP
+For the LSP settings, I'm using the doom lsp module, which defaults to lsp-mode,
+and lsp-ui. The alternative, eglot, would mean I'd have to set up the language
+servers myself instead of relying on ~M-x lsp-install~. Although I have started to
+work on a nix-workflow to install node-packages for that purpose, the
+the ease of use of ~M-x lsp-install~ and the possibility of using lsp-ui means
+I'll stick to lsp-mode for now.
+
+Most of the language-specific settings are already defined under [[*Language-Specific Settings]].
+Here, I'll define some general settings.
+
+**** Handling
+Set ~capf~ as completion provider.
+
+#+begin_src elisp
+(setq lsp-completion-provider :capf)
+#+end_src
+
+Don't show completion item detail
+
+#+begin_src elisp
+(setq lsp-completion-show-detail nil)
+#+end_src
+
+But show completion item kind
+
+#+begin_src elisp
+(setq lsp-completion-show-kind t)
+#+end_src
+
+**** UI
+Although I like using ~lsp-ui-doc~, I don't want it to appear every time I'm
+hovering. Having a keybinding to glance at the documentation is fine for me.
+
+#+begin_src elisp
+(map! :leader
+      (:prefix ("c" . "code")
+       :desc "Glance at documentation" "g" #'lsp-ui-doc-glance))
+#+end_src
+
+Enable lenses
+#+begin_src elisp
+(setq lsp-lens-enable t)
+#+end_src
+
+Enable headerline with breadcrumbs.
+#+begin_src elisp
+(setq lsp-headerline-breadcrub-enable t)
+#+end_src
+
+Disable eldoc, as it does not look that good and mostly serves as a distraction.
+#+begin_src elisp
+(setq lsp-eldock-enable-hover nil)
+#+end_src
+
+Same with signature help, as well as help documentation
+#+begin_src elisp
+(setq lsp-signature-auto-activate nil)
+(setq lsp-signature-render-documentation nil)
+#+end_src
+
+* UI
+** Theming
+*** Doom Themes
+#+begin_src elisp :tangle packages.el
+(package! doom-themes)
+#+end_src
+
+#+begin_src elisp
+(setq doom-theme 'doom-nord-aurora)
+#+end_src
+
+*** Nano
+Nano is a minimalistic theme for emacs, and it is absolutely gorgeous. Although
+it lacks the features I need, I was always a fan of the look. Now, it's possible
+to enjoy the best of both worlds by theming Doom to look like Nano.
+
+#+begin_src elisp
+;; (add-to-list 'load-path "~/Code/doom-nano-testing")
+;; (require 'load-nano)
+;; (setq doom-themes-treemacs-theme "doom-atom")
+#+end_src
+
+*** Misc Themes
+**** Grayscale
+#+begin_src elisp :tangle packages.el
+(package! grayscale-theme)
+#+end_src
+
+**** Tao Themes
+Very appealing, minimalistic themes.
+
+#+begin_src elisp :tangle packages.el
+(package! tao-theme)
+#+end_src
+
+** Modeline
+*** Nano Modeline
+
+#+begin_src elisp :tangle packages.el
+(package! nano-modeline)
+#+end_src
+
+#+begin_src elisp
+;; (use-package! nano-modeline
+;;   :config
+;;   (nano-modeline-mode 1))
+#+end_src
+
+*** Doom Modeline
+
+Allow for more characters in the branch name
+
+#+begin_src elisp
+(setq doom-modeline-vcs-max-length 50)
+#+end_src
+
+#+begin_src elisp
+(setq doom-modeline-hud t)
+#+end_src
+
+# ** Dashboard
+# I don't really have much use for the Doom dashboard, so I'm replacing it with
+# the package [[https://github.com/emacs-dashboard/emacs-dashboard][Emacs Dashboard]].
+
+# - Install the package.
+# #+begin_src elisp :tangle packages.el
+# (package! dashboard)
+# #+end_src
+
+# Initialize the package
+# #+begin_src elisp
+# (use-package! dashboard
+#   :ensure t
+#   :config
+#   (dashboard-setup-startup-hook))
+
+# #+end_src
+
+# #+RESULTS:
+# : t
+
+# Show just a small text as startup banner, center the content and add a mix of widgets.
+# #+begin_src  elisp
+# (setq dashboard-startup-banner-logo-title "(emacs)")
+# (setq dashboard-startup-banner 2)
+# (setq dashboard-set-navigator t)
+# (setq dashboard-center-content t)
+# (setq dashboard-items '((bookmarks . 5)
+#                         (agenda . 5)))
+# (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+# (setq dashboard-set-heading-icons t)
+# (setq dashboard-set-file-icons t)
+# (setq dashboard-set-navigator t)
+# (setq dashboard-set-init-info t)
+# (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+#                                                    :height 1.1
+#                                                    :v-adjust -0.05
+#                                                    :face 'font-lock-keyword-face))
+# (setq dashboard-projects-switch-function 'projectile-persp-switch-project)
+# (setq doom-fallback-buffer-name "*dashboard*")
+# #+end_src
+
+# #+RESULTS:
+# : *dashboard*
+
+** Hydra
+*** Pretty Hydra
+
+# [[https://github.com/jerrypnz/major-mode-hydra.el#pretty-hydra][Pretty Hydra]] is a package for improving the looks of [[https://github.com/abo-abo/hydra][Hydra]], which is a
+# keybinding tool with a ui - similar to emacs-which-key.
+
+# Dap-Mode has Hydra built in, which can be opened via the command ~dap/hydra~. Out
+# of the box, the ui is not very pretty, which is why I'm wrapping the existing
+# config in pretty hydra.
+
+# First off, I need to install the package.
+
+# #+begin_src elisp :tangle packages.el
+# (package! pretty-hydra)
+# #+end_src
+
+# Then, I'm defining the hydra, using the existing dap-hydra config.
+
+# First, I'll define helper functions for using ~all-the-icons~ specification, specifically for:
+# - faicon (font awesome)
+# - fileicon (file icons)
+# - octicon (github octicons)
+# - material (material icons)
+# - mode-icon (mode icons)
+
+# Since faicon, fileicon, octicon and material are very similar - the only
+# difference between them is the suffix for both the name and the wrapper
+# all-the-icons function - I'll generate those functions dynamically.
+
+# #+begin_src elisp
+# (require 'all-the-icons)
+
+# (defvar func-suffixes '("faicon" "fileicon" "octicon" "material"))
+
+# ;; loop over func-suffixes and generate all-the-icons-functions
+# (dolist (suffix func-suffixes)
+#   (let ((func-name (intern (concat "with-" suffix)))
+#         (call-name (intern (concat "all-the-icons-" suffix))))
+#     (eval `(defun ,func-name (icon str &optional height v-adjust)
+#       (s-concat (,call-name icon :v-adjust (or v-adjust 0) :height (or height 0)) " " str)))))
+# #+end_src
+
+# Then, I'll define the mode-icon function seperately, since it functions a little
+# differently.
+
+# #+begin_src elisp
+# (defun with-mode-icon (mode str &optional height nospace face)
+#   (let* ((v-adjust (if (eq major-mode 'emacs-lisp-mode) 0.0 0.05))
+#          (args     `(:height ,(or height 1) :v-adjust ,v-adjust))
+#          (_         (when face
+#                       (lax-plist-put args :face face)))
+#          (icon     (apply #'all-the-icons-icon-for-mode mode args))
+#          (icon     (if (symbolp icon)
+#                        (apply #'all-the-icons-octicon "file-text" args)
+#                      icon)))
+#     (s-concat icon (if nospace "" " ") str)))
+# #+end_src
+
+# **** Transforming Dap-Hydra to Pretty Hydra
+
+# ***** Incompatibilities
+# For future-proofing this config, I want to build the hydra config dynamically as
+# well, using the existing ~dap-hydra~.
+
+# Here, I've run into an issue though - Hydra and Pretty Hydra have some
+# differences regarding the configuration object - and Dap-Hydra is using an
+# incompatible docstring format.
+
+# I could just type the config by hand, but where's the fun in that?
+
+# ***** Dynamically generating the configuration
+
+# All of the information necessary to generate the Pretty Hydra config can be
+# found in the existing dap-hydra instance. ~dap-hydra/heads~ contains a list of all
+# keys and their corresponding program - but the descriptions are missing, and the
+# entries are not categorized.
+
+# To get the remaining information, parsing the docstring is necessary.
+
+# ****** Parsing the docstring
+
+# First, a helper function to get any key's description from the docstring:
+
+# #+begin_src elisp
+# (defun get-key-description (key docstring)
+#   "Get the description for a key from the docstring."
+#   (when (string-match (format "\\(_%s_\\):[[:space:]]\\(\\(\\w+\\)\\([[:space:]]\\w+\\)*\\)" key) docstring)
+#     (match-string 2 docstring)))
+# #+end_src
+
+# Extracting the categories from the docstring. I can be certain that the category
+# titles are always in the second row, and they are surround by caret characters
+# (~^~). This makes it easy to just split the string - first on the newlines, and
+# then on the carets.
+
+# #+begin_src elisp
+# (defun get-categories (docstring)
+#     "Get the categories from the docstring."
+#     (let ((lines (split-string docstring "\n")))
+#         (seq-filter (lambda (x) (not (string-blank-p x)))
+#                     (split-string (nth 1 lines) "\\^"))))
+# #+end_src
+
+# The rows are somewhat tricky. The best approach seemed to use regex to remove as
+# much unnecessary content as possible - afterwards, the string can be split
+# again, by a single delimiter.
+
+# #+begin_src elisp
+# (defun split-row (row)
+#   "Split a row into a list of keys."
+#   (-slice (split-string (replace-regexp-in-string ":[^_]*\\(_\\|$\\)" "" row) "_") 1 -1))
+# #+end_src
+
+# Using the split-row function, it is no possible to extract a flat list of all
+# keys from the docstring. This is helpful for verifying that a key actually has a
+# corrisponding head object. (Some don't, like the ~q~ key in the dap-hydra).
+
+# #+begin_src elisp
+# (defun get-all-keys (docstring)
+#   "Get all keys from the docstring."
+#   (let ((lines (-slice (split-string docstring "\n") 3 -3)))
+#     (mapcan #'split-row lines)))
+# #+end_src
+
+# To match the keys to the corresponding categories, there are two approaches.
+
+# The first one seems straitforward and elegant: simply compare the indices of the
+# keys and the category titles in their respective horizontal lists.
+# But, since not all rows have entries at all columns, a seperate check for rows
+# starting with whitespace would be necessary. These rows could only be matched
+# using the second approach - obtain the offset in character widths for all keys
+# and the category titles, relative to the start of each row and compare those.
+
+# Even though the first approach is more elegant for the general case, I'll go
+# with the second one, since it needs to be implemented anyway.
+
+# This way, there is no need to check for rows starting with whitespace, and it is
+# possible to check every key independently.
+
+# First, the category offset.
+
+# #+begin_src elisp
+# (defun get-category-offsets (categories docstring)
+#   "Get the category titles' offsets in the docstring."
+#   (let ((title-row (nth 1 (split-string docstring "\n"))))
+#     (mapcar (lambda (x) `(,x . ,(string-match x title-row))) categories)))
+# #+end_src
+
+
+# For the comparison a higher-order-function that returns a comparison function for
+# a given offset is a nice way, to keep the ~mapcar~ call simple.
+
+# Because the offset is being passed into a lambda function, it needs to be
+# evaluated when the function is being returned. (Otherwise it would be accessed
+# during the comparison, where the variable is not available to the lambda.
+
+# #+begin_src elisp
+# (defun get-comparer (offset)
+#   "Get a comparer function for a given number of blank characters."
+#   `(lambda (x y)
+#     (let ((x-diff (abs (- (cdr x) ,offset)))
+#           (y-diff (abs (- (cdr y) ,offset))))
+#       (< x-diff y-diff))))
+
+# #+end_src
+
+# A small function to split the docstring along the newlines, and then return the
+# correct row for the given key.
+
+# #+begin_src elisp
+# (defun get-row-for-key (key docstring)
+#   "Get the row for a given key from the docstring."
+#   (let ((rows (split-string docstring "\n")))
+#     (seq-find (lambda (x) (member key (split-row x))) rows)))
+
+# #+end_src
+
+# The function to get the category for a given key.
+
+# #+begin_src elisp
+# (defun get-categories-for-key (key docstring)
+#   "Get the category for a key."
+#   (let* ((row (get-row-for-key key docstring))
+#          (categories (get-categories docstring))
+#          (category-offsets (get-category-offsets categories docstring))
+#          (key-offset (string-match (format "_%s_:" key) row))
+#          (comparer (get-comparer key-offset))
+#          (index (-elem-index (car (car (sort category-offsets comparer))) categories)))
+#     (nth index categories)))
+# #+end_src
+
+# ***** Transforming the data and generating the config
+
+# Now that the categories and the keys are available, it is possible to transform
+# the configuration into a format that is compatible with Pretty Hydra.
+
+# Although the description was missing from the dap-hydra head entries, there were
+# a lot of ~nil~ values, that seemed to cause issues with Pretty Hydra. So the
+# new entries will only have three values: the key, the corresponding function,
+# and the description, which was parsed from the docstring.
+
+# #+begin_src elisp
+# (defun add-description (entry docstring)
+#   "Add the description to a single entry."
+#   (let* ((key (car entry))
+#          (func (nth 1 entry))
+#          (desc (get-key-description key docstring))
+#          (rest (-slice entry 2)))
+#     `(,key ,func ,desc)))
+# #+end_src
+
+# Using this function, all heads can be preprocessed - in this step, they are also
+# filtered by checking for the existence in the docstring.
+
+# #+begin_src elisp
+# (defun preprocess-heads (heads docstring)
+#   "Preprocess the heads by checking whether their key is in the docstring and by adding the description."
+#   (let ((filtered-heads (seq-filter (lambda (x) (member (car x) (get-all-keys docstring))) heads)))
+#     (mapcar (lambda (x) (add-description x docstring)) filtered-heads)))
+# #+end_src
+
+# Next up is grouping the hydra header entries by their category. For ease of use,
+# as an intermediate step, an association list of categories and head entries is
+# created. Also, the head entries are being filtered by checking whether their
+# keys are contained in the docstring.
+
+# #+begin_src elisp
+# (defun associate-categories-with-heads (heads docstring)
+#   "Associate categories with heads."
+#   (mapcar (lambda (x) `(,x . ,(get-categories-for-key (car x) docstring))) heads))
+# #+end_src
+
+# After the necessary associations are created, the entries can be grouped by
+# their categories.
+
+# #+begin_src elisp
+# (defun group-heads (category head-category-alist)
+#   "Group heads into a category."
+#   (let ((category-heads (mapcar #'car (seq-filter (lambda (x) (string= (cdr x) category)) head-category-alist))))
+#     `(,category ,category-heads)))
+# #+end_src
+
+# Finally, everything comes together. The docstring is being parsed, the heads are
+# being preprocessed, the categories are being associated with the heads, and the
+# heads are being grouped by their categories.
+
+# #+begin_src elisp
+# (defun get-category-header-alist (heads docstring)
+#   "Get an alist of categories and their head entries."
+#   (let* ((keys (get-all-keys docstring))
+#          (processed-heads (preprocess-heads heads docstring))
+#          (categories (get-categories docstring))
+#          (head-category-alist (associate-categories-with-heads processed-heads docstring))
+#          (grouped-heads (mapcan (lambda (x) (group-heads x head-category-alist)) categories)))
+#     grouped-heads))
+# #+end_src
+
+
+# ***** Creating the Pretty Hydra
+
+# Both parsing and config generation is taken care of, what's missing is an
+# instance of the dap-hydra to transform.
+
+# Before ~dap-hydra/heads~ and ~dap-hydra/docstring~ are accessible, the command ~dap-hydra~ needs
+# to be called to initialize it. ~hydra-keyboard-quit~ immediately closes it again.
+
+# #+begin_src elisp
+# (dap-hydra)
+# (hydra-keyboard-quit)
+# #+end_src
+
+# There is one last hurdle - ~pretty-hydra-define~, which is used to create the
+# hydra, is a macro and not a function. This means that it is not possible to pass the
+# generated configuration as a regular variable. Nothing a little lisp magic could
+# not fix though.
+
+# Instead of passing the configuration as a variable, it is evaluated into the
+# macro call, which is then executed by ~eval~.
+
+# #+begin_src elisp
+# (eval `(pretty-hydra-define dap-hydra-pretty
+#          (:color amaranth :quit-key "q" :title (with-faicon "windows" "Dap" 1 -0.05))
+#          ,(get-category-header-alist dap-hydra/heads dap-hydra/docstring)))
+# #+end_src
+
+** Which-Key
+Which Key is a package that displays the keybindings for the current command in
+a popup. Especially in combination with evil-mode - which has a fantastic
+integration, it is very useful, especially for rarely used commands.
+
+Per default, which-key displays the keybindings for the current command in a
+popup at the bottom of the screen. This can be changed to either the side or the
+minibuffer, but all of those options don't appeal to me. Luckily, there is a
+[[https://github.com/tumashu/posframe][Posframe]] integration. Posframe is a package that displays a buffer in a child
+frame. This allows for much more flexibility in the placement of the popup.
+
+#+begin_src elisp :tangle packages.el
+(package! which-key-posframe)
+#+end_src
+
+There are some issues regarding the frame's height - sometimes the content is
+cut off. This seems to be an ongoing issue, as per [[https://github.com/yanghaoxie/which-key-posframe/issues/5][this Github issue]].
+
+The mentioned solution to use posframe's arghandler does not work anymore, as
+it is depcrecated. The recommended alternative is to use advise.
+
+#+begin_src elisp
+(defun wjb/posframe-arghandler (buffer-or-name arg-name value)
+  (let ((info '(:internal-border-width 2 :width 500 :height 48)))
+    (or (plist-get info arg-name) value)))
+(setq posframe-arghandler #'wjb/posframe-arghandler)
+#+end_src
+
+** Ivy
+Ivy is a package that provides a completion framework for Emacs. It is
+particularly useful for commands that require a lot of input, such as ~M-x~ or
+~find-file~.
+
+It is fast and leightweight, and there are a lot of packages that integrate with
+it.
+
+*** Keybindings
+
+Some of the default keybindings feel odd to me, for instance the tab key
+behavior. I'm still trying for a way to have the same behavior as in a terminal,
+i.e. multiple tab presses start cycling through the completion candidates.
+
+#+begin_src elisp
+;; (define-key ivy-minibuffer-map (kbd "TAB") 'ivy-partial)
+;; (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
+#+end_src
+
+*** Looks
+**** All-The-Icons Ivy Rich
+
+Per default, Ivy looks a little bland. All-The-Icons-Ivy Richt is an alternative
+to All-The-icons-Ivy (which had some issues with my setup)
+
+
+#+begin_src elisp :tangle packages.el
+(package! all-the-icons-ivy-rich)
+#+end_src
+
+#+begin_src elisp
+(use-package! all-the-icons-ivy-rich
+  :after counsel-projectile
+  :init (all-the-icons-ivy-rich-mode +1)
+  :config
+  (setq all-the-icons-ivy-rich-icon-size 0.8))
+#+end_src
+
+**** Ivy-Postframe
+
+Doom Emacs already has Ivy-Postframe enabled, so there are just some tweaks to
+be made.
+
+Per default, the window has a dynamic width, which means that when typing, it
+will rapidly change its width, which is not very pleasant to look at.
+#+begin_src elisp
+(setq ivy-posframe-width 80)
+#+end_src
+
+** Treemacs
+
+Treemacs is a file and project explorer similar to NeoTree or vim’s
+NerdTree, but largely inspired by the Project Explorer in Eclipse.
+It shows the file system outlines of your projects in a simple tree layout
+allowing quick navigation
+and exploration, while also possessing basic file management utilities.
+
+*** Treemacs-All-The-Icons
+
+Treemacs also has a package that adds icons to the file explorer.
+
+#+begin_src elisp :tangle packages.el
+;; (package! treemacs-all-the-icons)
+#+end_src
+
+** Vertico
+Prefix the current candidte with an arrow
+#+begin_src elisp
+(defun minibuffer-format-candidate (orig cand prefix suffix index _start)
+  (let ((prefix (if (= vertico--index index)
+                    "  " "   ")))
+    (funcall orig cand prefix suffix index _start)))
+
+(advice-add #'vertico--format-candidate
+            :around #'minibuffer-format-candidate)
+#+end_src
+
+Don't show results count
+#+begin_src elisp
+(setq vertico-count-format nil)
+#+end_src
+
+Make vertico-posframe a little wider
+#+begin_src elisp
+(setq vertico-posframe-width 200)
+#+end_src
+
+* Performance
+Various tweaks to improve the overall performance.
+** Raise the GC-Cons threshold
+#+begin_example elisp
+(setq gc-cons-threshold 100000000)
+#+end_example
+
+** Increase the amount of data which Emacs reads from the process
+#+begin_src elisp
+(setq read-process-output-max (* 1024 1024)) ;; 1mb
+#+end_src
+
+* Unsorted Packages
+#+begin_src elisp :tangle packages.el
+
+(package! dap-mode)
+
+;; Orgmode
+
+
+;; Only show emphasis markers when editing them
+(package! org-appear)
+
+;; Citations
+(package! org-ref :pin "3ca9beb744621f007d932deb8a4197467012c23a")
+
+;; HTTP requests via babel
+(package! ob-http :pin "b1428ea2a63bcb510e7382a1bf5fe82b19c104a7")
+
+;; OrgRoam visualization / webapp
+
+;; automatic latex rendering
+(package! org-fragtog :pin "479e0a1c3610dfe918d89a5f5a92c8aec37f131d")
+
+;; export github markdown
+(package! ox-gfm :pin "99f93011b069e02b37c9660b8fcb45dab086a07f")
+
+;; K8s
+(package! k8s-mode)
+
+;; Copilot
+(package! jsonrpc)
+;; (package! copilot
+;;   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+
+;; Multiple major modes in one buffer
+(package! polymode)
+(package! poly-markdown)
+
+#+end_src

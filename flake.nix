@@ -9,6 +9,7 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     emacs-overlay.url = "github:nix-community/emacs-overlay";
+    nix-doom-emacs.url = "github:nix-community/nix-doom-emacs";
 
 
     sops-nix.url = "github:Mic92/sops-nix";
@@ -21,6 +22,9 @@
     flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
 
     digga.url = "github:divnix/digga";
+
+    doom-emacs-config.url = "github:tiborpilz/doom-emacs-config";
+    doom-emacs-config.flake = false;
   };
 
   outputs = {
@@ -57,6 +61,7 @@
           digga.nixosModules.bootstrapIso
           digga.nixosModules.nixConfig
           home-manager.nixosModules.home-manager
+          inputs.nix-doom-emacs.hmModule
         ] ++ lib.my.mapModulesRec' (toString ./modules) import;
       };
 

@@ -7,6 +7,7 @@ let
 in {
   imports = [
     inputs.home-manager.nixosModules.home-manager
+    inputs.nix-doom-emacs.hmModule
   ];
 
   options.home = with types; {
