@@ -50,8 +50,8 @@
   services.xserver.enable = true;
 
   # Enable the KDE Plasma Desktop Environment.
-  # services.xserver.displayManager.sddm.enable = true;
-  services.xserver.desktopManager.plasma5.enable = true;
+  services.xserver.displayManager.sddm.enable = true;
+  # services.xserver.desktopManager.plasma5.enable = true;
   modules.desktop.bspwm.enable = true;
 
   # Configure keymap in X11
@@ -81,6 +81,8 @@
     #media-session.enable = true;
   };
 
+
+
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
@@ -93,6 +95,7 @@
     packages = with pkgs; [
       firefox
     ];
+    initialHashedPassword = "$y$j9T$Fz9mqs6YQGznhp4n1iGos.$YjDlvnUR0su9gcjLNeBMccHJrQCftFyswBONlEN2kkA"; # test
   };
 
   # modules.services.paperless.enable = true;
@@ -103,11 +106,17 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+    git
+    tmux
+    vim
+    wireguard-tools
+    partition-manager
+    gparted
+    hdparm
+    python3
   ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.system-features = [ "big-parallel" "kvm" "recursive-nix" ];
-  system.stateVersion = "22.05"; # Did you read the comment?
+  system.stateVersion = "22.11";
 }

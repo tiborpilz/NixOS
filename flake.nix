@@ -45,7 +45,7 @@
 
       pkgs = self.pkgs.x86_64-linux.nixpkgs;
 
-    in flake-utils-plus.lib.mkFlake {
+    in flake-utils-plus.lib.mkFlake rec {
       inherit self inputs supportedSystems;
 
       channels.nixpkgs-unstable.config = { allowUnfree = true; };
@@ -54,8 +54,10 @@
       hostDefaults = {
         channelName = "nixpkgs";
         modules = [
-          ./.
-        ];
+          digga.nixosModules.bootstrapIso
+          digga.nixosModules.nixConfig
+          home-manager.nixosModules.home-manager
+        ] ++ lib.my.mapModulesRec' (toString ./modules) import;
       };
 
       sharedOverlays = [
@@ -70,10 +72,10 @@
 
       hosts = mapModules ./hosts (hostPath: lib.my.mkHostAttrs hostPath { });
 
-      outputsBuilder = channels: {
+      outputsBuilder = channels: rec {
         packages = lib.foldAttrs (item: acc: item) {} (lib.attrValues (mapModules ./packages (p: import p { pkgs = channels.nixpkgs; })));
 
-        apps.repl = flake-utils.lib.mkApp {
+        apps.default = flake-utils.lib.mkApp {
           drv = pkgs.writeShellScriptBin "repl" ''
             confnix=$(mktemp)
             echo "builtins.getFlake (toString $(git rev-parse --show-toplevel))" >$confnix
@@ -84,25 +86,30 @@
 
       };
 
-      homeConfigurations = (lib.my.mergeAttrs (lib.forEach supportedSystems (system: {
-        "tibor-${system}" = home-manager.lib.homeManagerConfiguration {
-          inherit lib;
-          pkgs = self.pkgs;
+      homeConfigurations = digga.lib.mkHomeConfigurations self.nixosConfigurations;
 
-          modules = [
-            ./home
-            {
-              _module.args.inputs = inputs;
-              home.username = "tibor";
-              home.homeDirectory = "/home/tibor";
-              modules.syncthing.service = true;
-            }
-          ];
-        };
-      })));
+      nixosModules = lib.my.mapModulesRec (toString ./modules) import;
+
+      # homeConfigurations = (lib.my.mergeAttrs (lib.forEach supportedSystems (system: {
+      #   "tibor-${system}" = home-manager.lib.homeManagerConfiguration {
+      #     inherit lib;
+      #     pkgs = self.pkgs;
+
+      #     modules = [
+      #       ./home
+      #       {
+      #         _module.args.inputs = inputs;
+      #         home.username = "tibor";
+      #         home.homeDirectory = "/home/tibor";
+      #         modules.syncthing.service = true;
+      #       }
+      #     ];
+      #   };
+      # })));
 
       inherit lib;
     };
+}
 
       # lib = nixpkgs.lib.extend
       #   (self: super: {

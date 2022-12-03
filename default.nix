@@ -8,7 +8,7 @@ with lib.my;
     [
       inputs.sops-nix.nixosModules.sops
       inputs.home-manager.nixosModules.home-manager
-    ] ++ (mapModulesRec' (toString ./modules) import);
+    ];
 
   system.configurationRevision = with inputs; mkIf (self ? rev) self.rev;
 
