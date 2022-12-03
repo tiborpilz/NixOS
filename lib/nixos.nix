@@ -1,23 +1,24 @@
-{ inputs, pkgs, lib, ... }:
+{ inputs, lib, ... }:
 
 with lib;
 with lib.my;
 let sys = "x86_64-linux";
 in {
+  mkHostAttrs = path: attrs @ { system ? sys, ... }: {
+    inherit system;
+    specialArgs = { inherit lib inputs system; };
+    modules = [
+      {
+        networking.hostName = mkDefault (removeSuffix ".nix" (baseNameOf path));
+      }
+      (filterAttrs (n: v: !elem n [ "system" ]) attrs)
+      ../. # /default.nix
+      (import path)
+    ];
+  };
+
   mkHost = path: attrs @ { system ? sys, ... }:
-    nixosSystem {
-      inherit system;
-      specialArgs = { inherit lib inputs system; };
-      modules = [
-        {
-          nixpkgs.pkgs = pkgs;
-          networking.hostName = mkDefault (removeSuffix ".nix" (baseNameOf path));
-        }
-        (filterAttrs (n: v: !elem n [ "system" ]) attrs)
-        ../. # /default.nix
-        (import path)
-      ];
-    };
+    nixosSystem mkHostAttrs path attrs;
 
   mapHosts = dir: attrs @ { system ? system, ... }:
     mapModules dir
