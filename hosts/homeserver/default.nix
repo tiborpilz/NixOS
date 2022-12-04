@@ -101,6 +101,7 @@ with lib;
       extraGroups = [ "wheel" ];
       isNormalUser = true;
       password = "password";
+      shell = pkgs.zsh;
     };
 
     virtualisation.oci-containers.backend = "podman";
