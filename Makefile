@@ -17,5 +17,5 @@ deploy_homeserver_dry_run:
 deploy_edge: ## Deploy the edge nixos configuration to the hetzner vm
 	nix run nixpkgs#nixos-rebuild -- switch --flake .#edge --target-host root@159.69.194.44 --build-host localhost
 
-homemanager: ## Swith the home-manager configuration for the user 'tibor'
-	home-manager switch --flake .#tibor
+homemanager: ## Swith the home-manager configuration for the current user
+	home-manager switch --flake .

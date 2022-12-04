@@ -31,7 +31,7 @@ in {
 
   modules.syncthing.enable = true;
 
-  nix.package = pkgs.nix;
+  # nix.package = pkgs.nix;
   nix.settings = {
     build-users-group = "nixbld";
     experimental-features = [ "nix-command flakes" ];

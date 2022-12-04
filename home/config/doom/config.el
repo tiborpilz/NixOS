@@ -364,13 +364,13 @@
 (setq company-format-margin-function #'company-vscode-dark-icons-margin)
 ;; Looks:1 ends here
 
-;; [[file:config.org::*Load via nix somehow][Load via nix somehow:2]]
+;; [[file:config.org::*Copilot][Copilot:3]]
 (setq copilot-node-executable
       (replace-regexp-in-string "\n" "" (shell-command-to-string ". $XDG_CONFIG_HOME/zsh/.zshrc; nvm which 16")))
 
 (use-package! copilot
   :bind (("<backtab>" . 'copilot-accept-completion)))
-;; Load via nix somehow:2 ends here
+;; Copilot:3 ends here
 
 ;; [[file:config.org::*Python][Python:1]]
 (setq dap-python-debugger 'debugpy)
