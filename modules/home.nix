@@ -7,7 +7,6 @@ let
 in {
   imports = [
     inputs.home-manager.nixosModules.home-manager
-    inputs.nix-doom-emacs.hmModule
   ];
 
   options.home = with types; {
@@ -19,10 +18,16 @@ in {
   config = mkIf cfg.enable {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
-    home-manager.users.tibor.imports = [ ../home ];
+    home-manager.users.tibor = mkMerge [
+      inputs.nix-doom-emacs.hmModule
+      {
+        _module.args.inputs = inputs;
+        imports = [ ../home ];
+        home.file = mkAliasDefinitions options.home.file;
+        xdg.configFile = mkAliasDefinitions options.home.configFile;
+      }
+    ];
 
-    home-manager.users.tibor.home.file = mkAliasDefinitions options.home.file;
-    home-manager.users.tibor.xdg.configFile = mkAliasDefinitions options.home.configFile;
 
     systemd.services.home-manager-tibor = {
       # Need to wait for network since home-manager will get stuff from git

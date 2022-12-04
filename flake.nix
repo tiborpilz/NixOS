@@ -23,8 +23,11 @@
 
     digga.url = "github:divnix/digga";
 
-    doom-emacs-config.url = "github:tiborpilz/doom-emacs-config";
+    doom-emacs-config.url = "github:tiborpilz/doom-emacs-config/feat/remove-recipe-packages";
     doom-emacs-config.flake = false;
+
+    copilot-el.url = "github:zerolfx/copilot.el";
+    copilot-el.flake = false;
   };
 
   outputs = {
@@ -61,7 +64,6 @@
           digga.nixosModules.bootstrapIso
           digga.nixosModules.nixConfig
           home-manager.nixosModules.home-manager
-          inputs.nix-doom-emacs.hmModule
         ] ++ lib.my.mapModulesRec' (toString ./modules) import;
       };
 
@@ -78,7 +80,7 @@
       hosts = mapModules ./hosts (hostPath: lib.my.mkHostAttrs hostPath { });
 
       outputsBuilder = channels: rec {
-        packages = lib.foldAttrs (item: acc: item) {} (lib.attrValues (mapModules ./packages (p: import p { pkgs = channels.nixpkgs; })));
+        packages = lib.foldAttrs (item: acc: item) {} (lib.attrValues (mapModules ./packages (p: import p { inherit inputs; pkgs = channels.nixpkgs; })));
 
         apps.default = flake-utils.lib.mkApp {
           drv = pkgs.writeShellScriptBin "repl" ''
@@ -91,7 +93,14 @@
 
       };
 
-      homeConfigurations = digga.lib.mkHomeConfigurations self.nixosConfigurations;
+      # homeConfigurations = digga.lib.mkHomeConfigurations self.nixosConfigurations;
+
+      homeConfigurations.tibor = self.nixosConfigurations.edge.config.home-manager.users.tibor.home; # home-manager.lib.homeManagerConfiguration {
+      #   inherit lib;
+      #   pkgs = self.pkgs;
+
+      #   modules = [ self.nixosConfigurations.edge.config.home-manager.users.tibor.home ];
+      # };
 
       nixosModules = lib.my.mapModulesRec (toString ./modules) import;
 
