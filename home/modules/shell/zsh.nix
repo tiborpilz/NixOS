@@ -57,6 +57,14 @@ in
     home.sessionVariables.ZDOTDIR = "$XDG_CONFIG_HOME/zsh";
     home.sessionVariables.ZSH_CACHE_DIR = "$XDG_CACHE_HOME/zsh";
 
+    modules.shell.zsh.rcInit = ''
+      source ${pkgs.nix-zsh-completions}/share/zsh/plugins/nix/nix-zsh-completions.plugin.zsh
+      fpath=(${pkgs.nix-zsh-completions}/share/zsh/site-functions $fpath)
+      fpath=(${pkgs.nix}/share/zsh/site-functions $fpath)
+      fpath=(${pkgs.zsh-completions}/share/zsh/site-functions $fpath)
+      autoload -U compinit && compinit
+    '';
+
     xdg.configFile."zsh" = { source = "${configDir}/zsh"; recursive = true; };
 
     xdg.configFile."zsh/extra.zshrc".text =

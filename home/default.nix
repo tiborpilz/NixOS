@@ -29,7 +29,7 @@ in {
 
   modules.editors.neovim.enable = true;
 
-  modules.tools.vagrant.enable = true;
+  modules.tools.vagrant.enable = false;
 
   modules.syncthing.enable = true;
 
