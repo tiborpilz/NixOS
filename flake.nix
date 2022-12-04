@@ -23,9 +23,6 @@
 
     digga.url = "github:divnix/digga";
 
-    doom-emacs-config.url = "github:tiborpilz/doom-emacs-config/feat/remove-recipe-packages";
-    doom-emacs-config.flake = false;
-
     copilot-el.url = "github:zerolfx/copilot.el";
     copilot-el.flake = false;
   };
