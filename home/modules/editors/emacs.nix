@@ -19,8 +19,10 @@ let
     ];
   });
   emacsWithNativeComp = patchedEmacs.override {
-    nativeComp = true;
+    nativeComp = false;
   };
+
+  emacsPackage = pkgs.emacs;
 in
 {
   config = {
@@ -30,7 +32,9 @@ in
       emacsPackagesOverlay = self: super: {
         copilot = pkgs.my.copilot;
       };
-      package = emacsWithNativeComp;
+      package = emacsPackage;
     };
+
+    # home.packages = [ emacsPackage ];
   };
 }
