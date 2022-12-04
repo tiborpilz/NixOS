@@ -116,7 +116,7 @@
             ];
           };
         }
-      ));
+      )) // (lib.my.mkHomeAliases "tibor" self.nixosConfigurations self.homeConfigurations);
 
       nixosModules = lib.my.mapModulesRec (toString ./modules) import;
 
