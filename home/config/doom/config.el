@@ -365,11 +365,13 @@
 ;; Looks:1 ends here
 
 ;; [[file:config.org::*Copilot][Copilot:3]]
-(setq copilot-node-executable
-      (replace-regexp-in-string "\n" "" (shell-command-to-string ". $XDG_CONFIG_HOME/zsh/.zshrc; nvm which 16")))
-
-(use-package! copilot
-  :bind (("<backtab>" . 'copilot-accept-completion)))
+(nvm-use "16" (lambda ()
+                (setq copilot-node-executable
+                      (concat
+                       (nth 1 (nvm--find-exact-version-for "16"))
+                       "/bin/node"))
+                (use-package! copilot
+                  :bind ("<backtab>" . 'copilot-accept-completion))))
 ;; Copilot:3 ends here
 
 ;; [[file:config.org::*Python][Python:1]]

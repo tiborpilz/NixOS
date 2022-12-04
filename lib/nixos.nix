@@ -17,10 +17,10 @@ in {
     ];
   };
 
-  mkHost = path: attrs @ { system ? sys, ... }:
+  mkHost = path: attrs @ { ... }:
     nixosSystem mkHostAttrs path attrs;
 
-  mapHosts = dir: attrs @ { system ? system, ... }:
+  mapHosts = dir: attrs @ { ... }:
     mapModules dir
       (hostPath: mkHost hostPath attrs);
 

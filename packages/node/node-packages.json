@@ -1,4 +1,3 @@
 [
-    "@volar/vue-language-server",
-     ;
+    "@volar/vue-language-server"
 ]

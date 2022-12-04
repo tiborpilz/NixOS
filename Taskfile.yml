@@ -1,4 +1,3 @@
-{ success: true, code: 0 }
 version: "3"
 tasks:
   build-nixos-edge:
@@ -25,4 +24,6 @@ tasks:
   build-package-generateTaskfile:
     cmds:
       - "nix build .#generateTaskfile"
-
+  build-package-taskgen:
+    cmds:
+      - "nix build .#taskgen"

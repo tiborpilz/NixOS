@@ -569,12 +569,17 @@ In the future I could implement installing node 16 if it's missing.
 (package! nvm)
 #+end_src
 
+Since ~nvm--find-exact-version-for "16" is not available from the start, I'm
+setting the copilot-node-executable in a callback hook, after using nvm-use.
+Only then am I loading the copilot package.
 #+begin_src elisp
-(setq copilot-node-executable
-      (replace-regexp-in-string "\n" "" (shell-command-to-string ". $XDG_CONFIG_HOME/zsh/.zshrc; nvm which 16")))
-
-(use-package! copilot
-  :bind (("<backtab>" . 'copilot-accept-completion)))
+(nvm-use "16" (lambda ()
+                (setq copilot-node-executable
+                      (concat
+                       (nth 1 (nvm--find-exact-version-for "16"))
+                       "/bin/node"))
+                (use-package! copilot
+                  :bind ("<backtab>" . 'copilot-accept-completion))))
 #+end_src
 
 *** Debugging

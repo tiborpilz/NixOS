@@ -52,6 +52,8 @@
 
       pkgs = self.pkgs.x86_64-linux.nixpkgs;
 
+      nixosHosts = mapModules ./hosts/nixos (hostPath: lib.my.mkHostAttrs hostPath { system = "x86_64-linux"; });
+      darwinHosts = mapModules ./hosts/darwin (hostPath: lib.my.mkHostAttrs hostPath { system = "x86_64-darwin"; });
     in
     flake-utils-plus.lib.mkFlake rec {
       inherit lib self inputs supportedSystems;
@@ -80,7 +82,7 @@
         inputs.devshell.overlay
       ];
 
-      hosts = mapModules ./hosts (hostPath: lib.my.mkHostAttrs hostPath { });
+      hosts = nixosHosts // darwinHosts;
 
 
       outputsBuilder = channels: rec {
