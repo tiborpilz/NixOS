@@ -142,7 +142,7 @@ with lib;
       hostname = "tiborpilz.xyz";
       email = "tibor@pilz.berlin";
       basicAuth = {
-        enable = false;
+        enable = true;
         username = "tibor";
         password = "$2y$05$hchzpHMV8QabeLBTgSjIa.3Nqc7uqblFiQ8WTLKq4xSl4ZmR9rDGu";
       };
