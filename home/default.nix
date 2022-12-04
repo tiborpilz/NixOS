@@ -16,8 +16,8 @@ in {
   ];
 
   # Let Home Manager install and manage itself.
-  programs.home-manager.enable = false;
-  programs.man.enable = false;
+  programs.home-manager.enable = true;
+  programs.man.enable = true;
 
   modules.shell.zsh.enable = true;
   modules.shell.zsh.aliases.ungron = "gron --ungron";
@@ -30,6 +30,19 @@ in {
   modules.editors.neovim.enable = true;
 
   modules.syncthing.enable = true;
+
+  nix.package = pkgs.nix;
+  nix.settings = {
+    build-users-group = "nixbld";
+    experimental-features = [ "nix-command flakes" ];
+    cores = 0;
+    max-jobs = "auto";
+    trusted-users = [ "root" "tibor" ];
+    trusted-substituters = [ "https://cache.nixos.org" "https://tiborpilz.cachix.org" ];
+    substituters = [ "https://cache.nixos.org" "https://tiborpilz.cachix.org" ];
+    trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" "tiborpilz.cachix.org-1:KyBjAXY8eblxntQ+OG13IjT+M222VxT+25yw1lqnQS4=" ];
+    system-features = [ "big-parallel" "kvm" "recursive-nix" ];
+  };
 
   # Install MacOS applications to the user environment if the targetPlatform is Darwin
   # home.file."Applications/home-manager".source = let

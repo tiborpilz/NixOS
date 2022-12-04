@@ -9,31 +9,31 @@ let
   separator = ".";
 
   generateConfigScript = cfg:
-  let
-    serialize_list = list: seperator: concatStrings (intersperse seperator list);
+    let
+      serialize_list = list: seperator: concatStrings (intersperse seperator list);
 
-    serialize_value = v:
-      if isList v then serialize_list v ", " else
-      if isString v then v else
-      throw "invalid value type";
+      serialize_value = v:
+        if isList v then serialize_list v ", " else
+        if isString v then v else
+        throw "invalid value type";
 
-    serialize_entry = k: v: "${k} = ${serialize_value v}";
-    serialize_set = set: concatStrings (intersperse "\n" (mapAttrsToList (k: v: serialize_entry k v) set));
-    get_files = folder: mapAttrsToList (k: v: { name = "${k}.cfg"; content = (serialize_set v); }) folder;
-    get_folders = cfg: mapAttrsToList (k: v: { name = "${k}"; files = (get_files v); }) cfg;
+      serialize_entry = k: v: "${k} = ${serialize_value v}";
+      serialize_set = set: concatStrings (intersperse "\n" (mapAttrsToList (k: v: serialize_entry k v) set));
+      get_files = folder: mapAttrsToList (k: v: { name = "${k}.cfg"; content = (serialize_set v); }) folder;
+      get_folders = cfg: mapAttrsToList (k: v: { name = "${k}"; files = (get_files v); }) cfg;
 
-    file_script = file: target: ''
-      echo '${file.content}' > '${target}/${file.name}'
-    '';
-
-    folder_script = folder:
-      let target = "${root_dir}/conf/${folder.name}";
-      in
-      ''
-        mkdir -p ${target}
-        ${serialize_list (map (file: file_script file target) folder.files) "\n"}
+      file_script = file: target: ''
+        echo '${file.content}' > '${target}/${file.name}'
       '';
-  in
+
+      folder_script = folder:
+        let target = "${root_dir}/conf/${folder.name}";
+        in
+        ''
+          mkdir -p ${target}
+          ${serialize_list (map (file: file_script file target) folder.files) "\n"}
+        '';
+    in
     ''
       ${serialize_list (map (folder: folder_script folder) (get_folders cfg)) "\n"}
     '';
@@ -42,8 +42,8 @@ let
     services = {
       addons = {
         package = "standard";
-        binding = ["deconz"];
-        ui = ["basic" "habpanel"];
+        binding = [ "deconz" ];
+        ui = [ "basic" "habpanel" ];
       };
       runtime = {
         "org.openhab.i18n:language" = "en";
@@ -64,7 +64,7 @@ in
   config = mkIf cfg.enable {
     system.activationScripts.createOpenhabConfig = stringAfter [ "var" ] (generateConfigScript openhab_cfg);
     virtualisation.oci-containers.containers.openhab = {
-      ports = [  "${port}:${port}" ];
+      ports = [ "${port}:${port}" ];
       image = "openhab/openhab";
       volumes = [
         # "/etc/localtime:/etc/localtime:ro"

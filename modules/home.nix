@@ -4,15 +4,16 @@ with lib;
 with lib.my;
 let
   cfg = config.home;
-in {
+in
+{
   imports = [
     inputs.home-manager.nixosModules.home-manager
   ];
 
   options.home = with types; {
     enable = mkBoolOpt true;
-    file = mkOpt' attrs {} "Files to place directly in $HOME";
-    configFile = mkOpt' attrs {} "Files to place in $XDG_CONFIG_HOME";
+    file = mkOpt' attrs { } "Files to place directly in $HOME";
+    configFile = mkOpt' attrs { } "Files to place in $XDG_CONFIG_HOME";
   };
 
   config = mkIf cfg.enable {

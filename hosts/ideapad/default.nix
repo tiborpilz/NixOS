@@ -6,7 +6,8 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
+      # Include the results of the hardware scan.
       ./hardware-configuration.nix
       # ./tandoor.nix
       ./k3s.nix
@@ -28,7 +29,7 @@
   networking.useDHCP = false;
   networking.interfaces.enp3s0.useDHCP = true;
   networking.interfaces.wlp4s0.useDHCP = true;
-  
+
   networking.networkmanager.enable = true;
 
   # Configure network proxy if necessary

@@ -84,7 +84,8 @@
       '';
 
       peers = [
-        { # peer0
+        {
+          # peer0
           publicKey = "mydrVBi96wSZXOYt5a7TcWcNGs2AtDyd8BJHskJLsSU=";
           allowedIPs = [ "10.0.0.2/32" "fdc9:281f:04d7:9ee9::2/128" ];
         }

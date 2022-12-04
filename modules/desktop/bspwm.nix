@@ -4,7 +4,8 @@ with lib;
 with lib.my;
 let
   cfg = config.modules.desktop.bspwm;
-in {
+in
+{
   options.modules.desktop.bspwm = {
     enable = mkBoolOpt false;
   };
@@ -83,9 +84,9 @@ in {
         "super + space" = "${pkgs.rofi}/bin/rofi -show drun";
       };
       extraConfig = ''
-          super + {1-5}
-            bspc desktop -f {1-5}
-        '';
+        super + {1-5}
+          bspc desktop -f {1-5}
+      '';
     };
 
     home-manager.users.tibor.programs.rofi = {

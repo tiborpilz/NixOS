@@ -4,15 +4,16 @@ with lib;
 with lib.my;
 {
   options = with types; {
-    user = mkOpt attrs {};
+    user = mkOpt attrs { };
 
     env = mkOption {
       type = attrsOf (oneOf [ str path (listOf (either str path)) ]);
       apply = mapAttrs
-        (n: v: if isList v
-               then concatMapStringSep ":" (x: toString x) v
-               else (toString v));
-      default = {};
+        (n: v:
+          if isList v
+          then concatMapStringSep ":" (x: toString x) v
+          else (toString v));
+      default = { };
     };
   };
 
