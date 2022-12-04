@@ -470,10 +470,105 @@ Set typescript file indentation to be 2 levels by default.
 #+end_src
 
 *** Nix
-**** nix-mode
+**** nix-mode.el
+[[https://github.com/NixOS/nix-mode][Nix-mode]] is a major mode for editing nix expressions. It comes with a variaty of submodules
 #+begin_src elisp
 (use-package! nix-mode
   :mode "\\.nix\\'")
+#+end_src
+
+***** nix.el
+Nix.el contains some miscellanious tools. Interactive functions include:
+
+- nix-unpack - unpack source of a Nix attribute.
+  Available via ~M-x nix-unpack~ followed by the nix path and attribute path.
+
+- nix-build - functions similar to ~M-x compile~. Will build in the current
+  directory if it contains a ~default.nix~.
+
+There are also basic functions for interacting with nix - some variables are
+provided to point to Nix binaries that can be used in Lisp code.
+
+- ~nix-executable~
+- ~nix-build-executable~
+- ~nixinstantiate-executable~
+- ~nix-store-executable~
+- ~nix-shell-executable~
+
+Also, a function ~nix-system~ is provided to get the current system (the way Nix
+detects it).
+
+***** nix-flake.el
+
+Uses transient.el to provide a magit-like interface for supporting flake
+commands.
+Using ~M-x nix-flake~ commands can be run on the current flake, whereas ~M-x
+~nix-flake-init~ can initialize a flake from a atemplate.
+
+***** nix-repls.el
+
+Provides an interface for completion, nused by nix-company.el. Secondly it
+provides an interactive function to open a repl via ~M-x nix-repl~
+
+***** nix-store.el
+
+Displays information about the store path including logs associated with a
+derivation.
+
+***** nix-prettify-mode.el
+
+Improves display of store paths.
+
+**** nix-buffer
+Adds an emacs command to modify the buffer environment according to a Lisp
+expression buily by nix.
+
+**** Nix Options - A set of modes and functions
+
+***** Nixos-Options
+Interface for browsing and completing NixOS options.
+#+begin_src elisp :tangle packages.el
+(package! nixos-options)
+#+end_src
+
+***** Ivy-nixos-options
+Similar to nixos-options, with an ivy integration.
+#+begin_src elisp :tangle packages.el
+(package! ivy-nixos-options)
+#+end_src
+
+***** Company-nixos-options
+Adds a nixos-options backends list.
+
+#+begin_src elisp :tangle packages.el
+(package! company-nixos-options)
+#+end_src
+
+#+begin_src elisp
+(add-to-list 'company-backends 'company-nixos-options)
+#+end_src
+
+***** Nix-sandbox
+Utility functions to work with nix sandboxes.
+#+begin_src elisp
+(package! nix-sandbox)
+#+end_src
+
+- ~nix-shell-command~ composes command that can be executed in the given sandbox
+- ~nix-shell~ executes a command in the given sandbox
+- ~nix-compile~ compiles a program in the given sandbox
+- ~nix-find-sandbox~ searches from the given path upwards until it finds a shell.nix or default.nix file.
+- ~nix-current-sandbox~ searches for a sandbox file starting from the current working directory.
+- ~nix-executable-find~ a replacement for the built-in executable-find. The
+  function searches in the given sandbox for executables.
+
+Using the nix-sandbox utility functions, we can enhande Flycheck.
+
+#+begin_src elisp
+(setq flycheck-command-wrapper-function
+        (lambda (command) (apply 'nix-shell-command (nix-current-sandbox) command))
+      flycheck-executable-find
+        (lambda (cmd) (nix-executable-find (nix-current-sandbox) cmd)))
 #+end_src
 
 *** Python
