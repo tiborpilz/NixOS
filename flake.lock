@@ -148,11 +148,11 @@
     "doom-emacs-config": {
       "flake": false,
       "locked": {
-        "lastModified": 1670119863,
-        "narHash": "sha256-ezaAquGz6JKYRze8ZsOc+4xIpzkAucSjtMXgzpKtHSQ=",
+        "lastModified": 1670129203,
+        "narHash": "sha256-VmztDSU945JHNjqX/Kj3tztMFZj9AVn40CX8nwK2Apg=",
         "owner": "tiborpilz",
         "repo": "doom-emacs-config",
-        "rev": "9265f4b75a6943fa34260f5f818113efbdf1df7a",
+        "rev": "0410c1902a468438c8c9bc66e05e370479e9150c",
         "type": "github"
       },
       "original": {

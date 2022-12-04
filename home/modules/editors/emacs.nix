@@ -22,19 +22,65 @@ let
     nativeComp = false;
   };
 
-  emacsPackage = pkgs.emacs;
+  emacsPackage = emacsWithNativeComp;
 in
 {
   config = {
-    programs.doom-emacs = {
+    programs.doom-emacs = rec {
       enable = true;
       doomPrivateDir = repo;
+      doomPackageDir = let
+        filteredPath = builtins.path {
+          path = doomPrivateDir;
+          name = "doom-private-dir-filtered";
+          filter = path: type:
+            builtins.elem (baseNameOf path) [ "init.el" "packages.el" ];
+        };
+      in pkgs.linkFarm "doom-packages-dir" [
+        { name = "init.el"; path = "${filteredPath}/init.el"; }
+        { name = "packages.el"; path = "${filteredPath}/packages.el"; }
+        { name = "config.el"; path = pkgs.emptyFile; }
+      ];
       emacsPackagesOverlay = self: super: {
         copilot = pkgs.my.copilot;
       };
       package = emacsPackage;
+
+      extraConfig = ''
+        (setenv "LSP_USE_PLISTS" "true")
+      '';
     };
 
-    # home.packages = [ emacsPackage ];
+    home.packages = with pkgs; [
+      fd # for projectile
+      imagemagick # for image-dired
+      pinentry-emacs # in-emacs gnupg-prompts
+      zstd # for undo-fu-session/undo-tree compression
+
+      ## Module dependencies
+      # :checkers spell
+      (aspellWithDicts (ds: with ds; [ en en-computers en-science ]))
+
+      # :tools editorconfig
+      editorconfig-core-c
+
+      # :tools lookup & :lang org +roam
+      sqlite
+
+      # :lang latex & :lang org (late previews)
+      texlive.combined.scheme-medium
+
+      # alternative lsp server for nix
+      nil
+
+      # vue3 language server
+      my."@volar/vue-language-server"
+
+      # typescript language server
+      nodePackages.typescript-language-server
+
+      # Fonts
+      emacs-all-the-icons-fonts
+    ];
   };
 }
