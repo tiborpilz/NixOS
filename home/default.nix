@@ -16,7 +16,7 @@ in {
   ];
 
   # Let Home Manager install and manage itself.
-  programs.home-manager.enable = true;
+  programs.home-manager.enable = false;
   programs.man.enable = false;
 
   modules.shell.zsh.enable = true;
