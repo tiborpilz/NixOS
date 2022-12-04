@@ -1,17 +1,28 @@
-version: '3'
+{ success: true, code: 0 }
+version: "3"
 tasks:
-  default:
+  build-nixos-edge:
     cmds:
-      - /nix/store/81yi66w1q1spb27vp7blwbgb5myhwgjw-nix-2.11.0/bin/nix flake check
-  build-edge:
+      - "nix build .#nixosConfigurations.edge.config.system.build.toplevel"
+  build-nixos-homeserver:
     cmds:
-      - nix build .#nixosConfigurations.edge.config.system.build.toplevel
-  build-homeserver:
+      - "nix build .#nixosConfigurations.homeserver.config.system.build.toplevel"
+  build-nixos-ideapad:
     cmds:
-      - nix build .#nixosConfigurations.homeserver.config.system.build.toplevel
-  build-ideapad:
+      - "nix build .#nixosConfigurations.ideapad.config.system.build.toplevel"
+  build-nixos-thinkyMcThinkpad:
     cmds:
-      - nix build .#nixosConfigurations.ideapad.config.system.build.toplevel
-  build-thinkyMcThinkpad:
+      - "nix build .#nixosConfigurations.thinkyMcThinkpad.config.system.build.toplevel"
+  "build-package-@volar/vue-language-server":
     cmds:
-      - nix build .#nixosConfigurations.thinkyMcThinkpad.config.system.build.toplevel
+      - "nix build .#@volar/vue-language-server"
+  build-package-copilot:
+    cmds:
+      - "nix build .#copilot"
+  build-package-flakeRepl:
+    cmds:
+      - "nix build .#flakeRepl"
+  build-package-generateTaskfile:
+    cmds:
+      - "nix build .#generateTaskfile"
+

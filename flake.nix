@@ -23,6 +23,9 @@
 
     digga.url = "github:divnix/digga";
 
+    deno2nix.url = "github:SnO2WMaN/deno2nix";
+    devshell.url = "github:numtide/devshell";
+
     copilot-el.url = "github:zerolfx/copilot.el";
     copilot-el.flake = false;
   };
@@ -73,6 +76,8 @@
           };
           my = self.packages."${prev.system}";
         })
+        inputs.deno2nix.overlay
+        inputs.devshell.overlay
       ];
 
       hosts = mapModules ./hosts (hostPath: lib.my.mkHostAttrs hostPath { });
@@ -81,7 +86,11 @@
       outputsBuilder = channels: rec {
         inherit channels;
 
-        packages = lib.foldAttrs (item: acc: item) { } (lib.attrValues (mapModules ./packages (p: import p { inherit lib inputs; pkgs = channels.nixpkgs; })));
+        packages = lib.foldAttrs (item: acc: item) { }
+          (lib.attrValues (mapModules ./packages (p: import p {
+            inherit lib inputs;
+            pkgs = channels.nixpkgs;
+          })));
 
         apps = (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages) // { default = apps.flakeRepl; };
 
@@ -90,7 +99,6 @@
         };
 
         formatter = pkgs.nixpkgs-fmt;
-
       };
 
       homeConfigurations = lib.my.mergeAttrs (lib.forEach supportedSystems (system:
@@ -120,6 +128,5 @@
       )) // (lib.my.mkHomeAliases "tibor" self.nixosConfigurations self.homeConfigurations);
 
       nixosModules = lib.my.mapModulesRec (toString ./modules) import;
-      test = lib.my.mkHostAttrs ./host/edge {};
     };
 }
