@@ -77,7 +77,10 @@
 
       hosts = mapModules ./hosts (hostPath: lib.my.mkHostAttrs hostPath { });
 
+
       outputsBuilder = channels: rec {
+        inherit channels;
+
         packages = lib.foldAttrs (item: acc: item) { } (lib.attrValues (mapModules ./packages (p: import p { inherit inputs; pkgs = channels.nixpkgs; })));
 
         apps.default = lib.my.mkApp packages.repl;
@@ -93,12 +96,12 @@
         let
           user = if (system == "x86_64-darwin") then "tibor.pilz" else "tibor";
           homeDirectory = if (system == "x86_64-darwin") then "/Users/${user}" else "/home/${user}";
-          pkgs = self.pkgs."${system}";
+          pkgs = self.channels."${system}".nixpkgs;
           enableSyncthing = (system == "x86_64-linux");
         in
         {
           "${user}" = home-manager.lib.homeManagerConfiguration {
-            inherit pkgs lib;
+            inherit lib pkgs;
 
             modules = [
               ./home
@@ -108,6 +111,7 @@
                 home.username = user;
                 home.homeDirectory = homeDirectory;
                 modules.syncthing.service = enableSyncthing;
+                nix.package = pkgs.nix;
               }
             ];
           };

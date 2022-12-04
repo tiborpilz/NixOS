@@ -1,4 +1,4 @@
-name: "Test"
+name: "Build Configurations"
 on:
   pull_request:
   push:
@@ -15,4 +15,6 @@ jobs:
         name: tiborpilz
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: nix build .#homeConfigurations.tibor.activationPackage
-    - run: nix-shell --run "echo OK"
+    - run: nix build .#nixosConfigurations.edge.config.system.build.toplevel
+    - run: nix build .#nixosConfigurations.homeserver.config.system.build.toplevel
+    - run: nix build .#nixosConfigurations.thinkyMcThinkpad.config.system.build.toplevel
