@@ -531,12 +531,6 @@ Interface for browsing and completing NixOS options.
 (package! nixos-options)
 #+end_src
 
-***** Ivy-nixos-options
-Similar to nixos-options, with an ivy integration.
-#+begin_src elisp :tangle packages.el
-(package! ivy-nixos-options)
-#+end_src
-
 ***** Company-nixos-options
 Adds a nixos-options backends list.
 
