@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: org-mode package.el block
+# uuid:
+# key: trigger-key
+# condition: t
+# --
+
+#+begin_src elisp :tangle packages.el
+$1
+#+end_src

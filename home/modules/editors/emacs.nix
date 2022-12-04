@@ -5,11 +5,6 @@
 { lib, pkgs, inputs, ... }:
 with lib;
 let
-  repo = fetchGit {
-    url = "https://github.com/tiborpilz/doom-emacs-config";
-    ref = "feat/remove-recipe-packages";
-    rev = inputs.doom-emacs-config.rev;
-  };
   patchedEmacs = pkgs.emacs.overrideAttrs (old: {
     patches = (old.patches or [ ]) ++ [
       (pkgs.fetchpatch {
@@ -28,7 +23,7 @@ in
   config = {
     programs.doom-emacs = rec {
       enable = true;
-      doomPrivateDir = repo;
+      doomPrivateDir = ../../config/doom;
       doomPackageDir = let
         filteredPath = builtins.path {
           path = doomPrivateDir;

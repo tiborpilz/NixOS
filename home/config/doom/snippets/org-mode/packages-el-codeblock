@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: packages.el Codeblock
+# key: org-packages-codeblock
+# --
+
+#+BEGIN_SRC elisp :tangle packages.el
+$1
+#+END_SRC
