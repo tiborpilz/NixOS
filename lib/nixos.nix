@@ -23,4 +23,9 @@ in {
   mapHosts = dir: attrs @ { system ? system, ... }:
     mapModules dir
       (hostPath: mkHost hostPath attrs);
+
+  mkHomeAliases = name: nixosConfigurations: homeConfigurations:
+    mergeAttrs (forEach (attrNames nixosConfigurations) (host: {
+      "${name}@${host}" = homeConfigurations."${name}";
+    }));
 }
