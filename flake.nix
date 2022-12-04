@@ -83,14 +83,7 @@
       outputsBuilder = channels: rec {
         packages = lib.foldAttrs (item: acc: item) { } (lib.attrValues (mapModules ./packages (p: import p { inherit inputs; pkgs = channels.nixpkgs; })));
 
-        apps.default = flake-utils.lib.mkApp {
-          drv = pkgs.writeShellScriptBin "repl" ''
-            confnix=$(mktemp)
-            echo "builtins.getFlake (toString $(git rev-parse --show-toplevel))" >$confnix
-            trap "rm $confnix" EXIT
-            nix repl $confnix
-          '';
-        };
+        apps.default = lib.my.mkApp packages.repl;
 
         devShells = {
           default = import ./shell.nix { pkgs = channels.nixpkgs; };
