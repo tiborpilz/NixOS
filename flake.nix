@@ -99,7 +99,23 @@
 
       # homeConfigurations = digga.lib.mkHomeConfigurations self.nixosConfigurations;
 
-      homeConfigurations.tibor = self.nixosConfigurations.edge.config.home-manager.users.tibor.home; # home-manager.lib.homeManagerConfiguration {
+      # homeConfigurations.tibor = self.nixosConfigurations.edge.config.home-manager.users.tibor.home; # home-manager.lib.homeManagerConfiguration {
+
+      homeConfigurations.tibor = home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+        inherit lib;
+
+        modules = [
+          ./home
+          inputs.nix-doom-emacs.hmModule
+          {
+            _module.args.inputs = inputs;
+            home.username = "tibor";
+            home.homeDirectory = "/home/tibor";
+            modules.syncthing.service = true;
+          }
+        ];
+      };
       #   inherit lib;
       #   pkgs = self.pkgs;
 
