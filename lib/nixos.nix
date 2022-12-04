@@ -9,7 +9,7 @@ in {
     in {
       inherit system;
       output = if isDarwin then "darwinConfigurations" else "nixosConfigurations";
-      builder = if isDarwin then inputs.nix-darwin.lib.darwinSystem else lib.nixosSystem;
+      builder = if isDarwin then inputs.darwin.lib.darwinSystem else lib.nixosSystem;
       specialArgs = { inherit lib inputs system; };
       modules = [
         {
