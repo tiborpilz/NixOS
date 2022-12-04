@@ -1,7 +1,3 @@
-# Took a lot of inspiration from hlissner's dotfiles repo
-# although some tweaks were necessary, since this is a
-# home-manager configuration, not a nixos configuration.
-
 { lib, pkgs, inputs, ... }:
 with lib;
 let

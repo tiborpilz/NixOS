@@ -51,7 +51,7 @@
 
     in
     flake-utils-plus.lib.mkFlake rec {
-      inherit self inputs supportedSystems;
+      inherit lib self inputs supportedSystems;
 
       channels.nixpkgs-unstable.config = { allowUnfree = true; };
       channels.nixpkgs.config = { allowUnfree = true; };
@@ -59,8 +59,8 @@
       hostDefaults = {
         channelName = "nixpkgs";
         modules = [
-          # digga.nixosModules.bootstrapIso
-          # digga.nixosModules.nixConfig
+          digga.nixosModules.bootstrapIso
+          digga.nixosModules.nixConfig
           home-manager.nixosModules.home-manager
         ] ++ lib.my.mapModulesRec' (toString ./modules) import;
       };
@@ -81,15 +81,16 @@
       outputsBuilder = channels: rec {
         inherit channels;
 
-        packages = lib.foldAttrs (item: acc: item) { } (lib.attrValues (mapModules ./packages (p: import p { inherit inputs; pkgs = channels.nixpkgs; })));
+        packages = lib.foldAttrs (item: acc: item) { } (lib.attrValues (mapModules ./packages (p: import p { inherit lib inputs; pkgs = channels.nixpkgs; })));
 
-        apps.default = lib.my.mkApp packages.repl;
+        apps = (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages) // { default = apps.flakeRepl; };
 
         devShells = {
           default = import ./shell.nix { pkgs = channels.nixpkgs; };
         };
 
         formatter = pkgs.nixpkgs-fmt;
+
       };
 
       homeConfigurations = lib.my.mergeAttrs (lib.forEach supportedSystems (system:
@@ -119,7 +120,6 @@
       )) // (lib.my.mkHomeAliases "tibor" self.nixosConfigurations self.homeConfigurations);
 
       nixosModules = lib.my.mapModulesRec (toString ./modules) import;
-
-      inherit lib;
+      test = lib.my.mkHostAttrs ./host/edge {};
     };
 }

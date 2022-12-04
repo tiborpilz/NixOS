@@ -1,7 +1,16 @@
-.PHONY: help
+.PHONY: help build
 
 help: ## Show this help.
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
+
+build:
+ifeq (home, $(filter home,$(MAKECMDGOALS)))
+	nix build .#homeConfigurations.$(filter-out home, $(filter-out $@,$(MAKECMDGOALS))).activationPackage
+else ifeq (nixos, $(filter nixos,$(MAKECMDGOALS)))
+	nix build .#nixosConfigurations.$(filter-out nixos, $(filter-out $@,$(MAKECMDGOALS))).config.system.build.toplevel
+else
+	@echo 'Build target not valid!'
+endif
 
 generate_node_packages: ## Generate nix node packages based on packages/node/node-packages.json
 	nix run nixpkgs#node2nix -- -i packages/node/node-packages.json -o packages/node/node-packages.nix -14
@@ -19,3 +28,6 @@ deploy_edge: ## Deploy the edge nixos configuration to the hetzner vm
 
 homemanager: ## Swith the home-manager configuration for the current user
 	home-manager switch --flake .
+
+%:
+	@:
