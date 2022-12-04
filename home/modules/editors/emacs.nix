@@ -4,11 +4,20 @@
 
 { lib, pkgs, inputs, ... }:
 with lib;
-{
+let
+  repo = fetchGit {
+    url = "https://github.com/tiborpilz/doom-emacs-config";
+    ref = "feat/remove-recipe-packages";
+    rev = inputs.doom-emacs-config.rev;
+  };
+in {
   config = {
     programs.doom-emacs = {
       enable = true;
-      doomPrivateDir = ./doom;
+      doomPrivateDir = repo;
+      emacsPackagesOverlay = self: super: {
+        copilot = pkgs.my.copilot;
+      };
     };
   };
 }
