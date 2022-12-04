@@ -1,17 +1,19 @@
 { inputs, config, options, pkgs, lib, ... }:
 
 with lib;
-let cfg = config.modules.shell.tmux;
-    # Monkey-Patch tmux to use XDG_CONFIG_HOME
-    tmux = (pkgs.writeScriptBin "tmux" ''
-      #!${pkgs.stdenv.shell}
-      exec ${pkgs.tmux}/bin/tmux -f "$TMUX_HOME/tmux.conf" "$@"
-    '');
-    mylib = import ../../../lib { inherit inputs lib pkgs; };
-in {
+let
+  cfg = config.modules.shell.tmux;
+  # Monkey-Patch tmux to use XDG_CONFIG_HOME
+  tmux = (pkgs.writeScriptBin "tmux" ''
+    #!${pkgs.stdenv.shell}
+    exec ${pkgs.tmux}/bin/tmux -f "$TMUX_HOME/tmux.conf" "$@"
+  '');
+  mylib = import ../../../lib { inherit inputs lib pkgs; };
+in
+{
   options.modules.shell.tmux = with types; {
     enable = mylib.mkBoolOpt false;
-    rcFiles = mylib.mkOpt (listOf (either str path)) [];
+    rcFiles = mylib.mkOpt (listOf (either str path)) [ ];
   };
 
   config = mkIf cfg.enable {

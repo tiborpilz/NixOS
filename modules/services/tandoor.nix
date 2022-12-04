@@ -15,8 +15,8 @@ in
 
   config = mkIf cfg.enable {
     system.activationScripts.makeTandoorDir = stringAfter [ "var" ] ''
-        mkdir -p /var/lib/tandoor/{staticfiles,mediafiles}
-      '';
+      mkdir -p /var/lib/tandoor/{staticfiles,mediafiles}
+    '';
 
     modules.podgroups.pods.tandoor = {
       port = "${toString publicPort}:8080";

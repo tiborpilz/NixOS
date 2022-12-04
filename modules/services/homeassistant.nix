@@ -4,10 +4,10 @@ with lib.my;
 
 let
   homeassistant_cfg = {
-    default_config = {};
-    automation = [];
-    script = [];
-    scene = {};
+    default_config = { };
+    automation = [ ];
+    script = [ ];
+    scene = { };
     homeassistant = {
       name = "Tibitin Nest";
       latitude = "52.51405";
@@ -23,7 +23,7 @@ let
     };
   };
 
-  homeassistant_yaml = generators.toYAML {} homeassistant_cfg;
+  homeassistant_yaml = generators.toYAML { } homeassistant_cfg;
 
   homeassistant_config_dir = "/var/lib/homeassistant/config";
   cfg = config.modules.services.homeassistant;

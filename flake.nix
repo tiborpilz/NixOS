@@ -30,17 +30,17 @@
     copilot-el.flake = false;
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    nixpkgs-unstable,
-    home-manager,
-    sops-nix,
-    flake-utils,
-    flake-utils-plus,
-    digga,
-    ...
-  } @ inputs:
+  outputs =
+    { self
+    , nixpkgs
+    , nixpkgs-unstable
+    , home-manager
+    , sops-nix
+    , flake-utils
+    , flake-utils-plus
+    , digga
+    , ...
+    } @ inputs:
     let
       supportedSystems = [ "x86_64-linux" "x86_64-darwin" ];
       lib = nixpkgs.lib.extend
@@ -52,7 +52,8 @@
 
       pkgs = self.pkgs.x86_64-linux.nixpkgs;
 
-    in flake-utils-plus.lib.mkFlake rec {
+    in
+    flake-utils-plus.lib.mkFlake rec {
       inherit self inputs supportedSystems;
 
       channels.nixpkgs-unstable.config = { allowUnfree = true; };
@@ -80,7 +81,7 @@
       hosts = mapModules ./hosts (hostPath: lib.my.mkHostAttrs hostPath { });
 
       outputsBuilder = channels: rec {
-        packages = lib.foldAttrs (item: acc: item) {} (lib.attrValues (mapModules ./packages (p: import p { inherit inputs; pkgs = channels.nixpkgs; })));
+        packages = lib.foldAttrs (item: acc: item) { } (lib.attrValues (mapModules ./packages (p: import p { inherit inputs; pkgs = channels.nixpkgs; })));
 
         apps.default = flake-utils.lib.mkApp {
           drv = pkgs.writeShellScriptBin "repl" ''
@@ -95,6 +96,7 @@
           default = import ./shell.nix { pkgs = channels.nixpkgs; };
         };
 
+        formatter = pkgs.nixpkgs-fmt;
       };
 
       # homeConfigurations = digga.lib.mkHomeConfigurations self.nixosConfigurations;
@@ -145,10 +147,10 @@
     };
 }
 
-      # lib = nixpkgs.lib.extend
-      #   (self: super: {
-      #     my = import ./lib { inherit pkgs inputs; lib = self; };
-      #     hm = home-manager.lib;
+# lib = nixpkgs.lib.extend
+#   (self: super: {
+#     my = import ./lib { inherit pkgs inputs; lib = self; };
+#     hm = home-manager.lib;
 #         });
 
 #     in {

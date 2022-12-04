@@ -47,5 +47,5 @@ in
     # password = "password";
   };
 
-  users.groups.samba = {};
+  users.groups.samba = { };
 }

@@ -1,9 +1,11 @@
 { inputs, config, options, lib, pkgs, ... }:
 
 with lib;
-let cfg = config.modules.syncthing;
-    mylib = import ../../lib { inherit inputs lib pkgs; };
-in {
+let
+  cfg = config.modules.syncthing;
+  mylib = import ../../lib { inherit inputs lib pkgs; };
+in
+{
   options.modules.syncthing = {
     enable = mylib.mkBoolOpt false;
     service = mylib.mkBoolOpt false;

@@ -11,7 +11,7 @@ let
     rev = inputs.doom-emacs-config.rev;
   };
   patchedEmacs = pkgs.emacs.overrideAttrs (old: {
-    patches = (old.patches or []) ++ [
+    patches = (old.patches or [ ]) ++ [
       (pkgs.fetchpatch {
         url = "https://github.com/emacs-mirror/emacs/commit/8b52d9f5f177ce76b9ebecadd70c6dbbf07a20c6.patch";
         hash = "sha256-/W9yateE9UZ9a8CUjavQw0X7TgxigYzBuOvtAXdEsSA=";
@@ -21,7 +21,8 @@ let
   emacsWithNativeComp = patchedEmacs.override {
     nativeComp = true;
   };
-in {
+in
+{
   config = {
     programs.doom-emacs = {
       enable = true;

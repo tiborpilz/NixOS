@@ -24,5 +24,5 @@ rec {
     count (attr: pred attr.name attr.value) (attrsToList attrs);
 
   # mergeAttrs :: list -> attrs
-  mergeAttrs = list: foldr (p: c: p // c) {} list;
+  mergeAttrs = list: foldr (p: c: p // c) { } list;
 }

@@ -41,9 +41,9 @@ in
       sopsFile = cfg.sopsFile;
     };
 
-    sops.secrets.deluge_vpn_user = {};
-    sops.secrets.deluge_vpn_pass = {};
-    sops.secrets.deluge_password = {};
+    sops.secrets.deluge_vpn_user = { };
+    sops.secrets.deluge_vpn_pass = { };
+    sops.secrets.deluge_password = { };
 
     virtualisation.oci-containers.containers.deluge = {
       image = "binhex/arch-delugevpn:latest";
@@ -77,6 +77,6 @@ in
         "--privileged=true"
       ];
     };
-   modules.services.reverseProxy.proxies.deluge.publicPort = publicPort;
+    modules.services.reverseProxy.proxies.deluge.publicPort = publicPort;
   };
 }
