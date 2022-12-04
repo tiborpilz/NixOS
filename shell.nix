@@ -14,9 +14,11 @@ mkShell {
     node2nix
     nixos-rebuild
     cachix
+    go-task
   ];
   shellHook = ''
     export FLAKE="$PWD"
     export PATH="$FLAKE/bin:${nixBin}/bin:$PATH"
+
   '';
 }

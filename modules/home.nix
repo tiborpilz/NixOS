@@ -19,10 +19,12 @@ in
   config = mkIf cfg.enable {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
+    # home-manager.extraSpecialArgs = { inherit lib; };
     home-manager.users.tibor = mkMerge [
       inputs.nix-doom-emacs.hmModule
       {
         _module.args.inputs = inputs;
+        _module.args.lib = lib;
         imports = [ ../home ];
         home.file = mkAliasDefinitions options.home.file;
         xdg.configFile = mkAliasDefinitions options.home.configFile;
