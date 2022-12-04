@@ -29,6 +29,8 @@ in {
 
   modules.editors.neovim.enable = true;
 
+  modules.tools.vagrant.enable = true;
+
   modules.syncthing.enable = true;
 
   nix.settings = {
