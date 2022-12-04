@@ -556,13 +556,17 @@ Currently, this plugin only works with an older version of node (16) installed,
 which is handled via nvm. Since I'm using this concept on multiple machines, it
 makes sense to get the nvm version's path programatically.
 
-In the future I could implement installing node 16 if it's missing.
+Since I'm installing all my emacs modules via nix, the ~:recipe~ declaration is
+useless and ist just left in so that this config will still work on its own.
 
-**** TODO Load via nix somehow
+The actual package is defined in my nix config.
 #+begin_src elisp :tangle packages.el
-(package! jsonrpc)
-(package! copilot)
-;;   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+(package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+#+end_src
+
+In the future I could implement installing node 16 if it's missing.
+#+begin_src elisp :tangle packages.el
+(package! nvm)
 #+end_src
 
 #+begin_src elisp

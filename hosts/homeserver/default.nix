@@ -105,10 +105,10 @@ with lib;
     };
 
     virtualisation.oci-containers.backend = "podman";
-    system.stateVersion = "22.05";
+    system.stateVersion = "22.11";
     nixpkgs.config.allowUnfree = true;
 
-    home.enable = false;
+    home.enable = true;
 
     services.avahi = {
       enable = true;

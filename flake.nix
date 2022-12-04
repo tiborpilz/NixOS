@@ -59,8 +59,8 @@
       hostDefaults = {
         channelName = "nixpkgs";
         modules = [
-          digga.nixosModules.bootstrapIso
-          digga.nixosModules.nixConfig
+          # digga.nixosModules.bootstrapIso
+          # digga.nixosModules.nixConfig
           home-manager.nixosModules.home-manager
         ] ++ lib.my.mapModulesRec' (toString ./modules) import;
       };

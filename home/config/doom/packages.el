@@ -42,11 +42,13 @@
 (package! poetry)
 ;; Poetry:1 ends here
 
-;; [[file:config.org::*Load via nix somehow][Load via nix somehow:1]]
-(package! jsonrpc)
-(package! copilot)
-;;   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
-;; Load via nix somehow:1 ends here
+;; [[file:config.org::*Copilot][Copilot:1]]
+(package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+;; Copilot:1 ends here
+
+;; [[file:config.org::*Copilot][Copilot:2]]
+(package! nvm)
+;; Copilot:2 ends here
 
 ;; [[file:config.org::*Doom Themes][Doom Themes:1]]
 (package! doom-themes)
