@@ -13,6 +13,6 @@
       CREATE DATABASE nixcloud;
       GRANT ALL PRIVILIGES ON DATABASE nixcloud TO nixcloud;
     '';
-   };
+  };
 }
     

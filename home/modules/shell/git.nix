@@ -1,9 +1,11 @@
 { inputs, config, options, lib, pkgs, ... }:
 
 with lib;
-let cfg = config.modules.shell.git;
-    mylib = import ../../../lib { inherit inputs lib pkgs; };
-in {
+let
+  cfg = config.modules.shell.git;
+  mylib = import ../../../lib { inherit inputs lib pkgs; };
+in
+{
   options.modules.shell.git = {
     enable = mylib.mkBoolOpt false;
   };

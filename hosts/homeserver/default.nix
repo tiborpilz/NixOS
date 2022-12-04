@@ -83,6 +83,7 @@ with lib;
     services.openssh.permitRootLogin = "yes";
 
     environment.systemPackages = with pkgs; [
+      git
       tmux
       vim
       wireguard-tools

@@ -44,13 +44,14 @@ let
 
   mkProxyConfig = port: enableauth: username: password: host: {
     serverAliases = [ "http://${host}" ];
-    extraConfig = if enableauth then ''
-      reverse_proxy http://localhost:${toString port}
-      basicauth /* bcrypt {
-          ${username} ${password}
-      }
-    ''
-    else "reverse_proxy http://localhost:${toString port}";
+    extraConfig =
+      if enableauth then ''
+        reverse_proxy http://localhost:${toString port}
+        basicauth /* bcrypt {
+            ${username} ${password}
+        }
+      ''
+      else "reverse_proxy http://localhost:${toString port}";
   };
 in
 {
