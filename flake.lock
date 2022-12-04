@@ -145,23 +145,6 @@
         "type": "github"
       }
     },
-    "doom-emacs-config": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1670129203,
-        "narHash": "sha256-VmztDSU945JHNjqX/Kj3tztMFZj9AVn40CX8nwK2Apg=",
-        "owner": "tiborpilz",
-        "repo": "doom-emacs-config",
-        "rev": "0410c1902a468438c8c9bc66e05e370479e9150c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "tiborpilz",
-        "ref": "feat/remove-recipe-packages",
-        "repo": "doom-emacs-config",
-        "type": "github"
-      }
-    },
     "doom-snippets": {
       "flake": false,
       "locked": {
@@ -841,7 +824,6 @@
         "copilot-el": "copilot-el",
         "darwin": "darwin",
         "digga": "digga",
-        "doom-emacs-config": "doom-emacs-config",
         "emacs-overlay": "emacs-overlay",
         "flake-utils": "flake-utils_4",
         "flake-utils-plus": "flake-utils-plus_2",

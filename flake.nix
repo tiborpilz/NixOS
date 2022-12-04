@@ -87,8 +87,6 @@
         };
 
         formatter = pkgs.nixpkgs-fmt;
-
-        pkgs = channels.nixpkgs;
       };
 
       homeConfigurations = lib.my.mergeAttrs (lib.forEach supportedSystems (system:
