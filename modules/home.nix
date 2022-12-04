@@ -4,24 +4,31 @@ with lib;
 with lib.my;
 let
   cfg = config.home;
-in {
+in
+{
   imports = [
     inputs.home-manager.nixosModules.home-manager
   ];
 
   options.home = with types; {
     enable = mkBoolOpt true;
-    file = mkOpt' attrs {} "Files to place directly in $HOME";
-    configFile = mkOpt' attrs {} "Files to place in $XDG_CONFIG_HOME";
+    file = mkOpt' attrs { } "Files to place directly in $HOME";
+    configFile = mkOpt' attrs { } "Files to place in $XDG_CONFIG_HOME";
   };
 
   config = mkIf cfg.enable {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
-    home-manager.users.tibor.imports = [ ../home ];
+    home-manager.users.tibor = mkMerge [
+      inputs.nix-doom-emacs.hmModule
+      {
+        _module.args.inputs = inputs;
+        imports = [ ../home ];
+        home.file = mkAliasDefinitions options.home.file;
+        xdg.configFile = mkAliasDefinitions options.home.configFile;
+      }
+    ];
 
-    home-manager.users.tibor.home.file = mkAliasDefinitions options.home.file;
-    home-manager.users.tibor.xdg.configFile = mkAliasDefinitions options.home.configFile;
 
     systemd.services.home-manager-tibor = {
       # Need to wait for network since home-manager will get stuff from git

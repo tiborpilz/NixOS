@@ -1,12 +1,14 @@
 { inputs, config, options, lib, pkgs, ... }:
 
 with lib;
-let cfg = config.modules.shell.gnupg;
-    mylib = import ../../../lib { inherit inputs lib pkgs; };
-in {
+let
+  cfg = config.modules.shell.gnupg;
+  mylib = import ../../../lib { inherit inputs lib pkgs; };
+in
+{
   options.modules.shell.gnupg = with types; {
-    enable   = mylib.mkBoolOpt false;
-    cacheTTL = mylib.mkOpt int 3600;  # 1hr
+    enable = mylib.mkBoolOpt false;
+    cacheTTL = mylib.mkOpt int 3600; # 1hr
   };
 
   config = mkIf cfg.enable {

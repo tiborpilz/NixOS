@@ -1,16 +1,19 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> { } }:
 
 with pkgs;
-let nixBin =
-      writeShellScriptBin "nix" ''
-        ${nixVersions.stable}/bin/nix --option experimental-features "nix-command flakes" "$@"
-      '';
-in mkShell {
+let
+  nixBin =
+    writeShellScriptBin "nix" ''
+      ${nixVersions.stable}/bin/nix --option experimental-features "nix-command flakes" "$@"
+    '';
+in
+mkShell {
   buildInputs = [
     git
     nix-zsh-completions
     node2nix
     nixos-rebuild
+    cachix
   ];
   shellHook = ''
     export FLAKE="$PWD"
