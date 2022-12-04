@@ -1,0 +1,5 @@
+{
+    "imports": {
+        "json2yaml/": "https://deno.land/x/json2yaml@v1.0.1/"
+    }
+}
