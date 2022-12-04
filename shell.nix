@@ -11,6 +11,7 @@ in mkShell {
     nix-zsh-completions
     node2nix
     nixos-rebuild
+    cachix
   ];
   shellHook = ''
     export FLAKE="$PWD"

@@ -91,6 +91,10 @@
           '';
         };
 
+        devShells = {
+          default = import ./shell.nix { pkgs = channels.nixpkgs; };
+        };
+
       };
 
       # homeConfigurations = digga.lib.mkHomeConfigurations self.nixosConfigurations;
