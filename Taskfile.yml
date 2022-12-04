@@ -1,0 +1,17 @@
+version: '3'
+tasks:
+  default:
+    cmds:
+      - /nix/store/81yi66w1q1spb27vp7blwbgb5myhwgjw-nix-2.11.0/bin/nix flake check
+  build-edge:
+    cmds:
+      - nix build .#nixosConfigurations.edge.config.system.build.toplevel
+  build-homeserver:
+    cmds:
+      - nix build .#nixosConfigurations.homeserver.config.system.build.toplevel
+  build-ideapad:
+    cmds:
+      - nix build .#nixosConfigurations.ideapad.config.system.build.toplevel
+  build-thinkyMcThinkpad:
+    cmds:
+      - nix build .#nixosConfigurations.thinkyMcThinkpad.config.system.build.toplevel
