@@ -94,7 +94,7 @@
 
       homeConfigurations = lib.my.mergeAttrs (lib.forEach supportedSystems (system:
         let
-          user = if (system == "x86_64-darwin") then "tibor.pilz" else "tibor";
+          user = if (system == "x86_64-darwin") then "tiborpilz" else "tibor";
           homeDirectory = if (system == "x86_64-darwin") then "/Users/${user}" else "/home/${user}";
           pkgs = self.channels."${system}".nixpkgs;
           enableSyncthing = (system == "x86_64-linux");
