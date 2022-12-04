@@ -97,117 +97,37 @@
         };
 
         formatter = pkgs.nixpkgs-fmt;
+
+        pkgs = channels.nixpkgs;
       };
 
-      # homeConfigurations = digga.lib.mkHomeConfigurations self.nixosConfigurations;
+      homeConfigurations = lib.my.mergeAttrs (lib.forEach supportedSystems (system:
+        let
+          user = if (system == "x86_64-darwin") then "tibor.pilz" else "tibor";
+          homeDirectory = if (system == "x86_64-darwin") then "/home/${user}" else "/Users/${user}";
+          pkgs = self.pkgs."${system}";
+          enableSyncthing = (system == "x86_64-linux");
+        in
+        {
+          "${user}" = home-manager.lib.homeManagerConfiguration {
+            inherit pkgs lib;
 
-      # homeConfigurations.tibor = self.nixosConfigurations.edge.config.home-manager.users.tibor.home; # home-manager.lib.homeManagerConfiguration {
-
-      homeConfigurations.tibor = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
-        inherit lib;
-
-        modules = [
-          ./home
-          inputs.nix-doom-emacs.hmModule
-          {
-            _module.args.inputs = inputs;
-            home.username = "tibor";
-            home.homeDirectory = "/home/tibor";
-            modules.syncthing.service = true;
-          }
-        ];
-      };
-      #   inherit lib;
-      #   pkgs = self.pkgs;
-
-      #   modules = [ self.nixosConfigurations.edge.config.home-manager.users.tibor.home ];
-      # };
+            modules = [
+              ./home
+              inputs.nix-doom-emacs.hmModule
+              {
+                _module.args.inputs = inputs;
+                home.username = user;
+                home.homeDirectory = homeDirectory;
+                modules.syncthing.service = enableSyncthing;
+              }
+            ];
+          };
+        }
+      ));
 
       nixosModules = lib.my.mapModulesRec (toString ./modules) import;
-
-      # homeConfigurations = (lib.my.mergeAttrs (lib.forEach supportedSystems (system: {
-      #   "tibor-${system}" = home-manager.lib.homeManagerConfiguration {
-      #     inherit lib;
-      #     pkgs = self.pkgs;
-
-      #     modules = [
-      #       ./home
-      #       {
-      #         _module.args.inputs = inputs;
-      #         home.username = "tibor";
-      #         home.homeDirectory = "/home/tibor";
-      #         modules.syncthing.service = true;
-      #       }
-      #     ];
-      #   };
-      # })));
 
       inherit lib;
     };
 }
-
-# lib = nixpkgs.lib.extend
-#   (self: super: {
-#     my = import ./lib { inherit pkgs inputs; lib = self; };
-#     hm = home-manager.lib;
-#         });
-
-#     in {
-#       inherit packages overlays;
-#       lib = lib.my;
-
-#       # ."${system}" = {
-#       #   default = pkgs.hello;
-#       # } // import ./packages/node/default.nix {
-#       #   inherit pkgs system;
-#       # };
-
-#       # devShells."x86_64-linux".default =
-#       #   import ./shell.nix { inherit pkgs; };
-
-#       nixosModules =
-#         { dotfiles = import ./.; } // mapModulesRec ./modules import;
-
-#       nixosConfigurations =
-#         mapHosts ./hosts {};
-
-#       homeConfigurations.tibor = home-manager.lib.homeManagerConfiguration {
-#         inherit pkgs;
-#         inherit lib;
-
-#         modules = [
-#           ./home
-#           {
-#             _module.args.inputs = inputs;
-#             home.username = "tibor";
-#             home.homeDirectory = "/home/tibor";
-#             modules.syncthing.service = true;
-#           }
-#         ];
-#       };
-
-#       homeConfigurations.tibor-darwin = home-manager.lib.homeManagerConfiguration {
-#         pkgs = import inputs.nixpkgs-unstable {
-#           system = "x86_64-darwin";
-#           config.allowUnfree = true;
-#           overlays = lib.attrValues {
-#             default = final: prev: {
-#               unstable = mkPkgs nixpkgs-unstable;
-#               my = self.packages.x86_64-darwin;
-#             };
-#           };
-#         };
-#         inherit lib;
-
-#         modules = [
-#           ./home
-#           {
-#             _module.args.inputs = inputs;
-#             home.username = "tibor.pilz";
-#             home.homeDirectory = "/Users/tibor.pilz";
-#           }
-#         ];
-#       };
-#     };
-# }
