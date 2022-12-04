@@ -325,10 +325,25 @@
 (setq typescript-indent-level 2)
 ;; Code formatting:1 ends here
 
-;; [[file:config.org::*nix-mode][nix-mode:1]]
+;; [[file:config.org::*nix-mode.el][nix-mode.el:1]]
 (use-package! nix-mode
   :mode "\\.nix\\'")
-;; nix-mode:1 ends here
+;; nix-mode.el:1 ends here
+
+;; [[file:config.org::*Company-nixos-options][Company-nixos-options:2]]
+(add-to-list 'company-backends 'company-nixos-options)
+;; Company-nixos-options:2 ends here
+
+;; [[file:config.org::*Nix-sandbox][Nix-sandbox:1]]
+(package! nix-sandbox)
+;; Nix-sandbox:1 ends here
+
+;; [[file:config.org::*Nix-sandbox][Nix-sandbox:2]]
+(setq flycheck-command-wrapper-function
+        (lambda (command) (apply 'nix-shell-command (nix-current-sandbox) command))
+      flycheck-executable-find
+        (lambda (cmd) (nix-executable-find (nix-current-sandbox) cmd)))
+;; Nix-sandbox:2 ends here
 
 ;; [[file:config.org::*Run pytest in virtualenv][Run pytest in virtualenv:1]]
 (add-hook! python-mode

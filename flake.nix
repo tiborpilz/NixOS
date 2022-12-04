@@ -26,6 +26,8 @@
     deno2nix.url = "github:SnO2WMaN/deno2nix";
     devshell.url = "github:numtide/devshell";
 
+    deploy-rs.url = "github:serokell/deploy-rs";
+
     copilot-el.url = "github:zerolfx/copilot.el";
     copilot-el.flake = false;
   };
@@ -39,6 +41,7 @@
     , flake-utils
     , flake-utils-plus
     , digga
+    , deploy-rs
     , ...
     } @ inputs:
     let
@@ -83,7 +86,6 @@
       ];
 
       hosts = nixosHosts // darwinHosts;
-
 
       outputsBuilder = channels: rec {
         inherit channels;
