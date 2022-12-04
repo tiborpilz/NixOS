@@ -19,6 +19,5 @@ mkShell {
   shellHook = ''
     export FLAKE="$PWD"
     export PATH="$FLAKE/bin:${nixBin}/bin:$PATH"
-
   '';
 }
