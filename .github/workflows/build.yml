@@ -29,4 +29,4 @@ jobs:
       with:
         name: tiborpilz
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-    - run: nix build .#homeConfigurations.tiborpilz.activationPackage
+    - run: nix build '.#homeConfigurations."tibor.pilz".activationPackage'

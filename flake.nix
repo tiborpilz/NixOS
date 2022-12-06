@@ -111,6 +111,9 @@
           homeDirectory = if (system == "x86_64-darwin") then "/Users/${user}" else "/home/${user}";
           pkgs = self.channels."${system}".nixpkgs;
           enableSyncthing = (system == "x86_64-linux");
+          hosts = if (system == "x86_64-darwin") then (lib.attrNames self.darwinConfigurations) else (lib.attrNames self.nixosConfigurations);
+          mkHostAliases = map (h: "${user}@${h}") hosts;
+          aliases = mkHostAliases;
           homeConfiguration = home-manager.lib.homeManagerConfiguration {
             inherit lib pkgs;
 
@@ -126,9 +129,9 @@
               }
             ];
           };
-        in { "${user}" = homeConfiguration; }
-           // { "${lib.replaceStrings ["."] [""] user}" = homeConfiguration; }
-      )) // (lib.my.mkHomeAliases "tibor" self.nixosConfigurations self.homeConfigurations);
+          aliasConfigurations = lib.foldr (curr: prev: prev // { "${curr}" = homeConfiguration; }) {} aliases;
+        in { "${user}" = homeConfiguration; } // aliasConfigurations
+      ));
 
       nixosModules = lib.my.mapModulesRec (toString ./modules) import;
     };
