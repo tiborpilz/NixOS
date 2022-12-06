@@ -54,6 +54,10 @@
 (package! poetry)
 ;; Poetry:1 ends here
 
+;; [[file:config.org::*Live Preview][Live Preview:1]]
+(package! impatient-mode)
+;; Live Preview:1 ends here
+
 ;; [[file:config.org::*Copilot][Copilot:1]]
 (package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
 ;; Copilot:1 ends here
