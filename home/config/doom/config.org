@@ -544,7 +544,7 @@ Adds a nixos-options backends list.
 
 ***** Nix-sandbox
 Utility functions to work with nix sandboxes.
-#+begin_src elisp
+#+begin_src elisp :tangle packages.el
 (package! nix-sandbox)
 #+end_src
 

@@ -334,10 +334,6 @@
 (add-to-list 'company-backends 'company-nixos-options)
 ;; Company-nixos-options:2 ends here
 
-;; [[file:config.org::*Nix-sandbox][Nix-sandbox:1]]
-(package! nix-sandbox)
-;; Nix-sandbox:1 ends here
-
 ;; [[file:config.org::*Nix-sandbox][Nix-sandbox:2]]
 (setq flycheck-command-wrapper-function
         (lambda (command) (apply 'nix-shell-command (nix-current-sandbox) command))
