@@ -354,6 +354,13 @@
 (use-package! poly-markdown)
 ;; Code blocks:1 ends here
 
+;; [[file:config.org::*Live Preview][Live Preview:2]]
+  (defun markdown-html (buffer)
+    (princ (with-current-buffer buffer
+      (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
+    (current-buffer)))
+;; Live Preview:2 ends here
+
 ;; [[file:config.org::*Handling][Handling:1]]
 (setq company-idle-delay
       (lambda () (if (company-in-string-or-comment) nil 0.01)))
