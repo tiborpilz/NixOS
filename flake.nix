@@ -107,13 +107,11 @@
 
       homeConfigurations = lib.my.mergeAttrs (lib.forEach supportedSystems (system:
         let
-          user = if (system == "x86_64-darwin") then "tiborpilz" else "tibor";
+          user = if (system == "x86_64-darwin") then "tibor.pilz" else "tibor";
           homeDirectory = if (system == "x86_64-darwin") then "/Users/${user}" else "/home/${user}";
           pkgs = self.channels."${system}".nixpkgs;
           enableSyncthing = (system == "x86_64-linux");
-        in
-        {
-          "${user}" = home-manager.lib.homeManagerConfiguration {
+          homeConfiguration = home-manager.lib.homeManagerConfiguration {
             inherit lib pkgs;
 
             modules = [
@@ -128,7 +126,8 @@
               }
             ];
           };
-        }
+        in { "${user}" = homeConfiguration; }
+           // { "${lib.replaceStrings ["."] [""] user}" = homeConfiguration; }
       )) // (lib.my.mkHomeAliases "tibor" self.nixosConfigurations self.homeConfigurations);
 
       nixosModules = lib.my.mapModulesRec (toString ./modules) import;

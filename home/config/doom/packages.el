@@ -46,6 +46,10 @@
 (package! company-nixos-options)
 ;; Company-nixos-options:1 ends here
 
+;; [[file:config.org::*Nix-sandbox][Nix-sandbox:1]]
+(package! nix-sandbox)
+;; Nix-sandbox:1 ends here
+
 ;; [[file:config.org::*Poetry][Poetry:1]]
 (package! poetry)
 ;; Poetry:1 ends here
