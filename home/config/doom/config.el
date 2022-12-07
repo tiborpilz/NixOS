@@ -296,7 +296,7 @@
 ;; Nix-Doom-Emacs messes with dashboard:1 ends here
 
 ;; [[file:config.org::*Project Search Path][Project Search Path:1]]
-(setq projectile-project-search-path '(("~/Code/" . 1)))
+;; (setq projectile-project-search-path '(("~/Code/" . 2)))
 ;; Project Search Path:1 ends here
 
 ;; [[file:config.org::*Jest Test Mode][Jest Test Mode:2]]

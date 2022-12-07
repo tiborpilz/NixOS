@@ -67,6 +67,9 @@ in
       # typescript language server
       nodePackages.typescript-language-server
 
+      # vue language server
+      my."@volar/vue-language-server"
+
       # Fonts
       emacs-all-the-icons-fonts
     ];
