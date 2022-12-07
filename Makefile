@@ -5,7 +5,7 @@ help: ## Show this help.
 
 build:
 ifeq (home, $(filter home,$(MAKECMDGOALS)))
-	nix build .#homeConfigurations.$(filter-out home, $(filter-out $@,$(MAKECMDGOALS))).activationPackage
+	nix build '.#homeConfigurations."'$(filter-out home, $(filter-out $@,$(MAKECMDGOALS)))'".activationPackage'
 else ifeq (nixos, $(filter nixos,$(MAKECMDGOALS)))
 	nix build .#nixosConfigurations.$(filter-out nixos, $(filter-out $@,$(MAKECMDGOALS))).config.system.build.toplevel
 else

@@ -398,7 +398,7 @@ corresponding GH issue has a fix.
 * Projectile
 ** Project Search Path
 #+begin_src elisp
-(setq projectile-project-search-path '(("~/Code/" . 1)))
+;; (setq projectile-project-search-path '(("~/Code/" . 2)))
 #+end_src
 * Development
 ** Language-Specific Settings
