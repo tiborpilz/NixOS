@@ -3,6 +3,7 @@ let
   cfg = config.services.samba;
 in
 {
+  services.samba-wsdd.enable = true;
   networking.firewall.allowedTCPPorts = [ 5357 ];
   networking.firewall.allowedUDPPorts = [ 3702 ];
   services.samba = {
@@ -14,10 +15,11 @@ in
       server string = smbnix
       netbios name = smbnix
       security = user
-      #use sendfile = yes
-      #max protocol = smb2
+      # use sendfile = yes
+      # max protocol = smb2
       hosts allow = 0.0.0.0/0 192.168.2. 127.0.0.1 localhost
-      guest account = nobody
+      guest account = samba
+      map to guest = bad user
     '';
     shares = {
       "media" = {
@@ -44,7 +46,7 @@ in
     uid = 1001;
     isSystemUser = true;
     group = "samba";
-    # password = "password";
+    password = "password";
   };
 
   users.groups.samba = { };
