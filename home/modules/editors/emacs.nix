@@ -1,6 +1,7 @@
 { lib, pkgs, inputs, ... }:
 with lib;
 let
+  # Otherwise, emacs can't handle some LSP control characters
   patchedEmacs = pkgs.emacs.overrideAttrs (old: {
     patches = (old.patches or [ ]) ++ [
       (pkgs.fetchpatch {
@@ -12,8 +13,6 @@ let
   emacsWithNativeComp = patchedEmacs.override {
     nativeComp = false;
   };
-
-  emacsPackage = emacsWithNativeComp;
 in
 {
   config = {
@@ -32,10 +31,12 @@ in
         { name = "packages.el"; path = "${filteredPath}/packages.el"; }
         { name = "config.el"; path = pkgs.emptyFile; }
       ];
+      emacsPackage = emacsWithNativeComp;
+
       emacsPackagesOverlay = self: super: {
         copilot = pkgs.my.copilot;
       };
-      package = emacsPackage;
+      # package = emacsPackage;
 
       extraConfig = ''
         (setenv "LSP_USE_PLISTS" "true")
