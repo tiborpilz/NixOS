@@ -11,7 +11,7 @@ let
     ];
   });
   emacsWithNativeComp = patchedEmacs.override {
-    nativeComp = false;
+    nativeComp = true;
   };
 in
 {
@@ -33,8 +33,8 @@ in
       ];
       emacsPackage = emacsWithNativeComp;
 
-      emacsPackagesOverlay = self: super: {
-        copilot = pkgs.my.copilot;
+      emacsPackagesOverlay = self: super: with pkgs.my; {
+        inherit copilot lsp-bridge;
       };
       # package = emacsPackage;
 
@@ -62,17 +62,19 @@ in
       # :lang latex & :lang org (late previews)
       texlive.combined.scheme-medium
 
+      # Fonts
+      emacs-all-the-icons-fonts
+
+      # Language Servers
+      ## typescript language server
+      nodePackages.typescript-language-server
+
       # alternative lsp server for nix
       nil
 
-      # typescript language server
-      nodePackages.typescript-language-server
-
-      # vue language server
+      ## Vue
       my."@volar/vue-language-server"
-
-      # Fonts
-      emacs-all-the-icons-fonts
+      my.emmet-ls
     ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];

@@ -683,6 +683,22 @@
         "type": "github"
       }
     },
+    "lsp-bridge": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1670492783,
+        "narHash": "sha256-pKqBXZ+IYRh4tjRfvvlTNJ6K9yFmc/jLs6szHrte5Ic=",
+        "owner": "manateelazycat",
+        "repo": "lsp-bridge",
+        "rev": "e4552d45cc5284b1a1c4c59fba854d21cc028193",
+        "type": "github"
+      },
+      "original": {
+        "owner": "manateelazycat",
+        "repo": "lsp-bridge",
+        "type": "github"
+      }
+    },
     "nix-doom-emacs": {
       "inputs": {
         "doom-emacs": "doom-emacs",
@@ -1051,6 +1067,7 @@
         "flake-utils": "flake-utils_7",
         "flake-utils-plus": "flake-utils-plus_2",
         "home-manager": "home-manager_2",
+        "lsp-bridge": "lsp-bridge",
         "nix-doom-emacs": "nix-doom-emacs",
         "nixpkgs": "nixpkgs_8",
         "nixpkgs-unstable": "nixpkgs-unstable_2",

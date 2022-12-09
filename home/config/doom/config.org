@@ -843,7 +843,7 @@ Here, I'll define some general settings.
 Using plists should increase the LSP performance.
 
 #+begin_src elisp
-(setq lsp-use-lists 't)
+(setq lsp-use-lists t)
 #+end_src
 
 **** Handling
@@ -897,6 +897,14 @@ Same with signature help, as well as help documentation
 #+end_src
 
 
+
+**** LSP-Bridge
+As an alternative to ~lsp-mode~, which can be quite sluggish, I'm using
+~lsp-bridge~.
+
+#+begin_src elisp :tangle packages.el
+(package! lsp-bridge :recipe (:host github :repo "manateelazycat/lsp-bridge"))
+#+end_src
 *** Git
 Doom Emacs comes with Magit.
 
@@ -1417,13 +1425,14 @@ Make vertico-posframe a little wider
 Various tweaks to improve the overall performance.
 ** Raise the GC-Cons threshold
 #+begin_example elisp
-(setq gc-cons-threshold 100000000)
+(setq gc-cons-threshold (* 100 1024 1024)) ;; 100mb
 #+end_example
 
 ** Increase the amount of data which Emacs reads from the process
 #+begin_src elisp
-(setq read-process-output-max (* 1024 1024)) ;; 1mb
+(setq read-process-output-max (* 4 1024 1024)) ;; 4mb
 #+end_src
+
 
 * Unsorted Packages
 #+begin_src elisp :tangle packages.el

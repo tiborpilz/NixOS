@@ -30,6 +30,9 @@
 
     copilot-el.url = "github:zerolfx/copilot.el";
     copilot-el.flake = false;
+
+    lsp-bridge.url = "github:manateelazycat/lsp-bridge";
+    lsp-bridge.flake = false;
   };
 
   outputs =
@@ -130,6 +133,7 @@
             ];
           };
           aliasConfigurations = lib.foldr (curr: prev: prev // { "${curr}" = homeConfiguration; }) {} aliases;
+
         in { "${user}" = homeConfiguration; } // aliasConfigurations
       ));
 

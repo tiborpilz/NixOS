@@ -52,6 +52,7 @@ in
       tldr
       kubectl
       nodejs
+      amazon-ecr-credential-helper
     ];
 
     home.sessionVariables.ZDOTDIR = "$XDG_CONFIG_HOME/zsh";

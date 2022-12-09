@@ -66,6 +66,10 @@
 (package! nvm)
 ;; Copilot:2 ends here
 
+;; [[file:config.org::*LSP-Bridge][LSP-Bridge:1]]
+(package! lsp-bridge :recipe (:host github :repo "manateelazycat/lsp-bridge"))
+;; LSP-Bridge:1 ends here
+
 ;; [[file:config.org::*Doom Themes][Doom Themes:1]]
 (package! doom-themes)
 ;; Doom Themes:1 ends here

@@ -480,7 +480,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; Syntax Checking:1 ends here
 
 ;; [[file:config.org::*Performance][Performance:1]]
-(setq lsp-use-lists 't)
+(setq lsp-use-lists t)
 ;; Performance:1 ends here
 
 ;; [[file:config.org::*Handling][Handling:1]]
@@ -593,5 +593,5 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; Vertico:3 ends here
 
 ;; [[file:config.org::*Increase the amount of data which Emacs reads from the process][Increase the amount of data which Emacs reads from the process:1]]
-(setq read-process-output-max (* 1024 1024)) ;; 1mb
+(setq read-process-output-max (* 4 1024 1024)) ;; 4mb
 ;; Increase the amount of data which Emacs reads from the process:1 ends here
