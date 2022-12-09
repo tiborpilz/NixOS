@@ -1,6 +1,8 @@
-{ lib, pkgs, inputs, ... }:
+{ lib, pkgs, inputs, config, ... }:
 with lib;
 let
+  cfg = config.modules.editors.emacs;
+  mylib = import ../../../lib { inherit inputs lib pkgs; };
   # Otherwise, emacs can't handle some LSP control characters
   patchedEmacs = pkgs.emacs.overrideAttrs (old: {
     patches = (old.patches or [ ]) ++ [
@@ -15,8 +17,13 @@ let
   };
 in
 {
-  config = {
-    programs.doom-emacs = rec {
+  options.modules.editors.emacs = {
+    enable = mylib.mkBoolOpt false;
+    useNix = mylib.mkBoolOpt false;
+  };
+
+  config = mkIf cfg.enable {
+    programs.doom-emacs = mkIf cfg.useNix rec {
       enable = true;
       doomPrivateDir = ../../config/doom;
       doomPackageDir = let
@@ -44,6 +51,8 @@ in
     };
 
     home.packages = with pkgs; [
+      emacsWithNativeComp
+
       fd # for projectile
       imagemagick # for image-dired
       pinentry-emacs # in-emacs gnupg-prompts
@@ -76,5 +85,18 @@ in
     ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
+
+    home.activation.installDoomEmacs = mkIf (cfg.useNix) (lib.hm.dag.entryAfter ["WriteBoundary"] ''
+        if [ ! -d ".config/emacs" ]; then
+            git clone --depth=1 --single-branch https://github.com/doomemacs/doomemacs ".config/emacs"
+        fi
+
+        if [ ! -d ".config/doom" ]; then
+            tempdir=$(mktemp)
+            git clone https://github.com/tiborpilz/doom-emacs-config $tempdir
+            cp -r $tempdir/home/config/doom ~/.config/doom
+        fi
+        # .config/emacs/bin/doom sync
+      '');
   };
 }
