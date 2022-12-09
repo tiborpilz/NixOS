@@ -38,14 +38,6 @@
            :repo "merrickluo/lsp-tailwindcss"))
 ;; Tailwind:1 ends here
 
-;; [[file:config.org::*Nixos-Options][Nixos-Options:1]]
-(package! nixos-options)
-;; Nixos-Options:1 ends here
-
-;; [[file:config.org::*Company-nixos-options][Company-nixos-options:1]]
-(package! company-nixos-options)
-;; Company-nixos-options:1 ends here
-
 ;; [[file:config.org::*Nix-sandbox][Nix-sandbox:1]]
 (package! nix-sandbox)
 ;; Nix-sandbox:1 ends here
