@@ -100,6 +100,6 @@ in
           fi
           # .config/emacs/bin/doom sync
         '';
-      in (lib.hm.dag.entryAfter ["WriteBoundary"] (if cfg.useNix then activationScript else "" ));
+      in (lib.hm.dag.entryAfter ["WriteBoundary"] (if cfg.useNix then "" else activationScript ));
   };
 }
