@@ -330,10 +330,6 @@
   :mode "\\.nix\\'")
 ;; nix-mode.el:1 ends here
 
-;; [[file:config.org::*Company-nixos-options][Company-nixos-options:2]]
-(add-to-list 'company-backends 'company-nixos-options)
-;; Company-nixos-options:2 ends here
-
 ;; [[file:config.org::*Nix-sandbox][Nix-sandbox:2]]
 (setq flycheck-command-wrapper-function
         (lambda (command) (apply 'nix-shell-command (nix-current-sandbox) command))
@@ -362,8 +358,7 @@
 ;; Live Preview:2 ends here
 
 ;; [[file:config.org::*Handling][Handling:1]]
-(setq company-idle-delay
-      (lambda () (if (company-in-string-or-comment) nil 0.01)))
+(setq company-idle-delay 0)
 ;; Handling:1 ends here
 
 ;; [[file:config.org::*Handling][Handling:2]]
@@ -375,7 +370,8 @@
 ;; Handling:3 ends here
 
 ;; [[file:config.org::*Backends][Backends:1]]
-(setq company-backends '((company-capf company-dabbrev-code)))
+(after! lsp-mode
+  (setq company-backends '(company-capf)))
 ;; Backends:1 ends here
 
 ;; [[file:config.org::*Looks][Looks:1]]
@@ -383,14 +379,42 @@
 ;; Looks:1 ends here
 
 ;; [[file:config.org::*Copilot][Copilot:3]]
+(defun call-nvm (args &optional as-string)
+  (let ((nvm-command "source $XDG_CONFIG_HOME/zsh/.zshrc && nvm"))
+    (if as-string
+        (shell-command-to-string (concat nvm-command " " args))
+      (shell-command (concat nvm-command " " args)))))
+;; Copilot:3 ends here
+
+;; [[file:config.org::*Copilot][Copilot:4]]
+(if (not (eq 0 (call-nvm "ls 16")))
+  (call-nvm "install 16"))
+;; Copilot:4 ends here
+
+;; [[file:config.org::*Copilot][Copilot:5]]
 (nvm-use "16" (lambda ()
                 (setq copilot-node-executable
                       (concat
                        (nth 1 (nvm--find-exact-version-for "16"))
                        "/bin/node"))
                 (use-package! copilot
-                  :bind ("<backtab>" . 'copilot-accept-completion))))
-;; Copilot:3 ends here
+                  :hook (prog-mode . copilot-mode)
+                  :bind (:map copilot-completion-map
+                         ("C-SPC" . 'copilot-accept-completion)
+                         ("C-<spc>" . 'copilot-accept-completion)
+                         ("C-S-p" . 'copilot-previous-completion)
+                         ("C-S-n" . 'copilot-next-completion)))))
+;; Copilot:5 ends here
+
+;; [[file:config.org::*Copilot][Copilot:6]]
+(map! :leader
+      (:prefix-map ("i" . "insert")
+       (:prefix ("g" . "github copilot")
+        :desc "Show Copilot Completion" "s" #'copilot-complete
+        :desc "Insert Copilot Completion" "c" #'copilot-accept-completion))
+      (:prefix ("t" . "toggle")
+       :desc "Toggle Copilot" "p" #'copilot-mode))
+;; Copilot:6 ends here
 
 ;; [[file:config.org::*Python][Python:1]]
 (setq dap-python-debugger 'debugpy)
@@ -480,7 +504,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; Syntax Checking:1 ends here
 
 ;; [[file:config.org::*Performance][Performance:1]]
-(setq lsp-use-lists 't)
+;; (setq lsp-use-lists 't)
 ;; Performance:1 ends here
 
 ;; [[file:config.org::*Handling][Handling:1]]
@@ -488,12 +512,17 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; Handling:1 ends here
 
 ;; [[file:config.org::*Handling][Handling:2]]
-(setq lsp-completion-show-detail nil)
+(setq lsp-completion-show-detail t)
 ;; Handling:2 ends here
 
 ;; [[file:config.org::*Handling][Handling:3]]
 (setq lsp-completion-show-kind t)
 ;; Handling:3 ends here
+
+;; [[file:config.org::*Handling][Handling:4]]
+;; (setq lsp-auto-guess-root t)
+(add-hook 'prog-mode-hook #'lsp-deferred)
+;; Handling:4 ends here
 
 ;; [[file:config.org::*UI][UI:1]]
 (map! :leader
@@ -531,16 +560,19 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; Doom Themes:2 ends here
 
 ;; [[file:config.org::*Nano][Nano:1]]
-;; (add-to-list 'load-path "~/Code/doom-nano-testing")
-;; (require 'load-nano)
+;; (add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
 ;; (setq doom-themes-treemacs-theme "doom-atom")
 ;; Nano:1 ends here
 
 ;; [[file:config.org::*Nano Modeline][Nano Modeline:2]]
+(setq nano-modeline-theme 'nano-modeline-theme-nano)
+;; Nano Modeline:2 ends here
+
+;; [[file:config.org::*Nano Modeline][Nano Modeline:3]]
 (use-package! nano-modeline
   :config
   (nano-modeline-mode 1))
-;; Nano Modeline:2 ends here
+;; Nano Modeline:3 ends here
 
 ;; [[file:config.org::*Doom Modeline][Doom Modeline:1]]
 (setq doom-modeline-vcs-max-length 50)
