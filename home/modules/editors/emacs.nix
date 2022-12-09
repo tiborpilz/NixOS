@@ -87,17 +87,19 @@ in
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
 
-    home.activation.installDoomEmacs = mkIf (! cfg.useNix) (lib.hm.dag.entryAfter ["WriteBoundary"] ''
-        if [ ! -d ".config/emacs" ]; then
-            ${pkgs.git}/bin/git clone --depth=1 --single-branch https://github.com/doomemacs/doomemacs ".config/emacs"
-        fi
+    home.activation.installDoomEmacs =
+      let activationScript = ''
+          if [ ! -d ".config/emacs" ]; then
+              ${pkgs.git}/bin/git clone --depth=1 --single-branch https://github.com/doomemacs/doomemacs ".config/emacs"
+          fi
 
-        if [ ! -d ".config/doom" ]; then
-            tempdir=$(mktemp -d)
-            ${pkgs.git}/bin/git clone https://github.com/tiborpilz/nixos $tempdir
-            cp -r $tempdir/home/config/doom ~/.config/doom
-        fi
-        # .config/emacs/bin/doom sync
-      '');
+          if [ ! -d ".config/doom" ]; then
+              tempdir=$(mktemp -d)
+              ${pkgs.git}/bin/git clone https://github.com/tiborpilz/nixos $tempdir
+              cp -r $tempdir/home/config/doom ~/.config/doom
+          fi
+          # .config/emacs/bin/doom sync
+        '';
+      in (lib.hm.dag.entryAfter ["WriteBoundary"] (if cfg.useNix then activationScript else "" ));
   };
 }
