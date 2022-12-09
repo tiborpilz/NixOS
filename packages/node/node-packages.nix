@@ -1231,7 +1231,6 @@ in
       sources."to-fast-properties-2.0.0"
       sources."token-stream-1.0.0"
       sources."typesafe-path-0.2.2"
-      sources."typescript-4.9.4"
       sources."void-elements-3.1.0"
       sources."vscode-css-languageservice-6.2.1"
       sources."vscode-html-languageservice-5.0.3"
