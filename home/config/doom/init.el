@@ -25,9 +25,9 @@
                                         ; layout            ; auie,ctsrnm is the superior home row
 
        :completion
-       (company)           ; the ultimate code completion backend
+       (company +childframe)           ; the ultimate code completion backend
        ;;ido               ; the other *other* search engine...
-       (ivy +childframe +fuzzy +icons)               ; a search engine for love and lifoe
+       (ivy +fuzzy +icons)               ; a search engine for love and lifoe
        ;; (helm +fuzzy)      ; the *other* search engine for love and life
        ;; (vertico +icons +childframe)           ; the search engine of the future
 
@@ -92,26 +92,26 @@
        ;;grammar           ; tasing grammar mistake every you make
 
        :tools
-       ansible
-       biblio            ; Writes a PhD for you (citation needed)
+       ;; ansible
+       ;; biblio            ; Writes a PhD for you (citation needed)
        ;; (debugger +lsp)          ; FIXME stepping through code, to help you add bugs
        direnv
-       docker
+       ;; docker
                                         ; editorconfig      ; let someone else argue about tabs vs spaces
-       ein               ; tame Jupyter notebooks with emacs
+       ;; ein               ; tame Jupyter notebooks with emacs
        (eval +overlay)     ; run code, run (also, repls)
-       gist              ; interacting with github gists
-       (lookup +dictionary +docsets +offline)              ; navigate your code and its documentation
-       (lsp +peek)               ; M-x vscode
+       ;; gist              ; interacting with github gists
+       ;; (lookup +dictionary +docsets +offline)              ; navigate your code and its documentation
+       ;; (lsp +peek)               ; M-x vscode
        magit             ; a git porcelain for Emacs
        make              ; run make tasks from Emacs
        pass              ; password manager for nerds
        ;; pdf               ; pdf enhancements
-       prodigy           ; FIXME managing external services & code builders
+       ;; prodigy           ; FIXME managing external services & code builders
        rgb               ; creating color strings
        ;; taskrunner        ; taskrunner for all your projects
-       terraform         ; infrastructure as code
-       tmux              ; an API for interacting with tmux
+       ;; terraform         ; infrastructure as code
+       ;; tmux              ; an API for interacting with tmux
        ;;upload            ; map local to remote projects via ssh/ftp
 
        :os
@@ -143,39 +143,40 @@
        ;;gdscript          ; the language you waited for
        ;;(go +lsp)         ; the hipster dialect
        haskell              ; a language that's lazier than I am
-       hy                ; readability of scheme w/ speed of python
+       ;; hy                ; readability of scheme w/ speed of python
        ;;idris             ; a language you can depend on
        json              ; At least it ain't XML
        ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
-       javascript
-       julia
+       (javascript +lsp)
+       ;; julia
        ;;kotlin            ; a better, slicker Java(Script)
-       (latex             ; writing papers in Emacs has never been so fun
-        +latexmk
-        +cdlatex
-        +fold)
+       ;; (latex             ; writing papers in Emacs has never been so fun
+       ;;  +latexmk
+       ;;  +cdlatex
+       ;;  +fold)
        ;;lean              ; for folks with too much to prove
        ;;ledger            ; be audit you can be
        lua               ; one-based indices? one-based indices
        markdown          ; writing docs for people to ignore
        ;;nim               ; python + lisp at the speed of c
-       nix              ; I hereby declare "nix geht mehr!"
+       (nix +lsp)              ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
        (org
-        +brain
-        +dragndrop
-        +gnuplot
-        +hugo
-        +journal
-        +jupyter
-        +noter
-        +pandoc
-        +pomodoro
-        +present
-        +pretty
         +roam2)
+        ;; +brain
+        ;; +dragndrop
+        ;; +gnuplot
+        ;; +hugo
+        ;; +journal
+        ;; +jupyter
+        ;; +noter
+        ;; +pandoc
+        ;; +pomodoro
+        ;; +present
+        ;; +pretty
+        ;; +roam2)
        ;;php               ; perl's insecure younger brother
-       plantuml          ; diagrams for confusing people more
+       ;; plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
        (python +pyright)            ; beautiful is better than ugly
        ;;qt                ; the 'cutest' gui framework ever
@@ -193,7 +194,7 @@
        ;;swift             ; who asked for emoji variables?
        ;;terra             ; Earth and Moon in alignment for performance.
        web               ; the tubes
-       yaml              ; JSON, but readable
+       (yaml +lsp)              ; JSON, but readable
        ;;zig               ; C, but simpler
 
        :email

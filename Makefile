@@ -13,7 +13,7 @@ else
 endif
 
 generate_node_packages: ## Generate nix node packages based on packages/node/node-packages.json
-	nix run nixpkgs#node2nix -- -i packages/node/node-packages.json -o packages/node/node-packages.nix -14
+	cd packages/node && nix run nixpkgs#node2nix -- -i node-packages.json -o node-packages.nix
 
 packages/node/node-packages.nix: generate_node_packages
 

@@ -525,23 +525,6 @@ expression buily by nix.
 
 **** Nix Options - A set of modes and functions
 
-***** Nixos-Options
-Interface for browsing and completing NixOS options.
-#+begin_src elisp :tangle packages.el
-(package! nixos-options)
-#+end_src
-
-***** Company-nixos-options
-Adds a nixos-options backends list.
-
-#+begin_src elisp :tangle packages.el
-(package! company-nixos-options)
-#+end_src
-
-#+begin_src elisp
-(add-to-list 'company-backends 'company-nixos-options)
-#+end_src
-
 ***** Nix-sandbox
 Utility functions to work with nix sandboxes.
 #+begin_src elisp :tangle packages.el
@@ -628,8 +611,7 @@ completion.
 I don't want any delay in showing suggestions, unless I'm writing a string or a
 comment, then I want company to not show any suggestions at all.
 #+begin_src elisp
-(setq company-idle-delay
-      (lambda () (if (company-in-string-or-comment) nil 0.01)))
+(setq company-idle-delay 0)
 #+end_src
 
 
@@ -650,7 +632,8 @@ LSP where possible, and I don't want to use snippets in that way, I'm going to
 keep the list of backends very short.
 
 #+begin_src elisp
-(setq company-backends '((company-capf company-dabbrev-code)))
+(after! lsp-mode
+  (setq company-backends '(company-capf)))
 #+end_src
 
 **** Looks
@@ -681,9 +664,28 @@ In the future I could implement installing node 16 if it's missing.
 (package! nvm)
 #+end_src
 
-Since ~nvm--find-exact-version-for "16" is not available from the start, I'm
-setting the copilot-node-executable in a callback hook, after using nvm-use.
+
+First, I'm using a call to ~nvm~ to install node version 16. Sourcing ~$XDG_CONFIG_HOME/nvm/nvm.sh~ is necessary to make the ~nvm~ command available.
+
+First, I'm defining a helper function to call nvm after sourcing my zsh config
+(which provides nvm).
+#+begin_src elisp
+(defun call-nvm (args &optional as-string)
+  (let ((nvm-command "source $XDG_CONFIG_HOME/zsh/.zshrc && nvm"))
+    (if as-string
+        (shell-command-to-string (concat nvm-command " " args))
+      (shell-command (concat nvm-command " " args)))))
+#+end_src
+
+Then, I'm using the ~call-nvm~ function to install node 16 if it isn't already installed.
+#+begin_src elisp
+(if (not (eq 0 (call-nvm "ls 16")))
+  (call-nvm "install 16"))
+#+end_src
+
+To get the path to the node 16 executable, I'm using a ~nvm-use~ callback.
 Only then am I loading the copilot package.
+
 #+begin_src elisp
 (nvm-use "16" (lambda ()
                 (setq copilot-node-executable
@@ -691,7 +693,28 @@ Only then am I loading the copilot package.
                        (nth 1 (nvm--find-exact-version-for "16"))
                        "/bin/node"))
                 (use-package! copilot
-                  :bind ("<backtab>" . 'copilot-accept-completion))))
+                  :hook (prog-mode . copilot-mode)
+                  :bind (:map copilot-completion-map
+                         ("C-SPC" . 'copilot-accept-completion)
+                         ("C-<spc>" . 'copilot-accept-completion)
+                         ("C-S-p" . 'copilot-previous-completion)
+                         ("C-S-n" . 'copilot-next-completion)))))
+
+#+end_src
+
+In insert mode, I'm binding  ~C-SPC~ to accept the complete suggestion. I'm also binding ~C-S-p~ and ~C-S-n~ to navigate through the suggestions.
+
+Additionally, I'm binding ~i g s~ to show the suggestions, and ~i g c~
+to insert the suggestion for use in normal mode, and ~t p~ to toggle Copilot.
+
+#+begin_src elisp
+(map! :leader
+      (:prefix-map ("i" . "insert")
+       (:prefix ("g" . "github copilot")
+        :desc "Show Copilot Completion" "s" #'copilot-complete
+        :desc "Insert Copilot Completion" "c" #'copilot-accept-completion))
+      (:prefix ("t" . "toggle")
+       :desc "Toggle Copilot" "p" #'copilot-mode))
 #+end_src
 
 *** Debugging
@@ -843,7 +866,7 @@ Here, I'll define some general settings.
 Using plists should increase the LSP performance.
 
 #+begin_src elisp
-(setq lsp-use-lists 't)
+;; (setq lsp-use-lists 't)
 #+end_src
 
 **** Handling
@@ -856,7 +879,7 @@ Set ~capf~ as completion provider.
 Don't show completion item detail
 
 #+begin_src elisp
-(setq lsp-completion-show-detail nil)
+(setq lsp-completion-show-detail t)
 #+end_src
 
 But show completion item kind
@@ -864,6 +887,14 @@ But show completion item kind
 #+begin_src elisp
 (setq lsp-completion-show-kind t)
 #+end_src
+
+Automatically start LSP on file open, guess root.
+#+begin_src elisp
+;; (setq lsp-auto-guess-root t)
+(add-hook 'prog-mode-hook #'lsp-deferred)
+#+end_src
+
+#+RESULTS:
 
 **** UI
 Although I like using ~lsp-ui-doc~, I don't want it to appear every time I'm
@@ -925,10 +956,12 @@ it lacks the features I need, I was always a fan of the look. Now, it's possible
 to enjoy the best of both worlds by theming Doom to look like Nano.
 
 #+begin_src elisp
-;; (add-to-list 'load-path "~/Code/doom-nano-testing")
-;; (require 'load-nano)
+;; (add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
 ;; (setq doom-themes-treemacs-theme "doom-atom")
 #+end_src
+
+#+RESULTS:
+: doom-atom
 
 *** Misc Themes
 **** Grayscale
@@ -948,6 +981,13 @@ Very appealing, minimalistic themes.
 
 #+begin_src elisp :tangle packages.el
 (package! nano-modeline)
+#+end_src
+
+Let the nano-modeline look like the nano theme
+
+#+begin_src elisp
+(setq nano-modeline-theme 'nano-modeline-theme-nano)
+
 #+end_src
 
 #+begin_src elisp
@@ -1013,6 +1053,8 @@ Allow for more characters in the branch name
 # #+RESULTS:
 # : *dashboard*
 
+** Nano
+[[https://github.com/rougier/nano-emacs][Nano Emacs]] is a minimalistic config for emacs by [[https://github.com/rougier][Nicolas P. Rougier.]]. Under the hood, it's styled by the [[https://github.com/rougier/nano-theme][Nano Theme]].
 ** Hydra
 *** Pretty Hydra
 
