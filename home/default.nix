@@ -31,6 +31,8 @@ in {
   modules.shell.direnv.enable = true;
 
   modules.editors.neovim.enable = true;
+  modules.editors.emacs.enable = true;
+  modules.editors.emacs.useNix = false;
 
   modules.tools.vagrant.enable = false;
 
