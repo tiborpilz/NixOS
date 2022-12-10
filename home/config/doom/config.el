@@ -360,16 +360,14 @@
 ;; Live Preview:2 ends here
 
 ;; [[file:config.org::*Handling][Handling:1]]
-(setq company-idle-delay 0)
+(setq company-idle-delay 0.35 ;; How long to wait before popping up
+      company-minimum-prefix-length 2 ;; Show the menu after one key press
+      company-tooltip-limit 10 ;; Limit on how many options to display
+      company-tooltip-align-annotations t ;; Align annotations to the right
+      company-require-match nil           ;; Allow free typing
+      company-selection-wrap-around t ;; Wrap around to beginning when you hit bottom of suggestions
+      )
 ;; Handling:1 ends here
-
-;; [[file:config.org::*Handling][Handling:2]]
-(setq company-minimum-prefix-length 1)
-;; Handling:2 ends here
-
-;; [[file:config.org::*Handling][Handling:3]]
-(setq company-selection-wrap-around t)
-;; Handling:3 ends here
 
 ;; [[file:config.org::*Backends][Backends:1]]
 (after! lsp-mode
@@ -380,35 +378,45 @@
 (setq company-format-margin-function #'company-vscode-dark-icons-margin)
 ;; Looks:1 ends here
 
-;; [[file:config.org::*Copilot][Copilot:3]]
+;; [[file:config.org::*Getting a Node 16 binary][Getting a Node 16 binary:3]]
 (defun call-nvm (args &optional as-string)
   (let ((nvm-command "source $XDG_CONFIG_HOME/zsh/.zshrc && nvm"))
     (if as-string
         (shell-command-to-string (concat nvm-command " " args))
       (shell-command (concat nvm-command " " args)))))
-;; Copilot:3 ends here
+;; Getting a Node 16 binary:3 ends here
 
-;; [[file:config.org::*Copilot][Copilot:4]]
-(if (not (eq 0 (call-nvm "ls 16")))
-  (call-nvm "install 16"))
-;; Copilot:4 ends here
+;; [[file:config.org::*Getting a Node 16 binary][Getting a Node 16 binary:4]]
+(defun install-node-if-missing ()
+  (if (not (eq 0 (call-nvm "ls 16")))
+      (call-nvm "install 16")))
+;; Getting a Node 16 binary:4 ends here
 
-;; [[file:config.org::*Copilot][Copilot:5]]
-(nvm-use "16" (lambda ()
+;; [[file:config.org::*Loading the package][Loading the package:1]]
+(defun load-copilot ()
+  (use-package! copilot
+    :hook (prog-mode . copilot-mode)
+    :bind (:map copilot-completion-map
+           ("C-SPC" . 'copilot-accept-completion)
+           ("C-<spc>" . 'copilot-accept-completion)
+           ("C-S-p" . 'copilot-previous-completion)
+           ("C-S-n" . 'copilot-next-completion))))
+;; Loading the package:1 ends here
+
+;; [[file:config.org::*Loading the package][Loading the package:2]]
+(if (and
+     (boundp 'copilot-node-executable)
+     (file-exists-p copilot-node-executable))
+    (load-copilot)
+  ((nvm-use "16" (lambda ()
                 (setq copilot-node-executable
                       (concat
                        (nth 1 (nvm--find-exact-version-for "16"))
                        "/bin/node"))
-                (use-package! copilot
-                  :hook (prog-mode . copilot-mode)
-                  :bind (:map copilot-completion-map
-                         ("C-SPC" . 'copilot-accept-completion)
-                         ("C-<spc>" . 'copilot-accept-completion)
-                         ("C-S-p" . 'copilot-previous-completion)
-                         ("C-S-n" . 'copilot-next-completion)))))
-;; Copilot:5 ends here
+                (load-copilot)
+;; Loading the package:2 ends here
 
-;; [[file:config.org::*Copilot][Copilot:6]]
+;; [[file:config.org::*Loading the package][Loading the package:3]]
 (map! :leader
       (:prefix-map ("i" . "insert")
        (:prefix ("g" . "github copilot")
@@ -416,7 +424,7 @@
         :desc "Insert Copilot Completion" "c" #'copilot-accept-completion))
       (:prefix ("t" . "toggle")
        :desc "Toggle Copilot" "p" #'copilot-mode))
-;; Copilot:6 ends here
+;; Loading the package:3 ends here
 
 ;; [[file:config.org::*Python][Python:1]]
 (setq dap-python-debugger 'debugpy)

@@ -612,20 +612,15 @@ completion.
 **** Handling
 I don't want any delay in showing suggestions, unless I'm writing a string or a
 comment, then I want company to not show any suggestions at all.
-#+begin_src elisp
-(setq company-idle-delay 0)
-#+end_src
 
-
-I also want to get suggestions after the first typed character, to remove
-unnecessary delay.
 #+begin_src elisp
-(setq company-minimum-prefix-length 1)
-#+end_src
-
-I want the suggestions to wrap around.
-#+begin_src elisp
-(setq company-selection-wrap-around t)
+(setq company-idle-delay 0.35 ;; How long to wait before popping up
+      company-minimum-prefix-length 2 ;; Show the menu after one key press
+      company-tooltip-limit 10 ;; Limit on how many options to display
+      company-tooltip-align-annotations t ;; Align annotations to the right
+      company-require-match nil           ;; Allow free typing
+      company-selection-wrap-around t ;; Wrap around to beginning when you hit bottom of suggestions
+      )
 #+end_src
 
 **** Backends
@@ -649,6 +644,7 @@ those icons as what's being displayed.
 #+end_src
 
 *** Copilot
+**** Getting a Node 16 binary
 Currently, this plugin only works with an older version of node (16) installed,
 which is handled via nvm. Since I'm using this concept on multiple machines, it
 makes sense to get the nvm version's path programatically.
@@ -661,13 +657,10 @@ The actual package is defined in my nix config.
 (package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
 #+end_src
 
-In the future I could implement installing node 16 if it's missing.
 #+begin_src elisp :tangle packages.el
 (package! nvm)
 #+end_src
 
-
-First, I'm using a call to ~nvm~ to install node version 16. Sourcing ~$XDG_CONFIG_HOME/nvm/nvm.sh~ is necessary to make the ~nvm~ command available.
 
 First, I'm defining a helper function to call nvm after sourcing my zsh config
 (which provides nvm).
@@ -679,29 +672,46 @@ First, I'm defining a helper function to call nvm after sourcing my zsh config
       (shell-command (concat nvm-command " " args)))))
 #+end_src
 
-Then, I'm using the ~call-nvm~ function to install node 16 if it isn't already installed.
+Then, I'm using the ~call-nvm~ function to create a function that will install
+node 16 via ~nvm~ if it's not already installed.
 #+begin_src elisp
-(if (not (eq 0 (call-nvm "ls 16")))
-  (call-nvm "install 16"))
+(defun install-node-if-missing ()
+  (if (not (eq 0 (call-nvm "ls 16")))
+      (call-nvm "install 16")))
 #+end_src
 
-To get the path to the node 16 executable, I'm using a ~nvm-use~ callback.
-Only then am I loading the copilot package.
+
+**** Loading the package
+
+For reusability, I'm defining a function that will load the copilot package with
+some keybindings.
 
 #+begin_src elisp
-(nvm-use "16" (lambda ()
+(defun load-copilot ()
+  (use-package! copilot
+    :hook (prog-mode . copilot-mode)
+    :bind (:map copilot-completion-map
+           ("C-SPC" . 'copilot-accept-completion)
+           ("C-<spc>" . 'copilot-accept-completion)
+           ("C-S-p" . 'copilot-previous-completion)
+           ("C-S-n" . 'copilot-next-completion))))
+#+end_src
+
+Finally, I'm checking for the ~copilot-node-exectuable~. When building Doom Emacs
+via nix, I'm injecting a node16 path in the nix store, so setting the node
+executable here is only necessary if ~copilot-node-executable~ isn't already set.
+
+#+begin_src elisp
+(if (and
+     (boundp 'copilot-node-executable)
+     (file-exists-p copilot-node-executable))
+    (load-copilot)
+  ((nvm-use "16" (lambda ()
                 (setq copilot-node-executable
                       (concat
                        (nth 1 (nvm--find-exact-version-for "16"))
                        "/bin/node"))
-                (use-package! copilot
-                  :hook (prog-mode . copilot-mode)
-                  :bind (:map copilot-completion-map
-                         ("C-SPC" . 'copilot-accept-completion)
-                         ("C-<spc>" . 'copilot-accept-completion)
-                         ("C-S-p" . 'copilot-previous-completion)
-                         ("C-S-n" . 'copilot-next-completion)))))
-
+                (load-copilot)
 #+end_src
 
 In insert mode, I'm binding  ~C-SPC~ to accept the complete suggestion. I'm also binding ~C-S-p~ and ~C-S-n~ to navigate through the suggestions.
