@@ -50,13 +50,13 @@
 (package! impatient-mode)
 ;; Live Preview:1 ends here
 
-;; [[file:config.org::*Copilot][Copilot:1]]
+;; [[file:config.org::*Getting a Node 16 binary][Getting a Node 16 binary:1]]
 (package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
-;; Copilot:1 ends here
+;; Getting a Node 16 binary:1 ends here
 
-;; [[file:config.org::*Copilot][Copilot:2]]
+;; [[file:config.org::*Getting a Node 16 binary][Getting a Node 16 binary:2]]
 (package! nvm)
-;; Copilot:2 ends here
+;; Getting a Node 16 binary:2 ends here
 
 ;; [[file:config.org::*Doom Themes][Doom Themes:1]]
 (package! doom-themes)
