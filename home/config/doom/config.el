@@ -198,7 +198,7 @@
 
 ;; [[file:config.org::*automatic latex rendering][automatic latex rendering:1]]
 (use-package! org-fragtog
-  :hook (org-mode . org-fragtog-mode))
+  :hook (org-mode . 'org-fragtog-mode))
 ;; automatic latex rendering:1 ends here
 
 ;; [[file:config.org::*Latex fragments][Latex fragments:1]]
@@ -221,7 +221,7 @@
 (use-package! org-roam-ui
   :after org-roam
   :commands org-roam-ui-open
-  :hook (org-roam . org-roam-ui-mode)
+  :hook (org-roam . 'org-roam-ui-mode)
   :config
   (require 'org-roam) ; in case autoloaded
   (defun org-roam-ui-open ()
@@ -282,7 +282,7 @@
 
 ;; [[file:config.org::*Disable auto-fill-mode][Disable auto-fill-mode:2]]
 (use-package! org-appear
-  :hook (org-mode . org-appear-mode)
+  :hook (org-mode . 'org-appear-mode)
   :config
   (setq org-appear-autoemphasis t
         org-appear-autosubmarkers t
@@ -404,16 +404,14 @@
 ;; Loading the package:1 ends here
 
 ;; [[file:config.org::*Loading the package][Loading the package:2]]
-(if (and
-     (boundp 'copilot-node-executable)
-     (file-exists-p copilot-node-executable))
+(if (and (boundp 'copilot-node-executable) (file-exists-p copilot-node-executable))
     (load-copilot)
-  ((nvm-use "16" (lambda ()
-                (setq copilot-node-executable
-                      (concat
-                       (nth 1 (nvm--find-exact-version-for "16"))
-                       "/bin/node"))
-                (load-copilot)
+    (nvm-use "16" (lambda ()
+                   (setq copilot-node-executable
+                         (concat
+                          (nth 1 (nvm--find-exact-version-for "16"))
+                          "/bin/node"))
+                   (load-copilot))))
 ;; Loading the package:2 ends here
 
 ;; [[file:config.org::*Loading the package][Loading the package:3]]

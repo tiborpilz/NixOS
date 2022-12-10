@@ -65,6 +65,8 @@ in
       autoload -U compinit && compinit
     '';
 
+    modules.shell.zsh.aliases.xclip = "xclip -selection clipboard";
+
     xdg.configFile."zsh" = { source = "${configDir}/zsh"; recursive = true; };
 
     xdg.configFile."zsh/extra.zshrc".text =

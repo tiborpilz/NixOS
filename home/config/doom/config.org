@@ -256,7 +256,7 @@ Add `:ignore:` tag to headings, so only the headings will be ignored for an expo
 *** automatic latex rendering
 #+begin_src elisp
 (use-package! org-fragtog
-  :hook (org-mode . org-fragtog-mode))
+  :hook (org-mode . 'org-fragtog-mode))
 #+end_src
 
 *** Latex fragments
@@ -301,7 +301,7 @@ The closest comparison to org-roam-ui is Obsidian.
 (use-package! org-roam-ui
   :after org-roam
   :commands org-roam-ui-open
-  :hook (org-roam . org-roam-ui-mode)
+  :hook (org-roam . 'org-roam-ui-mode)
   :config
   (require 'org-roam) ; in case autoloaded
   (defun org-roam-ui-open ()
@@ -378,7 +378,7 @@ For Markdown, add a hook setting auto-fill-mode to -1.
 #+begin_src elisp
 
 (use-package! org-appear
-  :hook (org-mode . org-appear-mode)
+  :hook (org-mode . 'org-appear-mode)
   :config
   (setq org-appear-autoemphasis t
         org-appear-autosubmarkers t
@@ -702,16 +702,14 @@ via nix, I'm injecting a node16 path in the nix store, so setting the node
 executable here is only necessary if ~copilot-node-executable~ isn't already set.
 
 #+begin_src elisp
-(if (and
-     (boundp 'copilot-node-executable)
-     (file-exists-p copilot-node-executable))
+(if (and (boundp 'copilot-node-executable) (file-exists-p copilot-node-executable))
     (load-copilot)
-  ((nvm-use "16" (lambda ()
-                (setq copilot-node-executable
-                      (concat
-                       (nth 1 (nvm--find-exact-version-for "16"))
-                       "/bin/node"))
-                (load-copilot)
+    (nvm-use "16" (lambda ()
+                   (setq copilot-node-executable
+                         (concat
+                          (nth 1 (nvm--find-exact-version-for "16"))
+                          "/bin/node"))
+                   (load-copilot))))
 #+end_src
 
 In insert mode, I'm binding  ~C-SPC~ to accept the complete suggestion. I'm also binding ~C-S-p~ and ~C-S-n~ to navigate through the suggestions.
