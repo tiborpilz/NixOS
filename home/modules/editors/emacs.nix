@@ -73,6 +73,25 @@ in
       # vue language server
       my."@volar/vue-language-server"
 
+      # Python Language Server
+      python3Packages.python-lsp-server
+
+      # Python Language Server Dependencies
+      python3Packages.rope
+      python3Packages.pyflakes
+      python3Packages.mccabe
+      python3Packages.pycodestyle
+      python3Packages.pydocstyle
+      python3Packages.autopep8
+      python3Packages.yapf
+      python3Packages.flake8
+      python3Packages.pylint
+
+      # PPython Language Server Plugins
+      python3Packages.pylsp-mypy
+      python3Packages.pyls-isort
+      python3Packages.python-lsp-black
+
       # Fonts
       emacs-all-the-icons-fonts
       my.emmet-ls
