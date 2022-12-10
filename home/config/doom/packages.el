@@ -71,11 +71,11 @@
 ;; Tao Themes:1 ends here
 
 ;; [[file:config.org::*Nano Modeline][Nano Modeline:1]]
-(package! nano-modeline)
+;; (package! nano-modeline)
 ;; Nano Modeline:1 ends here
 
 ;; [[file:config.org::*Which-Key][Which-Key:1]]
-(package! which-key-posframe)
+;; (package! which-key-posframe)
 ;; Which-Key:1 ends here
 
 ;; [[file:config.org::*All-The-Icons Ivy Rich][All-The-Icons Ivy Rich:1]]
@@ -83,7 +83,7 @@
 ;; All-The-Icons Ivy Rich:1 ends here
 
 ;; [[file:config.org::*Treemacs-All-The-Icons][Treemacs-All-The-Icons:1]]
-;; (package! treemacs-all-the-icons)
+(package! treemacs-all-the-icons)
 ;; Treemacs-All-The-Icons:1 ends here
 
 ;; [[file:config.org::*Unsorted Packages][Unsorted Packages:1]]

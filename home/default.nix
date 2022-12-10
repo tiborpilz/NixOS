@@ -32,7 +32,7 @@ in {
 
   modules.editors.neovim.enable = true;
   modules.editors.emacs.enable = true;
-  modules.editors.emacs.useNix = false;
+  modules.editors.emacs.useNix = true;
 
   modules.tools.vagrant.enable = false;
 
@@ -42,7 +42,7 @@ in {
     build-users-group = "nixbld";
     experimental-features = [ "nix-command flakes" ];
     cores = 0;
-    max-jobs = "auto";
+    max-jobs = "16";
     trusted-users = [ "root" "tibor" ];
     # trusted-substituters = [ "https://cache.nixos.org/" "https://tiborpilz.cachix.org/" ];
     substituters = [ "https://cache.nixos.org/" "https://tiborpilz.cachix.org/" ];

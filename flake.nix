@@ -30,6 +30,9 @@
 
     copilot-el.url = "github:zerolfx/copilot.el";
     copilot-el.flake = false;
+
+    lsp-mode.url = "github:emacs-lsp/lsp-mode";
+    lsp-mode.flake = false;
   };
 
   outputs =
@@ -96,7 +99,9 @@
             pkgs = channels.nixpkgs;
           })));
 
-        apps = (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages) // { default = apps.flakeRepl; };
+          apps = (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages) // {
+            default = apps.flakeRepl;
+          };
 
         devShells = {
           default = import ./shell.nix { pkgs = channels.nixpkgs; };
