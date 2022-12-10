@@ -184,7 +184,7 @@
 ;; View exported file:1 ends here
 
 ;; [[file:config.org::*use github markdown][use github markdown:1]]
-(use-package! ox-gfm :after ox)
+(use-package! ox-gfm :after ox :defer t)
 ;; use github markdown:1 ends here
 
 ;; [[file:config.org::*Export headings up to five levels deep][Export headings up to five levels deep:1]]
@@ -215,7 +215,8 @@
 
 ;; [[file:config.org::*Add Org-Roam UI][Add Org-Roam UI:2]]
 (use-package! websocket
-  :after org-roam)
+  :after org-roam
+  :defer t)
 
 (use-package! org-roam-ui
   :after org-roam
@@ -317,6 +318,7 @@
 
 ;; [[file:config.org::*Tailwind][Tailwind:2]]
 (use-package! lsp-tailwindcss
+  :defer t
   :init
   (setq lsp-tailwindcss-add-on-mode t))
 ;; Tailwind:2 ends here
@@ -346,8 +348,8 @@
 ;; Run pytest in virtualenv:1 ends here
 
 ;; [[file:config.org::*Code blocks][Code blocks:1]]
-(use-package! polymode)
-(use-package! poly-markdown)
+;; (use-package! polymode
+;; (use-package! poly-markdown)
 ;; Code blocks:1 ends here
 
 ;; [[file:config.org::*Live Preview][Live Preview:2]]
@@ -508,7 +510,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; Performance:1 ends here
 
 ;; [[file:config.org::*Handling][Handling:1]]
-(setq lsp-completion-provider :capf)
+;; (setq lsp-completion-provider :capf)
 ;; Handling:1 ends here
 
 ;; [[file:config.org::*Handling][Handling:2]]
@@ -520,8 +522,8 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; Handling:3 ends here
 
 ;; [[file:config.org::*Handling][Handling:4]]
-;; (setq lsp-auto-guess-root t)
-(add-hook 'prog-mode-hook #'lsp-deferred)
+(setq lsp-auto-guess-root t)
+;; (add-hook 'prog-mode-hook #'lsp-deferred)
 ;; Handling:4 ends here
 
 ;; [[file:config.org::*UI][UI:1]]
@@ -531,20 +533,20 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; UI:1 ends here
 
 ;; [[file:config.org::*UI][UI:2]]
-(setq lsp-lens-enable t)
+;; (setq lsp-lens-enable t)
 ;; UI:2 ends here
 
 ;; [[file:config.org::*UI][UI:3]]
-(setq lsp-headerline-breadcrub-enable t)
+;; (setq lsp-headerline-breadcrub-enable t)
 ;; UI:3 ends here
 
 ;; [[file:config.org::*UI][UI:4]]
-(setq lsp-eldock-enable-hover nil)
+;; (setq lsp-eldock-enable-hover nil)
 ;; UI:4 ends here
 
 ;; [[file:config.org::*UI][UI:5]]
-(setq lsp-signature-auto-activate nil)
-(setq lsp-signature-render-documentation nil)
+;; (setq lsp-signature-auto-activate nil)
+;; (setq lsp-signature-render-documentation nil)
 ;; UI:5 ends here
 
 ;; [[file:config.org::*Disable Evil-Mode in timemachine mode][Disable Evil-Mode in timemachine mode:1]]
@@ -565,13 +567,13 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; Nano:1 ends here
 
 ;; [[file:config.org::*Nano Modeline][Nano Modeline:2]]
-(setq nano-modeline-theme 'nano-modeline-theme-nano)
+;; (setq nano-modeline-theme 'nano-modeline-theme-nano)
 ;; Nano Modeline:2 ends here
 
 ;; [[file:config.org::*Nano Modeline][Nano Modeline:3]]
-(use-package! nano-modeline
-  :config
-  (nano-modeline-mode 1))
+;; (use-package! nano-modeline
+;;   :config
+;;   (nano-modeline-mode 1))
 ;; Nano Modeline:3 ends here
 
 ;; [[file:config.org::*Doom Modeline][Doom Modeline:1]]
@@ -583,10 +585,10 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; Doom Modeline:2 ends here
 
 ;; [[file:config.org::*Which-Key][Which-Key:2]]
-(defun wjb/posframe-arghandler (buffer-or-name arg-name value)
-  (let ((info '(:internal-border-width 2 :width 500 :height 48)))
-    (or (plist-get info arg-name) value)))
-(setq posframe-arghandler #'wjb/posframe-arghandler)
+;; (defun wjb/posframe-arghandler (buffer-or-name arg-name value)
+;;   (let ((info '(:internal-border-width 2 :width 500 :height 48)))
+;;     (or (plist-get info arg-name) value)))
+;; (setq posframe-arghandler #'wjb/posframe-arghandler)
 ;; Which-Key:2 ends here
 
 ;; [[file:config.org::*Keybindings][Keybindings:1]]
@@ -596,6 +598,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 ;; [[file:config.org::*All-The-Icons Ivy Rich][All-The-Icons Ivy Rich:2]]
 (use-package! all-the-icons-ivy-rich
+  :defer t
   :after counsel-projectile
   :init (all-the-icons-ivy-rich-mode +1)
   :config
@@ -625,5 +628,5 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; Vertico:3 ends here
 
 ;; [[file:config.org::*Increase the amount of data which Emacs reads from the process][Increase the amount of data which Emacs reads from the process:1]]
-;; (setq read-process-output-max (* 4 1024 1024)) ;; 4mb
+(setq read-process-output-max (* 4 1024 1024)) ;; 4mb
 ;; Increase the amount of data which Emacs reads from the process:1 ends here

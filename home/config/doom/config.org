@@ -238,7 +238,7 @@ loaded or in a different repo.
 
 *** use github markdown
 #+begin_src elisp
-(use-package! ox-gfm :after ox)
+(use-package! ox-gfm :after ox :defer t)
 #+end_src
 
 *** Export headings up to five levels deep
@@ -295,7 +295,8 @@ The closest comparison to org-roam-ui is Obsidian.
 
 #+begin_src elisp
 (use-package! websocket
-  :after org-roam)
+  :after org-roam
+  :defer t)
 
 (use-package! org-roam-ui
   :after org-roam
@@ -459,6 +460,7 @@ Add the tailwind lsp package
 ...and use it
 #+begin_src elisp
 (use-package! lsp-tailwindcss
+  :defer t
   :init
   (setq lsp-tailwindcss-add-on-mode t))
 #+end_src
@@ -575,8 +577,8 @@ plays nicely with direnv.
 **** Code blocks
 To set up code-highlighting in markdown code blocks, I need multiple major modes in one buffer. The package polymode promises to allow that:
 #+begin_src elisp
-(use-package! polymode)
-(use-package! poly-markdown)
+;; (use-package! polymode
+;; (use-package! poly-markdown)
 #+end_src
 
 **** Live Preview
@@ -873,7 +875,7 @@ Using plists should increase the LSP performance.
 Set ~capf~ as completion provider.
 
 #+begin_src elisp
-(setq lsp-completion-provider :capf)
+;; (setq lsp-completion-provider :capf)
 #+end_src
 
 Don't show completion item detail
@@ -890,8 +892,8 @@ But show completion item kind
 
 Automatically start LSP on file open, guess root.
 #+begin_src elisp
-;; (setq lsp-auto-guess-root t)
-(add-hook 'prog-mode-hook #'lsp-deferred)
+(setq lsp-auto-guess-root t)
+;; (add-hook 'prog-mode-hook #'lsp-deferred)
 #+end_src
 
 #+RESULTS:
@@ -908,23 +910,23 @@ hovering. Having a keybinding to glance at the documentation is fine for me.
 
 Enable lenses
 #+begin_src elisp
-(setq lsp-lens-enable t)
+;; (setq lsp-lens-enable t)
 #+end_src
 
 Enable headerline with breadcrumbs.
 #+begin_src elisp
-(setq lsp-headerline-breadcrub-enable t)
+;; (setq lsp-headerline-breadcrub-enable t)
 #+end_src
 
 Disable eldoc, as it does not look that good and mostly serves as a distraction.
 #+begin_src elisp
-(setq lsp-eldock-enable-hover nil)
+;; (setq lsp-eldock-enable-hover nil)
 #+end_src
 
 Same with signature help, as well as help documentation
 #+begin_src elisp
-(setq lsp-signature-auto-activate nil)
-(setq lsp-signature-render-documentation nil)
+;; (setq lsp-signature-auto-activate nil)
+;; (setq lsp-signature-render-documentation nil)
 #+end_src
 
 
@@ -960,9 +962,6 @@ to enjoy the best of both worlds by theming Doom to look like Nano.
 ;; (setq doom-themes-treemacs-theme "doom-atom")
 #+end_src
 
-#+RESULTS:
-: doom-atom
-
 *** Misc Themes
 **** Grayscale
 #+begin_src elisp :tangle packages.el
@@ -980,20 +979,20 @@ Very appealing, minimalistic themes.
 *** Nano Modeline
 
 #+begin_src elisp :tangle packages.el
-(package! nano-modeline)
+;; (package! nano-modeline)
 #+end_src
 
 Let the nano-modeline look like the nano theme
 
 #+begin_src elisp
-(setq nano-modeline-theme 'nano-modeline-theme-nano)
+;; (setq nano-modeline-theme 'nano-modeline-theme-nano)
 
 #+end_src
 
 #+begin_src elisp
-(use-package! nano-modeline
-  :config
-  (nano-modeline-mode 1))
+;; (use-package! nano-modeline
+;;   :config
+;;   (nano-modeline-mode 1))
 #+end_src
 
 *** Doom Modeline
@@ -1053,293 +1052,6 @@ Allow for more characters in the branch name
 # #+RESULTS:
 # : *dashboard*
 
-** Nano
-[[https://github.com/rougier/nano-emacs][Nano Emacs]] is a minimalistic config for emacs by [[https://github.com/rougier][Nicolas P. Rougier.]]. Under the hood, it's styled by the [[https://github.com/rougier/nano-theme][Nano Theme]].
-** Hydra
-*** Pretty Hydra
-
-# [[https://github.com/jerrypnz/major-mode-hydra.el#pretty-hydra][Pretty Hydra]] is a package for improving the looks of [[https://github.com/abo-abo/hydra][Hydra]], which is a
-# keybinding tool with a ui - similar to emacs-which-key.
-
-# Dap-Mode has Hydra built in, which can be opened via the command ~dap/hydra~. Out
-# of the box, the ui is not very pretty, which is why I'm wrapping the existing
-# config in pretty hydra.
-
-# First off, I need to install the package.
-
-# #+begin_src elisp :tangle packages.el
-# (package! pretty-hydra)
-# #+end_src
-
-# Then, I'm defining the hydra, using the existing dap-hydra config.
-
-# First, I'll define helper functions for using ~all-the-icons~ specification, specifically for:
-# - faicon (font awesome)
-# - fileicon (file icons)
-# - octicon (github octicons)
-# - material (material icons)
-# - mode-icon (mode icons)
-
-# Since faicon, fileicon, octicon and material are very similar - the only
-# difference between them is the suffix for both the name and the wrapper
-# all-the-icons function - I'll generate those functions dynamically.
-
-# #+begin_src elisp
-# (require 'all-the-icons)
-
-# (defvar func-suffixes '("faicon" "fileicon" "octicon" "material"))
-
-# ;; loop over func-suffixes and generate all-the-icons-functions
-# (dolist (suffix func-suffixes)
-#   (let ((func-name (intern (concat "with-" suffix)))
-#         (call-name (intern (concat "all-the-icons-" suffix))))
-#     (eval `(defun ,func-name (icon str &optional height v-adjust)
-#       (s-concat (,call-name icon :v-adjust (or v-adjust 0) :height (or height 0)) " " str)))))
-# #+end_src
-
-# Then, I'll define the mode-icon function seperately, since it functions a little
-# differently.
-
-# #+begin_src elisp
-# (defun with-mode-icon (mode str &optional height nospace face)
-#   (let* ((v-adjust (if (eq major-mode 'emacs-lisp-mode) 0.0 0.05))
-#          (args     `(:height ,(or height 1) :v-adjust ,v-adjust))
-#          (_         (when face
-#                       (lax-plist-put args :face face)))
-#          (icon     (apply #'all-the-icons-icon-for-mode mode args))
-#          (icon     (if (symbolp icon)
-#                        (apply #'all-the-icons-octicon "file-text" args)
-#                      icon)))
-#     (s-concat icon (if nospace "" " ") str)))
-# #+end_src
-
-# **** Transforming Dap-Hydra to Pretty Hydra
-
-# ***** Incompatibilities
-# For future-proofing this config, I want to build the hydra config dynamically as
-# well, using the existing ~dap-hydra~.
-
-# Here, I've run into an issue though - Hydra and Pretty Hydra have some
-# differences regarding the configuration object - and Dap-Hydra is using an
-# incompatible docstring format.
-
-# I could just type the config by hand, but where's the fun in that?
-
-# ***** Dynamically generating the configuration
-
-# All of the information necessary to generate the Pretty Hydra config can be
-# found in the existing dap-hydra instance. ~dap-hydra/heads~ contains a list of all
-# keys and their corresponding program - but the descriptions are missing, and the
-# entries are not categorized.
-
-# To get the remaining information, parsing the docstring is necessary.
-
-# ****** Parsing the docstring
-
-# First, a helper function to get any key's description from the docstring:
-
-# #+begin_src elisp
-# (defun get-key-description (key docstring)
-#   "Get the description for a key from the docstring."
-#   (when (string-match (format "\\(_%s_\\):[[:space:]]\\(\\(\\w+\\)\\([[:space:]]\\w+\\)*\\)" key) docstring)
-#     (match-string 2 docstring)))
-# #+end_src
-
-# Extracting the categories from the docstring. I can be certain that the category
-# titles are always in the second row, and they are surround by caret characters
-# (~^~). This makes it easy to just split the string - first on the newlines, and
-# then on the carets.
-
-# #+begin_src elisp
-# (defun get-categories (docstring)
-#     "Get the categories from the docstring."
-#     (let ((lines (split-string docstring "\n")))
-#         (seq-filter (lambda (x) (not (string-blank-p x)))
-#                     (split-string (nth 1 lines) "\\^"))))
-# #+end_src
-
-# The rows are somewhat tricky. The best approach seemed to use regex to remove as
-# much unnecessary content as possible - afterwards, the string can be split
-# again, by a single delimiter.
-
-# #+begin_src elisp
-# (defun split-row (row)
-#   "Split a row into a list of keys."
-#   (-slice (split-string (replace-regexp-in-string ":[^_]*\\(_\\|$\\)" "" row) "_") 1 -1))
-# #+end_src
-
-# Using the split-row function, it is no possible to extract a flat list of all
-# keys from the docstring. This is helpful for verifying that a key actually has a
-# corrisponding head object. (Some don't, like the ~q~ key in the dap-hydra).
-
-# #+begin_src elisp
-# (defun get-all-keys (docstring)
-#   "Get all keys from the docstring."
-#   (let ((lines (-slice (split-string docstring "\n") 3 -3)))
-#     (mapcan #'split-row lines)))
-# #+end_src
-
-# To match the keys to the corresponding categories, there are two approaches.
-
-# The first one seems straitforward and elegant: simply compare the indices of the
-# keys and the category titles in their respective horizontal lists.
-# But, since not all rows have entries at all columns, a seperate check for rows
-# starting with whitespace would be necessary. These rows could only be matched
-# using the second approach - obtain the offset in character widths for all keys
-# and the category titles, relative to the start of each row and compare those.
-
-# Even though the first approach is more elegant for the general case, I'll go
-# with the second one, since it needs to be implemented anyway.
-
-# This way, there is no need to check for rows starting with whitespace, and it is
-# possible to check every key independently.
-
-# First, the category offset.
-
-# #+begin_src elisp
-# (defun get-category-offsets (categories docstring)
-#   "Get the category titles' offsets in the docstring."
-#   (let ((title-row (nth 1 (split-string docstring "\n"))))
-#     (mapcar (lambda (x) `(,x . ,(string-match x title-row))) categories)))
-# #+end_src
-
-
-# For the comparison a higher-order-function that returns a comparison function for
-# a given offset is a nice way, to keep the ~mapcar~ call simple.
-
-# Because the offset is being passed into a lambda function, it needs to be
-# evaluated when the function is being returned. (Otherwise it would be accessed
-# during the comparison, where the variable is not available to the lambda.
-
-# #+begin_src elisp
-# (defun get-comparer (offset)
-#   "Get a comparer function for a given number of blank characters."
-#   `(lambda (x y)
-#     (let ((x-diff (abs (- (cdr x) ,offset)))
-#           (y-diff (abs (- (cdr y) ,offset))))
-#       (< x-diff y-diff))))
-
-# #+end_src
-
-# A small function to split the docstring along the newlines, and then return the
-# correct row for the given key.
-
-# #+begin_src elisp
-# (defun get-row-for-key (key docstring)
-#   "Get the row for a given key from the docstring."
-#   (let ((rows (split-string docstring "\n")))
-#     (seq-find (lambda (x) (member key (split-row x))) rows)))
-
-# #+end_src
-
-# The function to get the category for a given key.
-
-# #+begin_src elisp
-# (defun get-categories-for-key (key docstring)
-#   "Get the category for a key."
-#   (let* ((row (get-row-for-key key docstring))
-#          (categories (get-categories docstring))
-#          (category-offsets (get-category-offsets categories docstring))
-#          (key-offset (string-match (format "_%s_:" key) row))
-#          (comparer (get-comparer key-offset))
-#          (index (-elem-index (car (car (sort category-offsets comparer))) categories)))
-#     (nth index categories)))
-# #+end_src
-
-# ***** Transforming the data and generating the config
-
-# Now that the categories and the keys are available, it is possible to transform
-# the configuration into a format that is compatible with Pretty Hydra.
-
-# Although the description was missing from the dap-hydra head entries, there were
-# a lot of ~nil~ values, that seemed to cause issues with Pretty Hydra. So the
-# new entries will only have three values: the key, the corresponding function,
-# and the description, which was parsed from the docstring.
-
-# #+begin_src elisp
-# (defun add-description (entry docstring)
-#   "Add the description to a single entry."
-#   (let* ((key (car entry))
-#          (func (nth 1 entry))
-#          (desc (get-key-description key docstring))
-#          (rest (-slice entry 2)))
-#     `(,key ,func ,desc)))
-# #+end_src
-
-# Using this function, all heads can be preprocessed - in this step, they are also
-# filtered by checking for the existence in the docstring.
-
-# #+begin_src elisp
-# (defun preprocess-heads (heads docstring)
-#   "Preprocess the heads by checking whether their key is in the docstring and by adding the description."
-#   (let ((filtered-heads (seq-filter (lambda (x) (member (car x) (get-all-keys docstring))) heads)))
-#     (mapcar (lambda (x) (add-description x docstring)) filtered-heads)))
-# #+end_src
-
-# Next up is grouping the hydra header entries by their category. For ease of use,
-# as an intermediate step, an association list of categories and head entries is
-# created. Also, the head entries are being filtered by checking whether their
-# keys are contained in the docstring.
-
-# #+begin_src elisp
-# (defun associate-categories-with-heads (heads docstring)
-#   "Associate categories with heads."
-#   (mapcar (lambda (x) `(,x . ,(get-categories-for-key (car x) docstring))) heads))
-# #+end_src
-
-# After the necessary associations are created, the entries can be grouped by
-# their categories.
-
-# #+begin_src elisp
-# (defun group-heads (category head-category-alist)
-#   "Group heads into a category."
-#   (let ((category-heads (mapcar #'car (seq-filter (lambda (x) (string= (cdr x) category)) head-category-alist))))
-#     `(,category ,category-heads)))
-# #+end_src
-
-# Finally, everything comes together. The docstring is being parsed, the heads are
-# being preprocessed, the categories are being associated with the heads, and the
-# heads are being grouped by their categories.
-
-# #+begin_src elisp
-# (defun get-category-header-alist (heads docstring)
-#   "Get an alist of categories and their head entries."
-#   (let* ((keys (get-all-keys docstring))
-#          (processed-heads (preprocess-heads heads docstring))
-#          (categories (get-categories docstring))
-#          (head-category-alist (associate-categories-with-heads processed-heads docstring))
-#          (grouped-heads (mapcan (lambda (x) (group-heads x head-category-alist)) categories)))
-#     grouped-heads))
-# #+end_src
-
-
-# ***** Creating the Pretty Hydra
-
-# Both parsing and config generation is taken care of, what's missing is an
-# instance of the dap-hydra to transform.
-
-# Before ~dap-hydra/heads~ and ~dap-hydra/docstring~ are accessible, the command ~dap-hydra~ needs
-# to be called to initialize it. ~hydra-keyboard-quit~ immediately closes it again.
-
-# #+begin_src elisp
-# (dap-hydra)
-# (hydra-keyboard-quit)
-# #+end_src
-
-# There is one last hurdle - ~pretty-hydra-define~, which is used to create the
-# hydra, is a macro and not a function. This means that it is not possible to pass the
-# generated configuration as a regular variable. Nothing a little lisp magic could
-# not fix though.
-
-# Instead of passing the configuration as a variable, it is evaluated into the
-# macro call, which is then executed by ~eval~.
-
-# #+begin_src elisp
-# (eval `(pretty-hydra-define dap-hydra-pretty
-#          (:color amaranth :quit-key "q" :title (with-faicon "windows" "Dap" 1 -0.05))
-#          ,(get-category-header-alist dap-hydra/heads dap-hydra/docstring)))
-# #+end_src
-
 ** Which-Key
 Which Key is a package that displays the keybindings for the current command in
 a popup. Especially in combination with evil-mode - which has a fantastic
@@ -1352,7 +1064,7 @@ minibuffer, but all of those options don't appeal to me. Luckily, there is a
 frame. This allows for much more flexibility in the placement of the popup.
 
 #+begin_src elisp :tangle packages.el
-(package! which-key-posframe)
+;; (package! which-key-posframe)
 #+end_src
 
 There are some issues regarding the frame's height - sometimes the content is
@@ -1362,10 +1074,10 @@ The mentioned solution to use posframe's arghandler does not work anymore, as
 it is depcrecated. The recommended alternative is to use advise.
 
 #+begin_src elisp
-(defun wjb/posframe-arghandler (buffer-or-name arg-name value)
-  (let ((info '(:internal-border-width 2 :width 500 :height 48)))
-    (or (plist-get info arg-name) value)))
-(setq posframe-arghandler #'wjb/posframe-arghandler)
+;; (defun wjb/posframe-arghandler (buffer-or-name arg-name value)
+;;   (let ((info '(:internal-border-width 2 :width 500 :height 48)))
+;;     (or (plist-get info arg-name) value)))
+;; (setq posframe-arghandler #'wjb/posframe-arghandler)
 #+end_src
 
 ** Ivy
@@ -1400,6 +1112,7 @@ to All-The-icons-Ivy (which had some issues with my setup)
 
 #+begin_src elisp
 (use-package! all-the-icons-ivy-rich
+  :defer t
   :after counsel-projectile
   :init (all-the-icons-ivy-rich-mode +1)
   :config
@@ -1430,7 +1143,7 @@ and exploration, while also possessing basic file management utilities.
 Treemacs also has a package that adds icons to the file explorer.
 
 #+begin_src elisp :tangle packages.el
-;; (package! treemacs-all-the-icons)
+(package! treemacs-all-the-icons)
 #+end_src
 
 ** Vertico
@@ -1459,12 +1172,12 @@ Make vertico-posframe a little wider
 Various tweaks to improve the overall performance.
 ** Raise the GC-Cons threshold
 #+begin_example elisp
-;; (setq gc-cons-threshold (* 100 1024 1024)) ;; 100mb
+(setq gc-cons-threshold (* 1024 1024 1024)) ;; 1G
 #+end_example
 
 ** Increase the amount of data which Emacs reads from the process
 #+begin_src elisp
-;; (setq read-process-output-max (* 4 1024 1024)) ;; 4mb
+(setq read-process-output-max (* 4 1024 1024)) ;; 4mb
 #+end_src
 
 * Unsorted Packages

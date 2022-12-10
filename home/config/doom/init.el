@@ -16,8 +16,8 @@
 
 
 ;; Enable deferred compilation, also use half of the available cores
-(setq native-comp-deferred-compilation t
-      native-comp-async-jobs-number 0)
+;; (setq native-comp-deferred-compilation t
+;;       native-comp-async-jobs-number 16)
 
 (doom! :input
        ;;chinese
@@ -60,7 +60,7 @@
 
        :editor
        (evil +everywhere); come to the dark side, we have cookies
-       file-templates    ; auto-snippets for empty files
+       ;; file-templates    ; auto-snippets for empty files
        fold              ; (nigh) universal code folding
        ;; (format +onsave)  ; automated prettiness
        ;;god               ; run Emacs commands without modifier keys
@@ -69,7 +69,7 @@
        ;;objed             ; text object editing for the innocent
        ;; parinfer          ; turn lisp into python, sort of
        rotate-text       ; cycle region at point between text candidates
-       snippets          ; my elves. They type so I don't have to
+       ;; snippets          ; my elves. They type so I don't have to
        word-wrap        ; soft wrapping with language-aware indent
 
        :emacs
@@ -87,11 +87,12 @@
        vterm             ; the best terminal emulation in Emacs
 
        :checkers
-       (syntax +childframe)              ; tasing you for every semicolon you forget
+       syntax               ; tasing you for every semicolon you forget
        ;;(spell +flyspell) ; tasing you for misspelling mispelling
        ;;grammar           ; tasing grammar mistake every you make
 
        :tools
+       (lsp +peek)
        ;; ansible
        ;; biblio            ; Writes a PhD for you (citation needed)
        ;; (debugger +lsp)          ; FIXME stepping through code, to help you add bugs
@@ -109,9 +110,9 @@
        ;; pdf               ; pdf enhancements
        ;; prodigy           ; FIXME managing external services & code builders
        rgb               ; creating color strings
-       ;; taskrunner        ; taskrunner for all your projects
-       ;; terraform         ; infrastructure as code
-       ;; tmux              ; an API for interacting with tmux
+       ; taskrunner        ; taskrunner for all your projects
+       terraform         ; infrastructure as code
+       tmux              ; an API for interacting with tmux
        ;;upload            ; map local to remote projects via ssh/ftp
 
        :os
@@ -150,10 +151,10 @@
        (javascript +lsp)
        ;; julia
        ;;kotlin            ; a better, slicker Java(Script)
-       ;; (latex             ; writing papers in Emacs has never been so fun
-       ;;  +latexmk
-       ;;  +cdlatex
-       ;;  +fold)
+       (latex             ; writing papers in Emacs has never been so fun
+        +latexmk
+        +cdlatex
+        +fold)
        ;;lean              ; for folks with too much to prove
        ;;ledger            ; be audit you can be
        lua               ; one-based indices? one-based indices
@@ -162,23 +163,21 @@
        (nix +lsp)              ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
        (org
+        +brain
+        +dragndrop
+        +gnuplot
+        +hugo
+        +journal
+        +noter
+        +pandoc
+        +pomodoro
+        +present
+        +pretty
         +roam2)
-        ;; +brain
-        ;; +dragndrop
-        ;; +gnuplot
-        ;; +hugo
-        ;; +journal
-        ;; +jupyter
-        ;; +noter
-        ;; +pandoc
-        ;; +pomodoro
-        ;; +present
-        ;; +pretty
-        ;; +roam2)
        ;;php               ; perl's insecure younger brother
        ;; plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
-       (python +pyright)            ; beautiful is better than ugly
+       (python +lsp +pyright)            ; beautiful is better than ugly
        ;;qt                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs
        ;;raku              ; the artist formerly known as perl6
