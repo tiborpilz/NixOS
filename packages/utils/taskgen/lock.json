@@ -1,3 +1,6 @@
 {
-  "https://deno.land/x/json2yaml@v1.0.1/mod.ts": "eb93f79ca9791ecb75b22def2fbce701c757b43be6e2ff8f3dbbe426b28941f4"
+  "version": "2",
+  "remote": {
+    "https://deno.land/x/json2yaml@v1.0.1/mod.ts": "eb93f79ca9791ecb75b22def2fbce701c757b43be6e2ff8f3dbbe426b28941f4"
+  }
 }
