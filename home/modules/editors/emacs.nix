@@ -3,22 +3,6 @@ with lib;
 let
   cfg = config.modules.editors.emacs;
   mylib = import ../../../lib { inherit inputs lib pkgs; };
-  # Otherwise, emacs can't handle some LSP control characters
-  # patchedEmacs = pkgs.emacs.overrideAttrs (old: {
-  #   patches = (old.patches or [ ]) ++ [
-  #     (pkgs.fetchpatch {
-  #       url = "https://github.com/emacs-mirror/emacs/commit/8b52d9f5f177ce76b9ebecadd70c6dbbf07a20c6.patch";
-  #       hash = "sha256-/W9yateE9UZ9a8CUjavQw0X7TgxigYzBuOvtAXdEsSA=";
-  #     })
-  #   ];
-  #   postFixup = (old.postFixup or "") + "wrapProgram $out/bin/emacs --set LSP_USE_PLISTS 'true'";
-  #   nativeComp = true;
-  # });
-  # emacsWithNativeComp = patchedEmacs.override {
-  #   nativeComp = true;
-  #   withXwidgets = true;
-  #   withGTK3 = true;
-  # };
 in
 {
   options.modules.editors.emacs = {
@@ -42,12 +26,11 @@ in
         { name = "packages.el"; path = "${filteredPath}/packages.el"; }
         { name = "config.el"; path = pkgs.emptyFile; }
       ];
-      emacsPackage = pkgs.my.emacs;
+      emacsPackage = pkgs.my.emacsGit;
 
       emacsPackagesOverlay = self: super: {
         copilot = pkgs.my.copilot;
-        emacs = pkgs.my.emacs;
-        # self.straightBuild { pname = "lsp-mode"; }; #pkgs.my.lsp-mode;
+        emacs = pkgs.my.emacsGit;
       };
       # package = emacsPackage;
 

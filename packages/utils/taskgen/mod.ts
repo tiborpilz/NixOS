@@ -1,4 +1,4 @@
-import { json2yaml } from "json2yaml/mod.ts";
+import { json2yaml } from 'https://deno.land/x/json2yaml/mod.ts';
 const systems = ['x86_64-darwin', 'x86_64-linux'] as const;
 
 type System = typeof systems[number];

@@ -86,6 +86,7 @@
         })
         inputs.deno2nix.overlay
         inputs.devshell.overlay
+        inputs.emacs-overlay.overlay
       ];
 
       hosts = nixosHosts // darwinHosts;
