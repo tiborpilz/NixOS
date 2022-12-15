@@ -30,9 +30,8 @@ in
 
       emacsPackagesOverlay = self: super: {
         copilot = pkgs.my.copilot;
-        emacs = pkgs.my.emacsGit;
+        emacs = emacsPackage;
       };
-      # package = emacsPackage;
 
       extraPackages = with pkgs; [ nodejs-16_x ];
 

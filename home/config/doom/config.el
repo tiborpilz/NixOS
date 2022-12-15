@@ -512,15 +512,15 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; Syntax Checking:1 ends here
 
 ;; [[file:config.org::*Performance][Performance:1]]
-;; (setq lsp-use-lists 't)
+(setq lsp-use-lists 't)
 ;; Performance:1 ends here
 
 ;; [[file:config.org::*Handling][Handling:1]]
-;; (setq lsp-completion-provider :capf)
+(setq lsp-completion-provider :capf)
 ;; Handling:1 ends here
 
 ;; [[file:config.org::*Handling][Handling:2]]
-(setq lsp-completion-show-detail t)
+;; (setq lsp-completion-show-detail t)
 ;; Handling:2 ends here
 
 ;; [[file:config.org::*Handling][Handling:3]]
@@ -528,7 +528,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; Handling:3 ends here
 
 ;; [[file:config.org::*Handling][Handling:4]]
-(setq lsp-auto-guess-root t)
+;; (setq lsp-auto-guess-root t)
 ;; (add-hook 'prog-mode-hook #'lsp-deferred)
 ;; Handling:4 ends here
 
@@ -539,20 +539,20 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; UI:1 ends here
 
 ;; [[file:config.org::*UI][UI:2]]
-;; (setq lsp-lens-enable t)
+(setq lsp-lens-enable t)
 ;; UI:2 ends here
 
 ;; [[file:config.org::*UI][UI:3]]
-;; (setq lsp-headerline-breadcrub-enable t)
+(setq lsp-headerline-breadcrub-enable t)
 ;; UI:3 ends here
 
 ;; [[file:config.org::*UI][UI:4]]
-;; (setq lsp-eldock-enable-hover nil)
+(setq lsp-eldock-enable-hover nil)
 ;; UI:4 ends here
 
 ;; [[file:config.org::*UI][UI:5]]
-;; (setq lsp-signature-auto-activate nil)
-;; (setq lsp-signature-render-documentation nil)
+(setq lsp-signature-auto-activate nil)
+(setq lsp-signature-render-documentation nil)
 ;; UI:5 ends here
 
 ;; [[file:config.org::*Disable Evil-Mode in timemachine mode][Disable Evil-Mode in timemachine mode:1]]
