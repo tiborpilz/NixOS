@@ -66,6 +66,7 @@ https://github.com/doomemacs/doomemacs/issues/6960#issuecomment-1327514660
 #+begin_src elisp :tangle packages.el
 (package! straight :pin "3eca39d")
 #+end_src
+
 ** Editorconfig
 #+begin_src elisp :tangle packages.el
 (package! editorconfig)
@@ -876,23 +877,23 @@ Here, I'll define some general settings.
 Using plists should increase the LSP performance.
 
 #+begin_src elisp
-;; (setq lsp-use-lists 't)
+(setq lsp-use-lists 't)
 #+end_src
 
 **** Handling
 Set ~capf~ as completion provider.
 
 #+begin_src elisp
-;; (setq lsp-completion-provider :capf)
+(setq lsp-completion-provider :capf)
 #+end_src
 
 Don't show completion item detail
 
 #+begin_src elisp
-(setq lsp-completion-show-detail t)
+;; (setq lsp-completion-show-detail t)
 #+end_src
 
-But show completion item kind
+Show completion item kind
 
 #+begin_src elisp
 (setq lsp-completion-show-kind t)
@@ -900,11 +901,9 @@ But show completion item kind
 
 Automatically start LSP on file open, guess root.
 #+begin_src elisp
-(setq lsp-auto-guess-root t)
+;; (setq lsp-auto-guess-root t)
 ;; (add-hook 'prog-mode-hook #'lsp-deferred)
 #+end_src
-
-#+RESULTS:
 
 **** UI
 Although I like using ~lsp-ui-doc~, I don't want it to appear every time I'm
@@ -918,25 +917,24 @@ hovering. Having a keybinding to glance at the documentation is fine for me.
 
 Enable lenses
 #+begin_src elisp
-;; (setq lsp-lens-enable t)
+(setq lsp-lens-enable t)
 #+end_src
 
 Enable headerline with breadcrumbs.
 #+begin_src elisp
-;; (setq lsp-headerline-breadcrub-enable t)
+(setq lsp-headerline-breadcrub-enable t)
 #+end_src
 
 Disable eldoc, as it does not look that good and mostly serves as a distraction.
 #+begin_src elisp
-;; (setq lsp-eldock-enable-hover nil)
+(setq lsp-eldock-enable-hover nil)
 #+end_src
 
 Same with signature help, as well as help documentation
 #+begin_src elisp
-;; (setq lsp-signature-auto-activate nil)
-;; (setq lsp-signature-render-documentation nil)
+(setq lsp-signature-auto-activate nil)
+(setq lsp-signature-render-documentation nil)
 #+end_src
-
 
 *** Git
 Doom Emacs comes with Magit.

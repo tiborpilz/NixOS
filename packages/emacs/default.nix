@@ -4,8 +4,8 @@ with pkgs;
 let
   add-feature-flags = emacs: (emacs.override {
     nativeComp = true;
-    withXwidgets = true;
-    withGTK3 = true;
+    withXwidgets = false;
+    withGTK3 = false;
   });
   add-env = emacs: key: value: (emacs.overrideAttrs (old: {
     postFixup = (old.postFixup or "") + "wrapProgram $out/bin/emacs --set ${key} ${value}";
