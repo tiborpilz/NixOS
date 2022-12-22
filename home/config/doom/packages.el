@@ -20,6 +20,10 @@
 (package! org-gcal)
 ;; Google Calendar integration:1 ends here
 
+;; [[file:config.org::*Automatically commit via git][Automatically commit via git:1]]
+(package! git-auto-commit-mode)
+;; Automatically commit via git:1 ends here
+
 ;; [[file:config.org::*Jest Test Mode][Jest Test Mode:1]]
 (package! jest-test-mode)
 ;; Jest Test Mode:1 ends here
@@ -57,6 +61,10 @@
 ;; [[file:config.org::*Getting a Node 16 binary][Getting a Node 16 binary:2]]
 (package! nvm)
 ;; Getting a Node 16 binary:2 ends here
+
+;; [[file:config.org::*Install][Install:1]]
+(package! devdocs)
+;; Install:1 ends here
 
 ;; [[file:config.org::*Doom Themes][Doom Themes:1]]
 (package! doom-themes)

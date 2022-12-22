@@ -159,34 +159,34 @@ See https://org-babel.readthedocs.io/en/latest/header-args/
 #+end_src
 *** LSP in org-babel src blocks
 #+begin_src elisp
-(cl-defmacro lsp-org-babel-enable (lang)
-  "Support LANG in org source code block."
-  (setq centaur-lsp 'lsp-mode)
-  (cl-check-type lang stringp)
-  (let* ((edit-pre (intern (format "org-babel-edit-prep:%s" lang)))
-         (intern-pre (intern (format "lsp--%s" (symbol-name edit-pre)))))
-    `(progn
-       (defun ,intern-pre (info)
-         (let ((file-name (->> info caddr (alist-get :file))))
-           (unless file-name
-             (setq file-name (make-temp-file "babel-lsp-")))
-           (setq buffer-file-name fie)
-           (lsp-deferred)))
-       (put ',intern-pre 'function-documentation
-            (format "Enable lsp-mode in the buffer of org source block (%s)."
-                    (upcase ,lang)))
-       (if (fboundp ',edit-pre)
-           (advice-add ',edit-pre :after ',intern-pre)
-         (progn
-           (defun ,edit-pre (info)
-             (,intern-pre info))
-           (put ',edit-pre 'function-documentation
-                (format "Prepare local buffer environment for org source block (%s)."
-                        (upcase ,lang))))))))
-(defvar org-babel-lang-list
-  '("go" "python" "ipython" "bash" "sh" "ditaa"))
-(dolist (lang org-babel-lang-list)
-  (eval `(lsp-org-babel-enable ,lang)))
+;; (cl-defmacro lsp-org-babel-enable (lang)
+;;   "Support LANG in org source code block."
+;;   (setq centaur-lsp 'lsp-mode)
+;;   (cl-check-type lang stringp)
+;;   (let* ((edit-pre (intern (format "org-babel-edit-prep:%s" lang)))
+;;          (intern-pre (intern (format "lsp--%s" (symbol-name edit-pre)))))
+;;     `(progn
+;;        (defun ,intern-pre (info)
+;;          (let ((file-name (->> info caddr (alist-get :file))))
+;;            (unless file-name
+;;              (setq file-name (make-temp-file "babel-lsp-")))
+;;            (setq buffer-file-name fie)
+;;            (lsp-deferred)))
+;;        (put ',intern-pre 'function-documentation
+;;             (format "Enable lsp-mode in the buffer of org source block (%s)."
+;;                     (upcase ,lang)))
+;;        (if (fboundp ',edit-pre)
+;;            (advice-add ',edit-pre :after ',intern-pre)
+;;          (progn
+;;            (defun ,edit-pre (info)
+;;              (,intern-pre info))
+;;            (put ',edit-pre 'function-documentation
+;;                 (format "Prepare local buffer environment for org source block (%s)."
+;;                         (upcase ,lang))))))))
+;; (defvar org-babel-lang-list
+;;   '("go" "python" "ipython" "bash" "sh" "ditaa"))
+;; (dolist (lang org-babel-lang-list)
+;;   (eval `(lsp-org-babel-enable ,lang)))
 #+end_src
 
 *** Auto-Tanglins
@@ -327,6 +327,10 @@ The closest comparison to org-roam-ui is Obsidian.
 ;;         org-gcal-fetch-file-alit '(("tbrpilz@googlemail.com" . "~/org/schedule.org"))))
 #+end_src
 
+*** Automatically commit via git
+#+begin_src elisp :tangle packages.el
+(package! git-auto-commit-mode)
+#+end_src
 ** Fixes and miscellanious improvements
 *** Visual-line-mode messes with with plaintext (markdow, latex)
 #+begin_src elisp
@@ -946,6 +950,29 @@ Doom Emacs comes with Magit.
      (evil-make-overriding-map git-timemachine-mode-map 'normal)
      ;; force update evil keymaps after git-timemachine-mode loaded
      (add-hook 'git-timemachine-mode-hook #'evil-normalize-keymaps)))
+#+end_src
+*** Documentation
+Devdocs (https://elpa.gnu.org/packages/devdocs.html) is a package for viewing
+documentations, similar to Dash (https://kapeli.com/dash).
+
+The documentation is hosted on https://devdocs.io/ and is open source. Sadly,
+Devdocs can not read docsets from Dash.
+
+**** Install
+
+#+begin_src elisp :tangle packages.el
+(package! devdocs)
+#+end_src
+
+**** Configuration
+Add keybindings under ~SPC o D~ ("o" for "open", "D" for "Devdocs").
+
+#+begin_src elisp
+(map! :leader
+      (:prefix ("D" . "devdocs")
+       :desc "Open devdocs" "o" #'devdocs-peruse
+       :desc "Search devdocs" "l" #'devdocs-lookup
+       :desc "Install devdocs set" "i" #'devdocs-install))
 #+end_src
 * UI
 ** Theming
