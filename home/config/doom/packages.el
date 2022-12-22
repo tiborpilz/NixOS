@@ -50,6 +50,10 @@
 
 (package! treemacs-all-the-icons)
 
+(package! xwwp :recipe (:host github :repo "BlueFlo0d/xwwp"))
+(package! xwwp-follow-link-ivy)
+(package! ctable)
+
 (package! dap-mode)
 
 ;; Orgmode
