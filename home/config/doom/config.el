@@ -230,6 +230,25 @@
 
 (add-hook! 'emacs-startup-hook #'doom-init-ui-h)
 
+(after! org-capture
+    (defun org-capture-select-template-prettier (&optional keys)
+    "Select a capture template, in a prettier way than default
+    Lisp programs can force the template by setting KEYS to a string."
+    (let ((org-capture-templates
+            (or (org-contextualize-keys
+                (org-capture-upgrade-templates org-capture-templates)
+                org-capture-templates-contexts)
+                '(("t" "Task" entry (file+headline "" "Tasks")
+                    "* TODO %?\n  %u\n  %a")))))
+        (if keys
+            (or (assoc keys org-capture-templates)
+                (error "No capture template referred to by \"%s\" keys" keys))
+        (org-mks org-capture-templates
+                "Select a capture template\n━━━━━━━━━━━━━━━━━━━━━━━━━"
+                "Template key: "
+                `(("q" ,(concat (all-the-icons-octicon "stop" :face 'all-the-icons-red :v-adjust 0.01) "\tAbort")))))))
+    (advice-add 'org-capture-select-template :override #'org-capture-select-template-prettier))
+
 (setf (alist-get 'height +org-capture-frame-parameters) 15)
       ;; (alist-get 'name +org-capture-frame-parameters) "❖ Capture") ;; ATM hardcoded in other places, so changing breaks stuff
 (setq +org-capture-fn
@@ -478,5 +497,13 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (setq vertico-count-format nil)
 
 (setq vertico-posframe-width 200)
+
+(use-package! xwwp-full
+  :after xwidget-webkit
+  :custom
+  (xwwp-follow-link-completion-system 'ivy)
+  :bind (:map xwidget-webkit-mode-map
+              ("f" . xwwp-ace-toggle)
+              ("v" . xwwp-follow-link)))
 
 (setq read-process-output-max (* 4 1024 1024)) ;; 4mb

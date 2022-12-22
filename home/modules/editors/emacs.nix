@@ -94,10 +94,8 @@ in
       # Fonts
       emacs-all-the-icons-fonts
       my.emmet-ls
-    ] ++ (if cfg.useNix then [] else [ emacsGit ] );
+    ] ++ (if cfg.useNix then [] else [ my.emacsGitXwWrapped ] );
 
-    # concat two arrays in nix
-    #
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
 
 
