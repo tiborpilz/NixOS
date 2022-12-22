@@ -82,6 +82,13 @@ gch() {
   git checkout "$(git branch --all | fzf-tmux | tr -d '[:space:]')"
 }
 
+npr() {
+  command=$(jq -r '.scripts | keys | .[]' package.json | fzf --preview "jq -r '.scripts[\"{}\"]' package.json")
+  if [[ ! -z command ]]; then
+    print -z "npm run $command"
+  fi
+}
+
 source <(kubectl completion zsh)
 alias k=kubectl
 # complete -F __start_kubectl k
