@@ -12,6 +12,7 @@ in
 
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
+      git
       gitAndTools.git-annex
       unstable.gitAndTools.gh
       gitAndTools.git-open

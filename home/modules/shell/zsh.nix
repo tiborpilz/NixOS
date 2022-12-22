@@ -52,6 +52,7 @@ in
       tldr
       kubectl
       nodejs
+      coreutils
     ];
 
     home.sessionVariables.ZDOTDIR = "$XDG_CONFIG_HOME/zsh";
