@@ -94,11 +94,16 @@ in
       # Fonts
       emacs-all-the-icons-fonts
       my.emmet-ls
-    ];
+    ] ++ (if cfg.useNix then [] else [ emacsGit ] );
 
+    # concat two arrays in nix
+    #
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
 
+
     # xdg.configFile."doom" = { source = ../../config/doom; recursive = true; };
+
+    # home.sessionVariables.DOOMDIR = (if !cfg.useNix then "${config.home.homeDirectory}/.config/nixos/home/config/doom" else "");
 
     home.activation.installDoomEmacs =
       let activationScript = ''
@@ -106,11 +111,15 @@ in
               ${pkgs.git}/bin/git clone --depth=1 --single-branch https://github.com/doomemacs/doomemacs ".config/emacs"
           fi
 
-          # if [ ! -d ".config/doom" ]; then
-          #     tempdir=$(mktemp -d)
-          #     ${pkgs.git}/bin/git clone https://github.com/tiborpilz/nixos $tempdir
-          #     cp -r $tempdir/home/config/doom ~/.config/doom
+          # if [ ! -d ".config/nixos" ]; then
+          #     ${pkgs.git}/bin/git clone --depth=1 --single-branch https://github.com/tiborpilz/nixos ".config/nixos"
           # fi
+
+          if [ ! -d ".config/doom" ]; then
+              tempdir=$(mktemp -d)
+              ${pkgs.git}/bin/git clone https://github.com/tiborpilz/nixos $tempdir
+              cp -r $tempdir/home/config/doom ~/.config/doom
+          fi
           # .config/emacs/bin/doom sync
         '';
       in (lib.hm.dag.entryAfter ["WriteBoundary"] (if cfg.useNix then "" else activationScript ));

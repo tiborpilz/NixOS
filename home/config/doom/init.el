@@ -102,6 +102,7 @@
        (eval +overlay)     ; run code, run (also, repls)
        ;; gist              ; interacting with github gists
        ;; (lookup +dictionary +docsets +offline)              ; navigate your code and its documentation
+       (lookup +docsets)
        (lsp +peek)               ; M-x vscode
        magit             ; a git porcelain for Emacs
        make              ; run make tasks from Emacs
