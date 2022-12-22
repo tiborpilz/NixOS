@@ -7,9 +7,11 @@ let
     withXwidgets = false;
     withGTK3 = false;
   });
+
   add-env = emacs: key: value: (emacs.overrideAttrs (old: {
     postFixup = (old.postFixup or "") + "wrapProgram $out/bin/emacs --set ${key} ${value}";
   }));
+
   add-plists-env = emacs: (add-env emacs "LSP_USE_PLISTS" "true");
 
   patch-nul-char-bug = let
@@ -23,4 +25,5 @@ in
 {
   "emacs" = add-plists-env (patch-nul-char-bug (add-feature-flags emacs));
   "emacsGit" = add-plists-env (add-feature-flags emacsGit);
+  "emacsGitRaw" = add-feature-flags emacsGit;
 } // emacsPackages.packages
