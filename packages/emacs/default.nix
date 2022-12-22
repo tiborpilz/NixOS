@@ -1,18 +1,24 @@
 { inputs, pkgs, lib, ... }:
 
-with pkgs;
 let
   add-feature-flags = emacs: (emacs.override {
     nativeComp = true;
-    withXwidgets = false;
-    withGTK3 = false;
+    withXwidgets = true;
+    withGTK3 = true;
   });
 
   add-env = emacs: key: value: (emacs.overrideAttrs (old: {
     postFixup = (old.postFixup or "") + "wrapProgram $out/bin/emacs --set ${key} ${value}";
   }));
 
+  wrap = emacs: (emacs.overrideAttrs (old: {
+    postFixup = (old.postFixup or "") + ''
+      pkgs.wrapProgram $out/bin/emacs --set LSP_USE_PLISTS=true --set WEBKIT_DISABLE_COMPOSITING_MODE=1
+    '';
+  }));
+
   add-plists-env = emacs: (add-env emacs "LSP_USE_PLISTS" "true");
+  add-disable-webkit-composition-env = emacs: (add-env emacs "WEBKIT_DISABLE_COMPOSITING_MODE" "1");
 
   patch-nul-char-bug = let
     json-nul-char-patch = (pkgs.fetchpatch {
@@ -22,8 +28,18 @@ let
     in emacs: emacs.overrideAttrs (old: { patches = old.patches or [] ++ [ json-nul-char-patch ]; });
   emacsPackages = lib.my.mapModules (toString ./.) (package: (import package) { inherit inputs pkgs lib; });
 in
-{
-  "emacs" = add-plists-env (patch-nul-char-bug (add-feature-flags emacs));
-  "emacsGit" = add-plists-env (add-feature-flags emacsGit);
-  "emacsGitRaw" = add-feature-flags emacsGit;
+rec {
+  emacs27Patched = (patch-nul-char-bug pkgs.emacs);
+  emacs27Xw = (add-feature-flags emacs27Patched);#add-env (patch-nul-char-bug (add-feature-flags emacs));
+  emacs27XwWrapped = (wrap emacs27Xw);
+  emacsGitXw = (add-feature-flags pkgs.emacsGit);
+  # emacsGitXwWrapped = (wrap emacsGitXw);
+  emacsGitXwWrapped = pkgs.symlinkJoin {
+    name = "emacs";
+    paths = [ emacsGitXw ];
+    nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/emacs --set LSP_USE_PLISTS true --set WEBKIT_DISABLE_COMPOSITING_MODE 1
+    '';
+  };
 } // emacsPackages.packages
