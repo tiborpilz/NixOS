@@ -86,14 +86,16 @@ in
       python3Packages.flake8
       python3Packages.pylint
 
-      # PPython Language Server Plugins
+      # Python Language Server Plugins
       python3Packages.pylsp-mypy
       python3Packages.pyls-isort
       python3Packages.python-lsp-black
 
       # Fonts
       emacs-all-the-icons-fonts
-      my.emmet-ls
+
+      # gpt.el
+      (python3.withPackages (p: with p; [ openai chardet requests ]))
     ] ++ (if cfg.useNix then [] else [ my.emacsGitXwWrapped ] );
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];

@@ -97,11 +97,14 @@
           (lib.attrValues (mapModules ./packages (p: import p {
             inherit lib inputs;
             pkgs = channels.nixpkgs;
-          })));
-
-          apps = (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages) // {
-            default = apps.flakeRepl;
+          }))) // {
+            default = packages.bw2pass;
           };
+
+
+        apps = (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages) // {
+          default = apps.flakeRepl;
+        };
 
         devShells = {
           default = import ./shell.nix { pkgs = channels.nixpkgs; };
