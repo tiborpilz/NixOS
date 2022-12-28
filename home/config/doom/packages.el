@@ -36,6 +36,8 @@
 
 ;; (package! dash-docs)
 
+(package! gpt)
+
 (package! doom-themes)
 
 (package! grayscale-theme)

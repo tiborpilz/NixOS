@@ -380,8 +380,11 @@ For Markdown, add a hook setting auto-fill-mode to -1.
 (add-hook! markdown-mode (auto-fill-mode -1))
 #+end_src
 
-#+begin_src elisp
+#+begin_src elisp :tangle packages.el
+(package! org-appear)
+#+end_src
 
+#+begin_src elisp
 (use-package! org-appear
   :hook (org-mode . 'org-appear-mode)
   :config
@@ -1028,6 +1031,25 @@ Put Docsets in share dir
 #+begin_src elisp
 ;; (setq dash-docs-docsets-path "$HOME/.local/share/docsets")
 #+end_src
+*** GPT
+GPT.el (https://github.com/stuhlmueller/gpt.el) is a package for interacting
+with OpenAI's GPT-3 API.
+
+**** Install
+#+begin_src elisp :tangle packages.el
+(package! gpt)
+#+end_src
+
+**** Configuration
+#+begin_src elisp
+(setq gpt-openai-key (password-store-get "bitwarden/openai-gpt-key"))
+(setq gpt-openai-engine "code-davinci-002")
+(use-package! gpt)
+#+end_src
+
+#+RESULTS:
+: gpt
+
 * UI
 ** Theming
 *** Doom Themes
@@ -1292,12 +1314,6 @@ Various tweaks to improve the overall performance.
 #+begin_src elisp :tangle packages.el
 
 (package! dap-mode)
-
-;; Orgmode
-
-
-;; Only show emphasis markers when editing them
-(package! org-appear)
 
 ;; Citations
 (package! org-ref :pin "3ca9beb744621f007d932deb8a4197467012c23a")

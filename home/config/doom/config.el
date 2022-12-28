@@ -454,6 +454,9 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 ;; (setq dash-docs-docsets-path "$HOME/.local/share/docsets")
 
+(setq gpt-openai-key (password-store-get "bitwarden/openai-gpt-key"))
+(use-package! gpt)
+
 (setq doom-theme 'doom-nord-aurora)
 
 ;; (add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)

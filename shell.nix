@@ -15,6 +15,7 @@ mkShell {
     nixos-rebuild
     cachix
     go-task
+    my.bw2pass
   ];
   shellHook = ''
     export FLAKE="$PWD"

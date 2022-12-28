@@ -38,6 +38,9 @@ in {
 
   modules.syncthing.enable = true;
 
+  modules.bitwarden.enable = true;
+  modules.password-store.enable = true;
+
   nix.settings = {
     build-users-group = "nixbld";
     experimental-features = [ "nix-command flakes" ];
