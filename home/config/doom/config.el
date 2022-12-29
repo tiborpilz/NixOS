@@ -8,18 +8,31 @@
   (string-equal system-type "gnu/linux"))
 
 (defun is-workstation ()
-  (string-equal (system-name) "archyMcArchstation"))
+  (string-equal (system-name) "workyMcWorkstation"))
 
-(setq font-scale-factor (if (is-workstation) 1.1 1.0))
+(setq font-scale-factor (if (is-workstation) 1.3 1.0))
 
 (defun scale-font (size)
   (round (* size font-scale-factor)))
 
-(when (is-mac) (setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14))) nil)
-;; (setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 16) :weight 'light)
-;;       doom-big-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 24))
-;;       doom-variable-pitch-font (font-spec :family "Open Sans" :size (scale-font 16))
-;;       doom-serif-font (font-spec :family "FreeSerif" :weight 'light))
+(setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14))
+      doom-variable-pitch-font (font-spec :family "sans" :size (scale-font 12))
+      doom-big-font (font-spec :family  "sans" :size (scale-font 16))
+      doom-serif-font (font-spec :family "FreeSerif" :weight 'light :size (scale-font 14)))
+
+(let* ((variable-tuple '(:font "ETBembo"))
+       (headline `(:inherit default :weight bold)))
+  (custom-theme-set-faces
+   'user
+   `(org-level-8 ((t (,@headline ,@variable-tuple))))
+   `(org-level-7 ((t (,@headline ,@variable-tuple))))
+   `(org-level-6 ((t (,@headline ,@variable-tuple))))
+   `(org-level-5 ((t (,@headline ,@variable-tuple))))
+   `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+   `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.17))))
+   `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.23))))
+   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.3))))
+   `(org-document-title ((t (,@headline ,@variable-tuple :height 1.4 :underline nil))))))
 
 (setq display-line-numbers-type 'relative)
 
@@ -38,7 +51,40 @@
 (setq calendar-week-start-day 1) ;; start on monday
 (setq org-agenda-include-diary t)
 
-(add-hook 'org-mode-hook #'+org-pretty-mode)
+(modify-all-frames-parameters
+ '((right-divider-width . 10)
+   (internal-border-width . 10)))
+(dolist (face '(window-divider
+                window-divider-first-pixel
+                window-divider-last-pixel))
+  (face-spec-reset-face face)
+  (set-face-foreground face (face-attribute 'default :background)))
+(set-face-background 'fringe (face-attribute 'default :background))
+
+(setq
+ ;; Edit settings
+ org-auto-align-tags nil
+ org-tags-column 0
+ org-catch-invisible-edits 'show-and-error
+ org-special-ctrl-a/e t
+ org-insert-heading-respect-content t
+
+ ;; Org styling, hide markup etc.
+ org-hide-emphasis-markers t
+ org-pretty-entities t
+ org-ellipsis "…"
+
+ ;; Agenda styling
+ org-agenda-tags-column 0
+ org-agenda-block-separator ?─
+ org-agenda-time-grid
+ '((daily today require-timed)
+   (800 1000 1200 1400 1600 1800 2000)
+   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+ org-agenda-current-time-string
+ "⭠ now ─────────────────────────────────────────────────")
+
+(global-org-modern-mode)
 
 (setq org-agenda-deadline-faces
       '((1.001 . error)
@@ -54,21 +100,6 @@
     (setq-local jit-lock-defer-time 0.05
                 jit-lock-stealth-time 1)))
 
-(after! org-superstar
-  (setq org-superstar-headline-bullets-list '("◉" "○" "✸" "✿" "✤" "✜" "◆" "▶")
-        org-superstar-prettify-item-bullets t ))
-
-(setq org-ellipsis " ▾ "
-      org-hide-leading-stars t
-      org-priority-highest ?A
-      org-priority-lowest ?E
-      org-priority-faces
-      '((?A . 'all-the-icons-red)
-        (?B . 'all-the-icons-orange)
-        (?C . 'all-the-icons-yellow)
-        (?D . 'all-the-icons-green)
-         (?E . 'all-the-icons-blue)))
-
 (use-package! ob-http
   :commands org-babel-execute:http)
 
@@ -82,35 +113,6 @@
         (:tangle . "no")
         (:comments . "link")))
 
-;; (cl-defmacro lsp-org-babel-enable (lang)
-;;   "Support LANG in org source code block."
-;;   (setq centaur-lsp 'lsp-mode)
-;;   (cl-check-type lang stringp)
-;;   (let* ((edit-pre (intern (format "org-babel-edit-prep:%s" lang)))
-;;          (intern-pre (intern (format "lsp--%s" (symbol-name edit-pre)))))
-;;     `(progn
-;;        (defun ,intern-pre (info)
-;;          (let ((file-name (->> info caddr (alist-get :file))))
-;;            (unless file-name
-;;              (setq file-name (make-temp-file "babel-lsp-")))
-;;            (setq buffer-file-name fie)
-;;            (lsp-deferred)))
-;;        (put ',intern-pre 'function-documentation
-;;             (format "Enable lsp-mode in the buffer of org source block (%s)."
-;;                     (upcase ,lang)))
-;;        (if (fboundp ',edit-pre)
-;;            (advice-add ',edit-pre :after ',intern-pre)
-;;          (progn
-;;            (defun ,edit-pre (info)
-;;              (,intern-pre info))
-;;            (put ',edit-pre 'function-documentation
-;;                 (format "Prepare local buffer environment for org source block (%s)."
-;;                         (upcase ,lang))))))))
-;; (defvar org-babel-lang-list
-;;   '("go" "python" "ipython" "bash" "sh" "ditaa"))
-;; (dolist (lang org-babel-lang-list)
-;;   (eval `(lsp-org-babel-enable ,lang)))
-
 (defun org-babel-tangle-config ()
   (when (string-equal (file-name-nondirectory (buffer-file-name))
                       "config.org")
@@ -120,6 +122,14 @@
 (add-hook 'org-mode-hook
           (lambda ()
             (add-hook 'after-save-hook #'org-babel-tangle-config)))
+
+(defadvice org-babel-execute-src-block (around progress nil activate)
+  (set-face-attribute
+   'org-block-background nil :background "LightSteelBlue")
+  (message "Running your code block")
+  ad-do-it
+  (set-face-attribute 'org-block-background nil :background "gray")
+  (message "Done with code block"))
 
 (map! :map org-mode-map
       :localleader
@@ -156,9 +166,6 @@
 ;(require 'ox-extra)
 ;(ox-extras-activate '(ignore-headlines))
 
-(use-package! org-fragtog
-  :hook (org-mode . 'org-fragtog-mode))
-
 (setq org-highlight-latex-and-related '(native script entities))
 
 ;(use-package! org-re-reveal)
@@ -189,6 +196,11 @@
 ;;         org-gcal-client-secret "CLIENT_SECRET"
 ;;         org-gcal-fetch-file-alit '(("tbrpilz@googlemail.com" . "~/org/schedule.org"))))
 
+(map! :map org-mode-map
+      :localleader
+      (:prefix-map ("B" . "babel")
+       (:desc "Insert structure template" "c" #'org-insert-structure-template)))
+
 (remove-hook 'text-mode-hook #'visual-line-mode)
 (add-hook 'text-mode-hook #'auto-fill-mode)
 
@@ -218,17 +230,9 @@
 
 (add-hook! markdown-mode (auto-fill-mode -1))
 
-(use-package! org-appear
-  :hook (org-mode . 'org-appear-mode)
-  :config
-  (setq org-appear-autoemphasis t
-        org-appear-autosubmarkers t
-        org-appear-autolinks nil)
-  ;; for proper first-time setup, `org-appear--set-elements'
-  ;; needs to be run after other hooks have acted.
-  (run-at-time nil nil #'org-appear--set-elements))
-
 (add-hook! 'emacs-startup-hook #'doom-init-ui-h)
+
+(use-package! org-tempo)
 
 (after! org-capture
     (defun org-capture-select-template-prettier (&optional keys)
@@ -297,6 +301,10 @@
   (princ (with-current-buffer buffer
     (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
   (current-buffer)))
+
+(setq lsp-terraform-ls-enable-show-reference t)
+(setq lsp-semantic-tokens-enable t)
+(setq lsp-semantic-tokens-honor-refresh-requests t)
 
 (setq company-idle-delay 0.35 ;; How long to wait before popping up
       company-minimum-prefix-length 2 ;; Show the menu after one key press
@@ -455,6 +463,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; (setq dash-docs-docsets-path "$HOME/.local/share/docsets")
 
 (setq gpt-openai-key (password-store-get "bitwarden/openai-gpt-key"))
+(setq gpt-openai-engine "code-davinci-002")
 (use-package! gpt)
 
 (setq doom-theme 'doom-nord-aurora)

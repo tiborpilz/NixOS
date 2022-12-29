@@ -23,29 +23,45 @@ running this config, and adjust certain settings accordingly.
   (string-equal system-type "gnu/linux"))
 
 (defun is-workstation ()
-  (string-equal (system-name) "archyMcArchstation"))
+  (string-equal (system-name) "workyMcWorkstation"))
 #+end_src
 
 ** Font selection
 Instead of setting the fonts twice, I'll define a scaling factor depending on
 the macine I'm running on, and then use that to set the font size.
 #+begin_src elisp
-(setq font-scale-factor (if (is-workstation) 1.1 1.0))
+(setq font-scale-factor (if (is-workstation) 1.3 1.0))
 
 (defun scale-font (size)
   (round (* size font-scale-factor)))
 #+end_src
 
 I'm a big fan of ligatures, and I've been using FiraCode for as long as I can remember.
+
 #+begin_src elisp
-(when (is-mac) (setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14))) nil)
-;; (setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 16) :weight 'light)
-;;       doom-big-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 24))
-;;       doom-variable-pitch-font (font-spec :family "Open Sans" :size (scale-font 16))
-;;       doom-serif-font (font-spec :family "FreeSerif" :weight 'light))
+(setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14))
+      doom-variable-pitch-font (font-spec :family "sans" :size (scale-font 12))
+      doom-big-font (font-spec :family  "sans" :size (scale-font 16))
+      doom-serif-font (font-spec :family "FreeSerif" :weight 'light :size (scale-font 14)))
 #+end_src
 
-#+RESULTS:
+Adjust org-mode headlines.
+#+begin_src elisp
+
+(let* ((variable-tuple '(:font "ETBembo"))
+       (headline `(:inherit default :weight bold)))
+  (custom-theme-set-faces
+   'user
+   `(org-level-8 ((t (,@headline ,@variable-tuple))))
+   `(org-level-7 ((t (,@headline ,@variable-tuple))))
+   `(org-level-6 ((t (,@headline ,@variable-tuple))))
+   `(org-level-5 ((t (,@headline ,@variable-tuple))))
+   `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+   `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.17))))
+   `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.23))))
+   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.3))))
+   `(org-document-title ((t (,@headline ,@variable-tuple :height 1.4 :underline nil))))))
+#+end_src
 
 ** Line numbers
 Since I'm using Evil/vim-keybindings, I prefer relative line numbers as default.
@@ -89,10 +105,54 @@ https://github.com/doomemacs/doomemacs/issues/6960#issuecomment-1327514660
 #+end_src
 
 ** Visual improvements
-*** mixed pitch & org-pretty-mode
-#+begin_src elisp
-(add-hook 'org-mode-hook #'+org-pretty-mode)
+*** Org-Modern
+Org-modern (https://github.com/minad/org-modern) contains a lot of nice visual
+improvements for org-mode.
+
+#+begin_src elisp :tangle packages.el
+(package! org-modern)
 #+end_src
+
+Use it globally and tweak it some more.
+#+begin_src elisp
+(modify-all-frames-parameters
+ '((right-divider-width . 10)
+   (internal-border-width . 10)))
+(dolist (face '(window-divider
+                window-divider-first-pixel
+                window-divider-last-pixel))
+  (face-spec-reset-face face)
+  (set-face-foreground face (face-attribute 'default :background)))
+(set-face-background 'fringe (face-attribute 'default :background))
+
+(setq
+ ;; Edit settings
+ org-auto-align-tags nil
+ org-tags-column 0
+ org-catch-invisible-edits 'show-and-error
+ org-special-ctrl-a/e t
+ org-insert-heading-respect-content t
+
+ ;; Org styling, hide markup etc.
+ org-hide-emphasis-markers t
+ org-pretty-entities t
+ org-ellipsis "…"
+
+ ;; Agenda styling
+ org-agenda-tags-column 0
+ org-agenda-block-separator ?─
+ org-agenda-time-grid
+ '((daily today require-timed)
+   (800 1000 1200 1400 1600 1800 2000)
+   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+ org-agenda-current-time-string
+ "⭠ now ─────────────────────────────────────────────────")
+
+(global-org-modern-mode)
+#+end_src
+
+#+RESULTS:
+: t
 
 *** Show passed deadlines as error
 #+begin_src elisp
@@ -107,7 +167,6 @@ https://github.com/doomemacs/doomemacs/issues/6960#issuecomment-1327514660
 #+begin_src elisp
 (setq org-fontify-quote-and-verse-blocks t)
 #+end_src
-
 *** Defer font-lock
 For a more responsive editing experience
 #+begin_src elisp
@@ -116,24 +175,6 @@ For a more responsive editing experience
   (when (> (buffer-size) 50000)
     (setq-local jit-lock-defer-time 0.05
                 jit-lock-stealth-time 1)))
-#+end_src
-
-*** Symbols
-#+begin_src elisp
-(after! org-superstar
-  (setq org-superstar-headline-bullets-list '("◉" "○" "✸" "✿" "✤" "✜" "◆" "▶")
-        org-superstar-prettify-item-bullets t ))
-
-(setq org-ellipsis " ▾ "
-      org-hide-leading-stars t
-      org-priority-highest ?A
-      org-priority-lowest ?E
-      org-priority-faces
-      '((?A . 'all-the-icons-red)
-        (?B . 'all-the-icons-orange)
-        (?C . 'all-the-icons-yellow)
-        (?D . 'all-the-icons-green)
-         (?E . 'all-the-icons-blue)))
 #+end_src
 
 ** Babel
@@ -157,39 +198,7 @@ See https://org-babel.readthedocs.io/en/latest/header-args/
         (:tangle . "no")
         (:comments . "link")))
 #+end_src
-*** LSP in org-babel src blocks
-#+begin_src elisp
-;; (cl-defmacro lsp-org-babel-enable (lang)
-;;   "Support LANG in org source code block."
-;;   (setq centaur-lsp 'lsp-mode)
-;;   (cl-check-type lang stringp)
-;;   (let* ((edit-pre (intern (format "org-babel-edit-prep:%s" lang)))
-;;          (intern-pre (intern (format "lsp--%s" (symbol-name edit-pre)))))
-;;     `(progn
-;;        (defun ,intern-pre (info)
-;;          (let ((file-name (->> info caddr (alist-get :file))))
-;;            (unless file-name
-;;              (setq file-name (make-temp-file "babel-lsp-")))
-;;            (setq buffer-file-name fie)
-;;            (lsp-deferred)))
-;;        (put ',intern-pre 'function-documentation
-;;             (format "Enable lsp-mode in the buffer of org source block (%s)."
-;;                     (upcase ,lang)))
-;;        (if (fboundp ',edit-pre)
-;;            (advice-add ',edit-pre :after ',intern-pre)
-;;          (progn
-;;            (defun ,edit-pre (info)
-;;              (,intern-pre info))
-;;            (put ',edit-pre 'function-documentation
-;;                 (format "Prepare local buffer environment for org source block (%s)."
-;;                         (upcase ,lang))))))))
-;; (defvar org-babel-lang-list
-;;   '("go" "python" "ipython" "bash" "sh" "ditaa"))
-;; (dolist (lang org-babel-lang-list)
-;;   (eval `(lsp-org-babel-enable ,lang)))
-#+end_src
-
-*** Auto-Tanglins
+*** Auto-Tanglins TODO: make this work
 I want org to tangle my config.org on file save, regardless whether it's the one
 loaded or in a different repo.
 
@@ -204,6 +213,20 @@ loaded or in a different repo.
           (lambda ()
             (add-hook 'after-save-hook #'org-babel-tangle-config)))
 #+end_src
+*** Make Babel prettier
+#+begin_src elisp
+(defadvice org-babel-execute-src-block (around progress nil activate)
+  (set-face-attribute
+   'org-block-background nil :background "LightSteelBlue")
+  (message "Running your code block")
+  ad-do-it
+  (set-face-attribute 'org-block-background nil :background "gray")
+  (message "Done with code block"))
+#+end_src
+
+#+RESULTS:
+: org-babel-execute-src-block
+
 ** Import/Export
 *** View exported file
 #+begin_src elisp
@@ -255,7 +278,11 @@ Add `:ignore:` tag to headings, so only the headings will be ignored for an expo
 #+end_src
 
 *** automatic latex rendering
-#+begin_src elisp
+#+begin_code elisp :tangle packages.el
+(package! org-fragtog)
+#+end_code
+
+#+begin_src elisp :tangle none
 (use-package! org-fragtog
   :hook (org-mode . 'org-fragtog-mode))
 #+end_src
@@ -327,12 +354,30 @@ The closest comparison to org-roam-ui is Obsidian.
 ;;         org-gcal-fetch-file-alit '(("tbrpilz@googlemail.com" . "~/org/schedule.org"))))
 #+end_src
 
-*** Automatically commit via git
-#+begin_src elisp :tangle packages.el
-(package! git-auto-commit-mode)
-#+end_src
 ** Fixes and miscellanious improvements
-*** Visual-line-mode messes with with plaintext (markdow, latex)
+*** Add shortcut for inserting  source, quote and example blocks
+
+For some reqson, ~<S <TAB>~ has stopped working, but I stumbled across
+~org-insert-structure-template~ which has the added benefit of choice.
+
+Right now it's stuck on a simple emacs-y keybinding, so I'm changing it to a
+more Evil-like one.
+
+It seems that ~localleader~ is pretty swamped, especially in org-mode, so I guess
+I waill try to cluster a few keybindings I want to add for aome time now - since
+it's Babel related, ~<SPC> [localleader] B~ should fit as an entrypoint.
+
+I'm adjusting the bindings just for ~org-mode~.
+
+#+begin_src elisp
+(map! :map org-mode-map
+      :localleader
+      (:prefix-map ("B" . "babel")
+       (:desc "Insert structure template" "c" #'org-insert-structure-template)))
+#+end_src
+
+
+ *** Visual-line-mode messes with with plaintext (markdow, latex)
 #+begin_src elisp
 (remove-hook 'text-mode-hook #'visual-line-mode)
 (add-hook 'text-mode-hook #'auto-fill-mode)
@@ -380,22 +425,6 @@ For Markdown, add a hook setting auto-fill-mode to -1.
 (add-hook! markdown-mode (auto-fill-mode -1))
 #+end_src
 
-#+begin_src elisp :tangle packages.el
-(package! org-appear)
-#+end_src
-
-#+begin_src elisp
-(use-package! org-appear
-  :hook (org-mode . 'org-appear-mode)
-  :config
-  (setq org-appear-autoemphasis t
-        org-appear-autosubmarkers t
-        org-appear-autolinks nil)
-  ;; for proper first-time setup, `org-appear--set-elements'
-  ;; needs to be run after other hooks have acted.
-  (run-at-time nil nil #'org-appear--set-elements))
-#+end_src
-
 *** Nix-Doom-Emacs messes with dashboard
 I'm using the nix-doom-emacs package to install emacs & dependencies, and for
 some reason, using that binary, the Dashboard is disabled. [[https://github.com/nix-community/nix-doom-emacs/issues/88#issuecomment-1115500602][This comment]] in a
@@ -403,6 +432,11 @@ corresponding GH issue has a fix.
 
 #+begin_src elisp
 (add-hook! 'emacs-startup-hook #'doom-init-ui-h)
+#+end_src
+*** Faster insertion of org structures (i.e. source blocks)
+For some reason, ~org-tempo~ does not start at launch, so I'm  loading it here.
+#+begin_src elisp
+(use-package! org-tempo)
 #+end_src
 ** Capture
 *** Improve org-capture dialog
@@ -428,7 +462,7 @@ corresponding GH issue has a fix.
 
 #+END_SRC
 
-The [[file:~/.emacs.d/bin/org-capture][org-capture bin]] is rather nice, but I'd be nicer with a smaller frame, and
+The [[file:~/.emacs.d/bin/org-capture][org-capture bin]] is rather nice, but It would be even nicer with a smaller frame, and
 no modeline.
 #+BEGIN_SRC emacs-lisp
 (setf (alist-get 'height +org-capture-frame-parameters) 15)
@@ -646,6 +680,18 @@ Then, set up a markdown-html function.
     (princ (with-current-buffer buffer
       (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
     (current-buffer)))
+#+end_src
+
+*** Terraform
+There are two competing lsp servers for Terraform with support in Emacs, but,
+although ~terraform-lsp~ is the more featurerich, I'm sticking with ~terraform-ls~
+since it's not only more reliable, but seems to not work with TF versions above 0.12.
+But still, ~terraform-lsp~ is a good alternative, with some nice- to- haves.
+
+#+begin_src elisp
+(setq lsp-terraform-ls-enable-show-reference t)
+(setq lsp-semantic-tokens-enable t)
+(setq lsp-semantic-tokens-honor-refresh-requests t)
 #+end_src
 ** Tools
 *** Code Completion
@@ -1047,9 +1093,6 @@ with OpenAI's GPT-3 API.
 (use-package! gpt)
 #+end_src
 
-#+RESULTS:
-: gpt
-
 * UI
 ** Theming
 *** Doom Themes
@@ -1084,6 +1127,14 @@ Very appealing, minimalistic themes.
 (package! tao-theme)
 #+end_src
 
+*** Ewal
+Wewal (https://github.com/cyruseuros/ewal) is similar to (and builds upon)
+pywal, but for Emacs. It allows you to set the theme of Emacs based on the
+colors of your wallpaper. (Or other pictures).
+
+#+begin_src elisp :tangle packages.el
+(package! ewal)
+#+end_src
 ** Modeline
 *** Nano Modeline
 
@@ -1324,7 +1375,6 @@ Various tweaks to improve the overall performance.
 ;; OrgRoam visualization / webapp
 
 ;; automatic latex rendering
-(package! org-fragtog :pin "479e0a1c3610dfe918d89a5f5a92c8aec37f131d")
 
 ;; export github markdown
 (package! ox-gfm :pin "99f93011b069e02b37c9660b8fcb45dab086a07f")

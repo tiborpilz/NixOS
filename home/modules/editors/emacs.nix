@@ -26,7 +26,7 @@ in
         { name = "packages.el"; path = "${filteredPath}/packages.el"; }
         { name = "config.el"; path = pkgs.emptyFile; }
       ];
-      emacsPackage = pkgs.my.emacsGit;
+      emacsPackage = pkgs.my.emacsGitXwWrapped;
 
       emacsPackagesOverlay = self: super: {
         copilot = pkgs.my.copilot;
@@ -90,6 +90,9 @@ in
       python3Packages.pylsp-mypy
       python3Packages.pyls-isort
       python3Packages.python-lsp-black
+
+      # Terraform language server
+      terraform-lsp
 
       # Fonts
       emacs-all-the-icons-fonts
