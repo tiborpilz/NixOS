@@ -2,6 +2,8 @@
 
 (package! editorconfig)
 
+(package! org-modern)
+
 (package! org-present)
 
 (unpin! org-roam)
@@ -9,8 +11,6 @@
 (package! websocket :pin "fda4455333309545c0787a79d73c19ddbeb57980") ; dependency of `org-roam-ui'
 
 (package! org-gcal)
-
-(package! git-auto-commit-mode)
 
 (package! jest-test-mode)
 
@@ -44,6 +44,8 @@
 
 (package! tao-theme)
 
+(package! ewal)
+
 ;; (package! nano-modeline)
 
 ;; (package! which-key-posframe)
@@ -58,12 +60,6 @@
 
 (package! dap-mode)
 
-;; Orgmode
-
-
-;; Only show emphasis markers when editing them
-(package! org-appear)
-
 ;; Citations
 (package! org-ref :pin "3ca9beb744621f007d932deb8a4197467012c23a")
 
@@ -73,7 +69,6 @@
 ;; OrgRoam visualization / webapp
 
 ;; automatic latex rendering
-(package! org-fragtog :pin "479e0a1c3610dfe918d89a5f5a92c8aec37f131d")
 
 ;; export github markdown
 (package! ox-gfm :pin "99f93011b069e02b37c9660b8fcb45dab086a07f")

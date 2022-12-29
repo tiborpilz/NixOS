@@ -59,7 +59,7 @@ in
     home.sessionVariables.ZDOTDIR = "$XDG_CONFIG_HOME/zsh";
     home.sessionVariables.ZSH_CACHE_DIR = "$XDG_CACHE_HOME/zsh";
 
-    home.sessionPath = [ "$HOME/.krew/bin" ];
+    home.sessionPath = [ "$XDG_CONFIG_HOME/.krew/bin" ];
 
     modules.shell.zsh.rcInit = ''
       source ${pkgs.nix-zsh-completions}/share/zsh/plugins/nix/nix-zsh-completions.plugin.zsh

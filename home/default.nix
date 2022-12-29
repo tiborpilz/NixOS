@@ -13,6 +13,7 @@ in {
 
   home.packages = with pkgs; [
     (nerdfonts.override { fonts = [ "FiraCode" ]; })
+    etBook
 
     # Need later version of bash for nix-shell to work correctly on macos
     bash
@@ -26,7 +27,7 @@ in {
   modules.shell.zsh.aliases.ungron = "gron --ungron";
 
   modules.shell.tmux.enable = true;
-  modules.shell.gnupg.enable = false;
+  modules.shell.gnupg.enable = true;
   modules.shell.git.enable = true;
   modules.shell.direnv.enable = true;
 
@@ -40,6 +41,8 @@ in {
 
   modules.bitwarden.enable = true;
   modules.password-store.enable = true;
+
+  modules.pywal.enable = true;
 
   nix.settings = {
     build-users-group = "nixbld";
