@@ -92,7 +92,7 @@ in
       python3Packages.python-lsp-black
 
       # Terraform language server
-      terraform-lsp
+      terraform-ls
 
       # Fonts
       emacs-all-the-icons-fonts

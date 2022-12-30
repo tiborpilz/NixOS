@@ -17,6 +17,9 @@ in {
 
     # Need later version of bash for nix-shell to work correctly on macos
     bash
+
+    # Setuptools is missing from python
+    python3Packages.setuptools
   ];
 
   # Let Home Manager install and manage itself.
@@ -42,7 +45,7 @@ in {
   modules.bitwarden.enable = true;
   modules.password-store.enable = true;
 
-  modules.pywal.enable = true;
+  modules.colorschemes.enable = true;
 
   nix.settings = {
     build-users-group = "nixbld";
