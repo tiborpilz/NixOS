@@ -86,6 +86,8 @@
 
 (global-org-modern-mode)
 
+(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+
 (setq org-agenda-deadline-faces
       '((1.001 . error)
         (1.0 . org-warning)
@@ -468,8 +470,13 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (setq doom-theme 'doom-nord-aurora)
 
-;; (add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
-;; (setq doom-themes-treemacs-theme "doom-atom")
+(add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
+(setq doom-themes-treemacs-theme "doom-atom")
+
+(use-package ewal
+  :init (setq ewal-use-built-in-always-p nil
+              ewal-use-built-in-on-failure-p t
+              ewal-built-in-palette "sexy-material"))
 
 ;; (setq nano-modeline-theme 'nano-modeline-theme-nano)
 

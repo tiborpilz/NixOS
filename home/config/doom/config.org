@@ -154,6 +154,10 @@ Use it globally and tweak it some more.
 #+RESULTS:
 : t
 
+*** Vastly improve the tree's display
+#+begin_src elisp
+(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+#+end_src
 *** Show passed deadlines as error
 #+begin_src elisp
 (setq org-agenda-deadline-faces
@@ -1110,8 +1114,8 @@ it lacks the features I need, I was always a fan of the look. Now, it's possible
 to enjoy the best of both worlds by theming Doom to look like Nano.
 
 #+begin_src elisp
-;; (add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
-;; (setq doom-themes-treemacs-theme "doom-atom")
+(add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
+(setq doom-themes-treemacs-theme "doom-atom")
 #+end_src
 
 *** Misc Themes
@@ -1119,7 +1123,7 @@ to enjoy the best of both worlds by theming Doom to look like Nano.
 #+begin_src elisp :tangle packages.el
 (package! grayscale-theme)
 #+end_src
-
+It leetle much on the warm side for my tastes...
 **** Tao Themes
 Very appealing, minimalistic themes.
 
@@ -1128,13 +1132,41 @@ Very appealing, minimalistic themes.
 #+end_src
 
 *** Ewal
-Wewal (https://github.com/cyruseuros/ewal) is similar to (and builds upon)
+Ewal (https://github.com/cyruseuros/ewal) is similar to (and builds upon)
 pywal, but for Emacs. It allows you to set the theme of Emacs based on the
 colors of your wallpaper. (Or other pictures).
 
 #+begin_src elisp :tangle packages.el
 (package! ewal)
 #+end_src
+
+#+begin_src elisp
+(use-package ewal
+  :init (setq ewal-use-built-in-always-p nil
+              ewal-use-built-in-on-failure-p t
+              ewal-built-in-palette "sexy-material"))
+#+end_src
+
+
+
+*** Theme Magic
+In a stark difference to the other solutions, which wants to adjust Emacs to the buty of the
+rest of the world, Theme Magic (https://github.com/jcaw/theme-magic), which uses
+PyWal (again!) to adjust every color it can to match your glorious editor.
+
+#+begin_src elisp :tangle packages.
+(package! theme-magic)
+#+end_src
+*** Autothemer
+More than auto"magically" generating hew themes, Autothemer
+(https://github.com/jasonm23/autothemer) is more of a tool for those proficient
+in themeing or those who want to be. a package for
+generating color schemes, although it is more flexible than ewal or pywal.
+
+#+begin_src elisp :tangle packages.el
+(package! autothemer)
+#+end_src
+
 ** Modeline
 *** Nano Modeline
 

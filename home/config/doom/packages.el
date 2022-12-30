@@ -46,6 +46,8 @@
 
 (package! ewal)
 
+(package! autothemer)
+
 ;; (package! nano-modeline)
 
 ;; (package! which-key-posframe)
