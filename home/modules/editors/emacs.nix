@@ -96,9 +96,6 @@ in
 
       # Fonts
       emacs-all-the-icons-fonts
-
-      # gpt.el
-      (python3.withPackages (p: with p; [ openai chardet requests ]))
     ] ++ (if cfg.useNix then [] else [ my.emacsGitXwWrapped ] );
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
