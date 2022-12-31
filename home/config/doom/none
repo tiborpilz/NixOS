@@ -1,0 +1,2 @@
+(use-package! org-fragtog
+  :hook (org-mode . 'org-fragtog-mode))

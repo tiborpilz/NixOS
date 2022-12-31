@@ -1113,9 +1113,13 @@ Nano is a minimalistic theme for emacs, and it is absolutely gorgeous. Although
 it lacks the features I need, I was always a fan of the look. Now, it's possible
 to enjoy the best of both worlds by theming Doom to look like Nano.
 
+The only issue is that loading ~doom-nano-testing~ currently does more than just
+adjust the colorscheme, and while I like the minimal top modeline, I'd like to
+have a choice. In the future, I will pick and choose from Nano to adjust the layout.
+
 #+begin_src elisp
-(add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
-(setq doom-themes-treemacs-theme "doom-atom")
+;; (add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
+;; (setq doom-themes-treemacs-theme "doom-atom")
 #+end_src
 
 *** Misc Themes
@@ -1131,19 +1135,20 @@ Very appealing, minimalistic themes.
 (package! tao-theme)
 #+end_src
 
-*** Ewal
+**** Ewal
 Ewal (https://github.com/cyruseuros/ewal) is similar to (and builds upon)
 pywal, but for Emacs. It allows you to set the theme of Emacs based on the
 colors of your wallpaper. (Or other pictures).
 
 #+begin_src elisp :tangle packages.el
 (package! ewal)
+(package! ewal-doom-themes)
 #+end_src
 
 #+begin_src elisp
 (use-package ewal
   :init (setq ewal-use-built-in-always-p nil
-              ewal-use-built-in-on-failure-p t
+              ewal-use-built-in-on-failure-p nil
               ewal-built-in-palette "sexy-material"))
 #+end_src
 
@@ -1154,7 +1159,7 @@ In a stark difference to the other solutions, which wants to adjust Emacs to the
 rest of the world, Theme Magic (https://github.com/jcaw/theme-magic), which uses
 PyWal (again!) to adjust every color it can to match your glorious editor.
 
-#+begin_src elisp :tangle packages.
+#+begin_src elisp :tangle packages.el
 (package! theme-magic)
 #+end_src
 *** Autothemer
@@ -1168,27 +1173,7 @@ generating color schemes, although it is more flexible than ewal or pywal.
 #+end_src
 
 ** Modeline
-*** Nano Modeline
-
-#+begin_src elisp :tangle packages.el
-;; (package! nano-modeline)
-#+end_src
-
-Let the nano-modeline look like the nano theme
-
-#+begin_src elisp
-;; (setq nano-modeline-theme 'nano-modeline-theme-nano)
-
-#+end_src
-
-#+begin_src elisp
-;; (use-package! nano-modeline
-;;   :config
-;;   (nano-modeline-mode 1))
-#+end_src
-
 *** Doom Modeline
-
 Allow for more characters in the branch name
 
 #+begin_src elisp
@@ -1199,7 +1184,12 @@ Allow for more characters in the branch name
 (setq doom-modeline-hud t)
 #+end_src
 
-# ** Dashboard
+** Dashboard
+
+I prefer something more simpler - also the dashboard can display SVGs:
+#+begin_src elisp
+(setq fancy-splash-image (concat doom-private-dir "splash-logos/emacs-logo-cutout.svg"))
+#+end_src
 # I don't really have much use for the Doom dashboard, so I'm replacing it with
 # the package [[https://github.com/emacs-dashboard/emacs-dashboard][Emacs Dashboard]].
 

@@ -41,8 +41,13 @@ in
         (setq copilot-node-executable "${pkgs.nodejs-16_x}/bin/node")
       '';
     };
-
-    home.packages = with pkgs; [
+    programs.emacs.enable = true;
+    programs.emacs.extraConfig = ''
+      (setenv "LSP_USE_PLISTS" "true")
+      (setq lsp-use-plists t)
+    '';
+    programs.emacs.package = pkgs.my.emacsGitXw;
+    programs.emacs.extraPackages = self: with pkgs; [
       # emacsWithNativeComp
 
       fd # for projectile
@@ -96,7 +101,7 @@ in
 
       # Fonts
       emacs-all-the-icons-fonts
-    ] ++ (if cfg.useNix then [] else [ my.emacsGitXwWrapped ] );
+    ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
 

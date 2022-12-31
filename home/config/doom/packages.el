@@ -45,10 +45,11 @@
 (package! tao-theme)
 
 (package! ewal)
+(package! ewal-doom-themes)
+
+(package! theme-magic)
 
 (package! autothemer)
-
-;; (package! nano-modeline)
 
 ;; (package! which-key-posframe)
 
