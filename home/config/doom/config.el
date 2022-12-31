@@ -470,23 +470,19 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (setq doom-theme 'doom-nord-aurora)
 
-(add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
-(setq doom-themes-treemacs-theme "doom-atom")
+;; (add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
+;; (setq doom-themes-treemacs-theme "doom-atom")
 
 (use-package ewal
   :init (setq ewal-use-built-in-always-p nil
-              ewal-use-built-in-on-failure-p t
+              ewal-use-built-in-on-failure-p nil
               ewal-built-in-palette "sexy-material"))
-
-;; (setq nano-modeline-theme 'nano-modeline-theme-nano)
-
-;; (use-package! nano-modeline
-;;   :config
-;;   (nano-modeline-mode 1))
 
 (setq doom-modeline-vcs-max-length 50)
 
 (setq doom-modeline-hud t)
+
+(setq fancy-splash-image (concat doom-private-dir "splash-logos/emacs-logo-cutout.svg"))
 
 ;; (defun wjb/posframe-arghandler (buffer-or-name arg-name value)
 ;;   (let ((info '(:internal-border-width 2 :width 500 :height 48)))

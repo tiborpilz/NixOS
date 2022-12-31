@@ -24,6 +24,13 @@ in {
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
+
+  # Regardlass of whether I'm using Bash (I'm not),
+  # I need an up-to-date binary for nix-shell and some other settings in ".profile" that
+  # are only there when `bash` is enabled.
+
+  programs.bash.enable = true;
+
   programs.man.enable = true;
 
   modules.shell.zsh.enable = true;
