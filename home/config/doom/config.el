@@ -15,10 +15,12 @@
 (defun scale-font (size)
   (round (* size font-scale-factor)))
 
-(setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14))
-      doom-variable-pitch-font (font-spec :family "sans" :size (scale-font 12))
-      doom-big-font (font-spec :family  "sans" :size (scale-font 16))
-      doom-serif-font (font-spec :family "FreeSerif" :weight 'light :size (scale-font 14)))
+(setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14)))
+
+;; (setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14))
+;;       doom-variable-pitch-font (font-spec :family "sans" :size (scale-font 12))
+;;       doom-big-font (font-spec :family  "sans" :size (scale-font 16))
+;;       doom-serif-font (font-spec :family "FreeSerif" :weight 'light :size (scale-font 14)))
 
 (let* ((variable-tuple '(:font "ETBembo"))
        (headline `(:inherit default :weight bold)))

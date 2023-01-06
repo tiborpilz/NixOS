@@ -29,6 +29,7 @@ running this config, and adjust certain settings accordingly.
 ** Font selection
 Instead of setting the fonts twice, I'll define a scaling factor depending on
 the macine I'm running on, and then use that to set the font size.
+
 #+begin_src elisp
 (setq font-scale-factor (if (is-workstation) 1.3 1.0))
 
@@ -39,10 +40,12 @@ the macine I'm running on, and then use that to set the font size.
 I'm a big fan of ligatures, and I've been using FiraCode for as long as I can remember.
 
 #+begin_src elisp
-(setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14))
-      doom-variable-pitch-font (font-spec :family "sans" :size (scale-font 12))
-      doom-big-font (font-spec :family  "sans" :size (scale-font 16))
-      doom-serif-font (font-spec :family "FreeSerif" :weight 'light :size (scale-font 14)))
+(setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14)))
+
+;; (setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14))
+;;       doom-variable-pitch-font (font-spec :family "sans" :size (scale-font 12))
+;;       doom-big-font (font-spec :family  "sans" :size (scale-font 16))
+;;       doom-serif-font (font-spec :family "FreeSerif" :weight 'light :size (scale-font 14)))
 #+end_src
 
 Adjust org-mode headlines.
