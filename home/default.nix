@@ -20,6 +20,13 @@ in {
 
     # Setuptools is missing from python
     python3Packages.setuptools
+
+    # bat is a better cat (as a program, at least)
+    bat
+
+    htop
+
+    pandoc
   ];
 
   # Let Home Manager install and manage itself.
@@ -37,7 +44,7 @@ in {
   modules.shell.zsh.aliases.ungron = "gron --ungron";
 
   modules.shell.tmux.enable = true;
-  modules.shell.gnupg.enable = true;
+  modules.shell.gnupg.enable = false;
   modules.shell.git.enable = true;
   modules.shell.direnv.enable = true;
 
@@ -49,10 +56,10 @@ in {
 
   modules.syncthing.enable = true;
 
-  modules.bitwarden.enable = true;
+  modules.bitwarden.enable = false;
   modules.password-store.enable = true;
 
-  modules.colorschemes.enable = true;
+  modules.colorschemes.enable = false;
 
   nix.settings = {
     build-users-group = "nixbld";

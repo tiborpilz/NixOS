@@ -46,7 +46,7 @@ in
       (setenv "LSP_USE_PLISTS" "true")
       (setq lsp-use-plists t)
     '';
-    programs.emacs.package = pkgs.my.emacsGitXw;
+    programs.emacs.package = pkgs.emacsGit;
     programs.emacs.extraPackages = self: with pkgs; [
       # emacsWithNativeComp
 
@@ -101,6 +101,9 @@ in
 
       # Fonts
       emacs-all-the-icons-fonts
+
+      # Markdown conversion and live preview
+      pandoc
     ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
