@@ -12,7 +12,7 @@
 
 (package! org-gcal)
 
-(package! jest-test-mode)
+(package! jest)
 
 (package! svelte-mode)
 

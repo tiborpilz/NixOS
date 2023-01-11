@@ -1,4 +1,4 @@
-{ inputs, pkgs, lib, ... }:
+{ inputs, pkgs, lib, config, ... }:
 
 with lib;
 with lib.my;
@@ -81,12 +81,18 @@ in {
     system-features = [ "big-parallel" "kvm" "recursive-nix" ];
   };
 
-  # Install MacOS applications to the user environment if the targetPlatform is Darwin
-  # home.file."Applications/home-manager".source = let
-  # apps = pkgs.buildEnv {
-  #   name = "home-manager-applications";
-  #   paths = config.home.packages;
-  #   pathsToLink = "/Applications";
-  # };
-  # in mkIf pkgs.stdenv.targetPlatform.isDarwin "${apps}/Applications";
+  # Copy Nix-installed MacOS applications to the home application folder, while resolving symlinks
+  # This is due to spotlight not resolving symlinks for some reason
+  # TODO: check if this will still work with a nix-managed doom config
+  home.activation.installApps = mkIf pkgs.stdenv.targetPlatform.isDarwin (lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    baseDir="$HOME/Applications/Home Manager Apps"
+    if [ -d "$baseDir" ]; then
+      rm -rf "$baseDir"
+    fi
+    mkdir -p "$baseDir"
+    for app in $(ls $HOME/.nix-profile/Applications); do
+      cp -fHRL "$HOME/.nix-profile/Applications/$app" "$baseDir"
+      chmod -R +w "$baseDir/$app"
+    done
+  '');
 }

@@ -116,6 +116,7 @@ improvements for org-mode.
 (package! org-modern)
 #+end_src
 
+
 Use it globally and tweak it some more.
 #+begin_src elisp
 (modify-all-frames-parameters
@@ -127,6 +128,12 @@ Use it globally and tweak it some more.
   (face-spec-reset-face face)
   (set-face-foreground face (face-attribute 'default :background)))
 (set-face-background 'fringe (face-attribute 'default :background))
+
+(use-package! org-modern
+  :after org
+  :custom
+  (org-modern-star '("◉" "○" "◈" "◇" "•"))
+  (org-modern-timestamp '(" %d.%m.%Y " . " %H:%M ")))
 
 (setq
  ;; Edit settings
@@ -153,9 +160,6 @@ Use it globally and tweak it some more.
 
 (global-org-modern-mode)
 #+end_src
-
-#+RESULTS:
-: t
 
 *** Vastly improve the tree's display
 #+begin_src elisp
@@ -489,19 +493,16 @@ no modeline.
 ** Language-Specific Settings
 *** Web Dev (JS/TS/CSS)
 **** Testing
-***** Jest Test Mode
-Jest-Test-Mode.el is a minor mode for running jest via npx.
-
+***** Jest.el
 #+begin_src elisp :tangle packages.el
-(package! jest-test-mode)
+(package! jest)
 #+end_src
 
 #+begin_src elisp
-(use-package! jest-test-mode
-  :commands jest-test-mode
-  :hook (typescript-mode js-mode typescript-tsx-mode))
+(use-package! jest
+  :after (typescript-mode js-mode typescript-tsx-mode)
+  :hook (typescript-mode . jest-minor-mode))
 #+end_src
-
 **** Svelte
 #+begin_src elisp :tangle packages.el
 (package! svelte-mode)
