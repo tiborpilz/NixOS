@@ -63,6 +63,12 @@
   (set-face-foreground face (face-attribute 'default :background)))
 (set-face-background 'fringe (face-attribute 'default :background))
 
+(use-package! org-modern
+  :after org
+  :custom
+  (org-modern-star '("◉" "○" "◈" "◇" "•"))
+  (org-modern-timestamp '(" %d.%m.%Y " . " %H:%M ")))
+
 (setq
  ;; Edit settings
  org-auto-align-tags nil
@@ -267,9 +273,9 @@
 
 ;; (setq projectile-project-search-path '(("~/Code/" . 2)))
 
-(use-package! jest-test-mode
-  :commands jest-test-mode
-  :hook (typescript-mode js-mode typescript-tsx-mode))
+(use-package! jest
+  :after (typescript-mode js-mode typescript-tsx-mode)
+  :hook (typescript-mode . jest-minor-mode))
 
 (use-package! svelte-mode
     :mode "\\.svelte\\'")
