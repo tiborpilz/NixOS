@@ -26,7 +26,7 @@ in
         { name = "packages.el"; path = "${filteredPath}/packages.el"; }
         { name = "config.el"; path = pkgs.emptyFile; }
       ];
-      emacsPackage = pkgs.my.emacsGitXwWrapped;
+      emacsPackage = pkgs.my.emacsGitWrapped;
 
       emacsPackagesOverlay = self: super: {
         copilot = pkgs.my.copilot;
@@ -41,12 +41,12 @@ in
         (setq copilot-node-executable "${pkgs.nodejs-16_x}/bin/node")
       '';
     };
-    programs.emacs.enable = true;
-    programs.emacs.extraConfig = ''
-      (setenv "LSP_USE_PLISTS" "true")
-      (setq lsp-use-plists t)
-    '';
-    programs.emacs.package = pkgs.emacsGit;
+    # programs.emacs.enable = true;
+    # programs.emacs.extraConfig = ''
+    #   (setenv "LSP_USE_PLISTS" "true")
+    #   (setq lsp-use-plists t)
+    # '';
+    # programs.emacs.package = pkgs.my.emacsGitWrapped;
     programs.emacs.extraPackages = self: with pkgs; [
       # emacsWithNativeComp
 
@@ -105,6 +105,7 @@ in
       # Markdown conversion and live preview
       pandoc
     ];
+    home.packages = [ pkgs.my.emacsGitWrapped ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
 
