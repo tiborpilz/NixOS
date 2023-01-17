@@ -5,6 +5,7 @@ let
   cfg = config.modules.shell.zsh;
   mylib = import ../../../lib { inherit inputs lib pkgs; };
   configDir = ../../config;
+  envVars = config.home.sessionVariables;
 in
 {
   options.modules.shell.zsh = with types; {
@@ -56,10 +57,11 @@ in
       coreutils
     ];
 
-    home.sessionVariables.ZDOTDIR = "$XDG_CONFIG_HOME/zsh";
-    home.sessionVariables.ZSH_CACHE_DIR = "$XDG_CACHE_HOME/zsh";
+    home.sessionVariables.ZDOTDIR = "${envVars.XDG_CONFIG_HOME}/zsh";
+    home.sessionVariables.ZSH_CACHE_DIR = "${envVars.XDG_CACHE_HOME}/zsh";
+    home.sessionVariables.NVM_DIR = "${envVars.XDG_CONFIG_HOME}/nvm";
 
-    home.sessionPath = [ "$XDG_CONFIG_HOME/.krew/bin" ];
+    # home.sessionPath = [ "${home.sessionVariables.XDG_CONFIG_HOME}/.krew/bin" ];
 
     modules.shell.zsh.rcInit = ''
       source ${pkgs.nix-zsh-completions}/share/zsh/plugins/nix/nix-zsh-completions.plugin.zsh

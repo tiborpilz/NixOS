@@ -11,12 +11,32 @@ let
     postFixup = (old.postFixup or "") + "wrapProgram $out/bin/emacs --set ${key} ${value}";
   }));
 
-  wrap = with pkgs; emacsPkg: (symlinkJoin {
+  emacsScript = emacsPkg: pkgs.writeShellScriptBin "emacs" ''
+    #!/usr/bin/env bash
+    . $HOME/.profile
+    exec ${emacsPkg}/bin/emacs "$@"
+  '';
+
+  wrap = with pkgs; emacsPkg:
+  let
+    emacsScriptPath = emacsScript emacsPkg;
+  in
+    (symlinkJoin {
     name = "emacs";
-    paths = [ emacsPkg ];
+    paths = [ emacsScriptPath emacsPkg ];
     nativeBuildInputs = [ makeBinaryWrapper ];
+    meta = {
+      platforms = emacsPkg.meta.platforms;
+    };
     postBuild = ''
-      wrapProgram $out/bin/emacs --set LSP_USE_PLISTS true --set WEBKIT_DISABLE_COMPOSITING_MODE 1
+      rm $out/Applications/Emacs.app/Contents/MacOS/Emacs
+      cp $out/bin/emacs $out/Applications/Emacs.app/Contents/MacOS/Emacs
+      echo "\$out ###"
+      cat $out/bin/emacs
+      echo "emacsScriptPath ###"
+      cat ${emacsScriptPath.outPath}/bin/emacs
+      # cp $out/bin/emacs $out/Applications/Emacs.app/Contents/MacOS/Emacs
+      wrapProgram $out/Applications/Emacs.app/Contents/MacOS/Emacs --set LSP_USE_PLISTS true --set WEBKIT_DISABLE_COMPOSITING_MODE 1
     '';
   });
 
@@ -34,4 +54,5 @@ rec {
   emacs27XwWrapped = (wrap emacs27Xw);
   emacsGitXw = (add-feature-flags pkgs.emacsGit);
   emacsGitXwWrapped = (wrap emacsGitXw);
+  emacsGitWrapped = (wrap pkgs.emacsGit);
 } // emacsPackages.packages
