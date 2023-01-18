@@ -5,6 +5,10 @@ let
     nativeComp = true;
     withXwidgets = true;
     withGTK3 = true;
+  }).overrideAttrs (old: {
+    configureFlags = old.configureFlags ++ [
+      "--with-no-title-bars"
+    ];
   });
 
   add-env = emacs: key: value: (emacs.overrideAttrs (old: {
@@ -12,8 +16,14 @@ let
   }));
 
   emacsScript = emacsPkg: pkgs.writeShellScriptBin "emacs" ''
-    #!/usr/bin/env bash
+    # get nix vars
+    if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+      . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+    fi
+
+    # get user vars
     . $HOME/.profile
+
     exec ${emacsPkg}/bin/emacs "$@"
   '';
 
