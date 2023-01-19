@@ -14,6 +14,9 @@ let
   emacsScript = emacsPkg: pkgs.writeShellScriptBin "emacs" ''
     #!/usr/bin/env bash
     . $HOME/.profile
+    export LSP_USE_PLISTS true
+    export WEBKIT_DISABLE_COMPOSITING_MODE true
+
     exec ${emacsPkg}/bin/emacs "$@"
   '';
 
@@ -29,20 +32,20 @@ let
       platforms = emacsPkg.meta.platforms;
     };
     postBuild = ''
-      rm $out/Applications/Emacs.app/Contents/MacOS/Emacs
-      cp $out/bin/emacs $out/Applications/Emacs.app/Contents/MacOS/Emacs
-      echo "\$out ###"
-      cat $out/bin/emacs
-      echo "emacsScriptPath ###"
-      cat ${emacsScriptPath.outPath}/bin/emacs
-      # cp $out/bin/emacs $out/Applications/Emacs.app/Contents/MacOS/Emacs
-      wrapProgram $out/Applications/Emacs.app/Contents/MacOS/Emacs --set LSP_USE_PLISTS true --set WEBKIT_DISABLE_COMPOSITING_MODE 1
+      if [ -d $out/Applications ]; then
+        rm $out/Applications/Emacs.app/Contents/MacOS/Emacs
+        wrapProgram $out/bin/emacs --set LSP_USE_PLISTS true --set WEBKIT_DISABLE_COMPOSITING_MODE 1
+        cp $out/bin/emacs $out/Applications/Emacs.app/Contents/MacOS/Emacs
+      else
+        wrapProgram $out/bin/emacs --set LSP_USE_PLISTS true --set WEBKIT_DISABLE_COMPOSITING_MODE 1
+      fi
     '';
   });
 
   patch-nul-char-bug = let
     json-nul-char-patch = (pkgs.fetchpatch {
-      url = "https://github.com/emacs-mirror/emacs/commit/8b52d9f5f177ce76b9ebecadd70c6dbbf07a20c6.patch";
+
+    url = "https://github.com/emacs-mirror/emacs/commit/8b52d9f5f177ce76b9ebecadd70c6dbbf07a20c6.patch";
       hash = "sha256-/W9yateE9UZ9a8CUjavQw0X7TgxigYzBuOvtAXdEsSA=";
     });
     in emacs: emacs.overrideAttrs (old: { patches = old.patches or [] ++ [ json-nul-char-patch ]; });
