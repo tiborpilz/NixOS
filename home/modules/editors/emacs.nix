@@ -41,13 +41,14 @@ in
         (setq copilot-node-executable "${pkgs.nodejs-16_x}/bin/node")
       '';
     };
-    # programs.emacs.enable = true;
-    # programs.emacs.extraConfig = ''
-    #   (setenv "LSP_USE_PLISTS" "true")
-    #   (setq lsp-use-plists t)
-    # '';
-    # programs.emacs.package = pkgs.my.emacsGitWrapped;
-    programs.emacs.extraPackages = self: with pkgs; [
+    programs.emacs.enable = true;
+    programs.emacs.extraConfig = ''
+      (setenv "LSP_USE_PLISTS" "true")
+      (setq lsp-use-plists t)
+    '';
+
+    programs.emacs.package = pkgs.my.emacsGitWrapped;
+    home.packages = with pkgs; [
       # emacsWithNativeComp
 
       fd # for projectile
@@ -105,7 +106,6 @@ in
       # Markdown conversion and live preview
       pandoc
     ];
-    home.packages = [ pkgs.my.emacsGitWrapped ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
 

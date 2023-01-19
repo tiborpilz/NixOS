@@ -28,7 +28,7 @@ in
     '';
   };
 
-  config = mkIf cfg.enable {
+  config = mkIf cfg.enable rec {
     # TODO    home.xdg.configFile."zsh/.zshrc".text = #
     programs.zsh = {
       enable = true;
@@ -90,5 +90,14 @@ in
        ${cfg.envInit}
     '';
 
+    # Picks up all files in all `home.packages` that contain '#compdef' and puts them into one completion directory.
+    # xdg.configFile."zsh/vendor-completions".source = with pkgs;
+    #   runCommandNoCC "vendored-zsh-completions" {} ''
+    #     mkdir -p $out
+    #     ${fd}/bin/fd -t f '^_[^.]+$' \
+    #       ${lib.escapeShellArgs home.packages} \
+    #       --exec ${ripgrep}/bin/rg -0l '^#compdef' {} \
+    #       | xargs -0 cp -n -t $out/
+    #   '';
   };
 }

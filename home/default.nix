@@ -61,6 +61,9 @@ in {
 
   modules.colorschemes.enable = false;
 
+  modules.darwin.yabai.enable = pkgs.stdenv.targetPlatform.isDarwin;
+  modules.tools.container.enable = true;
+
   nix.settings = {
     build-users-group = "nixbld";
     experimental-features = [ "nix-command flakes" ];
