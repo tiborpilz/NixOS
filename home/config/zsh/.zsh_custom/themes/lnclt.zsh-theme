@@ -26,6 +26,7 @@ function nix_shell_prompt() {
 }
 
 PROMPT=' $(nix_shell_prompt)$ret_status %{$fg[white]%}$(get_pwd) $(git_prompt_info)%{$reset_color%}%{$reset_color%} '
+RPS1=''
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[white]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"

@@ -26,7 +26,6 @@ in
         _module.args.inputs = inputs;
         _module.args.lib.my = lib.my;
         imports = [ ../../home ];
-        home.packages = [ pkgs.direnv ];
         # home.file = mkAliasDefinitions options.home.file;
         # xdg.configFile = mkAliasDefinitions options.home.configFile;
       }
