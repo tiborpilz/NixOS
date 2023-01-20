@@ -108,8 +108,6 @@ with lib;
     system.stateVersion = "22.11";
     nixpkgs.config.allowUnfree = true;
 
-    home.enable = true;
-
     services.avahi = {
       enable = true;
       publish = {
@@ -137,6 +135,8 @@ with lib;
 
     # Seems like a bug in systemd, more info: https://github.com/NixOS/nixpkgs/issues/180175#issuecomment-1273827251
     systemd.services.NetworkManager-wait-online.enable = false;
+
+    home.enable = true;
 
     modules.services.reverseProxy = {
       enable = true;
