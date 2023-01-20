@@ -40,6 +40,13 @@
 
 (setq tab-width 2)
 
+(use-package! exec-path-from-shell
+  :ensure t
+  :if (memq window-system '(mac ns x))
+  :config
+  (setq exec-path-from-shell-variables '("PATH" "NVM_PATH" "NVM_BIN"))
+  (exec-path-from-shell-initialize))
+
 (setq org-directory "~/org/")
 (setq org-agenda-files (list org-directory))
 
