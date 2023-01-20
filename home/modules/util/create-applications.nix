@@ -1,8 +1,6 @@
 { config, lib, pkgs, ... }:
 with lib;
 {
-  home.file."Applications/Home Manager Apps" = {};
-
   home.activation = mkIf pkgs.stdenv.isDarwin {
     copyApplications = let
       apps = pkgs.buildEnv {
