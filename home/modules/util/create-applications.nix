@@ -1,6 +1,7 @@
 { config, lib, pkgs, ... }:
 with lib;
 {
+  home.file."Applications/Home Manager Apps" = {};
 
   home.activation = mkIf pkgs.stdenv.isDarwin {
     copyApplications = let
@@ -10,14 +11,14 @@ with lib;
         pathsToLink = "/Applications";
       };
     in lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      baseDir="$HOME/Applications/Home Manager Apps"
-      if [ -d "$baseDir" ]; then
-        rm -rf "$baseDir"
+      base_dir="$HOME/Applications/hm-apps"
+      if [ -d "$base_dir" ]; then
+        rm -rf "$base_dir"
       fi
-      mkdir -p "$baseDir"
-      for appFile in ${apps}/Applications/*; do
-        target="$baseDir/$(basename "$appFile")"
-        $DRY_RUN_CMD cp ''${VERBOSE_ARG:+-v} -fHRL "$appFile" "$baseDir"
+      mkdir -p "$base_dir"
+      for app_file in ${apps}/Applications/*; do
+        target="$base_dir/$(basename "$app_file")"
+        $DRY_RUN_CMD cp ''${VERBOSE_ARG:+-v} -fHRL "$app_file" "$base_dir"
         $DRY_RUN_CMD chmod ''${VERBOSE_ARG:+-v} -R +w "$target"
       done
     '';

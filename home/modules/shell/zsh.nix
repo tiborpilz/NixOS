@@ -32,7 +32,6 @@ in
     # TODO    home.xdg.configFile."zsh/.zshrc".text = #
     programs.zsh = {
       enable = true;
-      enableCompletion = true;
     };
 
     # targets.genericLinux.enable = true;

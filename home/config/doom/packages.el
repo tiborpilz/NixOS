@@ -2,6 +2,8 @@
 
 (package! editorconfig)
 
+(package! exec-path-from-shell)
+
 (package! org-modern)
 
 (package! org-present)
