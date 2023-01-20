@@ -87,15 +87,4 @@ in
   # Copy Nix-installed MacOS applications to the home application folder, while resolving symlinks
   # This is due to spotlight not resolving symlinks for some reason
   # TODO: check if this will still work with a nix-managed doom config
-  home.activation.installApps = mkIf pkgs.stdenv.targetPlatform.isDarwin (lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    baseDir="$HOME/Applications/hm-apps"
-    if [ -d "$baseDir" ]; then
-      rm -rf "$baseDir"
-    fi
-    mkdir -p "$baseDir"
-    for app in $(ls $HOME/.nix-profile/Applications); do
-      cp -fHRL "$HOME/.nix-profile/Applications/$app" "$baseDir"
-      chmod -R +w "$baseDir/$app"
-    done
-  '');
 }
