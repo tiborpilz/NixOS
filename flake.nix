@@ -47,7 +47,7 @@
     , ...
     } @ inputs:
     let
-      supportedSystems = [ "x86_64-linux" "x86_64-darwin" ];
+      supportedSystems = [ "x86_64-darwin" ];
       lib = nixpkgs.lib.extend
         (self: super: {
           my = import ./lib { inherit inputs; lib = self; pkgs = nixpkgs; };
@@ -57,8 +57,15 @@
 
       pkgs = self.pkgs.x86_64-linux.nixpkgs;
 
-      nixosHosts = mapModules ./hosts/nixos (hostPath: lib.my.mkHostAttrs hostPath { system = "x86_64-linux"; });
-      darwinHosts = mapModules ./hosts/darwin (hostPath: lib.my.mkHostAttrs hostPath { system = "x86_64-darwin"; });
+      nixosHosts = mapModules ./hosts/nixos (hostPath: lib.my.mkHostAttrs hostPath {
+        system = "x86_64-linux";
+        # modules = lib.my.mapModulesRec' (toString ./modules/nixos) import;
+      });
+
+      darwinHosts = mapModules ./hosts/darwin (hostPath: lib.my.mkHostAttrs hostPath {
+        system = "x86_64-darwin";
+        modules = lib.my.mapModulesRec' (toString ./modules/darwin) import;
+      });
     in
     flake-utils-plus.lib.mkFlake rec {
       inherit lib self inputs supportedSystems;
@@ -69,11 +76,10 @@
       hostDefaults = {
         channelName = "nixpkgs";
         modules = [
-          digga.nixosModules.bootstrapIso
-          digga.nixosModules.nixConfig
+          # digga.nixosModules.bootstrapIso
+          # digga.nixosModules.nixConfig
           home-manager.nixosModules.home-manager
-        # ] ++ lib.my.mapModulesRec' (toString ./modules) import;
-        ];
+        ] ++ lib.my.mapModulesRec' (toString ./modules/shared) import;
       };
 
       sharedOverlays = [
@@ -89,7 +95,8 @@
         inputs.emacs-overlay.overlay
       ];
 
-      hosts = nixosHosts // darwinHosts;
+      # hosts = nixosHosts // darwinHosts;
+      hosts = darwinHosts;
 
       outputsBuilder = channels: rec {
         inherit channels;

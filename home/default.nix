@@ -1,10 +1,11 @@
 { inputs, pkgs, lib, config, ... }:
 
 with lib;
-with lib.my;
 
 let mylib = import ../lib { inherit inputs lib pkgs; };
-in {
+in 
+  with mylib;
+  {
   imports = mylib.mapModulesRec' (toString ./modules) import;
 
   home.stateVersion = "22.11";
@@ -61,7 +62,6 @@ in {
 
   modules.colorschemes.enable = false;
 
-  modules.darwin.yabai.enable = pkgs.stdenv.targetPlatform.isDarwin;
   modules.tools.container.enable = true;
 
   nix.settings = {
