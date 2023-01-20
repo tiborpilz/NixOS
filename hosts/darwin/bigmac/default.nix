@@ -12,7 +12,20 @@ with lib;
   config = {
     homebrew.enable = true;
 
-    homebrew.casks = [ "flutter" ];
+    homebrew.taps = [
+      "felixkratz/formulae" #sketchybar
+      "koekeishiya/formulae" #yabai/skhd
+    ];
+
+    homebrew.casks = [
+      "flutter"
+      "lima" # docker-desktop / vm alternative
+      "podman" # docker alternative
+      "ddcctl" # brightness control
+      "sketchybar"
+      "yabai"
+      "skhd"
+    ];
 
     services.nix-daemon.enable = true;
     services.karabiner-elements.enable = true;
