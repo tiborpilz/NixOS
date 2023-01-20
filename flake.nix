@@ -95,8 +95,7 @@
         inputs.emacs-overlay.overlay
       ];
 
-      # hosts = nixosHosts // darwinHosts;
-      hosts = darwinHosts;
+      hosts = nixosHosts // darwinHosts;
 
       outputsBuilder = channels: rec {
         inherit channels;
