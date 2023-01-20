@@ -25,16 +25,16 @@ in
       {
         _module.args.inputs = inputs;
         _module.args.lib = lib;
-        imports = [ ../home ];
+        imports = [ ../../home ];
         home.file = mkAliasDefinitions options.home.file;
         xdg.configFile = mkAliasDefinitions options.home.configFile;
       }
     ];
 
 
-    systemd.services.home-manager-tibor = {
-      # Need to wait for network since home-manager will get stuff from git
-      after = [ "network-online.target" ];
-    };
+    # systemd.services.home-manager-tibor = {
+    #   # Need to wait for network since home-manager will get stuff from git
+    #   after = [ "network-online.target" ];
+    # };
   };
 }

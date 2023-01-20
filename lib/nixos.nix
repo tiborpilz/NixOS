@@ -4,7 +4,7 @@ with lib;
 with lib.my;
 let sys = "x86_64-linux";
 in {
-  mkHostAttrs = path: attrs @ { system ? sys, ... }:
+  mkHostAttrs = path: attrs @ { system ? sys, modules ? [], ... }:
     let isDarwin = system == "x86_64-darwin";
     in {
       inherit system;
@@ -15,10 +15,10 @@ in {
         {
           networking.hostName = mkDefault (removeSuffix ".nix" (baseNameOf path));
         }
-        (filterAttrs (n: v: !elem n [ "system" ]) attrs)
+        (filterAttrs (n: v: !elem n [ "system" "modules" ]) attrs)
         ../. # /default.nix
         (import path)
-      ];
+      ] ++ modules;
     };
 
   mkHomeAliases = name: nixosConfigurations: homeConfigurations:
