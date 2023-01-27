@@ -19,12 +19,17 @@ with lib;
 
     homebrew.casks = [
       "flutter"
+      "podman-desktop"
+      "android-sdk"
+    ];
+
+    homebrew.brews = [
       "lima" # docker-desktop / vm alternative
       "podman" # docker alternative
-      "ddcctl" # brightness control
       "sketchybar"
       "yabai"
       "skhd"
+      "ddcctl" # brightness control
     ];
 
     services.nix-daemon.enable = true;
