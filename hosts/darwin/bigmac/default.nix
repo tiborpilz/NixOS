@@ -21,6 +21,7 @@ with lib;
       "flutter"
       "podman-desktop"
       "android-sdk"
+      "cool-retro-term"
     ];
 
     homebrew.brews = [
