@@ -125,9 +125,11 @@ Only initialize when running in a GUI frame on macos and linux.
 #+end_src
 
 ** Visual improvements
-*** Org-Modern
+*** TODO Org-Modern
 Org-modern (https://github.com/minad/org-modern) contains a lot of nice visual
 improvements for org-mode.
+
+(I Need to adjust the style to fit into my theme)
 
 #+begin_src elisp :tangle packages.el
 (package! org-modern)
@@ -135,7 +137,7 @@ improvements for org-mode.
 
 
 Use it globally and tweak it some more.
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (modify-all-frames-parameters
  '((right-divider-width . 10)
    (internal-border-width . 10)))
@@ -573,6 +575,7 @@ Set typescript file indentation to be 2 levels by default.
 (setq typescript-indent-level 2)
 #+end_src
 
+**** TODO Typescript REPL
 *** Nix
 **** nix-mode.el
 [[https://github.com/NixOS/nix-mode][Nix-mode]] is a major mode for editing nix expressions. It comes with a variaty of submodules

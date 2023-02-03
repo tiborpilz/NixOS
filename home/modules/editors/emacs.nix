@@ -105,6 +105,10 @@ in
 
       # Markdown conversion and live preview
       pandoc
+
+      # Typescript repl / execution
+      nodePackages.ts-node
+      nodePackages.typescript
     ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];

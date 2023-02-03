@@ -54,6 +54,7 @@ in
       krew
       nodejs
       coreutils
+      thefuck
     ];
 
     home.sessionVariables.ZDOTDIR = "${envVars.XDG_CONFIG_HOME}/zsh";

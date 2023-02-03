@@ -19,4 +19,5 @@
  '(org-level-5 ((t (:inherit default :weight bold :font "ETBembo"))))
  '(org-level-6 ((t (:inherit default :weight bold :font "ETBembo"))))
  '(org-level-7 ((t (:inherit default :weight bold :font "ETBembo"))))
- '(org-level-8 ((t (:inherit default :weight bold :font "ETBembo")))))
+ '(org-level-8 ((t (:inherit default :weight bold :font "ETBembo"))))
+ '(variable-pitch ((t (:weight ultra-light :family "Sans Serif")))))
