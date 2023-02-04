@@ -49,6 +49,8 @@ in
   modules.shell.git.enable = true;
   modules.shell.direnv.enable = true;
 
+  programs.alacritty.enable = true;
+
   modules.editors.neovim.enable = true;
   modules.editors.emacs.enable = true;
   modules.editors.emacs.useNix = false;
