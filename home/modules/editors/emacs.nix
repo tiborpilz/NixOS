@@ -3,6 +3,7 @@ with lib;
 let
   cfg = config.modules.editors.emacs;
   mylib = import ../../../lib { inherit inputs lib pkgs; };
+  emacsPackage = pkgs.my.emacsGitXwWrapped;
 in
 {
   options.modules.editors.emacs = {
@@ -12,6 +13,7 @@ in
 
   config = mkIf cfg.enable {
     programs.doom-emacs = mkIf cfg.useNix rec {
+      inherit emacsPackage;
       enable = true;
       doomPrivateDir = ../../config/doom;
       doomPackageDir = let
@@ -26,7 +28,6 @@ in
         { name = "packages.el"; path = "${filteredPath}/packages.el"; }
         { name = "config.el"; path = pkgs.emptyFile; }
       ];
-      emacsPackage = pkgs.my.emacsGitWrapped;
 
       emacsPackagesOverlay = self: super: {
         copilot = pkgs.my.copilot;
@@ -41,12 +42,12 @@ in
         (setq copilot-node-executable "${pkgs.nodejs-16_x}/bin/node")
       '';
     };
-    # programs.emacs.enable = true;
-    # programs.emacs.extraConfig = ''
-    #   (setenv "LSP_USE_PLISTS" "true")
-    #   (setq lsp-use-plists t)
-    # '';
-    # programs.emacs.package = pkgs.my.emacsGitWrapped;
+    programs.emacs.enable = true;
+    programs.emacs.extraConfig = ''
+      (setenv "LSP_USE_PLISTS" "true")
+      (setq lsp-use-plists t)
+    '';
+    programs.emacs.package = emacsPackage;
     programs.emacs.extraPackages = self: with pkgs; [
       # emacsWithNativeComp
 
