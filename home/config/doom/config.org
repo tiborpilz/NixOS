@@ -130,15 +130,27 @@ Enabling =mixed-pitch-mode= will make the text in org-mode look more like a
 book, with the headings in a larger font, and the body text in a smaller font.
 This is a great way to make your more readable, and it also helps with focus on
 the content, instead of the formatting.
-
 In addition, I'm changing the way headlines look, with top-level headlines
 actually having a larger font - I'm also removing the color from the headlines,
 since in this mode, the distinction between the different levels is already made by the font size.
 
 #+begin_src elisp
 (defun org-mode-mixed-pitch-hook ()
-  (when mixed-pitch-mode
-    (let* ((variable-tuple '(:font "sans"))
+  (if mixed-pitch-mode
+      (let* ((variable-tuple '(:font "sans"))
+             (headline `(:inherit default)))
+        (custom-theme-set-faces
+         'user
+         `(org-level-8 ((t (,@headline ,@variable-tuple))))
+         `(org-level-7 ((t (,@headline ,@variable-tuple))))
+         `(org-level-6 ((t (,@headline ,@variable-tuple))))
+         `(org-level-5 ((t (,@headline ,@variable-tuple))))
+         `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1 :weight bold))))
+         `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.2 :weight bold))))
+         `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.4 :weight bold))))
+         `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.6 :weight bold))))
+         `(org-document-title ((t (,@headline ,@variable-tuple :height 1.8))))))
+    (let* ((variable-tuple '(:font "FiraCode Nerd Font" :height 1.0 :weight normal))
            (headline `(:inherit default)))
       (custom-theme-set-faces
        'user
@@ -146,14 +158,17 @@ since in this mode, the distinction between the different levels is already made
        `(org-level-7 ((t (,@headline ,@variable-tuple))))
        `(org-level-6 ((t (,@headline ,@variable-tuple))))
        `(org-level-5 ((t (,@headline ,@variable-tuple))))
-       `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1 :weight bold))))
-       `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.2 :weight bold))))
-       `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.4 :weight bold))))
-       `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.6 :weight bold))))
-       `(org-document-title ((t (,@headline ,@variable-tuple :height 1.8))))))))
+       `(org-level-4 ((t (,@headline ,@variable-tuple))))
+       `(org-level-3 ((t (,@headline ,@variable-tuple))))
+       `(org-level-2 ((t (,@headline ,@variable-tuple))))
+       `(org-level-1 ((t (,@headline ,@variable-tuple))))
+       `(org-document-title ((t (,@headline ,@variable-tuple))))))))
 
 (add-hook 'mixed-pitch-mode-hook #'org-mode-mixed-pitch-hook)
 #+end_src
+
+#+RESULTS:
+| +latex-fold-set-variable-pitch-h | solaire-mode-reset-buffer | org-mode-mixed-pitch-hook |
 
 To reset the faces to their original values, I'm using a hook that is run when ~mixed-pitch-mode~ is disabled.
 
@@ -351,13 +366,6 @@ loaded or in a different repo.
 (setq org-export-headline-levels 5)
 #+end_src
 
-*** Ignore tag
-Add `:ignore:` tag to headings, so only the headings will be ignored for an export
-#+begin_src elisp
-;(require 'ox-extra)
-;(ox-extras-activate '(ignore-headlines))
-#+end_src
-
 *** automatic latex rendering
 #+begin_code elisp :tangle packages.el
 ;; (package! org-fragtog)
@@ -382,16 +390,22 @@ Add `:ignore:` tag to headings, so only the headings will be ignored for an expo
 
 ** Extensions
 *** Roam
-**** Use the same directory as org
-#+begin_src elisp
+[[https://www.orgroam.com/][Org-Roam]] is an Emacs package that helps manage a
+collection of plain text notes that are linked together to form a knowledge
+graph. It provides features such as bidirectional linking, backlinks, graph
+visualization, and search. It is heavily inspired by
+[[https://roamresearch.com/][Roam Research]] and
+[[https://obsidian.md/][Obsidian]].
+
+I'm using a subdirectory of my org directory for org-roam files.
+#+begin_src emacs-lisp
 (setq org-roam-directory "~/org/roam")
 #+end_src
 
-**** Add Org-Roam UI
-Org-Roam UI is a web-based interface for Org-roam. It is a separate package -
-and it also needs the websocket package as dependency.
-
-The closest comparison to org-roam-ui is Obsidian.
+**** Org-Roam UI
+Although org-roam has a built-in graph visualization, compared to the
+alternatives like Obsidian, it is severely lacking. Org-Roam UI is a web-based
+interface for org-roam that approximates the graph visualization of Obsidian.
 
 #+begin_src elisp :tangle packages.el
 (package! org-roam-ui)
@@ -418,37 +432,50 @@ The closest comparison to org-roam-ui is Obsidian.
 (setq org-roam-ui-open-on-start t)
 #+end_src
 
+I'm using ~SPC-n-r-u~ to open org-roam-ui.
+
+#+begin_src emacs-lisp
+(map! :leader
+      (:prefix-map ("n" . "notes")
+                   (:prefix-map ("r" . "roam")
+                    :desc "Org-Roam UI" "u" #'org-roam-ui-open)))
+#+end_src
+
 **** Fixes
 ***** "global-git-commit-mode" Error
-:PROPERTIES:
-:ID:       49dcbd41-c690-4102-84cd-c7fb08894bc0
-:END:
 For some reason, inserting a roam node causes the following error:
 ~global-git-commit-mode: Symbol’s function definition is void:
-global-git-commit-mode~.
-- According [[https://github.com/doomemacs/doomemacs/issues/6425#issuecomment-1433245212][this Github issue]], pinning ~transient~ and ~with-editor~ can fix
-  this.
+global-git-commit-mode~. According [[https://github.com/doomemacs/doomemacs/issues/6425#issuecomment-1433245212][this Github issue]], pinning ~transient~ and ~with-editor~ can fix
+this.
 
-  #+begin_src elisp :tangle packages.el
+#+begin_src emacs-lisp :tangle packages.el
 (package! transient
-      :pin "c2bdf7e12c530eb85476d3aef317eb2941ab9440"
-      :recipe (:host github :repo "magit/transient"))
+  :pin "c2bdf7e12c530eb85476d3aef317eb2941ab9440"
+  :recipe (:host github :repo "magit/transient"))
 
 (package! with-editor
-          :pin "bbc60f68ac190f02da8a100b6fb67cf1c27c53ab"
-          :recipe (:host github :repo "magit/with-editor"))
-  #+end_src
-*** Google Calendar integration
-#+begin_src elisp :tangle packages.el
+  :pin "bbc60f68ac190f02da8a100b6fb67cf1c27c53ab"
+  :recipe (:host github :repo "magit/with-editor"))
+#+end_src
+
+*** TODO Google Calendar integration
+:PROPERTIES:
+:header-args: :tangle no
+:END:
+
+Via org-cal, I can sync my Google Calendar with my org agenda. Currently, it's
+disabled because I need to solve secrets management first.
+
+#+begin_src emacs-lisp :tangle packages.el
 (package! org-gcal)
 #+end_src
 
-#+begin_src elisp
-;; (use-package! org-gcal
-;;   :config
-;;   (setq org-gcal-client-id "CLIENT_ID"
-;;         org-gcal-client-secret "CLIENT_SECRET"
-;;         org-gcal-fetch-file-alit '(("tbrpilz@googlemail.com" . "~/org/schedule.org"))))
+#+begin_src emacs-lisp
+(use-package! org-gcal
+  :config
+  (setq org-gcal-client-id "CLIENT_ID"
+        org-gcal-client-secret "CLIENT_SECRET"
+        org-gcal-fetch-file-alit '(("tbrpilz@googlemail.com" . "~/org/schedule.org"))))
 #+end_src
 
 ** Fixes and miscellanious improvements
@@ -470,7 +497,7 @@ I'm adjusting the bindings just for ~org-mode~.
 (map! :map org-mode-map
       :localleader
       (:prefix-map ("B" . "babel")
-       (:desc "Insert structure template" "c" #'org-insert-structure-template)))
+                   (:desc "Insert structure template" "c" #'org-insert-structure-template)))
 #+end_src
 
 
@@ -539,30 +566,30 @@ For some reason, ~org-tempo~ does not start at launch, so I'm  loading it here.
 *** Improve org-capture dialog
 #+BEGIN_SRC elisp
 (after! org-capture
-    (defun org-capture-select-template-prettier (&optional keys)
+  (defun org-capture-select-template-prettier (&optional keys)
     "Select a capture template, in a prettier way than default
     Lisp programs can force the template by setting KEYS to a string."
     (let ((org-capture-templates
-            (or (org-contextualize-keys
+           (or (org-contextualize-keys
                 (org-capture-upgrade-templates org-capture-templates)
                 org-capture-templates-contexts)
-                '(("t" "Task" entry (file+headline "" "Tasks")
-                    "* TODO %?\n  %u\n  %a")))))
-        (if keys
-            (or (assoc keys org-capture-templates)
-                (error "No capture template referred to by \"%s\" keys" keys))
+               '(("t" "Task" entry (file+headline "" "Tasks")
+                  "* TODO %?\n  %u\n  %a")))))
+      (if keys
+          (or (assoc keys org-capture-templates)
+              (error "No capture template referred to by \"%s\" keys" keys))
         (org-mks org-capture-templates
-                "Select a capture template\n━━━━━━━━━━━━━━━━━━━━━━━━━"
-                "Template key: "
-                `(("q" ,(concat (all-the-icons-octicon "stop" :face 'all-the-icons-red :v-adjust 0.01) "\tAbort")))))))
-    (advice-add 'org-capture-select-template :override #'org-capture-select-template-prettier))
+                 "Select a capture template\n━━━━━━━━━━━━━━━━━━━━━━━━━"
+                 "Template key: "
+                 `(("q" ,(concat (all-the-icons-octicon "stop" :face 'all-the-icons-red :v-adjust 0.01) "\tAbort")))))))
+  (advice-add 'org-capture-select-template :override #'org-capture-select-template-prettier))
 #+END_SRC
 
 The org-capture bin is rather nice, but It would be even nicer with a smaller frame, and
 no modeline.
 #+BEGIN_SRC elisp
 (setf (alist-get 'height +org-capture-frame-parameters) 15)
-      ;; (alist-get 'name +org-capture-frame-parameters) "❖ Capture") ;; ATM hardcoded in other places, so changing breaks stuff
+;; (alist-get 'name +org-capture-frame-parameters) "❖ Capture") ;; ATM hardcoded in other places, so changing breaks stuff
 (setq +org-capture-fn
       (lambda ()
         (interactive)
@@ -597,7 +624,7 @@ Jest-Test-Mode.el is a minor mode for running jest via npx.
 
 #+begin_src elisp
 (use-package! svelte-mode
-    :mode "\\.svelte\\'")
+  :mode "\\.svelte\\'")
 #+end_src
 
 **** Vue
@@ -745,11 +772,11 @@ To use it:
 
 Then, set up a markdown-html function.
 
-#+begin_src elisp
-  (defun markdown-html (buffer)
-    (princ (with-current-buffer buffer
-      (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
-    (current-buffer)))
+#+begin_src emacs-lisp
+(defun markdown-html (buffer)
+  (princ (with-current-buffer buffer
+           (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
+         (current-buffer)))
 #+end_src
 
 *** Terraform
@@ -850,10 +877,10 @@ some keybindings.
   (use-package! copilot
     :hook (prog-mode . copilot-mode)
     :bind (:map copilot-completion-map
-           ("C-SPC" . 'copilot-accept-completion)
-           ("C-<spc>" . 'copilot-accept-completion)
-           ("C-S-p" . 'copilot-previous-completion)
-           ("C-S-n" . 'copilot-next-completion))))
+                ("C-SPC" . 'copilot-accept-completion)
+                ("C-<spc>" . 'copilot-accept-completion)
+                ("C-S-p" . 'copilot-previous-completion)
+                ("C-S-n" . 'copilot-next-completion))))
 #+end_src
 
 Finally, I'm checking for the ~copilot-node-exectuable~. When building Doom Emacs
@@ -863,12 +890,12 @@ executable here is only necessary if ~copilot-node-executable~ isn't already set
 #+begin_src elisp
 (if (and (boundp 'copilot-node-executable) (file-exists-p copilot-node-executable))
     (load-copilot)
-    (nvm-use "16" (lambda ()
-                   (setq copilot-node-executable
-                         (concat
-                          (nth 1 (nvm--find-exact-version-for "16"))
-                          "/bin/node"))
-                   (load-copilot))))
+  (nvm-use "16" (lambda ()
+                  (setq copilot-node-executable
+                        (concat
+                         (nth 1 (nvm--find-exact-version-for "16"))
+                         "/bin/node"))
+                  (load-copilot))))
 #+end_src
 
 In insert mode, I'm binding  ~C-SPC~ to accept the complete suggestion. I'm also binding ~C-S-p~ and ~C-S-n~ to navigate through the suggestions.
@@ -879,9 +906,9 @@ to insert the suggestion for use in normal mode, and ~t p~ to toggle Copilot.
 #+begin_src elisp
 (map! :leader
       (:prefix-map ("i" . "insert")
-       (:prefix ("g" . "github copilot")
-        :desc "Show Copilot Completion" "s" #'copilot-complete
-        :desc "Insert Copilot Completion" "c" #'copilot-accept-completion))
+                   (:prefix ("g" . "github copilot")
+                    :desc "Show Copilot Completion" "s" #'copilot-complete
+                    :desc "Insert Copilot Completion" "c" #'copilot-accept-completion))
       (:prefix ("t" . "toggle")
        :desc "Toggle Copilot" "p" #'copilot-mode))
 #+end_src
@@ -985,8 +1012,8 @@ session has been created and removing it when the session is terminated.
   (add-hook 'window-configuration-change-hook 'reset-file-window-buffer))
 
 (defun remove-reset-file-window-buffer-hook (&rest args)
-    "Remove the reset-file-window-buffer function from the window-configuration-change-hook."
-    (remove-hook 'window-configuration-change-hook 'reset-file-window-buffer))
+  "Remove the reset-file-window-buffer function from the window-configuration-change-hook."
+  (remove-hook 'window-configuration-change-hook 'reset-file-window-buffer))
 
 (add-hook 'dap-mode-hook 'add-reset-file-window-buffer-hook)
 #+end_src
@@ -1192,9 +1219,9 @@ Menu" and ~SPC-a-i~ for "open interactive AI buffer".
 #+begin_src elisp
 (map! :leader
       (:prefix-map ("a" . "AI")
-        :desc "Send selection to GPT" "s" #'gptel-send
-        :desc "Open send menu before sending selection to GPT" "S" #'gptel-send-menu
-        :desc "Open interactive AI buffer with GPT" "i" #'gptel))
+       :desc "Send selection to GPT" "s" #'gptel-send
+       :desc "Open send menu before sending selection to GPT" "S" #'gptel-send-menu
+       :desc "Open interactive AI buffer with GPT" "i" #'gptel))
 #+end_src
 
 It's possible to choose between Markdown, Org or plain Text Mode for the
