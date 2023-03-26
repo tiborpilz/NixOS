@@ -12,9 +12,6 @@
 
 (setq font-scale-factor (if (is-workstation) 1.3 1.0))
 
-(defun scale-font (size)
-  (round (* size font-scale-factor)))
-
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14)))
 
 ;; (setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14))
@@ -53,9 +50,42 @@
 (setq calendar-week-start-day 1) ;; start on monday
 (setq org-agenda-include-diary t)
 
+(defun org-mode-mixed-pitch-hook ()
+  (when mixed-pitch-mode
+    (let* ((variable-tuple '(:font "sans"))
+           (headline `(:inherit default)))
+      (custom-theme-set-faces
+       'user
+       `(org-level-8 ((t (,@headline ,@variable-tuple))))
+       `(org-level-7 ((t (,@headline ,@variable-tuple))))
+       `(org-level-6 ((t (,@headline ,@variable-tuple))))
+       `(org-level-5 ((t (,@headline ,@variable-tuple))))
+       `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1 :weight bold))))
+       `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.2 :weight bold))))
+       `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.4 :weight bold))))
+       `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.6 :weight bold))))
+       `(org-document-title ((t (,@headline ,@variable-tuple :height 1.8))))))))
+
+(add-hook 'mixed-pitch-mode-hook #'org-mode-mixed-pitch-hook)
+
+(defun reset-org-faces ()
+  (custom-theme-set-faces
+   'user
+   `(org-level-8 ((t (inherit))))
+   `(org-level-7 ((t (inherit))))
+   `(org-level-6 ((t (inherit))))
+   `(org-level-5 ((t (inherit))))
+   `(org-level-4 ((t (inherit))))
+   `(org-level-3 ((t (inherit))))
+   `(org-level-2 ((t (inherit))))
+   `(org-level-1 ((t (inherit))))
+   `(org-document-title ((t (inherit))))))
+
+(add-hook 'disable-mixed-pitch-mode-hook #'reset-org-faces)
+
 (modify-all-frames-parameters
- '((right-divider-width . 10)
-   (internal-border-width . 10)))
+ '((right-divider-width . 8)
+   (internal-border-width . 8)))
 (dolist (face '(window-divider
                 window-divider-first-pixel
                 window-divider-last-pixel))
@@ -70,13 +100,6 @@
   (org-modern-timestamp '(" %d.%m.%Y " . " %H:%M ")))
 
 (setq
- ;; Edit settings
- org-auto-align-tags nil
- org-tags-column 0
- org-catch-invisible-edits 'show-and-error
- org-special-ctrl-a/e t
- org-insert-heading-respect-content t
-
  ;; Org styling, hide markup etc.
  org-hide-emphasis-markers t
  org-pretty-entities t
@@ -133,14 +156,6 @@
           (lambda ()
             (add-hook 'after-save-hook #'org-babel-tangle-config)))
 
-(defadvice org-babel-execute-src-block (around progress nil activate)
-  (set-face-attribute
-   'org-block-background nil :background "LightSteelBlue")
-  (message "Running your code block")
-  ad-do-it
-  (set-face-attribute 'org-block-background nil :background "gray")
-  (message "Done with code block"))
-
 (map! :map org-mode-map
       :localleader
       :desc "View exported file" "v" #'org-view-output-file)
@@ -169,7 +184,7 @@
 (defvar org-view-external-file-extensions '("html")
   "File formats that should be opened externally.")
 
-(use-package! ox-gfm :after ox :defer t)
+;; (use-package! ox-gfm :after ox :defer t)
 
 (setq org-export-headline-levels 5)
 
@@ -178,9 +193,7 @@
 
 (setq org-highlight-latex-and-related '(native script entities))
 
-;(use-package! org-re-reveal)
-
-(setq org-roam-directory "~/org")
+(setq org-roam-directory "~/org/roam")
 
 (use-package! websocket
   :after org-roam
@@ -198,7 +211,7 @@
     (unless org-roam-ui-mode (org-roam-ui-mode 1))
     (browse-url-xdg-open (format "http://localhost:%d" org-roam-ui-port))))
 
-(setq org-roam-ui-open-on-start nil)
+(setq org-roam-ui-open-on-start t)
 
 ;; (use-package! org-gcal
 ;;   :config
@@ -273,9 +286,9 @@
 
 ;; (setq projectile-project-search-path '(("~/Code/" . 2)))
 
-(use-package! jest
-  :after (typescript-mode js-mode typescript-tsx-mode)
-  :hook (typescript-mode . jest-minor-mode))
+(use-package! jest-test-mode
+  :commands jest-test-mode
+  :hook (typescript-mode js-mode typescript-tsx-mode))
 
 (use-package! svelte-mode
     :mode "\\.svelte\\'")
@@ -292,11 +305,6 @@
 
 (use-package! nix-mode
   :mode "\\.nix\\'")
-
-(setq flycheck-command-wrapper-function
-        (lambda (command) (apply 'nix-shell-command (nix-current-sandbox) command))
-      flycheck-executable-find
-        (lambda (cmd) (nix-executable-find (nix-current-sandbox) cmd)))
 
 (add-hook! python-mode
   (advice-add 'python-pytest-file :before
@@ -472,14 +480,24 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 ;; (setq dash-docs-docsets-path "$HOME/.local/share/docsets")
 
-(setq gpt-openai-key (password-store-get "bitwarden/openai-gpt-key"))
+(setq gpt-openai-key (lambda () password-store-get "bitwarden/openai-gpt-key"))
 (setq gpt-openai-engine "code-davinci-002")
 (use-package! gpt)
 
-(setq doom-theme 'doom-nord-aurora)
+(defun get-api-key ()
+  (password-store-get "bitwarden/openai-gpt-key"))
 
-;; (add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
-;; (setq doom-themes-treemacs-theme "doom-atom")
+(setq gptel-api-key 'get-api-key)
+
+(map! :leader
+      (:prefix-map ("a" . "AI")
+        :desc "Send selection to GPT" "s" #'gptel-send
+        :desc "Open send menu before sending selection to GPT" "S" #'gptel-send-menu
+        :desc "Open interactive AI buffer with GPT" "i" #'gptel))
+
+(setq gptel-default-mode 'org-mode)
+
+(setq doom-theme 'doom-nord-aurora)
 
 (use-package ewal
   :init (setq ewal-use-built-in-always-p nil
@@ -500,12 +518,12 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; (define-key ivy-minibuffer-map (kbd "TAB") 'ivy-partial)
 ;; (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
 
-(use-package! all-the-icons-ivy-rich
-  :defer t
-  :after counsel-projectile
-  :init (all-the-icons-ivy-rich-mode +1)
-  :config
-  (setq all-the-icons-ivy-rich-icon-size 0.8))
+;; (use-package! all-the-icons-ivy-rich
+;;   :defer t
+;;   :after counsel-projectile
+;;   :init (all-the-icons-ivy-rich-mode +1)
+;;   :config
+;;   (setq all-the-icons-ivy-rich-icon-size 0.8))
 
 (setq ivy-posframe-width 80)
 
@@ -528,5 +546,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
   :bind (:map xwidget-webkit-mode-map
               ("f" . xwwp-ace-toggle)
               ("v" . xwwp-follow-link)))
+
+(setq gc-cons-threshold (* 1024 1024 1024)) ;; 1G
 
 (setq read-process-output-max (* 4 1024 1024)) ;; 4mb
