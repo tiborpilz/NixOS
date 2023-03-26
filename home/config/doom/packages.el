@@ -1,18 +1,25 @@
-(package! straight :pin "3eca39d")
-
-(package! editorconfig)
+(package! org-padding :recipe (:host github :repo "toncherami/org-padding"))
 
 (package! org-modern)
 
-(package! org-present)
+(package! ob-http)
 
-(unpin! org-roam)
+;; (package! org-present)
+
 (package! org-roam-ui)
-(package! websocket :pin "fda4455333309545c0787a79d73c19ddbeb57980") ; dependency of `org-roam-ui'
+(package! websocket) ; dependency of `org-roam-ui'
+
+(package! transient
+      :pin "c2bdf7e12c530eb85476d3aef317eb2941ab9440"
+      :recipe (:host github :repo "magit/transient"))
+
+(package! with-editor
+          :pin "bbc60f68ac190f02da8a100b6fb67cf1c27c53ab"
+          :recipe (:host github :repo "magit/with-editor"))
 
 (package! org-gcal)
 
-(package! jest)
+(package! jest-test-mode)
 
 (package! svelte-mode)
 
@@ -21,8 +28,6 @@
 (package! lsp-tailwindcss
   :recipe (:host github
            :repo "merrickluo/lsp-tailwindcss"))
-
-(package! nix-sandbox)
 
 (package! poetry)
 
@@ -37,6 +42,8 @@
 ;; (package! dash-docs)
 
 (package! gpt)
+
+(package! gptel)
 
 (package! doom-themes)
 
@@ -53,36 +60,10 @@
 
 ;; (package! which-key-posframe)
 
-(package! all-the-icons-ivy-rich)
+;; (package! all-the-icons-ivy-rich)
 
 (package! treemacs-all-the-icons)
 
 (package! xwwp :recipe (:host github :repo "BlueFlo0d/xwwp"))
 (package! xwwp-follow-link-ivy)
 (package! ctable)
-
-(package! dap-mode)
-
-;; Citations
-(package! org-ref :pin "3ca9beb744621f007d932deb8a4197467012c23a")
-
-;; HTTP requests via babel
-(package! ob-http :pin "b1428ea2a63bcb510e7382a1bf5fe82b19c104a7")
-
-;; OrgRoam visualization / webapp
-
-;; automatic latex rendering
-
-;; export github markdown
-(package! ox-gfm :pin "99f93011b069e02b37c9660b8fcb45dab086a07f")
-
-;; K8s
-(package! k8s-mode)
-
-;; Copilot
-;; (package! copilot
-;;   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
-
-;; Multiple major modes in one buffer
-(package! polymode)
-(package! poly-markdown)

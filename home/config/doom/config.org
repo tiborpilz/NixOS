@@ -1,14 +1,27 @@
-#+PROPERTY: header-args :elisp :tangle ./config.el
+#+PROPERTY: header-args elisp :tangle ./config.el
+
+* Introduction
+
+This is my Emacs configuration. I'm using [[https://github.com/doomemacs/doomemacs][Doom Emacs]], which is preconfigured
+with a ton of plugins, and as such a great starting point for a modern Emacs configuration, while still being very modular. This file contains settings,
+snippets and other customizations that I've added on top of Doom.
+
+This file is not written in Emacs Lisp, but in [[https://orgmode.org/][Org
+Mode]]. I'm using [[https://en.wikipedia.org/wiki/Literate_programming][Literate
+Programming]] for my configuration, which means that  the configuration file
+contains both documentation (in Org Mode) and code (in Emacs Lisp) intermixed
+together in a single file. The documentation can be exported to various formats
+such as HTML or PDF, while the code can be executed by Emacs to customize the
+editor. So this is a living document, that can be used as a reference for
+certain decisions I've made or workarounds I've implemented. 
 
 * Base Settings
-** Personal data
-Set Name and mail adress
+First, I set up some basic settings, such as my name and email address.
 #+begin_src elisp
 (setq user-full-name "Tibor Pilz"
       user-mail-address "tibor@pilz.berlin")
 #+end_src
 
-** Add checks for different machines
 Although I would like to keep the differences between my development
 environments as low as possible - also to counteract configuration drift, there
 are some settings that need to be specific to some of my machines - e.g. the
@@ -32,12 +45,9 @@ the macine I'm running on, and then use that to set the font size.
 
 #+begin_src elisp
 (setq font-scale-factor (if (is-workstation) 1.3 1.0))
-
-(defun scale-font (size)
-  (round (* size font-scale-factor)))
 #+end_src
 
-I'm a big fan of ligatures, and I've been using FiraCode for as long as I can remember.
+Since I'm using Evil/ (vim-keybindings), I prefer relative line numbers.
 
 #+begin_src elisp
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14)))
@@ -73,25 +83,31 @@ Since I'm using Evil/vim-keybindings, I prefer relative line numbers as default.
 (setq display-line-numbers-type 'relative)
 #+end_src
 
-** Tab width
-2 spaces, suck it k&r
+
 #+begin_src elisp
 (setq tab-width 2)
 #+end_src
 
-** Fix straight.el
-https://github.com/doomemacs/doomemacs/issues/6960#issuecomment-1327514660
-
-#+begin_src elisp :tangle packages.el
-(package! straight :pin "3eca39d")
-#+end_src
-
-** Editorconfig
-#+begin_src elisp :tangle packages.el
-(package! editorconfig)
-#+end_src
 * Org Mode
+
+I use org-mode to manage my tasks, take notes, and create outlines within Emacs.
+It helps increase my productivity by having all my notes and tasks in one easily
+accessible place.
+
+In a general sense, org files are similar to markdown files, meaning they can
+be read as plain text, but they also contain some additional metadata that can
+be used for organization and formatting purposes. However, thanks to extensive
+tooling (most of it in Emacs), org files are more powerful and versatile than
+Markdown files, as they offer features such as outlining, table editing, and
+interactive code blocks (like Jupyter). In fact, org mode is what makes this
+literate config possible.
+
 ** Base Settings
+First, some basic settings for org-mode, such as the directory where I keep my
+org files, and the files that I want to include in my agenda.
+I'll also enable property inheritance, which means that properties set for an
+entire file or parent heading will be inherited by all child headings.
+
 #+begin_src elisp
 (setq org-directory "~/org/")
 (setq org-agenda-files (list org-directory))
@@ -108,9 +124,77 @@ https://github.com/doomemacs/doomemacs/issues/6960#issuecomment-1327514660
 #+end_src
 
 ** Visual improvements
+Now, some visual improvements.
+
+Enabling =mixed-pitch-mode= will make the text in org-mode look more like a
+book, with the headings in a larger font, and the body text in a smaller font.
+This is a great way to make your more readable, and it also helps with focus on
+the content, instead of the formatting.
+
+In addition, I'm changing the way headlines look, with top-level headlines
+actually having a larger font - I'm also removing the color from the headlines,
+since in this mode, the distinction between the different levels is already made by the font size.
+
+#+begin_src elisp
+(defun org-mode-mixed-pitch-hook ()
+  (when mixed-pitch-mode
+    (let* ((variable-tuple '(:font "sans"))
+           (headline `(:inherit default)))
+      (custom-theme-set-faces
+       'user
+       `(org-level-8 ((t (,@headline ,@variable-tuple))))
+       `(org-level-7 ((t (,@headline ,@variable-tuple))))
+       `(org-level-6 ((t (,@headline ,@variable-tuple))))
+       `(org-level-5 ((t (,@headline ,@variable-tuple))))
+       `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1 :weight bold))))
+       `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.2 :weight bold))))
+       `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.4 :weight bold))))
+       `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.6 :weight bold))))
+       `(org-document-title ((t (,@headline ,@variable-tuple :height 1.8))))))))
+
+(add-hook 'mixed-pitch-mode-hook #'org-mode-mixed-pitch-hook)
+#+end_src
+
+To reset the faces to their original values, I'm using a hook that is run when ~mixed-pitch-mode~ is disabled.
+
+#+begin_src elisp
+(defun reset-org-faces ()
+  (custom-theme-set-faces
+   'user
+   `(org-level-8 ((t (inherit))))
+   `(org-level-7 ((t (inherit))))
+   `(org-level-6 ((t (inherit))))
+   `(org-level-5 ((t (inherit))))
+   `(org-level-4 ((t (inherit))))
+   `(org-level-3 ((t (inherit))))
+   `(org-level-2 ((t (inherit))))
+   `(org-level-1 ((t (inherit))))
+   `(org-document-title ((t (inherit))))))
+
+(add-hook 'disable-mixed-pitch-mode-hook #'reset-org-faces)
+#+end_src
+
+*** TODO Padding
+:PROPERTIES:
+:header-args: :tangle no
+:END:
+
+Set up custom padding for org-mode headings and blocks. Currently disabled since
+it should only be used with =mixed-pitch-mode=.
+
+#+begin_src elisp :tangle packages.el
+(package! org-padding :recipe (:host github :repo "toncherami/org-padding"))
+#+end_src
+
+#+begin_src elisp
+(use-package! org-padding
+  :config
+  (setq org-padding-heading-padding-alist
+        '((0.0 . 1.0) (0.0 . 0.8) (0.0 . 0.6) (0.0 . 0.5) (0.0 . 0.5) (0.0 . 0.5) (0.0 . 0.5) (0.0 . 0.5))))
+#+end_src
+
 *** Org-Modern
-Org-modern (https://github.com/minad/org-modern) contains a lot of nice visual
-improvements for org-mode.
+[[https://github.com/minad/org-modern][Org-modern]] contains a lot of nice visual improvements for org-mode.
 
 #+begin_src elisp :tangle packages.el
 (package! org-modern)
@@ -120,8 +204,8 @@ improvements for org-mode.
 Use it globally and tweak it some more.
 #+begin_src elisp
 (modify-all-frames-parameters
- '((right-divider-width . 10)
-   (internal-border-width . 10)))
+ '((right-divider-width . 8)
+   (internal-border-width . 8)))
 (dolist (face '(window-divider
                 window-divider-first-pixel
                 window-divider-last-pixel))
@@ -136,13 +220,6 @@ Use it globally and tweak it some more.
   (org-modern-timestamp '(" %d.%m.%Y " . " %H:%M ")))
 
 (setq
- ;; Edit settings
- org-auto-align-tags nil
- org-tags-column 0
- org-catch-invisible-edits 'show-and-error
- org-special-ctrl-a/e t
- org-insert-heading-respect-content t
-
  ;; Org styling, hide markup etc.
  org-hide-emphasis-markers t
  org-pretty-entities t
@@ -165,6 +242,7 @@ Use it globally and tweak it some more.
 #+begin_src elisp
 (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 #+end_src
+
 *** Show passed deadlines as error
 #+begin_src elisp
 (setq org-agenda-deadline-faces
@@ -190,6 +268,10 @@ For a more responsive editing experience
 
 ** Babel
 *** HTTP requests via babel
+#+begin_src elisp :tangle packages.el
+(package! ob-http)
+#+end_src
+
 #+begin_src elisp
 (use-package! ob-http
   :commands org-babel-execute:http)
@@ -209,7 +291,8 @@ See https://org-babel.readthedocs.io/en/latest/header-args/
         (:tangle . "no")
         (:comments . "link")))
 #+end_src
-*** Auto-Tanglins TODO: make this work
+
+*** Auto-Tangling
 I want org to tangle my config.org on file save, regardless whether it's the one
 loaded or in a different repo.
 
@@ -224,19 +307,6 @@ loaded or in a different repo.
           (lambda ()
             (add-hook 'after-save-hook #'org-babel-tangle-config)))
 #+end_src
-*** Make Babel prettier
-#+begin_src elisp
-(defadvice org-babel-execute-src-block (around progress nil activate)
-  (set-face-attribute
-   'org-block-background nil :background "LightSteelBlue")
-  (message "Running your code block")
-  ad-do-it
-  (set-face-attribute 'org-block-background nil :background "gray")
-  (message "Done with code block"))
-#+end_src
-
-#+RESULTS:
-: org-babel-execute-src-block
 
 ** Import/Export
 *** View exported file
@@ -273,7 +343,7 @@ loaded or in a different repo.
 
 *** use github markdown
 #+begin_src elisp
-(use-package! ox-gfm :after ox :defer t)
+;; (use-package! ox-gfm :after ox :defer t)
 #+end_src
 
 *** Export headings up to five levels deep
@@ -290,12 +360,12 @@ Add `:ignore:` tag to headings, so only the headings will be ignored for an expo
 
 *** automatic latex rendering
 #+begin_code elisp :tangle packages.el
-(package! org-fragtog)
+;; (package! org-fragtog)
 #+end_code
 
 #+begin_src elisp :tangle none
-(use-package! org-fragtog
-  :hook (org-mode . 'org-fragtog-mode))
+;; (use-package! org-fragtog
+;;   :hook (org-mode . 'org-fragtog-mode))
 #+end_src
 
 *** Latex fragments
@@ -305,31 +375,27 @@ Add `:ignore:` tag to headings, so only the headings will be ignored for an expo
 
 *** Presentation
 **** Export to Reveal.js
-#+begin_src elisp
-;(use-package! org-re-reveal)
-#+end_src
 **** org-present
 #+begin_src elisp :tangle packages.el
-(package! org-present)
+;; (package! org-present)
 #+end_src
 
 ** Extensions
 *** Roam
-*** Use the same directory as org
+**** Use the same directory as org
 #+begin_src elisp
-(setq org-roam-directory "~/org")
+(setq org-roam-directory "~/org/roam")
 #+end_src
 
-*** Add Org-Roam UI
+**** Add Org-Roam UI
 Org-Roam UI is a web-based interface for Org-roam. It is a separate package -
 and it also needs the websocket package as dependency.
 
 The closest comparison to org-roam-ui is Obsidian.
 
 #+begin_src elisp :tangle packages.el
-(unpin! org-roam)
 (package! org-roam-ui)
-(package! websocket :pin "fda4455333309545c0787a79d73c19ddbeb57980") ; dependency of `org-roam-ui'
+(package! websocket) ; dependency of `org-roam-ui'
 #+end_src
 
 #+begin_src elisp
@@ -349,9 +415,29 @@ The closest comparison to org-roam-ui is Obsidian.
     (unless org-roam-ui-mode (org-roam-ui-mode 1))
     (browse-url-xdg-open (format "http://localhost:%d" org-roam-ui-port))))
 
-(setq org-roam-ui-open-on-start nil)
+(setq org-roam-ui-open-on-start t)
 #+end_src
 
+**** Fixes
+***** "global-git-commit-mode" Error
+:PROPERTIES:
+:ID:       49dcbd41-c690-4102-84cd-c7fb08894bc0
+:END:
+For some reason, inserting a roam node causes the following error:
+~global-git-commit-mode: Symbol’s function definition is void:
+global-git-commit-mode~.
+- According [[https://github.com/doomemacs/doomemacs/issues/6425#issuecomment-1433245212][this Github issue]], pinning ~transient~ and ~with-editor~ can fix
+  this.
+
+  #+begin_src elisp :tangle packages.el
+(package! transient
+      :pin "c2bdf7e12c530eb85476d3aef317eb2941ab9440"
+      :recipe (:host github :repo "magit/transient"))
+
+(package! with-editor
+          :pin "bbc60f68ac190f02da8a100b6fb67cf1c27c53ab"
+          :recipe (:host github :repo "magit/with-editor"))
+  #+end_src
 *** Google Calendar integration
 #+begin_src elisp :tangle packages.el
 (package! org-gcal)
@@ -388,7 +474,7 @@ I'm adjusting the bindings just for ~org-mode~.
 #+end_src
 
 
- *** Visual-line-mode messes with with plaintext (markdow, latex)
+*** Visual-line-mode messes with with plaintext (markdow, latex)
 #+begin_src elisp
 (remove-hook 'text-mode-hook #'visual-line-mode)
 (add-hook 'text-mode-hook #'auto-fill-mode)
@@ -470,12 +556,11 @@ For some reason, ~org-tempo~ does not start at launch, so I'm  loading it here.
                 "Template key: "
                 `(("q" ,(concat (all-the-icons-octicon "stop" :face 'all-the-icons-red :v-adjust 0.01) "\tAbort")))))))
     (advice-add 'org-capture-select-template :override #'org-capture-select-template-prettier))
-
 #+END_SRC
 
-The [[file:~/.emacs.d/bin/org-capture][org-capture bin]] is rather nice, but It would be even nicer with a smaller frame, and
+The org-capture bin is rather nice, but It would be even nicer with a smaller frame, and
 no modeline.
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC elisp
 (setf (alist-get 'height +org-capture-frame-parameters) 15)
       ;; (alist-get 'name +org-capture-frame-parameters) "❖ Capture") ;; ATM hardcoded in other places, so changing breaks stuff
 (setq +org-capture-fn
@@ -493,15 +578,17 @@ no modeline.
 ** Language-Specific Settings
 *** Web Dev (JS/TS/CSS)
 **** Testing
-***** Jest.el
+***** Jest Test Mode
+Jest-Test-Mode.el is a minor mode for running jest via npx.
+
 #+begin_src elisp :tangle packages.el
-(package! jest)
+(package! jest-test-mode)
 #+end_src
 
 #+begin_src elisp
-(use-package! jest
-  :after (typescript-mode js-mode typescript-tsx-mode)
-  :hook (typescript-mode . jest-minor-mode))
+(use-package! jest-test-mode
+  :commands jest-test-mode
+  :hook (typescript-mode js-mode typescript-tsx-mode))
 #+end_src
 **** Svelte
 #+begin_src elisp :tangle packages.el
@@ -610,31 +697,6 @@ Improves display of store paths.
 Adds an emacs command to modify the buffer environment according to a Lisp
 expression buily by nix.
 
-**** Nix Options - A set of modes and functions
-
-***** Nix-sandbox
-Utility functions to work with nix sandboxes.
-#+begin_src elisp :tangle packages.el
-(package! nix-sandbox)
-#+end_src
-
-- ~nix-shell-command~ composes command that can be executed in the given sandbox
-- ~nix-shell~ executes a command in the given sandbox
-- ~nix-compile~ compiles a program in the given sandbox
-- ~nix-find-sandbox~ searches from the given path upwards until it finds a shell.nix or default.nix file.
-- ~nix-current-sandbox~ searches for a sandbox file starting from the current working directory.
-- ~nix-executable-find~ a replacement for the built-in executable-find. The
-  function searches in the given sandbox for executables.
-
-Using the nix-sandbox utility functions, we can enhande Flycheck.
-
-#+begin_src elisp
-(setq flycheck-command-wrapper-function
-        (lambda (command) (apply 'nix-shell-command (nix-current-sandbox) command))
-      flycheck-executable-find
-        (lambda (cmd) (nix-executable-find (nix-current-sandbox) cmd)))
-#+end_src
-
 *** Python
 **** Poetry
 After years of frustration, I'm finally content with setting up and managing
@@ -659,7 +721,7 @@ plays nicely with direnv.
 #+end_src
 
 *** Markdown
-**** Code blocks
+**** TODO Code blocks
 To set up code-highlighting in markdown code blocks, I need multiple major modes in one buffer. The package polymode promises to allow that:
 #+begin_src elisp
 ;; (use-package! polymode
@@ -1096,13 +1158,53 @@ with OpenAI's GPT-3 API.
 
 **** Configuration
 #+begin_src elisp
-(setq gpt-openai-key (password-store-get "bitwarden/openai-gpt-key"))
+(setq gpt-openai-key (lambda () password-store-get "bitwarden/openai-gpt-key"))
 (setq gpt-openai-engine "code-davinci-002")
 (use-package! gpt)
 #+end_src
 
-* UI
-** Theming
+* Tools
+** Language AI
+GPTel (https://github.com/karthink/gptel) is a package for interacting with
+GPT-3.
+
+#+begin_src elisp :tangle packages.el
+(package! gptel)
+#+end_src
+
+To use GPTel, the variable ~gptel-api-key~ needs to be set. I'm retrieving the
+key via pass.
+
+#+begin_src elisp
+(defun get-api-key ()
+  (password-store-get "bitwarden/openai-gpt-key"))
+
+(setq gptel-api-key 'get-api-key)
+#+end_src
+
+GPTel can run interactively in a separate buffer via ~M-x gptel~ or directly on
+selected code via ~M-x gptel-send~. Furthermore, the prompt for the sent snippet
+can be adjusted via ~M-x gptel-send-menu~.
+
+I'm binding the Commands to ~SPC-a-s~ for "send to AI", ~SPC-a-S~ for "open send
+Menu" and ~SPC-a-i~ for "open interactive AI buffer".
+
+#+begin_src elisp
+(map! :leader
+      (:prefix-map ("a" . "AI")
+        :desc "Send selection to GPT" "s" #'gptel-send
+        :desc "Open send menu before sending selection to GPT" "S" #'gptel-send-menu
+        :desc "Open interactive AI buffer with GPT" "i" #'gptel))
+#+end_src
+
+It's possible to choose between Markdown, Org or plain Text Mode for the
+interactive buffer. I'm choosing Org so that I can immediately run the provided
+code snippets.
+
+#+begin_src elisp
+(setq gptel-default-mode 'org-mode)
+#+end_src
+
 *** Doom Themes
 #+begin_src elisp :tangle packages.el
 (package! doom-themes)
@@ -1112,29 +1214,14 @@ with OpenAI's GPT-3 API.
 (setq doom-theme 'doom-nord-aurora)
 #+end_src
 
-*** Nano
-Nano is a minimalistic theme for emacs, and it is absolutely gorgeous. Although
-it lacks the features I need, I was always a fan of the look. Now, it's possible
-to enjoy the best of both worlds by theming Doom to look like Nano.
-
-The only issue is that loading ~doom-nano-testing~ currently does more than just
-adjust the colorscheme, and while I like the minimal top modeline, I'd like to
-have a choice. In the future, I will pick and choose from Nano to adjust the layout.
-
-#+begin_src elisp
-;; (add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
-;; (setq doom-themes-treemacs-theme "doom-atom")
-#+end_src
-
 *** Misc Themes
 **** Grayscale
 #+begin_src elisp :tangle packages.el
 (package! grayscale-theme)
 #+end_src
-It leetle much on the warm side for my tastes...
+
 **** Tao Themes
 Very appealing, minimalistic themes.
-
 #+begin_src elisp :tangle packages.el
 (package! tao-theme)
 #+end_src
@@ -1194,49 +1281,6 @@ I prefer something more simpler - also the dashboard can display SVGs:
 #+begin_src elisp
 (setq fancy-splash-image (concat doom-private-dir "splash-logos/emacs-logo-cutout.svg"))
 #+end_src
-# I don't really have much use for the Doom dashboard, so I'm replacing it with
-# the package [[https://github.com/emacs-dashboard/emacs-dashboard][Emacs Dashboard]].
-
-# - Install the package.
-# #+begin_src elisp :tangle packages.el
-# (package! dashboard)
-# #+end_src
-
-# Initialize the package
-# #+begin_src elisp
-# (use-package! dashboard
-#   :ensure t
-#   :config
-#   (dashboard-setup-startup-hook))
-
-# #+end_src
-
-# #+RESULTS:
-# : t
-
-# Show just a small text as startup banner, center the content and add a mix of widgets.
-# #+begin_src  elisp
-# (setq dashboard-startup-banner-logo-title "(emacs)")
-# (setq dashboard-startup-banner 2)
-# (setq dashboard-set-navigator t)
-# (setq dashboard-center-content t)
-# (setq dashboard-items '((bookmarks . 5)
-#                         (agenda . 5)))
-# (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-# (setq dashboard-set-heading-icons t)
-# (setq dashboard-set-file-icons t)
-# (setq dashboard-set-navigator t)
-# (setq dashboard-set-init-info t)
-# (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-#                                                    :height 1.1
-#                                                    :v-adjust -0.05
-#                                                    :face 'font-lock-keyword-face))
-# (setq dashboard-projects-switch-function 'projectile-persp-switch-project)
-# (setq doom-fallback-buffer-name "*dashboard*")
-# #+end_src
-
-# #+RESULTS:
-# : *dashboard*
 
 ** Which-Key
 Which Key is a package that displays the keybindings for the current command in
@@ -1275,7 +1319,6 @@ It is fast and leightweight, and there are a lot of packages that integrate with
 it.
 
 *** Keybindings
-
 Some of the default keybindings feel odd to me, for instance the tab key
 behavior. I'm still trying for a way to have the same behavior as in a terminal,
 i.e. multiple tab presses start cycling through the completion candidates.
@@ -1291,18 +1334,17 @@ i.e. multiple tab presses start cycling through the completion candidates.
 Per default, Ivy looks a little bland. All-The-Icons-Ivy Richt is an alternative
 to All-The-icons-Ivy (which had some issues with my setup)
 
-
 #+begin_src elisp :tangle packages.el
-(package! all-the-icons-ivy-rich)
+;; (package! all-the-icons-ivy-rich)
 #+end_src
 
 #+begin_src elisp
-(use-package! all-the-icons-ivy-rich
-  :defer t
-  :after counsel-projectile
-  :init (all-the-icons-ivy-rich-mode +1)
-  :config
-  (setq all-the-icons-ivy-rich-icon-size 0.8))
+;; (use-package! all-the-icons-ivy-rich
+;;   :defer t
+;;   :after counsel-projectile
+;;   :init (all-the-icons-ivy-rich-mode +1)
+;;   :config
+;;   (setq all-the-icons-ivy-rich-icon-size 0.8))
 #+end_src
 
 **** Ivy-Postframe
@@ -1377,43 +1419,13 @@ xwidget-webkit browser.
 #+end_src
 * Performance
 Various tweaks to improve the overall performance.
-** Raise the GC-Cons threshold
-#+begin_example elisp
-(setq gc-cons-threshold (* 1024 1024 1024)) ;; 1G
-#+end_example
 
-** Increase the amount of data which Emacs reads from the process
+Raise the GC-Cons threshold:
 #+begin_src elisp
-(setq read-process-output-max (* 4 1024 1024)) ;; 4mb
+(setq gc-cons-threshold (* 1024 1024 1024)) ;; 1G
 #+end_src
 
-* Unsorted Packages
-#+begin_src elisp :tangle packages.el
-
-(package! dap-mode)
-
-;; Citations
-(package! org-ref :pin "3ca9beb744621f007d932deb8a4197467012c23a")
-
-;; HTTP requests via babel
-(package! ob-http :pin "b1428ea2a63bcb510e7382a1bf5fe82b19c104a7")
-
-;; OrgRoam visualization / webapp
-
-;; automatic latex rendering
-
-;; export github markdown
-(package! ox-gfm :pin "99f93011b069e02b37c9660b8fcb45dab086a07f")
-
-;; K8s
-(package! k8s-mode)
-
-;; Copilot
-;; (package! copilot
-;;   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
-
-;; Multiple major modes in one buffer
-(package! polymode)
-(package! poly-markdown)
-
+Increase the amount of data which Emacs reads from the process:
+#+begin_src elisp
+(setq read-process-output-max (* 4 1024 1024)) ;; 4mb
 #+end_src

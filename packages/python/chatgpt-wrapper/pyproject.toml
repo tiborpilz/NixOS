@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "chatgpt-wrapper"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "chatgpt_wrapper"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+chatgpt = {git = "https://github.com/mmabrouk/chatgpt-wrapper.git", rev = "main"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
