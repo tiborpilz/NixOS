@@ -1,4 +1,5 @@
 [
     "@volar/vue-language-server",
-    "emmet-ls"
+    "emmet-ls",
+    "@previewjs/cli"
 ]

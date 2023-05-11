@@ -4,15 +4,13 @@
 
 (package! exec-path-from-shell)
 
-(package! org-modern)
-
-(package! org-present)
-
 (unpin! org-roam)
 (package! org-roam-ui)
 (package! websocket :pin "fda4455333309545c0787a79d73c19ddbeb57980") ; dependency of `org-roam-ui'
 
 (package! org-gcal)
+
+(package! org-present)
 
 (package! jest)
 
@@ -23,8 +21,6 @@
 (package! lsp-tailwindcss
   :recipe (:host github
            :repo "merrickluo/lsp-tailwindcss"))
-
-(package! nix-sandbox)
 
 (package! poetry)
 
@@ -40,6 +36,8 @@
 
 (package! gpt)
 
+(package! quarto-mode)
+
 (package! doom-themes)
 
 (package! grayscale-theme)
@@ -52,6 +50,10 @@
 (package! theme-magic)
 
 (package! autothemer)
+
+(package! base16-theme)
+
+(package! kurecolor)
 
 ;; (package! which-key-posframe)
 

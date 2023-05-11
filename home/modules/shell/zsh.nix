@@ -55,6 +55,7 @@ in
       nodejs
       coreutils
       thefuck
+      wakatime
     ];
 
     home.sessionVariables.ZDOTDIR = "${envVars.XDG_CONFIG_HOME}/zsh";

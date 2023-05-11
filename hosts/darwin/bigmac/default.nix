@@ -22,6 +22,7 @@ with lib;
       "podman-desktop"
       "android-sdk"
       "cool-retro-term"
+      "mactex"
     ];
 
     homebrew.brews = [

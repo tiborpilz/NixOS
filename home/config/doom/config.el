@@ -22,20 +22,6 @@
 ;;       doom-big-font (font-spec :family  "sans" :size (scale-font 16))
 ;;       doom-serif-font (font-spec :family "FreeSerif" :weight 'light :size (scale-font 14)))
 
-(let* ((variable-tuple '(:font "ETBembo"))
-       (headline `(:inherit default :weight bold)))
-  (custom-theme-set-faces
-   'user
-   `(org-level-8 ((t (,@headline ,@variable-tuple))))
-   `(org-level-7 ((t (,@headline ,@variable-tuple))))
-   `(org-level-6 ((t (,@headline ,@variable-tuple))))
-   `(org-level-5 ((t (,@headline ,@variable-tuple))))
-   `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
-   `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.17))))
-   `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.23))))
-   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.3))))
-   `(org-document-title ((t (,@headline ,@variable-tuple :height 1.4 :underline nil))))))
-
 (setq display-line-numbers-type 'relative)
 
 (setq tab-width 2)
@@ -144,7 +130,7 @@
 
 (setq org-highlight-latex-and-related '(native script entities))
 
-;(use-package! org-re-reveal)
+;; (use-package! org-re-reveal)
 
 (setq org-roam-directory "~/org")
 
@@ -171,6 +157,18 @@
 ;;   (setq org-gcal-client-id "CLIENT_ID"
 ;;         org-gcal-client-secret "CLIENT_SECRET"
 ;;         org-gcal-fetch-file-alit '(("tbrpilz@googlemail.com" . "~/org/schedule.org"))))
+
+(use-package! org-present
+  :hook (org-present-mode . (lambda ()
+                              (org-present-big)
+                              (org-display-inline-images)
+                              (org-present-hide-cursor)
+                              (org-present-read-only)))
+  :hook (org-present-mode-quit . (lambda ()
+                                   (org-present-small)
+                                   (org-remove-inline-images)
+                                   (org-present-show-cursor)
+                                   (org-present-read-write))))
 
 (map! :map org-mode-map
       :localleader
@@ -259,10 +257,10 @@
 (use-package! nix-mode
   :mode "\\.nix\\'")
 
-(setq flycheck-command-wrapper-function
-        (lambda (command) (apply 'nix-shell-command (nix-current-sandbox) command))
-      flycheck-executable-find
-        (lambda (cmd) (nix-executable-find (nix-current-sandbox) cmd)))
+;; (setq flycheck-command-wrapper-function
+;;         (lambda (command) (apply 'nix-shell-command (nix-current-sandbox) command))
+;;       flycheck-executable-find
+;;         (lambda (cmd) (nix-executable-find (nix-current-sandbox) cmd)))
 
 (add-hook! python-mode
   (advice-add 'python-pytest-file :before
@@ -442,6 +440,9 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (setq gpt-openai-engine "code-davinci-002")
 (use-package! gpt)
 
+(use-package quarto-mode
+  :mode (("\\.Rmd" . poly-quarto-mode)))
+
 (setq doom-theme 'doom-nord-aurora)
 
 ;; (add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
@@ -451,6 +452,12 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
   :init (setq ewal-use-built-in-always-p nil
               ewal-use-built-in-on-failure-p nil
               ewal-built-in-palette "sexy-material"))
+
+;; (use-package base16-theme
+;;   :ensure t
+;;   :demand t
+;;   :config
+;;   (load-theme 'base16-default-dark t))
 
 (setq doom-modeline-vcs-max-length 50)
 

@@ -49,21 +49,21 @@ I'm a big fan of ligatures, and I've been using FiraCode for as long as I can re
 #+end_src
 
 Adjust org-mode headlines.
-#+begin_src elisp
+#+begin_src elisp :tangle none
 
-(let* ((variable-tuple '(:font "ETBembo"))
-       (headline `(:inherit default :weight bold)))
-  (custom-theme-set-faces
-   'user
-   `(org-level-8 ((t (,@headline ,@variable-tuple))))
-   `(org-level-7 ((t (,@headline ,@variable-tuple))))
-   `(org-level-6 ((t (,@headline ,@variable-tuple))))
-   `(org-level-5 ((t (,@headline ,@variable-tuple))))
-   `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
-   `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.17))))
-   `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.23))))
-   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.3))))
-   `(org-document-title ((t (,@headline ,@variable-tuple :height 1.4 :underline nil))))))
+;; (let* ((variable-tuple '(:font "ETBembo"))
+;;        (headline `(:inherit default :weight bold)))
+;;   (custom-theme-set-faces
+;;    'user
+;;    `(org-level-8 ((t (,@headline ,@variable-tuple))))
+;;    `(org-level-7 ((t (,@headline ,@variable-tuple))))
+;;    `(org-level-6 ((t (,@headline ,@variable-tuple))))
+;;    `(org-level-5 ((t (,@headline ,@variable-tuple))))
+;;    `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+;;    `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.17))))
+;;    `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.23))))
+;;    `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.3))))
+;;    `(org-document-title ((t (,@headline ,@variable-tuple :height 1.4 :underline nil))))))
 #+end_src
 
 ** Line numbers
@@ -125,59 +125,59 @@ Only initialize when running in a GUI frame on macos and linux.
 #+end_src
 
 ** Visual improvements
-*** TODO Org-Modern
+*** TODO Make Org-Modern loog good
 Org-modern (https://github.com/minad/org-modern) contains a lot of nice visual
 improvements for org-mode.
 
 (I Need to adjust the style to fit into my theme)
 
-#+begin_src elisp :tangle packages.el
-(package! org-modern)
+#+begin_src elisp :tangle none
+;; (package! org-modern)
 #+end_src
 
 
 Use it globally and tweak it some more.
-#+begin_src elisp :tangle no
-(modify-all-frames-parameters
- '((right-divider-width . 10)
-   (internal-border-width . 10)))
-(dolist (face '(window-divider
-                window-divider-first-pixel
-                window-divider-last-pixel))
-  (face-spec-reset-face face)
-  (set-face-foreground face (face-attribute 'default :background)))
-(set-face-background 'fringe (face-attribute 'default :background))
+#+begin_src elisp :tangle none
+;; (modify-all-frames-parameters
+;;  '((right-divider-width . 10)
+;;    (internal-border-width . 10)))
+;; (dolist (face '(window-divider
+;;                 window-divider-first-pixel
+;;                 window-divider-last-pixel))
+;;   (face-spec-reset-face face)
+;;   (set-face-foreground face (face-attribute 'default :background)))
+;; (set-face-background 'fringe (face-attribute 'default :background))
 
-(use-package! org-modern
-  :after org
-  :custom
-  (org-modern-star '("◉" "○" "◈" "◇" "•"))
-  (org-modern-timestamp '(" %d.%m.%Y " . " %H:%M ")))
+;; (use-package! org-modern
+;;   :after org
+;;   :custom
+;;   (org-modern-star '("◉" "○" "◈" "◇" "•"))
+;;   (org-modern-timestamp '(" %d.%m.%Y " . " %H:%M ")))
 
-(setq
- ;; Edit settings
- org-auto-align-tags nil
- org-tags-column 0
- org-catch-invisible-edits 'show-and-error
- org-special-ctrl-a/e t
- org-insert-heading-respect-content t
+;; (setq
+;;  ;; Edit settings
+;;  org-auto-align-tags nil
+;;  org-tags-column 0
+;;  org-catch-invisible-edits 'show-and-error
+;;  org-special-ctrl-a/e t
+;;  org-insert-heading-respect-content t
 
- ;; Org styling, hide markup etc.
- org-hide-emphasis-markers t
- org-pretty-entities t
- org-ellipsis "…"
+;;  ;; Org styling, hide markup etc.
+;;  org-hide-emphasis-markers t
+;;  org-pretty-entities t
+;;  org-ellipsis "…"
 
- ;; Agenda styling
- org-agenda-tags-column 0
- org-agenda-block-separator ?─
- org-agenda-time-grid
- '((daily today require-timed)
-   (800 1000 1200 1400 1600 1800 2000)
-   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
- org-agenda-current-time-string
- "⭠ now ─────────────────────────────────────────────────")
+;;  ;; Agenda styling
+;;  org-agenda-tags-column 0
+;;  org-agenda-block-separator ?─
+;;  org-agenda-time-grid
+;;  '((daily today require-timed)
+;;    (800 1000 1200 1400 1600 1800 2000)
+;;    " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+;;  org-agenda-current-time-string
+;;  "⭠ now ─────────────────────────────────────────────────")
 
-(global-org-modern-mode)
+;; (global-org-modern-mode)
 #+end_src
 
 *** Vastly improve the tree's display
@@ -324,14 +324,9 @@ Add `:ignore:` tag to headings, so only the headings will be ignored for an expo
 
 *** Presentation
 **** Export to Reveal.js
-#+begin_src elisp
-;(use-package! org-re-reveal)
+#+begin_src elisp none
+;; (use-package! org-re-reveal)
 #+end_src
-**** org-present
-#+begin_src elisp :tangle packages.el
-(package! org-present)
-#+end_src
-
 ** Extensions
 *** Roam
 *** Use the same directory as org
@@ -384,6 +379,25 @@ The closest comparison to org-roam-ui is Obsidian.
 ;;         org-gcal-fetch-file-alit '(("tbrpilz@googlemail.com" . "~/org/schedule.org"))))
 #+end_src
 
+*** Presentation
+**** Org-Present
+#+begin_src elisp :tangle packages.el
+(package! org-present)
+#+end_src
+
+#+begin_src elisp
+(use-package! org-present
+  :hook (org-present-mode . (lambda ()
+                              (org-present-big)
+                              (org-display-inline-images)
+                              (org-present-hide-cursor)
+                              (org-present-read-only)))
+  :hook (org-present-mode-quit . (lambda ()
+                                   (org-present-small)
+                                   (org-remove-inline-images)
+                                   (org-present-show-cursor)
+                                   (org-present-read-write))))
+#+end_src
 ** Fixes and miscellanious improvements
 *** Add shortcut for inserting  source, quote and example blocks
 
@@ -634,8 +648,8 @@ expression buily by nix.
 
 ***** Nix-sandbox
 Utility functions to work with nix sandboxes.
-#+begin_src elisp :tangle packages.el
-(package! nix-sandbox)
+#+begin_src elisp :tangle none
+;; (package! nix-sandbox)
 #+end_src
 
 - ~nix-shell-command~ composes command that can be executed in the given sandbox
@@ -649,10 +663,10 @@ Utility functions to work with nix sandboxes.
 Using the nix-sandbox utility functions, we can enhande Flycheck.
 
 #+begin_src elisp
-(setq flycheck-command-wrapper-function
-        (lambda (command) (apply 'nix-shell-command (nix-current-sandbox) command))
-      flycheck-executable-find
-        (lambda (cmd) (nix-executable-find (nix-current-sandbox) cmd)))
+;; (setq flycheck-command-wrapper-function
+;;         (lambda (command) (apply 'nix-shell-command (nix-current-sandbox) command))
+;;       flycheck-executable-find
+;;         (lambda (cmd) (nix-executable-find (nix-current-sandbox) cmd)))
 #+end_src
 
 *** Python
@@ -1121,6 +1135,18 @@ with OpenAI's GPT-3 API.
 (use-package! gpt)
 #+end_src
 
+*** Quarto
+Quarto (https://quarto.org/) is a package for writing literate programming,
+based on Pandoc.
+
+#+begin_src elisp :tangle packages.el
+(package! quarto-mode)
+#+end_src
+
+#+begin_src elisp
+(use-package quarto-mode
+  :mode (("\\.Rmd" . poly-quarto-mode)))
+#+end_src
 * UI
 ** Theming
 *** Doom Themes
@@ -1195,6 +1221,36 @@ generating color schemes, although it is more flexible than ewal or pywal.
 #+begin_src elisp :tangle packages.el
 (package! autothemer)
 #+end_src
+
+*** Base 16 Themes
+Since they rely on only the 16 base terminal colors, base 16 themes are very
+popular and make it easy to have a harmonized look across all your programs.
+Fortunately, there is a base 16 theme for Doom Emacs, which stems from the
+"Tinted Themeing project" (https://github.com/tinted-theming/home).
+
+#+begin_src elisp :tangle packages.el
+(package! base16-theme)
+#+end_src
+
+#+begin_src elisp
+;; (use-package base16-theme
+;;   :ensure t
+;;   :demand t
+;;   :config
+;;   (load-theme 'base16-default-dark t))
+#+end_src
+
+Some of the themes have a bit too less contrast for my taste. I think  the issue
+is that all 16 colors are taken 'as-is', whereas it should be possible to
+create a color scheme with more nuance via color correcting the applied colors.
+
+~kurecolor~ seems to be a library aimed exactly at such a purpose.
+
+#+begin_src elisp :tangle packages.el
+(package! kurecolor)
+#+end_src
+
+**** TODO: Implement more complex color schemes based on base16 colors
 
 ** Modeline
 *** Doom Modeline
@@ -1326,6 +1382,9 @@ to All-The-icons-Ivy (which had some issues with my setup)
 #+end_src
 
 **** Ivy-Postframe
+:LOGBOOK:
+CLOCK: [2023-02-10 Fri 12:39]--[2023-02-10 Fri 12:41] =>  0:02
+:END:
 
 Doom Emacs already has Ivy-Postframe enabled, so there are just some tweaks to
 be made.
