@@ -65,6 +65,7 @@ in
   modules.colorschemes.enable = false;
 
   modules.tools.container.enable = true;
+  modules.terminal.kitty.enable = true;
 
   nix.settings = {
     build-users-group = "nixbld";

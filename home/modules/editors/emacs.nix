@@ -109,6 +109,10 @@ in
       # Typescript repl / execution
       nodePackages.ts-node
       nodePackages.typescript
+
+      # doom emacs org :jupyter and :gnuplot
+      gnuplot
+      jupyter
     ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
