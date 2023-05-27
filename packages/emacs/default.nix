@@ -15,17 +15,10 @@ let
     name = "emacs";
     paths = [ emacsPkg ];
     nativeBuildInputs = [ makeBinaryWrapper ];
-    meta = emacsPkg.meta;
     postBuild = ''
-      rm $out/Applications/Emacs.app/Contents/MacOS/Emacs
-      cp $out/bin/emacs $out/Applications/Emacs.app/Contents/MacOS/Emacs
-      echo "\$out ###"
-      cat $out/bin/emacs
-      echo "emacsScriptPath ###"
-      cat ${emacsScriptPath.outPath}/bin/emacs
-      # cp $out/bin/emacs $out/Applications/Emacs.app/Contents/MacOS/Emacs
-      wrapProgram $out/Applications/Emacs.app/Contents/MacOS/Emacs --set LSP_USE_PLISTS true --set WEBKIT_DISABLE_COMPOSITING_MODE 1
+      wrapProgram $out/bin/emacs --set LSP_USE_PLISTS true --set WEBKIT_DISABLE_COMPOSITING_MODE 1
     '';
+    meta = emacsPkg.meta;
   });
 
   patch-nul-char-bug = let
@@ -38,9 +31,8 @@ let
 in
 rec {
   emacsStablePatched = (patch-nul-char-bug pkgs.emacs);
-  emacsStableXw = (add-feature-flags emacsStablePatched);#add-env (patch-nul-char-bug (add-feature-flags emacs));
-  emacsStableXwWrapped = (wrap emacsStableXw);
-  emacsGitXw = (add-feature-flags pkgs.emacsGit);
-  emacsGitXwWrapped = (wrap emacsGitXw);
-  emacsGitWrapped = (wrap pkgs.emacsGit);
+  emacsStable = (add-feature-flags emacsStablePatched); #add-env (patch-nul-char-bug (add-feature-flags emacs));
+  emacsStableWrapped = (wrap emacsStable);
+  emacsGit = (add-feature-flags pkgs.emacsGit);
+  emacsGitWrapped = (wrap emacsGit);
 } // emacsPackages.packages

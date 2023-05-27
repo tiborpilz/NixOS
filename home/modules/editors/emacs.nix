@@ -3,7 +3,7 @@ with lib;
 let
   cfg = config.modules.editors.emacs;
   mylib = import ../../../lib { inherit inputs lib pkgs; };
-  emacsPackage = pkgs.my.emacsGitXwWrapped;
+  emacsPackage = pkgs.my.emacsGitWrapped;
 in
 {
   options.modules.editors.emacs = {
@@ -69,6 +69,8 @@ in
       # :lang latex & :lang org (late previews)
       texlive.combined.scheme-medium
 
+      rnix
+
       # alternative lsp server for nix
       nil
 
@@ -106,7 +108,7 @@ in
       # Markdown conversion and live preview
       pandoc
     ];
-    home.packages = [ pkgs.my.emacsGitWrapped ];
+    # home.packages = [ pkgs.my.emacsGitWrapped ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
 
