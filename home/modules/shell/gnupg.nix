@@ -12,11 +12,12 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.sessionVariables.GNUPGHOME = "$XDG_CONFIG_HOME/gnupg";
+    home.sessionVariables.GNUPGHOME = "${config.xdg.configHome}/gnupg";
 
     home.packages = [ pkgs.yubikey-personalization-gui ];
 
     programs.gpg.enable = true;
+    programs.gpg.homedir = "${config.xdg.configHome}/gnupg";
     services.gpg-agent.enable = true;
     services.gpg-agent.enableSshSupport = true;
 

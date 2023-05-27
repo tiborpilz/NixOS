@@ -83,8 +83,8 @@
           };
           my = self.packages."${prev.system}";
         })
-        inputs.deno2nix.overlay
-        inputs.devshell.overlay
+        inputs.deno2nix.overlays.default
+        inputs.devshell.overlays.default
         inputs.emacs-overlay.overlay
       ];
 
