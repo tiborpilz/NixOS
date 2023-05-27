@@ -11,31 +11,11 @@ let
     postFixup = (old.postFixup or "") + "wrapProgram $out/bin/emacs --set ${key} ${value}";
   }));
 
-<<<<<<< HEAD
-  emacsScript = emacsPkg: pkgs.writeShellScriptBin "emacs" ''
-    #!/usr/bin/env bash
-    . $HOME/.profile
-    exec ${emacsPkg}/bin/emacs "$@"
-  '';
-
-  wrap = with pkgs; emacsPkg:
-  let
-    emacsScriptPath = emacsScript emacsPkg;
-  in
-    (symlinkJoin {
-    name = "emacs";
-    paths = [ emacsScriptPath emacsPkg ];
-    nativeBuildInputs = [ makeBinaryWrapper ];
-    meta = {
-      platforms = emacsPkg.meta.platforms;
-    };
-=======
   wrap = with pkgs; emacsPkg: (symlinkJoin {
     name = "emacs";
     paths = [ emacsPkg ];
     nativeBuildInputs = [ makeBinaryWrapper ];
     meta = emacsPkg.meta;
->>>>>>> 6768e0d (emacs: use git version again)
     postBuild = ''
       rm $out/Applications/Emacs.app/Contents/MacOS/Emacs
       cp $out/bin/emacs $out/Applications/Emacs.app/Contents/MacOS/Emacs
@@ -57,15 +37,9 @@ let
   emacsPackages = lib.my.mapModules (toString ./.) (package: (import package) { inherit inputs pkgs lib; });
 in
 rec {
-<<<<<<< HEAD
-  emacs27Patched = (patch-nul-char-bug pkgs.emacs);
-  emacs27Xw = (add-feature-flags emacs27Patched); #add-env (patch-nul-char-bug (add-feature-flags emacs));
-  emacs27XwWrapped = (wrap emacs27Xw);
-=======
   emacsStablePatched = (patch-nul-char-bug pkgs.emacs);
   emacsStableXw = (add-feature-flags emacsStablePatched);#add-env (patch-nul-char-bug (add-feature-flags emacs));
   emacsStableXwWrapped = (wrap emacsStableXw);
->>>>>>> 6768e0d (emacs: use git version again)
   emacsGitXw = (add-feature-flags pkgs.emacsGit);
   emacsGitXwWrapped = (wrap emacsGitXw);
   emacsGitWrapped = (wrap pkgs.emacsGit);
