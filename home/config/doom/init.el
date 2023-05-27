@@ -16,8 +16,8 @@
 
 
 ;; Enable deferred compilation, also use half of the available cores
-(setq native-comp-deferred-compilation t
-      native-comp-async-jobs-number 16)
+(setq native-comp-jit-compilation t
+      native-comp-async-jobs-number 32)
 
 (doom! :input
        ;;chinese
@@ -69,7 +69,7 @@
        ;;objed             ; text object editing for the innocent
        ;; parinfer          ; turn lisp into python, sort of
        rotate-text       ; cycle region at point between text candidates
-       ;; snippets          ; my elves. They type so I don't have to
+       snippets          ; my elves. They type so I don't have to
        word-wrap        ; soft wrapping with language-aware indent
 
        :emacs
@@ -96,12 +96,12 @@
        biblio            ; Writes a PhD for you (citation needed)
        (debugger +lsp)          ; FIXME stepping through code, to help you add bugs
        direnv
-       ;; docker
+        docker
        editorconfig      ; let someone else argue about tabs vs spaces
-       ;; ein               ; tame Jupyter notebooks with emacs
+        ein               ; tame Jupyter notebooks with emacs
        (eval +overlay)     ; run code, run (also, repls)
-       ;; gist              ; interacting with github gists
-       ;; (lookup +dictionary +docsets +offline)              ; navigate your code and its documentation
+        gist              ; interacting with github gists
+        (lookup +dictionary +docsets +offline)              ; navigate your code and its documentation
        (lookup +docsets)
        (lsp +peek)               ; M-x vscode
        (magit +forge)             ; a git porcelain for Emacs
@@ -110,7 +110,7 @@
        pdf               ; pdf enhancements
        prodigy           ; FIXME managing external services & code builders
        rgb               ; creating color strings
-       ; taskrunner        ; taskrunner for all your projects
+       taskrunner        ; taskrunner for all your projects
        terraform         ; infrastructure as code
        tmux              ; an API for interacting with tmux
        ;;upload            ; map local to remote projects via ssh/ftp
