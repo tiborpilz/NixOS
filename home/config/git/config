@@ -28,3 +28,6 @@
 	default = current
 [init]
 	defaultBranch = main
+
+[gitlab "gitlab.com/api/v4"]
+  user = tiborpilz
