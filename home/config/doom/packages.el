@@ -45,6 +45,11 @@
 
 (package! gptel)
 
+(package! org-ai
+  :recipe (:host github
+           :repo "rksm/org-ai"
+           :files ("*.el" "README.md" "snippets")))
+
 (package! doom-themes)
 
 (package! grayscale-theme)
