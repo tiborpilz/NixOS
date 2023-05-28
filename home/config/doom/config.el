@@ -504,6 +504,14 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (setq gptel-default-mode 'org-mode)
 
+(use-package org-ai
+  :after org
+  :config
+  (org-ai-install-yasnippets)
+  (setq org-ai-openai-api-token (password-store-get "bitwarden/openai-gpt-key"))
+  (setq org-ai-default-chat-model "gpt-3.5-turbo")
+)
+
 (setq doom-theme 'doom-nord-aurora)
 
 (use-package ewal

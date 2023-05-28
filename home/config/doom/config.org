@@ -1183,6 +1183,7 @@ with OpenAI's GPT-3 API.
 
 * Tools
 ** Language AI
+*** GPTel
 GPTel (https://github.com/karthink/gptel) is a package for interacting with
 GPT-3.
 
@@ -1223,6 +1224,27 @@ code snippets.
 (setq gptel-default-mode 'org-mode)
 #+end_src
 
+
+*** Org-AI
+Minor mode for Emacs org-mode that provides access to OpenAI API's.
+
+#+begin_src elisp :tangle packages.el
+(package! org-ai
+  :recipe (:host github
+           :repo "rksm/org-ai"
+           :files ("*.el" "README.md" "snippets")))
+#+end_src
+
+#+begin_src elisp
+(use-package org-ai
+  :after org
+  :config
+  (org-ai-install-yasnippets)
+  (setq org-ai-openai-api-token (password-store-get "bitwarden/openai-gpt-key"))
+  (setq org-ai-default-chat-model "gpt-3.5-turbo")
+)
+#+end_src
+** Visuals
 *** Doom Themes
 #+begin_src elisp :tangle packages.el
 (package! doom-themes)
