@@ -37,6 +37,8 @@
 
 (package! nvm)
 
+(package! lab :recipe (:host github :repo "isamert/lab.el"))
+
 (package! devdocs)
 
 ;; (package! dash-docs)

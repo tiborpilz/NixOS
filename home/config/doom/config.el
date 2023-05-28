@@ -331,13 +331,22 @@
 (setq lsp-semantic-tokens-enable t)
 (setq lsp-semantic-tokens-honor-refresh-requests t)
 
-(setq company-idle-delay 0.35 ;; How long to wait before popping up
-      company-minimum-prefix-length 2 ;; Show the menu after one key press
+(setq company-idle-delay 0 ;; How long to wait before popping up
+      company-minimum-prefix-length 1 ;; Show the menu after one key press
       company-tooltip-limit 10 ;; Limit on how many options to display
       company-tooltip-align-annotations t ;; Align annotations to the right
       company-require-match nil           ;; Allow free typing
       company-selection-wrap-around t ;; Wrap around to beginning when you hit bottom of suggestions
       )
+
+;; Unbind existing keybindings
+(with-eval-after-load 'evil-maps
+  (define-key evil-normal-state-map (kbd "C-n") nil)
+  (define-key evil-insert-state-map (kbd "C-p") nil))
+
+;; Bind company to C-n
+(map! :map evil-insert-state-map
+      "C-n" #'company-manual-begin)
 
 (after! lsp-mode
   (setq company-backends '(company-capf)))
@@ -479,6 +488,12 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
      ;; force update evil keymaps after git-timemachine-mode loaded
      (add-hook 'git-timemachine-mode-hook #'evil-normalize-keymaps)))
 
+(use-package lab
+  :after magit
+  :config
+  (setq lab-host "https://gitlab.com")
+  (setq lab-token (password-store-get "bitwarden/gitlab-token")))
+
 (map! :leader
       (:prefix ("D" . "devdocs")
        :desc "Open devdocs" "o" #'devdocs-peruse
@@ -561,6 +576,68 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
   :bind (:map xwidget-webkit-mode-map
               ("f" . xwwp-ace-toggle)
               ("v" . xwwp-follow-link)))
+
+(require 'dash)
+(require 's)
+
+(defmacro with-face (STR &rest PROPS)
+  "Return STR propertized with PROPS."
+  `(propertize ,STR 'face (list ,@PROPS)))
+
+(defmacro esh-section (NAME ICON FORM &rest PROPS)
+  "Build eshell section NAME with ICON prepended to evaled FORM with PROPS."
+  `(setq ,NAME
+         (lambda () (when ,FORM
+                      (-> ,ICON
+                          (concat esh-section-delim ,FORM)
+                          (with-face ,@PROPS))))))
+
+(defun esh-acc (acc x)
+  "Accumulator for evaluating and concatenating esh-sections."
+  (--if-let (funcall x)
+      (if (s-blank? acc)
+          it
+        (concat acc esh-sep it))
+    acc))
+
+(defun esh-prompt-func ()
+  "Build `eshell-prompt-function'"
+  (concat esh-header
+          (-reduce-from 'esh-acc "" eshell-funcs)
+          "\n"
+          eshell-prompt-string))
+
+(setq esh-sep " ")
+
+(setq esh-section-delim " ")
+
+(setq esh-header "\n")
+
+(setq eshell-prompt-regexp " ")
+(setq eshell-prompt-string " ")
+
+(esh-section esh-dir
+             "\xf07c"  ;  (faicon folder)
+             (abbreviate-file-name (eshell/pwd))
+             '(:foreground "gold" :bold ultra-bold :underline t))
+
+(esh-section esh-git
+            "\xe907"  ;  (git icon)
+            (magit-get-current-branch)
+            '(:foreground "pink"))
+
+(esh-section esh-python
+             "\xe928"  ;  (python icon)
+             pyvenv-virtual-env-name)
+
+(esh-section esh-clock
+             "\xf017"  ;  (clock icon)
+             (format-time-string "%H:%M" (current-time))
+             '(:foreground "forest green"))
+
+(setq eshell-funcs (list esh-dir esh-git esh-python esh-clock))
+
+(setq eshell-prompt-function 'esh-prompt-func)
 
 (setq gc-cons-threshold (* 1024 1024 1024)) ;; 1G
 

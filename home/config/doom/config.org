@@ -1,4 +1,6 @@
 #+PROPERTY: header-args elisp :tangle ./config.el
+#+PROPERTY: header-args elisp :results silent
+
 
 * Introduction
 
@@ -791,14 +793,31 @@ I don't want any delay in showing suggestions, unless I'm writing a string or a
 comment, then I want company to not show any suggestions at all.
 
 #+begin_src elisp
-(setq company-idle-delay 0.35 ;; How long to wait before popping up
-      company-minimum-prefix-length 2 ;; Show the menu after one key press
+(setq company-idle-delay 0 ;; How long to wait before popping up
+      company-minimum-prefix-length 1 ;; Show the menu after one key press
       company-tooltip-limit 10 ;; Limit on how many options to display
       company-tooltip-align-annotations t ;; Align annotations to the right
       company-require-match nil           ;; Allow free typing
       company-selection-wrap-around t ;; Wrap around to beginning when you hit bottom of suggestions
       )
 #+end_src
+
+**** Manual Triggering
+I want to be able to trigger company manually, so I'm binding it to ~C-n~ - but
+since that is already bound to evil-paste-pop, I have to first unbind it.
+
+#+begin_src elisp
+;; Unbind existing keybindings
+(with-eval-after-load 'evil-maps
+  (define-key evil-normal-state-map (kbd "C-n") nil)
+  (define-key evil-insert-state-map (kbd "C-p") nil))
+
+;; Bind company to C-n
+(map! :map evil-insert-state-map
+      "C-n" #'company-manual-begin)
+#+end_src
+
+#+RESULTS:
 
 **** Backends
 A backend is responsible for providing the completion suggestions. As I'm using
@@ -1123,6 +1142,27 @@ Doom Emacs comes with Magit.
      ;; force update evil keymaps after git-timemachine-mode loaded
      (add-hook 'git-timemachine-mode-hook #'evil-normalize-keymaps)))
 #+end_src
+
+**** Gitlab
+Although Magit/Forge supports Gitlab, there is some functionality missing,
+especially in regards to the pipelines. For that, I'm using ~lab.el~
+
+#+begin_src elisp :tangle packages.el
+(package! lab :recipe (:host github :repo "isamert/lab.el"))
+#+end_src
+
+Wait for the package to be loaded before setting the variables.
+#+begin_src elisp
+(use-package lab
+  :after magit
+  :config
+  (setq lab-host "https://gitlab.com")
+  (setq lab-token (password-store-get "bitwarden/gitlab-token")))
+#+end_src
+
+#+RESULTS:
+: t
+
 *** Documentation
 **** Devdocs
 Devdocs (https://elpa.gnu.org/packages/devdocs.html) is a package for viewing
@@ -1457,6 +1497,123 @@ xwidget-webkit browser.
               ("f" . xwwp-ace-toggle)
               ("v" . xwwp-follow-link)))
 #+end_src
+** Eshell
+Eshell is a shell implemented in Emacs Lisp. It is a replacement for command
+shells such as bash, zsh or fish, providing a general purpose command line
+environment, which also supports Emacs features like command completion,
+history, and redirection.
+
+*** Prompt
+I start with generating a macro which accepts a name, an icon, a form or
+variable, and potentially face properties. This macro generates anonymous
+functions that are merged and assessed when prompted.
+
+(Shoutout to [[https://www.modernemacs.com/post/custom-eshell][Modern Emacs]])
+
+#+begin_src elisp
+(require 'dash)
+(require 's)
+
+(defmacro with-face (STR &rest PROPS)
+  "Return STR propertized with PROPS."
+  `(propertize ,STR 'face (list ,@PROPS)))
+
+(defmacro esh-section (NAME ICON FORM &rest PROPS)
+  "Build eshell section NAME with ICON prepended to evaled FORM with PROPS."
+  `(setq ,NAME
+         (lambda () (when ,FORM
+                      (-> ,ICON
+                          (concat esh-section-delim ,FORM)
+                          (with-face ,@PROPS))))))
+
+(defun esh-acc (acc x)
+  "Accumulator for evaluating and concatenating esh-sections."
+  (--if-let (funcall x)
+      (if (s-blank? acc)
+          it
+        (concat acc esh-sep it))
+    acc))
+
+(defun esh-prompt-func ()
+  "Build `eshell-prompt-function'"
+  (concat esh-header
+          (-reduce-from 'esh-acc "" eshell-funcs)
+          "\n"
+          eshell-prompt-string))
+#+end_src
+
+Next is the configuration
+
+The seperator between the sections
+#+begin_src elisp
+(setq esh-sep " ")
+#+end_src
+
+The Seperator between a section icon and form
+#+begin_src elisp
+(setq esh-section-delim " ")
+#+end_src
+
+The Eshell prompt header
+#+begin_src elisp
+(setq esh-header "\n")
+#+end_src
+
+The prompt regexp and string, since I don't want to vary them based on my login,
+I keep them the same.
+
+#+begin_src elisp
+(setq eshell-prompt-regexp " ")
+(setq eshell-prompt-string " ")
+#+end_src
+
+Now, I can generate some sections.
+
+Folder section:
+#+begin_src elisp
+(esh-section esh-dir
+             "\xf07c"  ;  (faicon folder)
+             (abbreviate-file-name (eshell/pwd))
+             '(:foreground "gold" :bold ultra-bold :underline t))
+#+end_src
+
+Git section:
+#+begin_src elisp
+(esh-section esh-git
+            "\xe907"  ;  (git icon)
+            (magit-get-current-branch)
+            '(:foreground "pink"))
+#+end_src
+
+Python Venv section:
+#+begin_src elisp
+(esh-section esh-python
+             "\xe928"  ;  (python icon)
+             pyvenv-virtual-env-name)
+#+end_src
+
+Clock section:
+#+begin_src elisp
+(esh-section esh-clock
+             "\xf017"  ;  (clock icon)
+             (format-time-string "%H:%M" (current-time))
+             '(:foreground "forest green"))
+#+end_src
+
+
+Now, I can generate the prompt function. First, I define the list of sections
+#+begin_src elisp
+(setq eshell-funcs (list esh-dir esh-git esh-python esh-clock))
+#+end_src
+
+Then, I generate the prompt function
+#+begin_src elisp
+(setq eshell-prompt-function 'esh-prompt-func)
+#+end_src
+
+#+RESULTS:
+: esh-prompt-func
+
 * Performance
 Various tweaks to improve the overall performance.
 
