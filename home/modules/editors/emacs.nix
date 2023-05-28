@@ -48,7 +48,7 @@ in
       (setq lsp-use-plists t)
     '';
     programs.emacs.package = emacsPackage;
-    programs.emacs.extraPackages = self: with pkgs; [
+    home.packages = with pkgs; [
       # emacsWithNativeComp
 
       fd # for projectile
@@ -68,8 +68,6 @@ in
 
       # :lang latex & :lang org (late previews)
       texlive.combined.scheme-medium
-
-      rnix
 
       # alternative lsp server for nix
       nil
