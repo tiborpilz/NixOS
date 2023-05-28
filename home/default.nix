@@ -53,6 +53,7 @@ in {
   modules.editors.emacs.useNix = false;
 
   modules.tools.vagrant.enable = false;
+  modules.tools.podman.enable = true;
 
   modules.syncthing.enable = true;
 
