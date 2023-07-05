@@ -60,6 +60,18 @@
     layout = "us";
     xkbVariant = "";
     xkbOptions = "caps:swapescape";
+
+    libinput = {
+      enable = true;
+
+      mouse = {
+        accelProfile = "flat";
+      };
+
+      touchpad = {
+        accelProfile = "flat";
+      };
+    };
   };
 
   # Enable CUPS to print documents.
