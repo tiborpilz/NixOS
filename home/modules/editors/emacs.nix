@@ -29,6 +29,8 @@ in
         { name = "config.el"; path = pkgs.emptyFile; }
       ];
 
+      # emacsPackage = pkgs.emacsGit;
+
       emacsPackagesOverlay = self: super: {
         copilot = pkgs.my.copilot;
         emacs = emacsPackage;
@@ -69,11 +71,14 @@ in
       # :lang latex & :lang org (late previews)
       texlive.combined.scheme-medium
 
-      # alternative lsp server for nix
-      nil
+      # typescript is a dependency for running lsp-mode
+      nodePackages.typescript
 
       # typescript language server
       nodePackages.typescript-language-server
+
+      # alternative lsp server for nix
+      nil
 
       # vue language server
       my."@volar/vue-language-server"
