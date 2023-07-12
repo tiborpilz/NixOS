@@ -36,7 +36,6 @@ in
   # Regardlass of whether I'm using Bash (I'm not),
   # I need an up-to-date binary for nix-shell and some other settings in ".profile" that
   # are only there when `bash` is enabled.
-
   programs.bash.enable = true;
 
   programs.man.enable = true;
@@ -45,7 +44,7 @@ in
   modules.shell.zsh.aliases.ungron = "gron --ungron";
 
   modules.shell.tmux.enable = true;
-  modules.shell.gnupg.enable = false;
+  modules.shell.gnupg.enable = true;
   modules.shell.git.enable = true;
   modules.shell.direnv.enable = true;
 
