@@ -60,7 +60,7 @@ in
 
     home.sessionVariables.ZDOTDIR = "${envVars.XDG_CONFIG_HOME}/zsh";
     home.sessionVariables.ZSH_CACHE_DIR = "${envVars.XDG_CACHE_HOME}/zsh";
-    home.sessionVariables.NVM_DIR = "${envVars.XDG_CONFIG_HOME}/nvm";
+    # home.sessionVariables.NVM_DIR = "${envVars.XDG_CONFIG_HOME}/nvm";
 
     # home.sessionPath = [ "${home.sessionVariables.XDG_CONFIG_HOME}/.krew/bin" ];
 

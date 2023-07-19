@@ -104,7 +104,7 @@ Only initialize when running in a GUI frame on macos and linux.
   :ensure t
   :if (memq window-system '(mac ns x))
   :config
-  (setq exec-path-from-shell-variables '("PATH" "NVM_PATH" "NVM_BIN"))
+  (setq exec-path-from-shell-variables '("PATH" "NVM_DIR" "NVM_BIN"))
   (exec-path-from-shell-initialize))
 #+end_src
 * Org Mode
