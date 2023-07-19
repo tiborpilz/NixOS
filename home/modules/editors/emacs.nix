@@ -76,7 +76,7 @@ in
       nodePackages.typescript-language-server
 
       # vue language server
-      my."@volar/vue-language-server"
+      # my."@volar/vue-language-server"
 
       # Python Language Server
       python3Packages.python-lsp-server
@@ -93,7 +93,7 @@ in
       python3Packages.pylint
 
       # Python Language Server Plugins
-      python3Packages.pylsp-mypy
+      # python3Packages.pylsp-mypy
       python3Packages.pyls-isort
       python3Packages.python-lsp-black
 
@@ -118,7 +118,7 @@ in
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
 
 
-    # xdg.configFile."doom" = { source = ../../config/doom; recursive = true; };
+    xdg.configFile."doom" = { source = ../../config/doom; recursive = true; };
 
     # home.sessionVariables.DOOMDIR = (if !cfg.useNix then "${config.home.homeDirectory}/.config/nixos/home/config/doom" else "");
 
@@ -132,11 +132,11 @@ in
           #     ${pkgs.git}/bin/git clone --depth=1 --single-branch https://github.com/tiborpilz/nixos ".config/nixos"
           # fi
 
-          if [ ! -d ".config/doom" ]; then
-              tempdir=$(mktemp -d)
-              ${pkgs.git}/bin/git clone https://github.com/tiborpilz/nixos $tempdir
-              cp -r $tempdir/home/config/doom ~/.config/doom
-          fi
+          # if [ ! -d ".config/doom" ]; then
+          #    tempdir=$(mktemp -d)
+          #    ${pkgs.git}/bin/git clone https://github.com/tiborpilz/nixos $tempdir
+          #    cp -r $tempdir/home/config/doom ~/.config/doom
+          # fi
           # .config/emacs/bin/doom sync
         '';
       in (lib.hm.dag.entryAfter ["WriteBoundary"] (if cfg.useNix then "" else activationScript ));

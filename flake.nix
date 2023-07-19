@@ -2,10 +2,10 @@
   description = "NixOS and Home-Manager configurations";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-22.11";
+    nixpkgs.url = "nixpkgs/nixos-23.05";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
-    home-manager.url = "github:nix-community/home-manager";
+    home-manager.url = "github:nix-community/home-manager/release-23.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     emacs-overlay.url = "github:nix-community/emacs-overlay";
@@ -47,7 +47,7 @@
     , ...
     } @ inputs:
     let
-      supportedSystems = [ "x86_64-linux" "x86_64-darwin" ];
+      supportedSystems = [ "x86_64-linux" "aarch64-darwin" ];
       lib = nixpkgs.lib.extend
         (self: super: {
           my = import ./lib { inherit inputs; lib = self; pkgs = nixpkgs; };
@@ -90,9 +90,9 @@
           };
           my = self.packages."${prev.system}";
         })
-        inputs.deno2nix.overlay
-        inputs.devshell.overlay
-        inputs.emacs-overlay.overlay
+        inputs.deno2nix.overlays.default
+        inputs.devshell.overlays.default
+        inputs.emacs-overlay.overlays.default
       ];
 
       hosts = nixosHosts // darwinHosts;
@@ -122,11 +122,12 @@
 
       homeConfigurations = lib.my.mergeAttrs (lib.forEach supportedSystems (system:
         let
-          user = if (system == "x86_64-darwin") then "tibor.pilz" else "tibor";
-          homeDirectory = if (system == "x86_64-darwin") then "/Users/${user}" else "/home/${user}";
-          pkgs = self.channels."${system}".nixpkgs;
+	  isDarwin = (system == "x86_64-darwin" || system == "aarch64-darwin");
+          user = if (isDarwin) then "tibor.pilz" else "tibor";
+          homeDirectory = if (isDarwin) then "/Users/${user}" else "/home/${user}";
+          pkgs = self.channels.${system}.nixpkgs;
           enableSyncthing = (system == "x86_64-linux");
-          hosts = if (system == "x86_64-darwin") then (lib.attrNames self.darwinConfigurations) else (lib.attrNames self.nixosConfigurations);
+          hosts = if (isDarwin) then (lib.attrNames self.darwinConfigurations) else (lib.attrNames self.nixosConfigurations);
           mkHostAliases = map (h: "${user}@${h}") hosts;
           aliases = mkHostAliases;
           homeConfiguration = home-manager.lib.homeManagerConfiguration {

@@ -17,7 +17,7 @@ in
     etBook
 
     # Need later version of bash for nix-shell to work correctly on macos
-    bash
+    # bash
 
     # Setuptools is missing from python
     python3Packages.setuptools
@@ -36,7 +36,7 @@ in
   # Regardlass of whether I'm using Bash (I'm not),
   # I need an up-to-date binary for nix-shell and some other settings in ".profile" that
   # are only there when `bash` is enabled.
-  programs.bash.enable = true;
+  # programs.bash.enable = true;
 
   programs.man.enable = true;
 

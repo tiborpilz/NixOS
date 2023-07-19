@@ -30,7 +30,7 @@
   :ensure t
   :if (memq window-system '(mac ns x))
   :config
-  (setq exec-path-from-shell-variables '("PATH" "NVM_PATH" "NVM_BIN"))
+  (setq exec-path-from-shell-variables '("PATH" "NVM_DIR" "NVM_BIN"))
   (exec-path-from-shell-initialize))
 
 (setq org-directory "~/org/")
