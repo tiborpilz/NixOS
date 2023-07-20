@@ -14,8 +14,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.sessionVariables.GNUPGHOME = "$XDG_CONFIG_HOME/gnupg";
-
     home.packages = [
       pkgs.yubikey-personalization
       pkgs.yubikey-manager
