@@ -8,7 +8,7 @@ in
   {
   imports = mylib.mapModulesRec' (toString ./modules) import;
 
-  home.stateVersion = "22.11";
+  home.stateVersion = "23.05";
 
   fonts.fontconfig.enable = true;
 
@@ -17,7 +17,7 @@ in
     etBook
 
     # Need later version of bash for nix-shell to work correctly on macos
-    # bash
+    bash
 
     # Setuptools is missing from python
     python3Packages.setuptools
