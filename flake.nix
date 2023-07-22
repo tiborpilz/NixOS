@@ -122,7 +122,7 @@
 
       homeConfigurations = lib.my.mergeAttrs (lib.forEach supportedSystems (system:
         let
-	  isDarwin = (system == "x86_64-darwin" || system == "aarch64-darwin");
+          isDarwin = (system == "x86_64-darwin" || system == "aarch64-darwin");
           user = if (isDarwin) then "tibor.pilz" else "tibor";
           homeDirectory = if (isDarwin) then "/Users/${user}" else "/home/${user}";
           pkgs = self.channels.${system}.nixpkgs;
