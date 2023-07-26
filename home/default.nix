@@ -64,6 +64,8 @@ in
   modules.colorschemes.enable = false;
 
   modules.tools.container.enable = true;
+  modules.tools.aws.enable = true;
+
   modules.terminal.kitty.enable = true;
 
   nix.settings = {
