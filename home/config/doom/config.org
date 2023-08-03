@@ -51,19 +51,19 @@ I'm a big fan of ligatures, and I've been using FiraCode for as long as I can re
 Adjust org-mode headlines.
 #+begin_src elisp :tangle none
 
-;; (let* ((variable-tuple '(:font "ETBembo"))
-;;        (headline `(:inherit default :weight bold)))
-;;   (custom-theme-set-faces
-;;    'user
-;;    `(org-level-8 ((t (,@headline ,@variable-tuple))))
-;;    `(org-level-7 ((t (,@headline ,@variable-tuple))))
-;;    `(org-level-6 ((t (,@headline ,@variable-tuple))))
-;;    `(org-level-5 ((t (,@headline ,@variable-tuple))))
-;;    `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
-;;    `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.17))))
-;;    `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.23))))
-;;    `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.3))))
-;;    `(org-document-title ((t (,@headline ,@variable-tuple :height 1.4 :underline nil))))))
+(let* ((variable-tuple '(:font "ETBembo"))
+       (headline `(:inherit default :weight bold)))
+  (custom-theme-set-faces
+   'user
+   `(org-level-8 ((t (,@headline ,@variable-tuple))))
+   `(org-level-7 ((t (,@headline ,@variable-tuple))))
+   `(org-level-6 ((t (,@headline ,@variable-tuple))))
+   `(org-level-5 ((t (,@headline ,@variable-tuple))))
+   `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+   `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.17))))
+   `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.23))))
+   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.3))))
+   `(org-document-title ((t (,@headline ,@variable-tuple :height 1.4 :underline nil))))))
 #+end_src
 
 ** Line numbers
@@ -184,6 +184,7 @@ Use it globally and tweak it some more.
 #+begin_src elisp
 (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 #+end_src
+
 *** Show passed deadlines as error
 #+begin_src elisp
 (setq org-agenda-deadline-faces
@@ -197,6 +198,7 @@ Use it globally and tweak it some more.
 #+begin_src elisp
 (setq org-fontify-quote-and-verse-blocks t)
 #+end_src
+
 *** Defer font-lock
 For a more responsive editing experience
 #+begin_src elisp
@@ -243,19 +245,6 @@ loaded or in a different repo.
           (lambda ()
             (add-hook 'after-save-hook #'org-babel-tangle-config)))
 #+end_src
-*** Make Babel prettier
-#+begin_src elisp
-(defadvice org-babel-execute-src-block (around progress nil activate)
-  (set-face-attribute
-   'org-block-background nil :background "LightSteelBlue")
-  (message "Running your code block")
-  ad-do-it
-  (set-face-attribute 'org-block-background nil :background "gray")
-  (message "Done with code block"))
-#+end_src
-
-#+RESULTS:
-: org-babel-execute-src-block
 
 ** Import/Export
 *** View exported file
@@ -329,12 +318,12 @@ Add `:ignore:` tag to headings, so only the headings will be ignored for an expo
 #+end_src
 ** Extensions
 *** Roam
-*** Use the same directory as org
+**** Use the same directory as org
 #+begin_src elisp
 (setq org-roam-directory "~/org")
 #+end_src
 
-*** Add Org-Roam UI
+**** Add Org-Roam UI
 Org-Roam UI is a web-based interface for Org-roam. It is a separate package -
 and it also needs the websocket package as dependency.
 
@@ -1470,9 +1459,6 @@ Various tweaks to improve the overall performance.
 #+begin_src elisp :tangle packages.el
 
 (package! dap-mode)
-
-;; Citations
-(package! org-ref :pin "3ca9beb744621f007d932deb8a4197467012c23a")
 
 ;; HTTP requests via babel
 (package! ob-http :pin "b1428ea2a63bcb510e7382a1bf5fe82b19c104a7")

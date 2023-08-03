@@ -85,14 +85,6 @@
           (lambda ()
             (add-hook 'after-save-hook #'org-babel-tangle-config)))
 
-(defadvice org-babel-execute-src-block (around progress nil activate)
-  (set-face-attribute
-   'org-block-background nil :background "LightSteelBlue")
-  (message "Running your code block")
-  ad-do-it
-  (set-face-attribute 'org-block-background nil :background "gray")
-  (message "Done with code block"))
-
 (map! :map org-mode-map
       :localleader
       :desc "View exported file" "v" #'org-view-output-file)
