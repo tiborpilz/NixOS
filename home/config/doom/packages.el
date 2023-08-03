@@ -67,9 +67,6 @@
 
 (package! dap-mode)
 
-;; Citations
-(package! org-ref :pin "3ca9beb744621f007d932deb8a4197467012c23a")
-
 ;; HTTP requests via babel
 (package! ob-http :pin "b1428ea2a63bcb510e7382a1bf5fe82b19c104a7")
 

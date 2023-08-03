@@ -72,11 +72,12 @@ in
       # alternative lsp server for nix
       nil
 
-      # typescript language server
+      # typescript & typescript language server
+      nodePackages.typescript
       nodePackages.typescript-language-server
 
       # vue language server
-      # my."@volar/vue-language-server"
+      my."@volar/vue-language-server"
 
       # Python Language Server
       python3Packages.python-lsp-server
