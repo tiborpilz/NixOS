@@ -7,13 +7,16 @@ let
   darwinConfig = {
     home.packages = with pkgs; [
       colima
+
+      # necessary for podman
+      qemu
     ];
   };
 
   sharedConfig = {
     home.packages = with pkgs; [
       podman
-      docker
+      podman-compose
     ];
   };
 in
