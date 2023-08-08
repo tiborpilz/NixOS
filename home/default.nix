@@ -22,12 +22,18 @@ in
     # Setuptools is missing from python
     python3Packages.setuptools
 
+    cmake
+
     # bat is a better cat (as a program, at least)
     bat
 
     htop
 
     pandoc
+
+    # PHP & composer
+    php82
+    php82Packages.composer
   ];
 
   # Let Home Manager install and manage itself.
