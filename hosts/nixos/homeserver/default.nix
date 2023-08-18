@@ -51,27 +51,8 @@ with lib;
     networking.networkmanager.enable = true;
 
     i18n.defaultLocale = "en_US.UTF-8";
-    # console = {
-    #   font = "Lat2-Terminus16";
-    #   keyMap = "us";
-    # };
 
     services.logind.lidSwitch = "ignore";
-
-    # services.avahi = {
-    #   nssmdns = true;
-    #   enable = true;
-    #   ipv4 = true;
-    #   ipv6 = true;
-    #   publish = {
-    #     enable = true;
-    #     addresses = true;
-    #     domain = true;
-    #     hinfo = true;
-    #     userServices = true;
-    #     workstation = true;
-    #   };
-    # };
 
     fileSystems = {
       "/".label = "nixos-root";
@@ -81,6 +62,8 @@ with lib;
 
     services.openssh.enable = true;
     services.openssh.permitRootLogin = "yes";
+
+    programs.zsh.enable = true;
 
     environment.systemPackages = with pkgs; [
       git
