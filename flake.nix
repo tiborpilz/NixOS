@@ -47,7 +47,7 @@
     , ...
     } @ inputs:
     let
-      supportedSystems = [ "x86_64-linux" "aarch64-darwin" ];
+      supportedSystems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" ];
       lib = nixpkgs.lib.extend
         (self: super: {
           my = import ./lib { inherit inputs; lib = self; pkgs = nixpkgs; };
