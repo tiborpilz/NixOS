@@ -18,6 +18,7 @@ jobs:
     - run: nix build .#nixosConfigurations.edge.config.system.build.toplevel
     - run: nix build .#nixosConfigurations.homeserver.config.system.build.toplevel
     - run: nix build .#nixosConfigurations.thinkyMcThinkpad.config.system.build.toplevel
+
   build-macos:
     runs-on: macos-latest
     steps:
