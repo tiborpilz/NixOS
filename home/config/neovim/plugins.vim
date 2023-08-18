@@ -54,6 +54,9 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 " planning/organization
 Plug 'vimwiki/vimwiki'
 
+" Timetracking
+Plug 'wakatime/vim-wakatime'
+
 " Languages
 "" Terraform
 Plug 'hashivim/vim-terraform'

@@ -2,10 +2,10 @@
   description = "NixOS and Home-Manager configurations";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-22.11";
+    nixpkgs.url = "nixpkgs/nixos-23.05";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
-    home-manager.url = "github:nix-community/home-manager";
+    home-manager.url = "github:nix-community/home-manager/release-23.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     emacs-overlay.url = "github:nix-community/emacs-overlay";
@@ -47,7 +47,7 @@
     , ...
     } @ inputs:
     let
-      supportedSystems = [ "x86_64-linux" "x86_64-darwin" ];
+      supportedSystems = [ "x86_64-linux" "aarch64-darwin" ];
       lib = nixpkgs.lib.extend
         (self: super: {
           my = import ./lib { inherit inputs; lib = self; pkgs = nixpkgs; };
@@ -57,8 +57,15 @@
 
       pkgs = self.pkgs.x86_64-linux.nixpkgs;
 
-      nixosHosts = mapModules ./hosts/nixos (hostPath: lib.my.mkHostAttrs hostPath { system = "x86_64-linux"; });
-      darwinHosts = mapModules ./hosts/darwin (hostPath: lib.my.mkHostAttrs hostPath { system = "x86_64-darwin"; });
+      nixosHosts = mapModules ./hosts/nixos (hostPath: lib.my.mkHostAttrs hostPath {
+        system = "x86_64-linux";
+        modules = lib.my.mapModulesRec' (toString ./modules/nixos) import;
+      });
+
+      darwinHosts = mapModules ./hosts/darwin (hostPath: lib.my.mkHostAttrs hostPath {
+        system = "x86_64-darwin";
+        modules = lib.my.mapModulesRec' (toString ./modules/darwin) import;
+      });
     in
     flake-utils-plus.lib.mkFlake rec {
       inherit lib self inputs supportedSystems;
@@ -72,7 +79,7 @@
           digga.nixosModules.bootstrapIso
           digga.nixosModules.nixConfig
           home-manager.nixosModules.home-manager
-        ] ++ lib.my.mapModulesRec' (toString ./modules) import;
+        ] ++ lib.my.mapModulesRec' (toString ./modules/shared) import;
       };
 
       sharedOverlays = [
@@ -85,7 +92,7 @@
         })
         inputs.deno2nix.overlays.default
         inputs.devshell.overlays.default
-        inputs.emacs-overlay.overlay
+        inputs.emacs-overlay.overlays.default
       ];
 
       hosts = nixosHosts // darwinHosts;
@@ -115,11 +122,12 @@
 
       homeConfigurations = lib.my.mergeAttrs (lib.forEach supportedSystems (system:
         let
-          user = if (system == "x86_64-darwin") then "tibor.pilz" else "tibor";
-          homeDirectory = if (system == "x86_64-darwin") then "/Users/${user}" else "/home/${user}";
-          pkgs = self.channels."${system}".nixpkgs;
+          isDarwin = (system == "x86_64-darwin" || system == "aarch64-darwin");
+          user = if (isDarwin) then "tibor.pilz" else "tibor";
+          homeDirectory = if (isDarwin) then "/Users/${user}" else "/home/${user}";
+          pkgs = self.channels.${system}.nixpkgs;
           enableSyncthing = (system == "x86_64-linux");
-          hosts = if (system == "x86_64-darwin") then (lib.attrNames self.darwinConfigurations) else (lib.attrNames self.nixosConfigurations);
+          hosts = if (isDarwin) then (lib.attrNames self.darwinConfigurations) else (lib.attrNames self.nixosConfigurations);
           mkHostAliases = map (h: "${user}@${h}") hosts;
           aliases = mkHostAliases;
           homeConfiguration = home-manager.lib.homeManagerConfiguration {

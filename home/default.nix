@@ -1,13 +1,14 @@
 { inputs, pkgs, lib, config, ... }:
 
 with lib;
-with lib.my;
 
 let mylib = import ../lib { inherit inputs lib pkgs; };
-in {
+in 
+  with mylib;
+  {
   imports = mylib.mapModulesRec' (toString ./modules) import;
 
-  home.stateVersion = "22.11";
+  home.stateVersion = "23.05";
 
   fonts.fontconfig.enable = true;
 
@@ -21,12 +22,18 @@ in {
     # Setuptools is missing from python
     python3Packages.setuptools
 
+    cmake
+
     # bat is a better cat (as a program, at least)
     bat
 
     htop
 
     pandoc
+
+    # PHP & composer
+    php82
+    php82Packages.composer
   ];
 
   # Let Home Manager install and manage itself.
@@ -35,8 +42,7 @@ in {
   # Regardlass of whether I'm using Bash (I'm not),
   # I need an up-to-date binary for nix-shell and some other settings in ".profile" that
   # are only there when `bash` is enabled.
-
-  programs.bash.enable = true;
+  # programs.bash.enable = true;
 
   programs.man.enable = true;
 
@@ -44,9 +50,11 @@ in {
   modules.shell.zsh.aliases.ungron = "gron --ungron";
 
   modules.shell.tmux.enable = true;
-  modules.shell.gnupg.enable = false;
+  modules.shell.gnupg.enable = true;
   modules.shell.git.enable = true;
   modules.shell.direnv.enable = true;
+
+  programs.alacritty.enable = true;
 
   modules.editors.neovim.enable = true;
   modules.editors.emacs.enable = true;
@@ -61,6 +69,11 @@ in {
   modules.password-store.enable = true;
 
   modules.colorschemes.enable = false;
+
+  modules.tools.container.enable = true;
+  modules.tools.aws.enable = true;
+
+  modules.terminal.kitty.enable = true;
 
   nix.settings = {
     build-users-group = "nixbld";
@@ -85,15 +98,4 @@ in {
   # Copy Nix-installed MacOS applications to the home application folder, while resolving symlinks
   # This is due to spotlight not resolving symlinks for some reason
   # TODO: check if this will still work with a nix-managed doom config
-  home.activation.installApps = mkIf pkgs.stdenv.targetPlatform.isDarwin (lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    baseDir="$HOME/Applications/hm-apps"
-    if [ -d "$baseDir" ]; then
-      rm -rf "$baseDir"
-    fi
-    mkdir -p "$baseDir"
-    for app in $(ls $HOME/.nix-profile/Applications); do
-      cp -fHRL "$HOME/.nix-profile/Applications/$app" "$baseDir"
-      chmod -R +w "$baseDir/$app"
-    done
-  '');
 }

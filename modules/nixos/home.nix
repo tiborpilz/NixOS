@@ -25,7 +25,7 @@ in
       {
         _module.args.inputs = inputs;
         _module.args.lib = lib;
-        imports = [ ../home ];
+        imports = [ ../../home ];
         home.file = mkAliasDefinitions options.home.file;
         xdg.configFile = mkAliasDefinitions options.home.configFile;
       }

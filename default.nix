@@ -10,7 +10,7 @@ with lib.my;
       inputs.home-manager.nixosModules.home-manager
     ];
 
-  system.configurationRevision = with inputs; mkIf (self ? rev) self.rev;
+  # system.configurationRevision = with inputs; mkIf (self ? rev) self.rev;
 
-  console.useXkbConfig = true;
+  # console.useXkbConfig = true;
 }
