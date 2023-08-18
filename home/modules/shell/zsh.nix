@@ -28,11 +28,10 @@ in
     '';
   };
 
-  config = mkIf cfg.enable {
+  config = mkIf cfg.enable rec {
     # TODO    home.xdg.configFile."zsh/.zshrc".text = #
     programs.zsh = {
       enable = true;
-      enableCompletion = true;
     };
 
     # targets.genericLinux.enable = true;
@@ -55,11 +54,13 @@ in
       krew
       nodejs
       coreutils
+      thefuck
+      wakatime
     ];
 
     home.sessionVariables.ZDOTDIR = "${envVars.XDG_CONFIG_HOME}/zsh";
     home.sessionVariables.ZSH_CACHE_DIR = "${envVars.XDG_CACHE_HOME}/zsh";
-    home.sessionVariables.NVM_DIR = "${envVars.XDG_CONFIG_HOME}/nvm";
+    # home.sessionVariables.NVM_DIR = "${envVars.XDG_CONFIG_HOME}/nvm";
 
     # home.sessionPath = [ "${home.sessionVariables.XDG_CONFIG_HOME}/.krew/bin" ];
 
@@ -90,5 +91,14 @@ in
        ${cfg.envInit}
     '';
 
+    # Picks up all files in all `home.packages` that contain '#compdef' and puts them into one completion directory.
+    # xdg.configFile."zsh/vendor-completions".source = with pkgs;
+    #   runCommandNoCC "vendored-zsh-completions" {} ''
+    #     mkdir -p $out
+    #     ${fd}/bin/fd -t f '^_[^.]+$' \
+    #       ${lib.escapeShellArgs home.packages} \
+    #       --exec ${ripgrep}/bin/rg -0l '^#compdef' {} \
+    #       | xargs -0 cp -n -t $out/
+    #   '';
   };
 }

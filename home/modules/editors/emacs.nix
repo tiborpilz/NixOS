@@ -3,7 +3,6 @@ with lib;
 let
   cfg = config.modules.editors.emacs;
   mylib = import ../../../lib { inherit inputs lib pkgs; };
-  emacsPackage = pkgs.my.emacsGitWrapped;
 in
 {
   options.modules.editors.emacs = {
@@ -13,7 +12,6 @@ in
 
   config = mkIf cfg.enable {
     programs.doom-emacs = mkIf cfg.useNix rec {
-      inherit emacsPackage;
       enable = true;
       doomPrivateDir = ../../config/doom;
       doomPackageDir = let
@@ -28,8 +26,7 @@ in
         { name = "packages.el"; path = "${filteredPath}/packages.el"; }
         { name = "config.el"; path = pkgs.emptyFile; }
       ];
-
-      # emacsPackage = pkgs.emacsGit;
+      emacsPackage = pkgs.my.emacsGitWrapped;
 
       emacsPackagesOverlay = self: super: {
         copilot = pkgs.my.copilot;
@@ -49,7 +46,8 @@ in
       (setenv "LSP_USE_PLISTS" "true")
       (setq lsp-use-plists t)
     '';
-    programs.emacs.package = emacsPackage;
+
+    programs.emacs.package = pkgs.my.emacsGitWrapped;
     home.packages = with pkgs; [
       # emacsWithNativeComp
 
@@ -71,14 +69,12 @@ in
       # :lang latex & :lang org (late previews)
       texlive.combined.scheme-medium
 
-      # typescript is a dependency for running lsp-mode
-      nodePackages.typescript
-
-      # typescript language server
-      nodePackages.typescript-language-server
-
       # alternative lsp server for nix
       nil
+
+      # typescript & typescript language server
+      nodePackages.typescript
+      nodePackages.typescript-language-server
 
       # vue language server
       my."@volar/vue-language-server"
@@ -98,7 +94,7 @@ in
       python3Packages.pylint
 
       # Python Language Server Plugins
-      python3Packages.pylsp-mypy
+      # python3Packages.pylsp-mypy
       python3Packages.pyls-isort
       python3Packages.python-lsp-black
 
@@ -110,13 +106,20 @@ in
 
       # Markdown conversion and live preview
       pandoc
+
+      # Typescript repl / execution
+      nodePackages.ts-node
+      nodePackages.typescript
+
+      # doom emacs org :jupyter and :gnuplot
+      gnuplot
+      jupyter
     ];
-    # home.packages = [ pkgs.my.emacsGitWrapped ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
 
 
-    # xdg.configFile."doom" = { source = ../../config/doom; recursive = true; };
+    xdg.configFile."doom" = { source = ../../config/doom; recursive = true; };
 
     # home.sessionVariables.DOOMDIR = (if !cfg.useNix then "${config.home.homeDirectory}/.config/nixos/home/config/doom" else "");
 
@@ -130,11 +133,11 @@ in
           #     ${pkgs.git}/bin/git clone --depth=1 --single-branch https://github.com/tiborpilz/nixos ".config/nixos"
           # fi
 
-          if [ ! -d ".config/doom" ]; then
-              tempdir=$(mktemp -d)
-              ${pkgs.git}/bin/git clone https://github.com/tiborpilz/nixos $tempdir
-              cp -r $tempdir/home/config/doom ~/.config/doom
-          fi
+          # if [ ! -d ".config/doom" ]; then
+          #    tempdir=$(mktemp -d)
+          #    ${pkgs.git}/bin/git clone https://github.com/tiborpilz/nixos $tempdir
+          #    cp -r $tempdir/home/config/doom ~/.config/doom
+          # fi
           # .config/emacs/bin/doom sync
         '';
       in (lib.hm.dag.entryAfter ["WriteBoundary"] (if cfg.useNix then "" else activationScript ));

@@ -1,25 +1,18 @@
-(package! org-padding :recipe (:host github :repo "toncherami/org-padding"))
+(package! straight :pin "3eca39d")
 
-(package! org-modern)
+(package! editorconfig)
 
-(package! ob-http)
+(package! exec-path-from-shell)
 
-;; (package! org-present)
-
+(unpin! org-roam)
 (package! org-roam-ui)
-(package! websocket) ; dependency of `org-roam-ui'
-
-(package! transient
-  :pin "c2bdf7e12c530eb85476d3aef317eb2941ab9440"
-  :recipe (:host github :repo "magit/transient"))
-
-(package! with-editor
-  :pin "bbc60f68ac190f02da8a100b6fb67cf1c27c53ab"
-  :recipe (:host github :repo "magit/with-editor"))
+(package! websocket :pin "fda4455333309545c0787a79d73c19ddbeb57980") ; dependency of `org-roam-ui'
 
 (package! org-gcal)
 
-(package! jest-test-mode)
+(package! org-present)
+
+(package! jest)
 
 (package! svelte-mode)
 
@@ -37,20 +30,13 @@
 
 (package! nvm)
 
-(package! lab :recipe (:host github :repo "isamert/lab.el"))
-
 (package! devdocs)
 
 ;; (package! dash-docs)
 
 (package! gpt)
 
-(package! gptel)
-
-(package! org-ai
-  :recipe (:host github
-           :repo "rksm/org-ai"
-           :files ("*.el" "README.md" "snippets")))
+(package! quarto-mode)
 
 (package! doom-themes)
 
@@ -65,12 +51,39 @@
 
 (package! autothemer)
 
+(package! base16-theme)
+
+(package! kurecolor)
+
 ;; (package! which-key-posframe)
 
-;; (package! all-the-icons-ivy-rich)
+(package! all-the-icons-ivy-rich)
 
 (package! treemacs-all-the-icons)
 
 (package! xwwp :recipe (:host github :repo "BlueFlo0d/xwwp"))
 (package! xwwp-follow-link-ivy)
 (package! ctable)
+
+(package! dap-mode)
+
+;; HTTP requests via babel
+(package! ob-http :pin "b1428ea2a63bcb510e7382a1bf5fe82b19c104a7")
+
+;; OrgRoam visualization / webapp
+
+;; automatic latex rendering
+
+;; export github markdown
+(package! ox-gfm :pin "99f93011b069e02b37c9660b8fcb45dab086a07f")
+
+;; K8s
+(package! k8s-mode)
+
+;; Copilot
+;; (package! copilot
+;;   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+
+;; Multiple major modes in one buffer
+(package! polymode)
+(package! poly-markdown)

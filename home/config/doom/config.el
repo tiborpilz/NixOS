@@ -10,30 +10,28 @@
 (defun is-workstation ()
   (string-equal (system-name) "workyMcWorkstation"))
 
-(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14))
+(setq font-scale-factor (if (is-workstation) 1.3 1.0))
+
+(defun scale-font (size)
+  (round (* size font-scale-factor)))
+
+(setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14)))
 
 ;; (setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14))
 ;;       doom-variable-pitch-font (font-spec :family "sans" :size (scale-font 12))
 ;;       doom-big-font (font-spec :family  "sans" :size (scale-font 16))
 ;;       doom-serif-font (font-spec :family "FreeSerif" :weight 'light :size (scale-font 14)))
 
-(let* ((variable-tuple '(:font "ETBembo"))
-       (headline `(:inherit default :weight bold)))
-  (custom-theme-set-faces
-   'user
-   `(org-level-8 ((t (,@headline ,@variable-tuple))))
-   `(org-level-7 ((t (,@headline ,@variable-tuple))))
-   `(org-level-6 ((t (,@headline ,@variable-tuple))))
-   `(org-level-5 ((t (,@headline ,@variable-tuple))))
-   `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
-   `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.17))))
-   `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.23))))
-   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.3))))
-   `(org-document-title ((t (,@headline ,@variable-tuple :height 1.4 :underline nil))))))
-
 (setq display-line-numbers-type 'relative)
 
 (setq tab-width 2)
+
+(use-package! exec-path-from-shell
+  :ensure t
+  :if (memq window-system '(mac ns x))
+  :config
+  (setq exec-path-from-shell-variables '("PATH" "NVM_DIR" "NVM_BIN"))
+  (exec-path-from-shell-initialize))
 
 (setq org-directory "~/org/")
 (setq org-agenda-files (list org-directory))
@@ -47,86 +45,6 @@
 (setq org-return-follows-link 1)
 (setq calendar-week-start-day 1) ;; start on monday
 (setq org-agenda-include-diary t)
-
-(defun org-mode-mixed-pitch-hook ()
-  (if mixed-pitch-mode
-      (let* ((variable-tuple '(:font "sans"))
-             (headline `(:inherit default)))
-        (custom-theme-set-faces
-         'user
-         `(org-level-8 ((t (,@headline ,@variable-tuple))))
-         `(org-level-7 ((t (,@headline ,@variable-tuple))))
-         `(org-level-6 ((t (,@headline ,@variable-tuple))))
-         `(org-level-5 ((t (,@headline ,@variable-tuple))))
-         `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1 :weight bold))))
-         `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.2 :weight bold))))
-         `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.4 :weight bold))))
-         `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.6 :weight bold))))
-         `(org-document-title ((t (,@headline ,@variable-tuple :height 1.8))))))
-    (let* ((variable-tuple '(:font "FiraCode Nerd Font" :height 1.0 :weight normal))
-           (headline `(:inherit default)))
-      (custom-theme-set-faces
-       'user
-       `(org-level-8 ((t (,@headline ,@variable-tuple))))
-       `(org-level-7 ((t (,@headline ,@variable-tuple))))
-       `(org-level-6 ((t (,@headline ,@variable-tuple))))
-       `(org-level-5 ((t (,@headline ,@variable-tuple))))
-       `(org-level-4 ((t (,@headline ,@variable-tuple))))
-       `(org-level-3 ((t (,@headline ,@variable-tuple))))
-       `(org-level-2 ((t (,@headline ,@variable-tuple))))
-       `(org-level-1 ((t (,@headline ,@variable-tuple))))
-       `(org-document-title ((t (,@headline ,@variable-tuple))))))))
-
-(add-hook 'mixed-pitch-mode-hook #'org-mode-mixed-pitch-hook)
-
-(defun reset-org-faces ()
-  (custom-theme-set-faces
-   'user
-   `(org-level-8 ((t (inherit))))
-   `(org-level-7 ((t (inherit))))
-   `(org-level-6 ((t (inherit))))
-   `(org-level-5 ((t (inherit))))
-   `(org-level-4 ((t (inherit))))
-   `(org-level-3 ((t (inherit))))
-   `(org-level-2 ((t (inherit))))
-   `(org-level-1 ((t (inherit))))
-   `(org-document-title ((t (inherit))))))
-
-(add-hook 'disable-mixed-pitch-mode-hook #'reset-org-faces)
-
-(modify-all-frames-parameters
- '((right-divider-width . 8)
-   (internal-border-width . 8)))
-(dolist (face '(window-divider
-                window-divider-first-pixel
-                window-divider-last-pixel))
-  (face-spec-reset-face face)
-  (set-face-foreground face (face-attribute 'default :background)))
-(set-face-background 'fringe (face-attribute 'default :background))
-
-(use-package! org-modern
-  :after org
-  :custom
-  (org-modern-star '("◉" "○" "◈" "◇" "•"))
-  (org-modern-timestamp '(" %d.%m.%Y " . " %H:%M ")))
-
-(setq
- ;; Org styling, hide markup etc.
- org-hide-emphasis-markers t
- org-pretty-entities t
- org-ellipsis "…"
-
- ;; Agenda styling
- org-agenda-tags-column 0
- org-agenda-block-separator ?─
- org-agenda-time-grid
- '((daily today require-timed)
-   (800 1000 1200 1400 1600 1800 2000)
-   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
- org-agenda-current-time-string
- "⭠ now ─────────────────────────────────────────────────")
-
-(global-org-modern-mode)
 
 (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
@@ -195,13 +113,18 @@
 (defvar org-view-external-file-extensions '("html")
   "File formats that should be opened externally.")
 
-;; (use-package! ox-gfm :after ox :defer t)
+(use-package! ox-gfm :after ox :defer t)
 
 (setq org-export-headline-levels 5)
 
+;(require 'ox-extra)
+;(ox-extras-activate '(ignore-headlines))
+
 (setq org-highlight-latex-and-related '(native script entities))
 
-(setq org-roam-directory "~/org/roam")
+;; (use-package! org-re-reveal)
+
+(setq org-roam-directory "~/org")
 
 (use-package! websocket
   :after org-roam
@@ -219,17 +142,30 @@
     (unless org-roam-ui-mode (org-roam-ui-mode 1))
     (browse-url-xdg-open (format "http://localhost:%d" org-roam-ui-port))))
 
-(setq org-roam-ui-open-on-start t)
+(setq org-roam-ui-open-on-start nil)
 
-(map! :leader
-      (:prefix-map ("n" . "notes")
-                   (:prefix-map ("r" . "roam")
-                    :desc "Org-Roam UI" "u" #'org-roam-ui-open)))
+;; (use-package! org-gcal
+;;   :config
+;;   (setq org-gcal-client-id "CLIENT_ID"
+;;         org-gcal-client-secret "CLIENT_SECRET"
+;;         org-gcal-fetch-file-alit '(("tbrpilz@googlemail.com" . "~/org/schedule.org"))))
+
+(use-package! org-present
+  :hook (org-present-mode . (lambda ()
+                              (org-present-big)
+                              (org-display-inline-images)
+                              (org-present-hide-cursor)
+                              (org-present-read-only)))
+  :hook (org-present-mode-quit . (lambda ()
+                                   (org-present-small)
+                                   (org-remove-inline-images)
+                                   (org-present-show-cursor)
+                                   (org-present-read-write))))
 
 (map! :map org-mode-map
       :localleader
       (:prefix-map ("B" . "babel")
-                   (:desc "Insert structure template" "c" #'org-insert-structure-template)))
+       (:desc "Insert structure template" "c" #'org-insert-structure-template)))
 
 (remove-hook 'text-mode-hook #'visual-line-mode)
 (add-hook 'text-mode-hook #'auto-fill-mode)
@@ -265,26 +201,26 @@
 (use-package! org-tempo)
 
 (after! org-capture
-  (defun org-capture-select-template-prettier (&optional keys)
+    (defun org-capture-select-template-prettier (&optional keys)
     "Select a capture template, in a prettier way than default
     Lisp programs can force the template by setting KEYS to a string."
     (let ((org-capture-templates
-           (or (org-contextualize-keys
+            (or (org-contextualize-keys
                 (org-capture-upgrade-templates org-capture-templates)
                 org-capture-templates-contexts)
-               '(("t" "Task" entry (file+headline "" "Tasks")
-                  "* TODO %?\n  %u\n  %a")))))
-      (if keys
-          (or (assoc keys org-capture-templates)
-              (error "No capture template referred to by \"%s\" keys" keys))
+                '(("t" "Task" entry (file+headline "" "Tasks")
+                    "* TODO %?\n  %u\n  %a")))))
+        (if keys
+            (or (assoc keys org-capture-templates)
+                (error "No capture template referred to by \"%s\" keys" keys))
         (org-mks org-capture-templates
-                 "Select a capture template\n━━━━━━━━━━━━━━━━━━━━━━━━━"
-                 "Template key: "
-                 `(("q" ,(concat (all-the-icons-octicon "stop" :face 'all-the-icons-red :v-adjust 0.01) "\tAbort")))))))
-  (advice-add 'org-capture-select-template :override #'org-capture-select-template-prettier))
+                "Select a capture template\n━━━━━━━━━━━━━━━━━━━━━━━━━"
+                "Template key: "
+                `(("q" ,(concat (all-the-icons-octicon "stop" :face 'all-the-icons-red :v-adjust 0.01) "\tAbort")))))))
+    (advice-add 'org-capture-select-template :override #'org-capture-select-template-prettier))
 
 (setf (alist-get 'height +org-capture-frame-parameters) 15)
-;; (alist-get 'name +org-capture-frame-parameters) "❖ Capture") ;; ATM hardcoded in other places, so changing breaks stuff
+      ;; (alist-get 'name +org-capture-frame-parameters) "❖ Capture") ;; ATM hardcoded in other places, so changing breaks stuff
 (setq +org-capture-fn
       (lambda ()
         (interactive)
@@ -293,12 +229,12 @@
 
 ;; (setq projectile-project-search-path '(("~/Code/" . 2)))
 
-(use-package! jest-test-mode
-  :commands jest-test-mode
-  :hook (typescript-mode js-mode typescript-tsx-mode))
+(use-package! jest
+  :after (typescript-mode js-mode typescript-tsx-mode)
+  :hook (typescript-mode . jest-minor-mode))
 
 (use-package! svelte-mode
-  :mode "\\.svelte\\'")
+    :mode "\\.svelte\\'")
 
 (with-eval-after-load 'web-mode
   (setq web-mode-script-padding 0))
@@ -313,6 +249,11 @@
 (use-package! nix-mode
   :mode "\\.nix\\'")
 
+;; (setq flycheck-command-wrapper-function
+;;         (lambda (command) (apply 'nix-shell-command (nix-current-sandbox) command))
+;;       flycheck-executable-find
+;;         (lambda (cmd) (nix-executable-find (nix-current-sandbox) cmd)))
+
 (add-hook! python-mode
   (advice-add 'python-pytest-file :before
               (lambda (&rest args)
@@ -324,29 +265,20 @@
 
 (defun markdown-html (buffer)
   (princ (with-current-buffer buffer
-           (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
-         (current-buffer)))
+    (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
+  (current-buffer)))
 
 (setq lsp-terraform-ls-enable-show-reference t)
 (setq lsp-semantic-tokens-enable t)
 (setq lsp-semantic-tokens-honor-refresh-requests t)
 
-(setq company-idle-delay 0 ;; How long to wait before popping up
-      company-minimum-prefix-length 1 ;; Show the menu after one key press
+(setq company-idle-delay 0.35 ;; How long to wait before popping up
+      company-minimum-prefix-length 2 ;; Show the menu after one key press
       company-tooltip-limit 10 ;; Limit on how many options to display
       company-tooltip-align-annotations t ;; Align annotations to the right
       company-require-match nil           ;; Allow free typing
       company-selection-wrap-around t ;; Wrap around to beginning when you hit bottom of suggestions
       )
-
-;; Unbind existing keybindings
-(with-eval-after-load 'evil-maps
-  (define-key evil-normal-state-map (kbd "C-n") nil)
-  (define-key evil-insert-state-map (kbd "C-p") nil))
-
-;; Bind company to C-n
-(map! :map evil-insert-state-map
-      "C-n" #'company-manual-begin)
 
 (after! lsp-mode
   (setq company-backends '(company-capf)))
@@ -367,25 +299,25 @@
   (use-package! copilot
     :hook (prog-mode . copilot-mode)
     :bind (:map copilot-completion-map
-                ("C-SPC" . 'copilot-accept-completion)
-                ("C-<spc>" . 'copilot-accept-completion)
-                ("C-S-p" . 'copilot-previous-completion)
-                ("C-S-n" . 'copilot-next-completion))))
+           ("C-SPC" . 'copilot-accept-completion)
+           ("C-<spc>" . 'copilot-accept-completion)
+           ("C-S-p" . 'copilot-previous-completion)
+           ("C-S-n" . 'copilot-next-completion))))
 
 (if (and (boundp 'copilot-node-executable) (file-exists-p copilot-node-executable))
     (load-copilot)
-  (nvm-use "16" (lambda ()
-                  (setq copilot-node-executable
-                        (concat
-                         (nth 1 (nvm--find-exact-version-for "16"))
-                         "/bin/node"))
-                  (load-copilot))))
+    (nvm-use "16" (lambda ()
+                   (setq copilot-node-executable
+                         (concat
+                          (nth 1 (nvm--find-exact-version-for "16"))
+                          "/bin/node"))
+                   (load-copilot))))
 
 (map! :leader
       (:prefix-map ("i" . "insert")
-                   (:prefix ("g" . "github copilot")
-                    :desc "Show Copilot Completion" "s" #'copilot-complete
-                    :desc "Insert Copilot Completion" "c" #'copilot-accept-completion))
+       (:prefix ("g" . "github copilot")
+        :desc "Show Copilot Completion" "s" #'copilot-complete
+        :desc "Insert Copilot Completion" "c" #'copilot-accept-completion))
       (:prefix ("t" . "toggle")
        :desc "Toggle Copilot" "p" #'copilot-mode))
 
@@ -432,8 +364,8 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
   (add-hook 'window-configuration-change-hook 'reset-file-window-buffer))
 
 (defun remove-reset-file-window-buffer-hook (&rest args)
-  "Remove the reset-file-window-buffer function from the window-configuration-change-hook."
-  (remove-hook 'window-configuration-change-hook 'reset-file-window-buffer))
+    "Remove the reset-file-window-buffer function from the window-configuration-change-hook."
+    (remove-hook 'window-configuration-change-hook 'reset-file-window-buffer))
 
 (add-hook 'dap-mode-hook 'add-reset-file-window-buffer-hook)
 
@@ -488,12 +420,6 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
      ;; force update evil keymaps after git-timemachine-mode loaded
      (add-hook 'git-timemachine-mode-hook #'evil-normalize-keymaps)))
 
-(use-package lab
-  :after magit
-  :config
-  (setq lab-host "https://gitlab.com")
-  (setq lab-token (password-store-get "bitwarden/gitlab-token")))
-
 (map! :leader
       (:prefix ("D" . "devdocs")
        :desc "Open devdocs" "o" #'devdocs-peruse
@@ -502,37 +428,28 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 ;; (setq dash-docs-docsets-path "$HOME/.local/share/docsets")
 
-(setq gpt-openai-key (lambda () password-store-get "bitwarden/openai-gpt-key"))
+(setq gpt-openai-key (password-store-get "bitwarden/openai-gpt-key"))
 (setq gpt-openai-engine "code-davinci-002")
 (use-package! gpt)
 
-(defun get-api-key ()
-  (password-store-get "bitwarden/openai-gpt-key"))
-
-(setq gptel-api-key 'get-api-key)
-
-(map! :leader
-      (:prefix-map ("a" . "AI")
-       :desc "Send selection to GPT" "s" #'gptel-send
-       :desc "Open send menu before sending selection to GPT" "S" #'gptel-send-menu
-       :desc "Open interactive AI buffer with GPT" "i" #'gptel))
-
-(setq gptel-default-mode 'org-mode)
-
-(use-package org-ai
-  :after org
-  :config
-  (org-ai-install-yasnippets)
-  (setq org-ai-openai-api-token (password-store-get "bitwarden/openai-gpt-key"))
-  (setq org-ai-default-chat-model "gpt-3.5-turbo")
-)
+(use-package quarto-mode
+  :mode (("\\.Rmd" . poly-quarto-mode)))
 
 (setq doom-theme 'doom-nord-aurora)
+
+;; (add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
+;; (setq doom-themes-treemacs-theme "doom-atom")
 
 (use-package ewal
   :init (setq ewal-use-built-in-always-p nil
               ewal-use-built-in-on-failure-p nil
               ewal-built-in-palette "sexy-material"))
+
+;; (use-package base16-theme
+;;   :ensure t
+;;   :demand t
+;;   :config
+;;   (load-theme 'base16-default-dark t))
 
 (setq doom-modeline-vcs-max-length 50)
 
@@ -548,12 +465,12 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; (define-key ivy-minibuffer-map (kbd "TAB") 'ivy-partial)
 ;; (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
 
-;; (use-package! all-the-icons-ivy-rich
-;;   :defer t
-;;   :after counsel-projectile
-;;   :init (all-the-icons-ivy-rich-mode +1)
-;;   :config
-;;   (setq all-the-icons-ivy-rich-icon-size 0.8))
+(use-package! all-the-icons-ivy-rich
+  :defer t
+  :after counsel-projectile
+  :init (all-the-icons-ivy-rich-mode +1)
+  :config
+  (setq all-the-icons-ivy-rich-icon-size 0.8))
 
 (setq ivy-posframe-width 80)
 
@@ -576,69 +493,5 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
   :bind (:map xwidget-webkit-mode-map
               ("f" . xwwp-ace-toggle)
               ("v" . xwwp-follow-link)))
-
-(require 'dash)
-(require 's)
-
-(defmacro with-face (STR &rest PROPS)
-  "Return STR propertized with PROPS."
-  `(propertize ,STR 'face (list ,@PROPS)))
-
-(defmacro esh-section (NAME ICON FORM &rest PROPS)
-  "Build eshell section NAME with ICON prepended to evaled FORM with PROPS."
-  `(setq ,NAME
-         (lambda () (when ,FORM
-                      (-> ,ICON
-                          (concat esh-section-delim ,FORM)
-                          (with-face ,@PROPS))))))
-
-(defun esh-acc (acc x)
-  "Accumulator for evaluating and concatenating esh-sections."
-  (--if-let (funcall x)
-      (if (s-blank? acc)
-          it
-        (concat acc esh-sep it))
-    acc))
-
-(defun esh-prompt-func ()
-  "Build `eshell-prompt-function'"
-  (concat esh-header
-          (-reduce-from 'esh-acc "" eshell-funcs)
-          "\n"
-          eshell-prompt-string))
-
-(setq esh-sep " ")
-
-(setq esh-section-delim " ")
-
-(setq esh-header "\n")
-
-(setq eshell-prompt-regexp " ")
-(setq eshell-prompt-string " ")
-
-(esh-section esh-dir
-             "\xf07c"  ;  (faicon folder)
-             (abbreviate-file-name (eshell/pwd))
-             '(:foreground "gold" :bold ultra-bold :underline t))
-
-(esh-section esh-git
-            "\xe907"  ;  (git icon)
-            (magit-get-current-branch)
-            '(:foreground "pink"))
-
-(esh-section esh-python
-             "\xe928"  ;  (python icon)
-             pyvenv-virtual-env-name)
-
-(esh-section esh-clock
-             "\xf017"  ;  (clock icon)
-             (format-time-string "%H:%M" (current-time))
-             '(:foreground "forest green"))
-
-(setq eshell-funcs (list esh-dir esh-git esh-python esh-clock))
-
-(setq eshell-prompt-function 'esh-prompt-func)
-
-(setq gc-cons-threshold (* 1024 1024 1024)) ;; 1G
 
 (setq read-process-output-max (* 4 1024 1024)) ;; 4mb

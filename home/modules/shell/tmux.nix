@@ -35,7 +35,6 @@ in
       '';
     };
 
-    home.sessionPath = [ "$TMUXIFIER/bin" ];
     home.sessionVariables = {
       TMUX_HOME = "${config.home.sessionVariables.XDG_CONFIG_HOME}/tmux";
       TMUXIFIER = "${config.home.sessionVariables.XDG_CONFIG_HOME}/tmuxifier";

@@ -14,11 +14,11 @@ in
     home.packages = with pkgs; [
       git
       gitAndTools.git-annex
-      unstable.gitAndTools.gh
+      gitAndTools.gh
+      gitAndTools.glab
       gitAndTools.git-open
       gitAndTools.diff-so-fancy
-      (mkIf config.modules.shell.gnupg.enable
-        gitAndTools.git-crypt)
+      gitAndTools.git-crypt
       act
     ];
 
