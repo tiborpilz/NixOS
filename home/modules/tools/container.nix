@@ -1,8 +1,7 @@
-{ lib, pkgs, config, inputs, ... }:
+{ lib, pkgs, config, ... }:
 with lib;
 let
   cfg = config.modules.tools.container;
-  mylib = import ../../../lib { inherit inputs lib pkgs; };
 
   darwinConfig = {
     home.packages = with pkgs; [
