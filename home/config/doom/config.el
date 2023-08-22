@@ -272,8 +272,8 @@
 (setq lsp-semantic-tokens-enable t)
 (setq lsp-semantic-tokens-honor-refresh-requests t)
 
-(setq company-idle-delay 0.35 ;; How long to wait before popping up
-      company-minimum-prefix-length 2 ;; Show the menu after one key press
+(setq company-idle-delay 0 ;; How long to wait before popping up
+      company-minimum-prefix-length 1 ;; Show the menu after one key press
       company-tooltip-limit 10 ;; Limit on how many options to display
       company-tooltip-align-annotations t ;; Align annotations to the right
       company-require-match nil           ;; Allow free typing
