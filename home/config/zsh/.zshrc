@@ -83,10 +83,14 @@ gch() {
 }
 
 npr() {
-  command=$(jq -r '.scripts | keys | .[]' package.json | fzf --preview "jq -r '.scripts[\"{}\"]' package.json")
+  command=$(jq -r '.scripts | keys | .[]' package.json | fzf-tmux --preview "jq -r '.scripts[\"{}\"]' package.json")
   if [[ ! -z command ]]; then
     print -z "npm run $command"
   fi
+}
+
+ccd() {
+  cd $(find ~/Code/* -type d -maxdepth 0 | fzf-tmux --preview 'glow {}/README.md --style=dark')
 }
 
 source <(kubectl completion zsh)
