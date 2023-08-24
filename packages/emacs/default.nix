@@ -55,6 +55,7 @@ rec {
   emacs27Patched = (patch-nul-char-bug pkgs.emacs);
   emacs27Xw = (add-feature-flags emacs27Patched); #add-env (patch-nul-char-bug (add-feature-flags emacs));
   emacs27XwWrapped = (wrap emacs27Xw);
+  emacs29Wrapped = (wrap pkgs.emacs29);
   emacsGitXw = (add-feature-flags pkgs.emacsGit);
   emacsGitXwWrapped = (wrap emacsGitXw);
   emacsGitWrapped = (wrap pkgs.emacsGit);

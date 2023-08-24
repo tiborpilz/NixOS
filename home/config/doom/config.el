@@ -227,7 +227,7 @@
         (set-window-parameter nil 'mode-line-format 'none)
         (org-capture)))
 
-;; (setq projectile-project-search-path '(("~/Code/" . 2)))
+(setq projectile-project-search-path '(("~/Code/" . 1)))
 
 (use-package! jest
   :after (typescript-mode js-mode typescript-tsx-mode)

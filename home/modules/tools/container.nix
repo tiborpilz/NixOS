@@ -5,7 +5,7 @@ let
 
   darwinConfig = {
     home.packages = with pkgs; [
-      colima
+      # colima
 
       # necessary for podman
       qemu

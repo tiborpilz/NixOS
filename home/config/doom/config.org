@@ -509,7 +509,7 @@ no modeline.
 * Projectile
 ** Project Search Path
 #+begin_src elisp
-;; (setq projectile-project-search-path '(("~/Code/" . 2)))
+(setq projectile-project-search-path '(("~/Code/" . 1)))
 #+end_src
 * Development
 ** Language-Specific Settings
@@ -1398,7 +1398,7 @@ and exploration, while also possessing basic file management utilities.
 Treemacs also has a package that adds icons to the file explorer.
 
 #+begin_src elisp :tangle packages.el
-(package! treemacs-all-the-icons)
+;; (package! treemacs-all-the-icons)
 #+end_src
 
 ** Vertico
