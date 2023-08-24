@@ -1,7 +1,7 @@
 call plug#begin('~/.config/nvim/plugged')
 
 " Copilot
-" Plug 'github/copilot.vim'
+Plug 'github/copilot.vim'
 
 " Dashboard
 Plug 'glepnir/dashboard-nvim'
@@ -54,18 +54,12 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 " planning/organization
 Plug 'vimwiki/vimwiki'
 
-" Timetracking
-Plug 'wakatime/vim-wakatime'
-
 " Languages
 "" Terraform
 Plug 'hashivim/vim-terraform'
 
 "" Nix
 Plug 'LnL7/vim-nix'
-
-"" Org
-Plug 'nvim-orgmode/orgmode'
 
 " LSP
 Plug 'neovim/nvim-lspconfig'
@@ -159,9 +153,6 @@ lua require('lsp-signature')
 
 " Iron repl config
 lua require('iron-config')
-
-" Orgmode setup
-lua require('orgmode')
 
 " Dashboard settings
 let g:dashboard_custom_header = [

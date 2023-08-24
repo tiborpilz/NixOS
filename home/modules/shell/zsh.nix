@@ -56,6 +56,9 @@ in
       coreutils
       thefuck
       wakatime
+
+      #Markdown View
+      glow
     ];
 
     home.sessionVariables.ZDOTDIR = "${envVars.XDG_CONFIG_HOME}/zsh";
