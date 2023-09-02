@@ -134,6 +134,7 @@ with lib;
 
     modules.services.syncthing.enable = true;
     modules.services.tandoor.enable = true;
+    modules.services.paperless.enable = true;
 
     modules.services.media = {
       calibre.enable = true;
