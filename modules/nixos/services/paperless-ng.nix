@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 with lib;
 with lib.my;
 let
@@ -16,15 +16,24 @@ in
   config = mkIf cfg.enable {
     system.activationScripts.makePaperlessDir = stringAfter [ "var" ] ''
       mkdir -p /var/lib/paperless/data
-      mkdir -p /data/media/paperless
+      mkdir -p /data/media/paperless/{consume,export}
     '';
 
-    modules.podgroups.pods.paperless-ng = {
+    modules.podgroups.pods.paperless-ngx = {
       port = "${toString publicPort}:8000";
 
+      containers.broker = {
+        image = "docker.io/redis:6.0";
+        volumes = [
+          "paperless-redis:/data"
+        ];
+      };
+
       containers.db = {
-        image = "docker.io/postgres:13";
-        volumes = [ "paperless-pgdata:/var/lib/postgresql/data" ];
+        image = "docker.io/postgres:15";
+        volumes = [
+          "paperless-pgdata:/var/lib/postgresql/data"
+        ];
         environment = {
           "POSTGRES_DB" = db_db;
           "POSTGRES_USER" = db_user;
@@ -32,26 +41,26 @@ in
         };
       };
 
-      containers.broker = {
-        image = "docker.io/redis:6.0";
-      };
-
       containers.webserver = {
-        image = "docker.io/jonaswinkler/paperless-ng:latest";
+        image = "ghcr.io/paperless-ngx/paperless-ngx:latest";
         dependsOn = [ "db" "broker" ];
         volumes = [
           "/var/lib/paperless/data:/usr/src/paperless/data"
-          "/data/media/paperless:/usr/src/paperless/media"
+          "media:/usr/src/paperless/media"
+          "/data/media/paperless/consume:/usr/src/paperless/consume"
+          "/data/media/paperless/export:/usr/src/paperless/export"
         ];
         environment = {
           "PAPERLESS_REDIS" = "redis://localhost:6379";
           "PAPERLESS_DBHOST" = "localhost";
+          "PAPERLESS_CONSUMPTION_DIR" = "/usr/src/paperless/consume";
           "PAPERLESS_TIKA_ENABLED" = "1";
           "PAPERLESS_TIKA_GOTENBERG_ENDPOINT" = "http://localhost:3000";
           "PAPERLESS_TIKA_ENDPOINT" = "http://localhost:9998";
           "DJANGO_SUPERUSER_PASSOWRD" = "Password";
           "PAPERLESS_ADMIN_USER" = "tibor";
           "PAPERLESS_ADMIN_PASSWORD" = "changeme";
+          "PAPERLESS_URL" = "https://paperless.${config.modules.services.reverseProxy.hostname}";
         };
       };
 
@@ -63,7 +72,7 @@ in
       };
 
       containers.tika = {
-        image = "docker.io/apache/tika";
+        image = "ghcr.io/paperless-ngx/tika:latest";
       };
     };
     modules.services.reverseProxy.proxies.paperless = {
