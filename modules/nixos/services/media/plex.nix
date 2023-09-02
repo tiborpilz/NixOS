@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 with lib;
 with lib.my;
 
@@ -16,19 +16,26 @@ in
       mkdir -p ${plexConfigDir}
     '';
 
-    virtualisation.oci-containers.containers.plex = {
-      image = "lscr.io/linuxserver/plex:latest";
-      volumes = [
-        "${plexConfigDir}:/config"
-        "/data/media/tv:/tv"
-        "/data/media/movies:/movies"
-      ];
-      environment = {
-        "PUID" = "0";
-        "PGID" = "0";
-        "VERSION" = "docker";
-      };
-      extraOptions = [ "--network=host" ];
+    services.plex = {
+      enable = true;
+      openFirewall = true;
     };
+
+    modules.services.reverseProxy.proxies.plex.publicPort = 32400;
+
+    # virtualisation.oci-containers.containers.plex = {
+    #   image = "lscr.io/linuxserver/plex:latest";
+    #   volumes = [
+    #     "${plexConfigDir}:/config"
+    #     "/data/media/tv:/tv"
+    #     "/data/media/movies:/movies"
+    #   ];
+    #   environment = {
+    #     "PUID" = "0";
+    #     "PGID" = "0";
+    #     "VERSION" = "docker";
+    #   };
+    #   extraOptions = [ "--network=host" ];
+    # };
   };
 }
