@@ -86,12 +86,15 @@ in
 
   config = mkIf (cfg.pods != { }) (mkMerge [
     {
-      # systemd.services = mapAttrs'
-      #   (n: v: nameValuePair "podman-create-pod-${n}-pod" (mkService n v))
-      #   cfg.pods;
-    }
-    {
+      systemd.services = mapAttrs'
+        (n: v: nameValuePair "podman-create-pod-${n}-pod" (mkService n v))
+        cfg.pods;
       virtualisation.oci-containers.containers = (mkContainers cfg.pods);
+      virtualisation.podman = {
+        enable = true;
+        dockerSocket.enable = true;
+        dockerCompat = true;
+      };
     }
   ]);
 }

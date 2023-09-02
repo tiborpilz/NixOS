@@ -10,12 +10,7 @@
 (defun is-workstation ()
   (string-equal (system-name) "workyMcWorkstation"))
 
-(setq font-scale-factor (if (is-workstation) 1.3 1.0))
-
-(defun scale-font (size)
-  (round (* size font-scale-factor)))
-
-(setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14)))
+(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14))
 
 ;; (setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14))
 ;;       doom-variable-pitch-font (font-spec :family "sans" :size (scale-font 12))

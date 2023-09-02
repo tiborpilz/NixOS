@@ -14,11 +14,16 @@ in
   };
 
   config = mkIf cfg.enable {
+    system.activationScripts.makePaperlessDir = stringAfter [ "var" ] ''
+      mkdir -p /var/lib/paperless/data
+      mkdir -p /data/media/paperless
+    '';
+
     modules.podgroups.pods.paperless-ng = {
       port = "${toString publicPort}:8000";
 
       containers.db = {
-        image = "postgres:13";
+        image = "docker.io/postgres:13";
         volumes = [ "paperless-pgdata:/var/lib/postgresql/data" ];
         environment = {
           "POSTGRES_DB" = db_db;
@@ -28,15 +33,15 @@ in
       };
 
       containers.broker = {
-        image = "redis:6.0";
+        image = "docker.io/redis:6.0";
       };
 
       containers.webserver = {
-        image = "jonaswinkler/paperless-ng:latest";
+        image = "docker.io/jonaswinkler/paperless-ng:latest";
         dependsOn = [ "db" "broker" ];
         volumes = [
-          "paperless_data:/usr/src/paperless/data"
-          "paperless_media:/usr/src/paperless/media"
+          "/var/lib/paperless/data:/usr/src/paperless/data"
+          "/data/media/paperless:/usr/src/paperless/media"
         ];
         environment = {
           "PAPERLESS_REDIS" = "redis://localhost:6379";
@@ -51,16 +56,19 @@ in
       };
 
       containers.gotenberg = {
-        image = "thecodingmachine/gotenberg:6.4.4";
+        image = "docker.io/thecodingmachine/gotenberg:6.4.4";
         environment = {
           "DISABLE_GOOGLE_CHROME" = "1";
         };
       };
 
       containers.tika = {
-        image = "apache/tika";
+        image = "docker.io/apache/tika";
       };
     };
-    modules.services.reverseProxy.proxies.paperless.publicPort = publicPort;
+    modules.services.reverseProxy.proxies.paperless = {
+      publicPort = publicPort;
+      auth = false;
+    };
   };
 }

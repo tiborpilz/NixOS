@@ -140,6 +140,7 @@ with lib;
       calibre.enable = true;
       deluge.enable = true;
       komga.enable = true;
+      plex.enable = true;
     };
   };
 }
