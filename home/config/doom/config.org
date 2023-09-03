@@ -31,11 +31,6 @@ I'm a big fan of ligatures, and I've been using FiraCode for as long as I can re
 
 #+begin_src elisp
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14))
-
-;; (setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14))
-;;       doom-variable-pitch-font (font-spec :family "sans" :size (scale-font 12))
-;;       doom-big-font (font-spec :family  "sans" :size (scale-font 16))
-;;       doom-serif-font (font-spec :family "FreeSerif" :weight 'light :size (scale-font 14)))
 #+end_src
 
 Adjust org-mode headlines.
@@ -107,7 +102,6 @@ Only initialize when running in a GUI frame on macos and linux.
 (setq org-log-done 'time) ; Log time when task completes
 (setq org-list-allow-alphabetical t)       ; a, A, a) A) list bullets)
 (setq org-catch-invisible-edits 'smart) ; don't treat lone _ / ^ as sub/superscripts, require _{} / ^{})
-
 
 (setq org-return-follows-link 1)
 (setq calendar-week-start-day 1) ;; start on monday
@@ -725,8 +719,8 @@ I don't want any delay in showing suggestions, unless I'm writing a string or a
 comment, then I want company to not show any suggestions at all.
 
 #+begin_src elisp
-(setq company-idle-delay 0 ;; How long to wait before popping up
-      company-minimum-prefix-length 1 ;; Show the menu after one key press
+(setq company-idle-delay 0.1 ;; How long to wait before popping up
+      company-minimum-prefix-length 0 ;; Show the menu after one key press
       company-tooltip-limit 10 ;; Limit on how many options to display
       company-tooltip-align-annotations t ;; Align annotations to the right
       company-require-match nil           ;; Allow free typing
@@ -742,6 +736,14 @@ keep the list of backends very short.
 #+begin_src elisp
 (after! lsp-mode
   (setq company-backends '(company-capf)))
+#+end_src
+
+***** Mode-Specific Backends
+The dictionary completion in ~org-mode~ just annoys me, and it seems to
+significantly slow down typing, so I'm disabling ~company-ispell~ (hopefully) everywhere.
+
+#+begin_src elisp
+(setq company-ispell-available nil)
 #+end_src
 
 **** Looks
@@ -800,7 +802,7 @@ some keybindings.
 #+begin_src elisp
 (defun load-copilot ()
   (use-package! copilot
-    :hook (prog-mode . copilot-mode)
+    :hook ((prog-mode text-mode) . copilot-mode)
     :bind (:map copilot-completion-map
            ("C-SPC" . 'copilot-accept-completion)
            ("C-<spc>" . 'copilot-accept-completion)
