@@ -316,7 +316,7 @@ The closest comparison to org-roam-ui is Obsidian.
 #+begin_src elisp :tangle packages.el
 (unpin! org-roam)
 (package! org-roam-ui)
-(package! websocket :pin "fda4455333309545c0787a79d73c19ddbeb57980") ; dependency of `org-roam-ui'
+(package! websocket) ; dependency of `org-roam-ui'
 #+end_src
 
 #+begin_src elisp
@@ -326,17 +326,25 @@ The closest comparison to org-roam-ui is Obsidian.
 
 (use-package! org-roam-ui
   :after org-roam
-  :commands org-roam-ui-open
-  :hook (org-roam . 'org-roam-ui-mode)
   :config
-  (require 'org-roam) ; in case autoloaded
-  (defun org-roam-ui-open ()
-    "Ensure the server is active, then open the roam graph."
-    (interactive    )
-    (unless org-roam-ui-mode (org-roam-ui-mode 1))
-    (browse-url-xdg-open (format "http://localhost:%d" org-roam-ui-port))))
+  (setq org-roam-ui-synch-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
 
-(setq org-roam-ui-open-on-start nil)
+;; (use-package! org-roam-ui
+;;   :after org-roam
+;;   :commands org-roam-ui-open
+;;   :hook (org-roam . 'org-roam-ui-mode)
+;;   :config
+;;   (require 'org-roam) ; in case autoloaded
+;;   (defun org-roam-ui-open ()
+;;     "Ensure the server is active, then open the roam graph."
+;;     (interactive    )
+;;     (unless org-roam-ui-mode (org-roam-ui-mode 1))
+;;     (browse-url-xdg-open (format "http://localhost:%d" org-roam-ui-port))))
+
+;; (setq org-roam-ui-open-on-start nil)
 #+end_src
 
 *** Google Calendar integration
@@ -756,6 +764,7 @@ those icons as what's being displayed.
 (setq company-format-margin-function #'company-vscode-dark-icons-margin)
 #+end_src
 
+**** Snippets
 *** Copilot
 **** Getting a Node 16 binary
 Currently, this plugin only works with an older version of node (16) installed,
@@ -1214,14 +1223,6 @@ Fortunately, there is a base 16 theme for Doom Emacs, which stems from the
 (package! base16-theme)
 #+end_src
 
-#+begin_src elisp
-;; (use-package base16-theme
-;;   :ensure t
-;;   :demand t
-;;   :config
-;;   (load-theme 'base16-default-dark t))
-#+end_src
-
 Some of the themes have a bit too less contrast for my taste. I think  the issue
 is that all 16 colors are taken 'as-is', whereas it should be possible to
 create a color scheme with more nuance via color correcting the applied colors.
@@ -1245,6 +1246,61 @@ Allow for more characters in the branch name
 #+begin_src elisp
 (setq doom-modeline-hud t)
 #+end_src
+
+*** Nano Modeline
+:PROPERTIES:
+:header-args: :tangle no
+:END:
+Nicolas P. Rougier spent a lot of effort creating beautiful, minimalistic themes
+for Emacs - some geared for scientific work, some for writing prose. While they
+are really pretty to look at, in my day to day business, they are a bit too
+minimalistic.
+
+One thing however that always stuck out for me was the brilliant NANO modeline.
+
+Ronisbr (https://github.com/ronisbr/doom-nano-modeline) attempted to port it to
+DOOM Emacs.
+
+#+begin_src elisp :tangle packages.el
+(package! doom-nano-modeline
+  :recipe (:host github
+  :repo "ronisbr/doom-nano-modeline"))
+#+end_src
+
+#+begin_src elisp
+(use-package! doom-nano-modeline
+  :config
+  (doom-nano-modeline-mode 1)
+  (global-hide-mode-line-mode 1))
+#+end_src
+
+**** Result:
+I'm a bit disappointed. It's very minimalistic, but without the colorscheme
+hiding the rough edges between e.g. treemacs and the modeline (which is still
+squished to the top of the page), the loss in useful information is not worth
+it.
+
+I'll keep it around for a bit, but I'm going back to doom modeline.
+
+** Spacing
+*** General Padding
+The way windows have been close together always kind of botheres me. Luckily,
+there's a package that seems to halp with simple padding, without any
+contortions.
+
+#+begin_src elisp :tangle packages.el
+(package! spacious-padding)
+#+end_src
+
+TO actually use it, I need to find a better color scheme, where the edges aren't
+as jarring, but it's very promising. The individual spacings can be adjusted
+with the following:$HOME
+
+#+begin_src elisp
+(setq spacious-padding-width '(:internal-border-width 10 :right-divider-width 30 :scroll-bar-width 5))
+#+end_src
+
+(The actual values obviously need to be tweaked though)
 
 ** Dashboard
 

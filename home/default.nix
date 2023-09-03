@@ -60,6 +60,10 @@ in
   modules.editors.emacs.enable = true;
   modules.editors.emacs.useNix = false;
 
+  # Bit of a catch-all for LSP stuff until I find a better spot
+  # without having to create a new module for every one
+  modules.editors.lsp.enable = true;
+
   modules.tools.vagrant.enable = false;
   modules.tools.podman.enable = true;
 
