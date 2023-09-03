@@ -12,11 +12,6 @@
 
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14))
 
-;; (setq doom-font (font-spec :family "FiraCode Nerd Font" :size (scale-font 14))
-;;       doom-variable-pitch-font (font-spec :family "sans" :size (scale-font 12))
-;;       doom-big-font (font-spec :family  "sans" :size (scale-font 16))
-;;       doom-serif-font (font-spec :family "FreeSerif" :weight 'light :size (scale-font 14)))
-
 (setq display-line-numbers-type 'relative)
 
 (setq tab-width 2)
@@ -35,7 +30,6 @@
 (setq org-log-done 'time) ; Log time when task completes
 (setq org-list-allow-alphabetical t)       ; a, A, a) A) list bullets)
 (setq org-catch-invisible-edits 'smart) ; don't treat lone _ / ^ as sub/superscripts, require _{} / ^{})
-
 
 (setq org-return-follows-link 1)
 (setq calendar-week-start-day 1) ;; start on monday
@@ -267,8 +261,8 @@
 (setq lsp-semantic-tokens-enable t)
 (setq lsp-semantic-tokens-honor-refresh-requests t)
 
-(setq company-idle-delay 0 ;; How long to wait before popping up
-      company-minimum-prefix-length 1 ;; Show the menu after one key press
+(setq company-idle-delay 0.1 ;; How long to wait before popping up
+      company-minimum-prefix-length 0 ;; Show the menu after one key press
       company-tooltip-limit 10 ;; Limit on how many options to display
       company-tooltip-align-annotations t ;; Align annotations to the right
       company-require-match nil           ;; Allow free typing
@@ -277,6 +271,8 @@
 
 (after! lsp-mode
   (setq company-backends '(company-capf)))
+
+(setq company-ispell-available nil)
 
 (setq company-format-margin-function #'company-vscode-dark-icons-margin)
 
@@ -292,7 +288,7 @@
 
 (defun load-copilot ()
   (use-package! copilot
-    :hook (prog-mode . copilot-mode)
+    :hook ((prog-mode text-mode) . copilot-mode)
     :bind (:map copilot-completion-map
            ("C-SPC" . 'copilot-accept-completion)
            ("C-<spc>" . 'copilot-accept-completion)
