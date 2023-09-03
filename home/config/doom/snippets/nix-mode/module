@@ -1,0 +1,21 @@
+# -*- mode: snippet -*-
+# name: nix-module
+# key: nixmod
+# condition: t
+# --
+
+{ lib, pkgs, inputs, config, ...}:
+with lib;
+let
+  cfg = config.modules.%s;
+  mylib = import ../../../lib { inherit inputs lib pkgs; };
+in
+{
+  options.modules.%s = {
+    enable = mylib.mkBoolOpt false;
+  };
+
+  config = mkIf cfg.enable {
+
+  };
+}

@@ -6,7 +6,7 @@
 
 (unpin! org-roam)
 (package! org-roam-ui)
-(package! websocket :pin "fda4455333309545c0787a79d73c19ddbeb57980") ; dependency of `org-roam-ui'
+(package! websocket) ; dependency of `org-roam-ui'
 
 (package! org-gcal)
 
@@ -54,6 +54,12 @@
 (package! base16-theme)
 
 (package! kurecolor)
+
+(package! doom-nano-modeline
+  :recipe (:host github
+  :repo "ronisbr/doom-nano-modeline"))
+
+(package! spacious-padding)
 
 ;; (package! which-key-posframe)
 

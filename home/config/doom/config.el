@@ -121,17 +121,25 @@
 
 (use-package! org-roam-ui
   :after org-roam
-  :commands org-roam-ui-open
-  :hook (org-roam . 'org-roam-ui-mode)
   :config
-  (require 'org-roam) ; in case autoloaded
-  (defun org-roam-ui-open ()
-    "Ensure the server is active, then open the roam graph."
-    (interactive    )
-    (unless org-roam-ui-mode (org-roam-ui-mode 1))
-    (browse-url-xdg-open (format "http://localhost:%d" org-roam-ui-port))))
+  (setq org-roam-ui-synch-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
 
-(setq org-roam-ui-open-on-start nil)
+;; (use-package! org-roam-ui
+;;   :after org-roam
+;;   :commands org-roam-ui-open
+;;   :hook (org-roam . 'org-roam-ui-mode)
+;;   :config
+;;   (require 'org-roam) ; in case autoloaded
+;;   (defun org-roam-ui-open ()
+;;     "Ensure the server is active, then open the roam graph."
+;;     (interactive    )
+;;     (unless org-roam-ui-mode (org-roam-ui-mode 1))
+;;     (browse-url-xdg-open (format "http://localhost:%d" org-roam-ui-port))))
+
+;; (setq org-roam-ui-open-on-start nil)
 
 ;; (use-package! org-gcal
 ;;   :config
@@ -436,15 +444,11 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
               ewal-use-built-in-on-failure-p nil
               ewal-built-in-palette "sexy-material"))
 
-;; (use-package base16-theme
-;;   :ensure t
-;;   :demand t
-;;   :config
-;;   (load-theme 'base16-default-dark t))
-
 (setq doom-modeline-vcs-max-length 50)
 
 (setq doom-modeline-hud t)
+
+(setq spacious-padding-width '(:internal-border-width 10 :right-divider-width 30 :scroll-bar-width 5))
 
 (setq fancy-splash-image (concat doom-private-dir "splash-logos/emacs-logo-cutout.svg"))
 
