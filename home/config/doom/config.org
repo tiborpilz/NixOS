@@ -542,12 +542,16 @@ root directory.
 
 ***** Formatting
 
-Remove 1 space padding from <script> tags
+Remove 1 space padding from <script> tags, set indent to 2.
 
 #+begin_src elisp
 (with-eval-after-load 'web-mode
-  (setq web-mode-script-padding 0))
+  (setq web-mode-script-padding 0)
+  (setq web-mode-style-padding 0)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-markup-indent-offset 2))
 #+end_src
+
 ***** Folding
 **** Tailwind
 Add the tailwind lsp package

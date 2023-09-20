@@ -234,7 +234,10 @@
     :mode "\\.svelte\\'")
 
 (with-eval-after-load 'web-mode
-  (setq web-mode-script-padding 0))
+  (setq web-mode-script-padding 0)
+  (setq web-mode-style-padding 0)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-markup-indent-offset 2))
 
 (use-package! lsp-tailwindcss
   :defer t
