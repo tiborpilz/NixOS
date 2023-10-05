@@ -35,6 +35,10 @@
 (setq calendar-week-start-day 1) ;; start on monday
 (setq org-agenda-include-diary t)
 
+(setq org-hide-leading-stars t)
+
+(setq org-startup-indented nil)
+
 (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
 (setq org-agenda-deadline-faces
@@ -113,7 +117,7 @@
 
 ;; (use-package! org-re-reveal)
 
-(setq org-roam-directory "~/org")
+(setq org-roam-directory "~/org/roam")
 
 (use-package! websocket
   :after org-roam
@@ -196,6 +200,32 @@
 (add-hook! 'emacs-startup-hook #'doom-init-ui-h)
 
 (use-package! org-tempo)
+
+(after! org
+  (setq org-capture-templates
+        '(("t" "Personal todo" entry (file+headline +org-capture-todo-file "Inbox")
+          "* TODO %?\n%i\n%a" :prepend t)
+         ("n" "Personal notes" entry (file+headline +org-capture-notes-file "Inbox")
+          "* %u %?\n%i\n%a" :prepend t)
+         ("j" "Journal" entry (file+olp+datetree +org-capture-journal-file)
+          "* %U %?\n%i\n%a" :prepend t)
+         ("p" "Templates for projects")
+         ("pt" "Project-local todo" entry
+          (file+headline +org-capture-project-todo-file "Inbox") "* TODO %?\n%i\n%a"
+          :prepend t)
+         ("pn" "Project-local notes" entry
+          (file+headline +org-capture-project-notes-file "Inbox") "* %U %?\n%i\n%a"
+          :prepend t)
+         ("pc" "Project-local changelog" entry
+          (file+headline +org-capture-project-changelog-file "Unreleased")
+          "* %U %?\n%i\n%a" :prepend t)
+         ("o" "Centralized templates for projects")
+         ("ot" "Project todo" entry #'+org-capture-central-project-todo-file
+          "* TODO %?\n %i\n %a" :heading "Tasks" :prepend nil)
+         ("on" "Project notes" entry #'+org-capture-central-project-notes-file
+          "* %U %?\n %i\n %a" :heading "Notes" :prepend t)
+         ("oc" "Project changelog" entry #'+org-capture-central-project-changelog-file
+          "* %U %?\n %i\n %a" :heading "Changelog" :prepend t))))
 
 (after! org-capture
     (defun org-capture-select-template-prettier (&optional keys)
@@ -392,7 +422,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (setq flycheck-syntax-automatically '(save-mode-enable))
 
-(setq lsp-use-lists 't)
+(setq lsp-use-plists 't)
 
 (setq lsp-completion-provider :capf)
 
@@ -415,6 +445,9 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (setq lsp-signature-auto-activate nil)
 (setq lsp-signature-render-documentation nil)
+
+(setq lsp-ui-doc-max-height 20
+      lsp-ui-doc-max-width 80)
 
 (eval-after-load 'git-timemachine
   '(progn

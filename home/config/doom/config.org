@@ -1,4 +1,5 @@
-#+PROPERTY: header-args :elisp :tangle ./config.el
+#+PROPERTY: header-args :elisp :tangle ./config.el :results silent
+#+TITLE: Doom Emacs Config
 
 * Base Settings
 ** Personal data
@@ -75,6 +76,7 @@ https://github.com/doomemacs/doomemacs/issues/6960#issuecomment-1327514660
 #+begin_src elisp :tangle packages.el
 (package! editorconfig)
 #+end_src
+
 ** Fix PATH in macos
 When using gui emacs in macos, env vars like PATH are not set correctly.
 ~exec-path-from-shell~ fixes that.
@@ -109,7 +111,19 @@ Only initialize when running in a GUI frame on macos and linux.
 #+end_src
 
 ** Visual improvements
-*** TODO Make Org-Modern loog good
+*** Hide leading stars except for currently selected headline
+#+begin_src elisp
+(setq org-hide-leading-stars t)
+#+end_src
+
+*** Don't indent content based on headline level
+#+begin_src elisp
+(setq org-startup-indented nil)
+#+end_src
+*** Make Org-Modern look good
+**** TODO actually implement this :emacs:
+Currently, this has some issues with doom emacs.
+
 Org-modern (https://github.com/minad/org-modern) contains a lot of nice visual
 improvements for org-mode.
 
@@ -214,7 +228,7 @@ See https://org-babel.readthedocs.io/en/latest/header-args/
         (:tangle . "no")
         (:comments . "link")))
 #+end_src
-*** Auto-Tanglins TODO: make this work
+*** Auto-Tangling TODO: make this work
 I want org to tangle my config.org on file save, regardless whether it's the one
 loaded or in a different repo.
 
@@ -304,7 +318,7 @@ Add `:ignore:` tag to headings, so only the headings will be ignored for an expo
 *** Roam
 **** Use the same directory as org
 #+begin_src elisp
-(setq org-roam-directory "~/org")
+(setq org-roam-directory "~/org/roam")
 #+end_src
 
 **** Add Org-Roam UI
@@ -362,6 +376,7 @@ The closest comparison to org-roam-ui is Obsidian.
 
 *** Presentation
 **** Org-Present
+Org-Present is a package to present org files right out of emacs.
 #+begin_src elisp :tangle packages.el
 (package! org-present)
 #+end_src
@@ -402,7 +417,7 @@ I'm adjusting the bindings just for ~org-mode~.
 #+end_src
 
 
- *** Visual-line-mode messes with with plaintext (markdow, latex)
+*** Visual-line-mode messes with with plaintext (markdow, latex)
 #+begin_src elisp
 (remove-hook 'text-mode-hook #'visual-line-mode)
 (add-hook 'text-mode-hook #'auto-fill-mode)
@@ -464,6 +479,41 @@ For some reason, ~org-tempo~ does not start at launch, so I'm  loading it here.
 (use-package! org-tempo)
 #+end_src
 ** Capture
+*** Add / change cappture templates
+Some other tools (like orgzly) work better with ~TODO~ instead of ~[ ]~ (and
+~DONE~ instead of ~[X]~).
+
+#+begin_src elisp
+(after! org
+  (setq org-capture-templates
+        '(("t" "Personal todo" entry (file+headline +org-capture-todo-file "Inbox")
+          "* TODO %?\n%i\n%a" :prepend t)
+         ("n" "Personal notes" entry (file+headline +org-capture-notes-file "Inbox")
+          "* %u %?\n%i\n%a" :prepend t)
+         ("j" "Journal" entry (file+olp+datetree +org-capture-journal-file)
+          "* %U %?\n%i\n%a" :prepend t)
+         ("p" "Templates for projects")
+         ("pt" "Project-local todo" entry
+          (file+headline +org-capture-project-todo-file "Inbox") "* TODO %?\n%i\n%a"
+          :prepend t)
+         ("pn" "Project-local notes" entry
+          (file+headline +org-capture-project-notes-file "Inbox") "* %U %?\n%i\n%a"
+          :prepend t)
+         ("pc" "Project-local changelog" entry
+          (file+headline +org-capture-project-changelog-file "Unreleased")
+          "* %U %?\n%i\n%a" :prepend t)
+         ("o" "Centralized templates for projects")
+         ("ot" "Project todo" entry #'+org-capture-central-project-todo-file
+          "* TODO %?\n %i\n %a" :heading "Tasks" :prepend nil)
+         ("on" "Project notes" entry #'+org-capture-central-project-notes-file
+          "* %U %?\n %i\n %a" :heading "Notes" :prepend t)
+         ("oc" "Project changelog" entry #'+org-capture-central-project-changelog-file
+          "* %U %?\n %i\n %a" :heading "Changelog" :prepend t))))
+#+end_src
+
+#+RESULTS:
+| t | Personal todo | entry | (file+headline +org-capture-todo-file Inbox) | * TODO %? |
+
 *** Improve org-capture dialog
 #+BEGIN_SRC elisp
 (after! org-capture
@@ -1002,7 +1052,7 @@ Here, I'll define some general settings.
 Using plists should increase the LSP performance.
 
 #+begin_src elisp
-(setq lsp-use-lists 't)
+(setq lsp-use-plists 't)
 #+end_src
 
 **** Handling
@@ -1059,6 +1109,12 @@ Same with signature help, as well as help documentation
 #+begin_src elisp
 (setq lsp-signature-auto-activate nil)
 (setq lsp-signature-render-documentation nil)
+#+end_src
+
+Set lsp-ui-doc sizing
+#+begin_src elisp
+(setq lsp-ui-doc-max-height 20
+      lsp-ui-doc-max-width 80)
 #+end_src
 
 *** Git
