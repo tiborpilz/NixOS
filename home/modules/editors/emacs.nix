@@ -77,7 +77,7 @@ in
       nodePackages.typescript-language-server
 
       # vue language server
-      my."@volar/vue-language-server"
+      my."@vue/language-server"
 
       # Python Language Server
       python3Packages.python-lsp-server
