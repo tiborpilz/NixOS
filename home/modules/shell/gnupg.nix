@@ -54,7 +54,7 @@ in
     modules.shell.zsh.rcInit = ''
       export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
       gpgconf --launch gpg-agent
-      echo UPDATESTARTUPTTY | gpg-connect-agent
+      echo UPDATESTARTUPTTY | gpg-connect-agent > /dev/null
     '';
   };
 }

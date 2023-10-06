@@ -1,4 +1,4 @@
-{ inputs, config, options, pkgs, lib, ... }:
+{ inputs, config, pkgs, lib, ... }:
 
 with lib;
 let
@@ -29,7 +29,7 @@ in
     '';
   };
 
-  config = mkIf cfg.enable rec {
+  config = mkIf cfg.enable {
     # TODO    home.xdg.configFile."zsh/.zshrc".text = #
     programs.zsh = {
       enable = true;
