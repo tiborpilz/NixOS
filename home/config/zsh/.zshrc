@@ -1,4 +1,3 @@
-
 # Add custom scripts to Path
 PATH=$PATH:$HOME/bin
 
@@ -7,7 +6,7 @@ PATH=$PATH:$HOME/.npm-global/bin
 PATH=$PATH:$HOME/go/bin
 
 
-# Antigen nPlugin Manager
+# Antigen Plugin Manager
 if [[ ! -a $HOME/.antigen/antigen.zsh ]]; then
   git clone --branch master https://github.com/zsh-users/antigen.git ~/.antigen
   cd ~/.antigen && git checkout v2.2.3 && cd ~
@@ -15,30 +14,16 @@ fi
 
 source $HOME/.antigen/antigen.zsh
 
+# Fix slow nvm startup time
+export NVM_LAZY_LOAD=true
+
 antigen use oh-my-zsh
 
-# Touchbar goodies
-antigen theme https://github.com/iam4x/zsh-iterm-touchbar
-
-antigen bundle bundler
 antigen bundle vi-mode
-antigen bundle history-substring-search
-
-antigen bundle docker
-antigen bundle docker-compose
-
-antigen bundle srijanshetty/zsh-pandoc-completion
 
 antigen bundle wfxr/forgit
 antigen bundle git
-
-antigen bundle soimort/translate-shell
-
-antigen bundle jscutlery/nx-completion@main
-# Colorful stuff
 antigen bundle zsh-users/zsh-syntax-highlighting
-
-antigen bundle chisui/zsh-nix-shell
 
 antigen bundle lukechilds/zsh-nvm
 
@@ -78,10 +63,12 @@ python-init() {
   pip install jupyter
 }
 
+# Interactive git checkout
 gch() {
   git checkout "$(git branch --all | fzf-tmux | tr -d '[:space:]')"
 }
 
+# Interactive npm run
 npr() {
   command=$(jq -r '.scripts | keys | .[]' package.json | fzf-tmux --preview "jq -r '.scripts[\"{}\"]' package.json")
   if [[ ! -z command ]]; then
@@ -89,6 +76,7 @@ npr() {
   fi
 }
 
+# Interactive cd to repo in ~/Code
 ccd() {
   cd $(find ~/Code/* -type d -maxdepth 0 | fzf-tmux --preview 'glow {}/README.md --style=dark')
 }
@@ -113,8 +101,8 @@ export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/
 
 ## Load NVM
 #export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-export NVM_DIR="${HOME}/nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+# export NVM_DIR="${HOME}/nvm"
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 ## Bootstrap interactive sessions
 
