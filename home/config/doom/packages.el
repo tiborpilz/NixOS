@@ -65,7 +65,7 @@
 
 (package! all-the-icons-ivy-rich)
 
-;; (package! treemacs-all-the-icons)
+(package! treemacs-all-the-icons)
 
 (package! xwwp :recipe (:host github :repo "BlueFlo0d/xwwp"))
 (package! xwwp-follow-link-ivy)

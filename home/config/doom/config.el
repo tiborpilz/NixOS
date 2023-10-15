@@ -472,6 +472,11 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (setq doom-theme 'doom-nord-aurora)
 
+(setq doom-themes-treemacs-theme "doom-colors")
+
+(with-eval-after-load 'doom-themes
+  (doom-themes-treemacs-config))
+
 ;; (add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
 ;; (setq doom-themes-treemacs-theme "doom-atom")
 

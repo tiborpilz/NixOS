@@ -1207,6 +1207,11 @@ based on Pandoc.
 
 #+begin_src elisp
 (setq doom-theme 'doom-nord-aurora)
+
+(setq doom-themes-treemacs-theme "doom-colors")
+
+(with-eval-after-load 'doom-themes
+  (doom-themes-treemacs-config))
 #+end_src
 
 *** Nano
@@ -1506,7 +1511,7 @@ and exploration, while also possessing basic file management utilities.
 Treemacs also has a package that adds icons to the file explorer.
 
 #+begin_src elisp :tangle packages.el
-;; (package! treemacs-all-the-icons)
+(package! treemacs-all-the-icons)
 #+end_src
 
 ** Vertico

@@ -62,9 +62,11 @@ Plug 'hashivim/vim-terraform'
 Plug 'LnL7/vim-nix'
 
 " LSP
+Plug 'williamboman/mason.nvim'
+Plug 'williamboman/mason-lspconfig.nvim'
 Plug 'neovim/nvim-lspconfig'
-Plug 'williamboman/nvim-lsp-installer'
-Plug 'jose-elias-alvarez/null-ls.nvim'
+
+" Plug 'jose-elias-alvarez/null-ls.nvim'
 " Plug 'folke/lsp-colors.nvim'
 " Plug 'simrat39/symbols-outline.nvim'
 " Plug 'folke/trouble.nvim'
