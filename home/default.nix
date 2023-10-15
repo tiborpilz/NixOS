@@ -34,6 +34,9 @@ in
     # PHP & composer
     php82
     php82Packages.composer
+
+    # Bun is a Node alternative
+    unstable.bun
   ];
 
   # Let Home Manager install and manage itself.
