@@ -10,7 +10,7 @@ in
     enable = mylib.mkBoolOpt false;
     cacheTTL = mylib.mkOpt int 3600; # 1hr
     maxCacheTTL = mylib.mkOpt int 86400; # 1 day
-    keygrip = mylib.mkOpt string "Keygrip = 1050A7CD50EAFCD36E696470775BC39D6FFA47A4";
+    keygrip = mylib.mkOpt types.str "Keygrip = 1050A7CD50EAFCD36E696470775BC39D6FFA47A4";
   };
 
   config = mkIf cfg.enable {

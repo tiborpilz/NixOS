@@ -18,6 +18,8 @@
 
 (unpin! lsp-mode)
 
+(package! astro-ts-mode)
+
 (package! lsp-tailwindcss
   :recipe (:host github
            :repo "merrickluo/lsp-tailwindcss"))

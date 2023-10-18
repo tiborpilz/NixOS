@@ -2,7 +2,7 @@
 
 let
   add-feature-flags = emacs: (emacs.override {
-    nativeComp = true;
+    withNativeCompilation = true;
     withXwidgets = true;
     withGTK3 = true;
   });
