@@ -603,6 +603,20 @@ Remove 1 space padding from <script> tags, set indent to 2.
 #+end_src
 
 ***** Folding
+**** Astro
+#+begin_src elisp :tangle packages.el
+(package! astro-ts-mode)
+#+end_src
+
+Because ~astro-ts-mode~ uses treesitter, treesitter needs to be set up to handle
+~.astro~ files properly.
+
+#+begin_src elisp
+(setq treesit-language-source-alist
+      '((astro "https://github.com/virchau13/tree-sitter-astro")
+        (css "https://github.com/tree-sitter/tree-sitter-css")
+        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")))
+#+end_src
 **** Tailwind
 Add the tailwind lsp package
 #+begin_src elisp :tangle packages.el

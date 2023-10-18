@@ -269,6 +269,11 @@
   (setq web-mode-code-indent-offset 2)
   (setq web-mode-markup-indent-offset 2))
 
+(setq treesit-language-source-alist
+      '((astro "https://github.com/virchau13/tree-sitter-astro")
+        (css "https://github.com/tree-sitter/tree-sitter-css")
+        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")))
+
 (use-package! lsp-tailwindcss
   :defer t
   :init
