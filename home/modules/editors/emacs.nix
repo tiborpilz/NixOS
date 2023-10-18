@@ -76,6 +76,9 @@ in
       nodePackages.typescript
       nodePackages.typescript-language-server
 
+      # Astrojs language server
+      nodePackages."@astrojs/language-server"
+
       # vue language server
       my."@vue/language-server"
 
