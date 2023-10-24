@@ -82,6 +82,8 @@ in
 
     modules.shell.zsh.aliases.xclip = "xclip -selection clipboard";
 
+    modules.shell.zsh.aliases.nix-shell = "nix-shell --run zsh";
+
     xdg.configFile."zsh" = { source = "${configDir}/zsh"; recursive = true; };
 
     xdg.configFile."zsh/extra.zshrc".text =
