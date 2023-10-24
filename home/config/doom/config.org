@@ -1520,12 +1520,19 @@ It shows the file system outlines of your projects in a simple tree layout
 allowing quick navigation
 and exploration, while also possessing basic file management utilities.
 
-*** Treemacs-All-The-Icons
-
-Treemacs also has a package that adds icons to the file explorer.
+*** Icons
+Doom switched from ~treemacs-all-the-icons~ to ~treemacs-nerd-icons~ recently -
+though the icons look weird per default. For some reason, the fix discussed [[https://discourse.doomemacs.org/t/ugly-icons-in-treemacs/4147][here]] does not work, so I'm applying it manually.
 
 #+begin_src elisp :tangle packages.el
-(package! treemacs-all-the-icons)
+(package! treemacs-nerd-icons :pin "9876cb478145a0ec4e36f64ff6583f3de7126216")
+#+end_src
+
+#+begin_src elisp
+(use-package treemacs-nerd-icons
+  :after treemacs
+  :config
+  (treemacs-load-theme "nerd-icons"))
 #+end_src
 
 ** Vertico
