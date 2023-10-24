@@ -25,8 +25,6 @@ antigen bundle wfxr/forgit
 antigen bundle git
 antigen bundle zsh-users/zsh-syntax-highlighting
 
-antigen bundle chisui/zsh-nix-shell
-
 antigen bundle lukechilds/zsh-nvm
 
 antigen apply
