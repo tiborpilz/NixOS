@@ -67,7 +67,7 @@
 
 (package! all-the-icons-ivy-rich)
 
-(package! treemacs-all-the-icons)
+(package! treemacs-nerd-icons :pin "9876cb478145a0ec4e36f64ff6583f3de7126216")
 
 (package! xwwp :recipe (:host github :repo "BlueFlo0d/xwwp"))
 (package! xwwp-follow-link-ivy)
