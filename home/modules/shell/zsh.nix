@@ -69,15 +69,14 @@ in
     # home.sessionPath = [ "${home.sessionVariables.XDG_CONFIG_HOME}/.krew/bin" ];
 
     modules.shell.zsh.rcInit = ''
-      # comletion
+      # completion
       source ${pkgs.nix-zsh-completions}/share/zsh/plugins/nix/nix-zsh-completions.plugin.zsh
       fpath=(${pkgs.nix-zsh-completions}/share/zsh/site-functions $fpath)
       fpath=(${pkgs.nix}/share/zsh/site-functions $fpath)
       fpath=(${pkgs.zsh-completions}/share/zsh/site-functions $fpath)
-      autoload -U compinit && compinit
 
       # thefuck initialization
-      eval $(thefuck --alias)
+      # eval $(thefuck --alias)
     '';
 
     modules.shell.zsh.aliases.xclip = "xclip -selection clipboard";
