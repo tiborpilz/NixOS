@@ -1529,10 +1529,9 @@ though the icons look weird per default. For some reason, the fix discussed [[ht
 #+end_src
 
 #+begin_src elisp
-(use-package treemacs-nerd-icons
+(use-package! treemacs-nerd-icons
   :after treemacs
-  :config
-  (treemacs-load-theme "nerd-icons"))
+  :config (treemacs-load-theme "nerd-icons"))
 #+end_src
 
 ** Vertico
