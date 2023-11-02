@@ -515,10 +515,9 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (setq ivy-posframe-width 80)
 
-(use-package treemacs-nerd-icons
+(use-package! treemacs-nerd-icons
   :after treemacs
-  :config
-  (treemacs-load-theme "nerd-icons"))
+  :config (treemacs-load-theme "nerd-icons"))
 
 (defun minibuffer-format-candidate (orig cand prefix suffix index _start)
   (let ((prefix (if (= vertico--index index)
