@@ -17,7 +17,7 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.packages = with pkgs; [ tmux ];
+    home.packages = with pkgs; [ tmux gitmux ];
 
     # modules.shell.zsh = {
     #   rcInit = "_cache tmuxifier init -";
