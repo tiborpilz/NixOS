@@ -21,11 +21,15 @@ in
       pkgs.gnupg
     ];
 
-    home.file."isDarwin" = lib.mkIf pkgs.stdenv.isDarwin {
-      text = ''
-        is darwin!
-      '';
-    };
+    modules.startup-script.import-pgp = ''
+      #!/usr/bin/env bash
+      # Import PGP key from server
+      gpg --recv-keys ${cfg.keyid}
+      # Import PGP key from Yubikey
+      gpg --import <(ykman openpgp export)
+      # Success!
+      echo "Imported PGP key" > /tmp/import-pgp.log
+    '';
 
     # For some reason, `programs.gpg` doesn't work on mac, although there
     # is a gnupg package. So I use the package and configure the package directly.
