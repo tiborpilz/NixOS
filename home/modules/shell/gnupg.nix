@@ -7,7 +7,7 @@ let
 in
 {
   options.modules.shell.gnupg = with types; {
-    keyid = mylib.mkOpt types.str ""; # public key id
+    public_key = mylib.mkOpt str ""; # public key id
     keygrip = mylib.mkOpt types.str ""; # keygrip
     enable = mylib.mkBoolOpt false;
     cacheTTL = mylib.mkOpt int 3600; # 1hr
@@ -15,27 +15,26 @@ in
   };
 
   config = mkIf cfg.enable {
+    # For some reason, `programs.gpg` doesn't work on mac, although there
+    # is a gnupg package. So I use the package and configure everything else system-agnostic.
+
     home.packages = [
       pkgs.yubikey-personalization
       pkgs.yubikey-manager
       pkgs.gnupg
     ];
 
-    modules.startup-script.import-pgp = ''
-      #!/usr/bin/env bash
-      # Import PGP key from server
-      gpg --recv-keys ${cfg.keyid}
-      # Import PGP key from Yubikey
-      gpg --import <(ykman openpgp export)
-      # Success!
-      echo "Imported PGP key" > /tmp/import-pgp.log
-    '';
-
-    # For some reason, `programs.gpg` doesn't work on mac, although there
-    # is a gnupg package. So I use the package and configure the package directly.
-    # programs.gpg.enable = true;
-    # services.gpg-agent.enable = true;
-    # services.gpg-agent.enableSshSupport = true;
+    # Automatically import public key from keyserver and, if connected, yubikey
+    home.activation = {
+      importGpgKeys = let
+        gpg = "${pkgs.gnupg}/bin/gpg";
+        keyid = cfg.public_key;
+      in mkIf (cfg.public_key != "")
+        (lib.hm.dag.entryAfter [ "linkGeneration"] ''
+          ${gpg} --list-keys ${keyid} > /dev/null 2>&1 || ${gpg} --recv-keys ${keyid}
+          ${gpg} --list-secret-keys ${keyid} > /dev/null 2>&1 || ${gpg} --card-status
+        '');
+    };
 
     home.file.".gnupg/gpg-agent.conf" = {
       text = ''

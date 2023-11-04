@@ -55,7 +55,7 @@ in
   modules.shell.tmux.enable = true;
   modules.shell.gnupg = {
     enable = true;
-    keyid = "03746612698994281D322B09923BC5E9B4E9509B";
+    public_key = "03746612698994281D322B09923BC5E9B4E9509B";
     keygrip = "1050A7CD50EAFCD36E696470775BC39D6FFA47A4";
   };
 
