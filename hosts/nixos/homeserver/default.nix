@@ -137,6 +137,11 @@ with lib;
     modules.services.paperless.enable = true;
     modules.services.firefly-iii.enable = true;
 
+    sops.secrets.firefly_import_configs_dkb = {
+      sopsFile = ./secrets/secrets.yaml;
+      path = "${modules.services.firefly-iii.configDir}/dkb.json";
+    };
+
     modules.services.media = {
       calibre.enable = true;
       deluge.enable = true;
