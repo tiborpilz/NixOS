@@ -24,7 +24,7 @@ in
     systemd.user.targets.tray = mkIf cfg.service {
       Unit = {
         Description = "Home Manager System Tray";
-        Requires = [ "graphical-session-pre.target" ];
+        Requires = [ "tray.target" ];
       };
     };
   };
