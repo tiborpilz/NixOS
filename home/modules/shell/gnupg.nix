@@ -1,4 +1,4 @@
-{ inputs, config, options, lib, pkgs, ... }:
+{ inputs, config, lib, pkgs, ... }:
 
 with lib;
 let
@@ -7,10 +7,11 @@ let
 in
 {
   options.modules.shell.gnupg = with types; {
+    keyid = mylib.mkOpt types.str ""; # public key id
+    keygrip = mylib.mkOpt types.str ""; # keygrip
     enable = mylib.mkBoolOpt false;
     cacheTTL = mylib.mkOpt int 3600; # 1hr
     maxCacheTTL = mylib.mkOpt int 86400; # 1 day
-    keygrip = mylib.mkOpt types.str "Keygrip = 1050A7CD50EAFCD36E696470775BC39D6FFA47A4";
   };
 
   config = mkIf cfg.enable {
@@ -20,8 +21,14 @@ in
       pkgs.gnupg
     ];
 
+    home.file."isDarwin" = lib.mkIf pkgs.stdenv.isDarwin {
+      text = ''
+        is darwin!
+      '';
+    };
+
     # For some reason, `programs.gpg` doesn't work on mac, although there
-    # is a gnupg package. So I use the package directly.
+    # is a gnupg package. So I use the package and configure the package directly.
     # programs.gpg.enable = true;
     # services.gpg-agent.enable = true;
     # services.gpg-agent.enableSshSupport = true;
@@ -31,14 +38,13 @@ in
         default-cache-ttl ${toString cfg.cacheTTL}
         pinentry-program ${pkgs.pinentry.gtk2}/bin/pinentry
         enable-ssh-support
-        write-env-file
-        use-standard-socket
         default-cache-ttl-ssh ${toString cfg.cacheTTL}
         max-cache-ttl ${toString cfg.maxCacheTTL}
       '';
     };
     home.file.".gnupg/scdaemon.conf" = {
       text = ''
+        pcsc-driver /usr/lib/libpcsclite.so
         card-timeout 5
         disable-ccid
       '';
@@ -46,7 +52,7 @@ in
     # SSH Key from Yubikey
     home.file.".gnupg/sshcontrol" = {
       text = ''
-        ${cfg.keygrip}
+        Keygrip = ${cfg.keygrip}
       '';
     };
 
