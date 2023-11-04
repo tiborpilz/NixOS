@@ -31,8 +31,8 @@ in
         keyid = cfg.public_key;
       in mkIf (cfg.public_key != "")
         (lib.hm.dag.entryAfter [ "linkGeneration"] ''
-          ${gpg} --list-keys ${keyid} > /dev/null 2>&1 || ${gpg} --recv-keys ${keyid}
-          ${gpg} --list-secret-keys ${keyid} > /dev/null 2>&1 || ${gpg} --card-status
+          ${gpg} --list-keys ${keyid} > /dev/null 2>&1 || ${gpg} --recv-keys ${keyid} > /dev/null 2>&1 || echo "Error during gpg import: No key!"
+          ${gpg} --list-secret-keys ${keyid} > /dev/null 2>&1 || ${gpg} --card-status > /dev/null 2>&1 || echo "Error during gpg import: No card!"
         '');
     };
 
