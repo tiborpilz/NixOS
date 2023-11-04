@@ -4,39 +4,49 @@ with lib.my;
 let
   fireflyPort = 8210;
   fintsPort = 8211;
-  baseDir = "/data/firefly-iii";
   cfg = config.modules.services.firefly-iii;
 in
 {
   options.modules.services.firefly-iii = {
     enable = mkBoolOpt false;
+    baseDir = mkOption {
+      description = ''
+        The base directory for all Firefly III data.
+      '';
+      type = types.str;
+      default = "/data/firefly-iii";
+    };
     fints = mkOption {
-      type = types.attrsOf types.str;
       default = {};
+      description = ''
+        Paths to sops-encrypted files containing the configuration for the respective bank.
+      '';
+    };
+    configDir = mkOption {
+      description = ''
+        The directory where the configuration files for the FinTS importer are stored.
+      '';
+      type = types.str;
+      default = "${cfg.baseDir}/configurations";
     };
   };
 
   config = mkIf cfg.enable {
     system.activationScripts.init-firefly-iii = stringAfter [ "var" ] ''
       # Create directories, if necessary
-      mkdir -p ${baseDir}/storage/{upload,database}
-      mkdir -p ${baseDir}/configurations
-
-      # Create configuration files for each bank, so `fints.dkb` will be `configurations/dkb.json` and so on
-      for bank in ${lib.attrNames fintsConfigs}; do
-        echo "${lib.toPrettyJSON (fintsConfigs.${bank})}" > ${baseDir}/configurations/${bank}.json
-      done
+      mkdir -p ${cfg.baseDir}/storage/{upload,database}
+      mkdir -p ${cfg.configDir}
 
       # Create empty database, if necessary
-      touch ${baseDir}/storage/database/database.sqlite
+      touch ${cfg.baseDir}/storage/database/database.sqlite
     '';
 
     virtualisation.oci-containers.containers.firefly-iii = {
       image = "docker.io/fireflyiii/core:latest";
       ports = ["${toString fireflyPort}:8080"];
       volumes = [
-        "${baseDir}/storage/upload:/var/www/html/storage/upload"
-        "${baseDir}/storage/database:/var/www/html/storage/database"
+        "${cfg.baseDir}/storage/upload:/var/www/html/storage/upload"
+        "${cfg.baseDir}/storage/database:/var/www/html/storage/database"
       ];
       environment = {
         APP_ENV = "local";
@@ -58,7 +68,7 @@ in
       image = "docker.io/benkl/firefly-iii-fints-importer:latest";
       ports = ["${toString fintsPort}:8080"];
       volumes = [
-        "${baseDir}/configurations:/app/configurations"
+        "${cfg.configDir}:/app/configurations"
       ];
     };
 
