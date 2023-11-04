@@ -37,7 +37,7 @@
 
 (setq org-hide-leading-stars t)
 
-(setq org-startup-indented nil)
+(setq org-startup-indented t)
 
 (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
@@ -475,7 +475,8 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (use-package quarto-mode
   :mode (("\\.Rmd" . poly-quarto-mode)))
 
-(setq doom-theme 'doom-nord-aurora)
+(setq doom-theme 'catppuccin)
+(setq catppuccin-flavor 'frappe)
 
 (setq doom-themes-treemacs-theme "doom-colors")
 
