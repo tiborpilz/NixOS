@@ -42,6 +42,8 @@
 
 (package! doom-themes)
 
+(package! catppuccin-theme)
+
 (package! grayscale-theme)
 
 (package! tao-theme)

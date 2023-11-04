@@ -1,5 +1,5 @@
-(let* ((variable-tuple '(:font "ETBembo"))
-       (headline `(:inherit default :weight bold)))
+(let* ((variable-tuple '(:font "FiraCode Nerd Font"))
+       (headline `(:inherit default :weight heavy)))
   (custom-theme-set-faces
    'user
    `(org-level-8 ((t (,@headline ,@variable-tuple))))
