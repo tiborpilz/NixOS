@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 with lib;
 with lib.my;
 let
@@ -29,6 +29,13 @@ in
       type = types.str;
       default = "${cfg.baseDir}/configurations";
     };
+    appKeyPath = mkOption {
+      description = ''
+        The path to the file containing the application key.
+      '';
+      type = types.str;
+      default = "${cfg.baseDir}/.env";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -41,9 +48,19 @@ in
       touch ${cfg.baseDir}/storage/database/database.sqlite
     '';
 
+    systemd.services.create-firefly-iii-network = {
+      wantedBy = [ "podman-firefly-fints-importer.service" "podman-firefly-iii.service" ];
+      after = [ "network.target" ];
+      serviceConfig = {
+        ExecStart = "${pkgs.podman}/bin/podman network create firefly-iii";
+        RemainAfterExit = true;
+      };
+    };
+
     virtualisation.oci-containers.containers.firefly-iii = {
       image = "docker.io/fireflyiii/core:latest";
       ports = ["${toString fireflyPort}:8080"];
+      extraOptions = ["--network=firefly-iii"];
       volumes = [
         "${cfg.baseDir}/storage/upload:/var/www/html/storage/upload"
         "${cfg.baseDir}/storage/database:/var/www/html/storage/database"
@@ -52,7 +69,7 @@ in
         APP_ENV = "local";
         APP_DEBUG = "false";
         SITE_OWNER = "tibor@pilz.berlin";
-        APP_KEY = "373971ff2e63f2ea16e8b6efc3e1ee2f"; # TODO: generate this once and store it in a secret
+        APP_KEY = "373971ff2e63f2ea16e8b6efc3e1ee2f";
         DEFAULT_LANGUAGE = "en_US";
         DEFAULT_LOCALE = "de_DE";
         TZ = "Europe/Berlin";
@@ -66,6 +83,7 @@ in
 
     virtualisation.oci-containers.containers.firefly-fints-importer = {
       image = "docker.io/benkl/firefly-iii-fints-importer:latest";
+      extraOptions = ["--network=firefly-iii"];
       ports = ["${toString fintsPort}:8080"];
       volumes = [
         "${cfg.configDir}:/app/configurations"

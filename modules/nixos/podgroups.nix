@@ -3,14 +3,21 @@
 with lib;
 let
   cfg = config.modules.podgroups;
-  dbOptions = { ... }: { options = { enable = mkEnableOption "database"; }; };
+  # dbOptions = { ... }: { options = { enable = mkEnableOption "database"; }; };
 
   podOptions = { ... }: {
     options = {
       port = mkOption {
         type = types.str;
-        description = "Port binding";
-        example = "80:8080";
+        description = "Port to expose";
+        example = "8080";
+        default = "";
+      };
+
+      ports = mkOption {
+        type = types.listOf types.str;
+        description = "Port bindings";
+        example = ["80:8080"];
       };
 
       containers = mkOption {
@@ -19,7 +26,6 @@ let
       };
     };
   };
-
 
   podContainerNames = podName: pod:
     map (containerName: "${podName}-${containerName}")
@@ -38,15 +44,19 @@ let
   #   };
   # };
 
-  mkService = name: pod: {
-    serviceConfig.Type = "oneshot";
-    wantedBy = map (containerName: "podman-${containerName}.service")
-      (podContainerNames name pod);
-    script = ''
+  mkService = name: pod: let
+    ports = if pod.port != "" then [ pod.port ] else pod.ports;
+    portFlags = concatMapStringsSep " " (port: "-p ${port}") ports;
+  in
+    {
+      serviceConfig.Type = "oneshot";
+      wantedBy = map (containerName: "podman-${containerName}.service")
+        (podContainerNames name pod);
+      script = ''
       ${pkgs.podman}/bin/podman pod exists ${name}-pod || \
-      ${pkgs.podman}/bin/podman pod create -n ${name}-pod -p '${pod.port}'
+      ${pkgs.podman}/bin/podman pod create -n ${name}-pod ${portFlags}
     '';
-  };
+    };
 
   mkContainers = pods:
     recursiveMergeAttrs (concatMap

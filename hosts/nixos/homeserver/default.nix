@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ config, pkgs, lib, ... }:
 with lib;
 {
   imports = [
@@ -137,9 +137,14 @@ with lib;
     modules.services.paperless.enable = true;
     modules.services.firefly-iii.enable = true;
 
-    sops.secrets.firefly_import_configs_dkb = {
+    sops.secrets.firefly_import_configs_dkb-private = {
       sopsFile = ./secrets/secrets.yaml;
-      path = "${modules.services.firefly-iii.configDir}/dkb.json";
+      path = "${config.modules.services.firefly-iii.configDir}/dkb-private.json";
+    };
+
+    sops.secrets.firefly_import_configs_dkb-savings = {
+      sopsFile = ./secrets/secrets.yaml;
+      path = "${config.modules.services.firefly-iii.configDir}/dkb-savings.json";
     };
 
     modules.services.media = {
