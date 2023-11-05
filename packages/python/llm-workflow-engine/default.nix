@@ -7,6 +7,9 @@
 pkgs.python3Packages.buildPythonPackage rec {
     pname = "llm-workflow-engine";
     version = "v0.18.2";
+    buildInputs = [
+      pkgs.git
+    ];
     src = pkgs.fetchFromGitHub {
       owner = "llm-workflow-engine";
       repo = pname;
