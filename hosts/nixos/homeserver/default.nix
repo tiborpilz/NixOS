@@ -18,6 +18,7 @@ with lib;
     networking.hostName = "homeserver";
     time.timeZone = "Europe/Berlin";
 
+
     networking.useDHCP = false;
     networking.interfaces.enp3s0.useDHCP = false;
     networking.interfaces.wlp4s0.useDHCP = false;
@@ -46,7 +47,7 @@ with lib;
 
     # networking.useNetworkd = false;
 
-    networking.firewall.enable = true;
+    networking.firewall.enable = false;
 
     networking.networkmanager.enable = true;
 
@@ -161,14 +162,30 @@ with lib;
       plex.enable = true;
     };
 
-    sops.secrets.nextcloud_admin_pass = {
-      owner = "nextcloud";
-    };
-
     modules.services.nextcloud = {
       enable = true;
       adminpassFile = config.sops.secrets.nextcloud_admin_pass.path;
-      home = "/data/nextcloud";
+      # home = "/nextcloud";
     };
+
+    sops.secrets.nextcloud_admin_pass = mkIf config.modules.services.nextcloud.enable {
+      owner = "nextcloud";
+    };
+
+    # sops.secrets.storagebox_nextcloud_smb_secrets = {
+    #   sopsFile = ./secrets/secrets.yaml;
+    #   path = "/etc/nixos/smb-secrets-storagebox-nextcloud";
+    # };
+
+    # Usually, filesystems should be part of the hardware configuration. But since
+    # this is a remote storage box, it's more bound to the config than the hardware.
+    # fileSystems."/nextcloud" = {
+    #   device = "//u304118.your-storagebox.de/u304118-sub1";
+    #   fsType = "cifs";
+    #   options = let
+    #     automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
+    #   in ["${automount_opts},credentials=/etc/nixos/smb-secrets-storagebox-nextcloud,uid=nextcloud,gid=nextcloud"];
+    # };
+
   };
 }
