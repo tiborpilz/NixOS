@@ -154,7 +154,7 @@ with lib;
     modules.services.media = {
       calibre.enable = true;
       deluge = {
-        enable = true;
+        enable = false;
         sopsFile = config.sops.secrets.deluge.path;
       };
       komga.enable = true;

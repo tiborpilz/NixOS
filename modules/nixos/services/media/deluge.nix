@@ -34,14 +34,23 @@ in
       # Create config directory
       mkdir -p ${delugeConfigDir}/openvpn
 
-      # Re-Download PIA OpenVPN config files
-      rm ${delugeConfigDir}/openvpn/*
-      mkdir -p ${delugeConfigDir}/openvpn
-      tempdir=$(mktemp -d)
-      ${pkgs.wget}/bin/wget -O $tempdir/openvpn.zip https://www.privateinternetaccess.com/openvpn/openvpn.zip
-      ${pkgs.unzip}/bin/unzip -d $tempdir $tempdir/openvpn.zip
-      mv $tempdir/${cfg.piaCountry}.ovpn ${delugeConfigDir}/openvpn
-      rm -rf $tempdir
+      # Write PIA WG config
+#       cat > ${delugeConfigDir}/openvpn/pia.conf << EOF
+# client
+# dev tun
+# proto udp
+# remote swiss.privateinternetaccess.com 1198
+# resolv-retry infinite
+# nobind
+
+      # # Re-Download PIA OpenVPN config files
+      # rm ${delugeConfigDir}/openvpn/*
+      # mkdir -p ${delugeConfigDir}/openvpn
+      # tempdir=$(mktemp -d)
+      # ${pkgs.wget}/bin/wget -O $tempdir/openvpn.zip https://www.privateinternetaccess.com/openvpn/openvpn.zip
+      # ${pkgs.unzip}/bin/unzip -d $tempdir $tempdir/openvpn.zip
+      # mv $tempdir/${cfg.piaCountry}.ovpn ${delugeConfigDir}/openvpn
+      # rm -rf $tempdir
     '';
 
     # system.activationScripts.generateSecretEnv = stringAfter [ "setupSecrets" ] ''
@@ -54,7 +63,7 @@ in
     # '';
 
     virtualisation.oci-containers.containers.deluge = {
-      image = "docker.io/binhex/arch-delugevpn:latest";
+      image = "docker.io/binhex/arch-delugevpn:2.1.1-3-02";
       ports = [
         "${toString publicPort}:8112"
         "8118:8118"
@@ -69,19 +78,22 @@ in
       environment = {
         "VPN_ENABLED" = "yes";
         "VPN_PROV" = "pia";
-        "VPN_CLIENT" = "openvpn";
-        "STRICT_PORT_FORWARD" = "yes";
-        "ENABLE_PRIVOXY" = "yes";
-        "LAN_NETWORK" = "192.168.2.0/24,10.88.0.1/16";
-        "NAME_SERVERS" = "84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1";
+        "VPN_CLIENT" = "wireguard";
+        "STRICT_PORT_FORWARD" = "no";
+        "ENABLE_PRIVOXY" = "no";
+        "LAN_NETWORK" = "84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1";
+        "NAME_SERVERS" = "1.1.1.1";
         "DELUGE_DAEMON_LOG_LEVEL" = "info";
         "DELUGE_WEB_LOG_LEVEL" = "info";
-        "DEBUG" = "true";
+        "DEBUG" = "false";
+        "PUID" = "0";
+        "PGID" = "0";
       };
       environmentFiles = mkIf (cfg.sopsFile != null) [
         (/. + builtins.toPath cfg.sopsFile)
       ];
       extraOptions = [
+        "--sysctl=\"net.ipv4.conf.all.src_valid_mark=1\""
         "--privileged=true"
       ];
     };
