@@ -9,6 +9,11 @@ let
   currentSystem = if pkgs.stdenv.isDarwin then "x86_64-darwin" else "x86_64-linux";
 in
 {
+  "llm-workflow-engine" = import ./llm-workflow-engine {
+    inherit pkgs;
+    inherit inputs;
+    inherit system;
+  };
   # "chatgpt-wrapper" = inputs.mach-nix.lib.x86_64-linux.buildPythonPackage {
   #   pname = "chatgpt-wrapper";
   #   version = "0.1.0";
