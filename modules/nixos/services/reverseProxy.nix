@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 with lib;
 with lib.my;
@@ -17,6 +17,12 @@ let
         description = "Enable authentication (per Service)";
         example = true;
         default = true;
+      };
+      targetHost = mkOption {
+        type = types.str;
+        description = "Target host (in most cases, localhost)";
+        example = "localhost";
+        default = "localhost";
       };
     };
   };
@@ -42,16 +48,16 @@ let
     };
   };
 
-  mkProxyConfig = port: enableauth: username: password: host: {
+  mkProxyConfig = { port, enableauth, username, password, host, targetHost, ... }: {
     serverAliases = [ "http://${host}" ];
     extraConfig =
       if enableauth then ''
-        reverse_proxy http://localhost:${toString port}
+        reverse_proxy http://${targetHost}:${toString port}
         basicauth /* bcrypt {
             ${username} ${password}
         }
       ''
-      else "reverse_proxy http://localhost:${toString port}";
+      else "reverse_proxy http://${targetHost}:${toString port}";
   };
 in
 {
@@ -97,8 +103,14 @@ in
     services.caddy = mkIf (cfg.proxies != { }) (mkMerge [
       {
         virtualHosts = mapAttrs'
-          (n: v: nameValuePair "${n}.${cfg.hostname}" (mkProxyConfig v.publicPort (cfg.basicAuth.enable && v.auth) cfg.basicAuth.username cfg.basicAuth.password "${n}.${cfg.hostname}"))
-          cfg.proxies;
+          (n: v: nameValuePair "${n}.${cfg.hostname}" (mkProxyConfig {
+            port = v.publicPort;
+            enableauth = (cfg.basicAuth.enable && v.auth);
+            username = cfg.basicAuth.username;
+            password = cfg.basicAuth.password;
+            host = "${n}.${cfg.hostname}";
+            targetHost = v.targetHost;
+          })) cfg.proxies;
         enable = true;
         email = cfg.email;
         globalConfig = ''
