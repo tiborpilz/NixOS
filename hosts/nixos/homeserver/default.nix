@@ -147,9 +147,16 @@ with lib;
       path = "${config.modules.services.firefly-iii.configDir}/dkb-savings.json";
     };
 
+    sops.secrets.deluge = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
     modules.services.media = {
       calibre.enable = true;
-      deluge.enable = true;
+      deluge = {
+        enable = true;
+        sopsFile = config.sops.secrets.deluge.path;
+      };
       komga.enable = true;
       plex.enable = true;
     };
