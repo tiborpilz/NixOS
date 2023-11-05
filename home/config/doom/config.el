@@ -284,11 +284,6 @@
 (use-package! nix-mode
   :mode "\\.nix\\'")
 
-;; (setq flycheck-command-wrapper-function
-;;         (lambda (command) (apply 'nix-shell-command (nix-current-sandbox) command))
-;;       flycheck-executable-find
-;;         (lambda (cmd) (nix-executable-find (nix-current-sandbox) cmd)))
-
 (add-hook! python-mode
   (advice-add 'python-pytest-file :before
               (lambda (&rest args)
