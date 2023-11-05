@@ -44,6 +44,13 @@ in
       mkdir -p ${cfg.baseDir}/storage/{upload,database}
       mkdir -p ${cfg.configDir}
 
+      # Need to copy configs because they are symlinked
+      if [ -d ${cfg.configDir}/copies ]; then
+        rm -rf ${cfg.configDir}/copies/**/*
+      fi
+      mkdir -p ${cfg.configDir}/copies
+      cp -L ${cfg.configDir}/*.json ${cfg.configDir}/copies
+
       # Create empty database, if necessary
       touch ${cfg.baseDir}/storage/database/database.sqlite
     '';
@@ -86,7 +93,7 @@ in
       extraOptions = ["--network=firefly-iii"];
       ports = ["${toString fintsPort}:8080"];
       volumes = [
-        "${cfg.configDir}:/app/configurations"
+        "${cfg.configDir}/copies:/app/configurations"
       ];
     };
 
