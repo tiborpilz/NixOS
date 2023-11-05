@@ -63,7 +63,7 @@
       });
 
       darwinHosts = mapModules ./hosts/darwin (hostPath: lib.my.mkHostAttrs hostPath {
-        system = "aarch64-darwin";
+        system = "x86_64-darwin";
         modules = lib.my.mapModulesRec' (toString ./modules/darwin) import;
       });
 
