@@ -2,10 +2,11 @@
 
 with lib;
 
-let mylib = import ../lib { inherit inputs lib pkgs; };
-in 
-  with mylib;
-  {
+let
+  mylib = import ../lib { inherit inputs lib pkgs; };
+in
+with mylib;
+{
   imports = mylib.mapModulesRec' (toString ./modules) import;
 
   home.stateVersion = "23.05";
@@ -86,6 +87,8 @@ in
   modules.tools.aws.enable = true;
 
   modules.terminal.kitty.enable = true;
+
+  modules.shell.manix.enable = true;
 
   nix = {
     registry.nixpkgs.flake = inputs.nixpkgs;
