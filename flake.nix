@@ -63,9 +63,10 @@
       });
 
       darwinHosts = mapModules ./hosts/darwin (hostPath: lib.my.mkHostAttrs hostPath {
-        system = "x86_64-darwin";
+        system = "aarch64-darwin";
         modules = lib.my.mapModulesRec' (toString ./modules/darwin) import;
       });
+
     in
     flake-utils-plus.lib.mkFlake rec {
       inherit lib self inputs supportedSystems;
@@ -79,6 +80,7 @@
           digga.nixosModules.bootstrapIso
           digga.nixosModules.nixConfig
           home-manager.nixosModules.home-manager
+          sops-nix.nixosModules.sops
         ] ++ lib.my.mapModulesRec' (toString ./modules/shared) import;
       };
 
