@@ -46,7 +46,7 @@ with lib;
 
     # networking.useNetworkd = false;
 
-    networking.firewall.enable = false;
+    networking.firewall.enable = true;
 
     networking.networkmanager.enable = true;
 
@@ -159,6 +159,16 @@ with lib;
       };
       komga.enable = true;
       plex.enable = true;
+    };
+
+    sops.secrets.nextcloud_admin_pass = {
+      owner = "nextcloud";
+    };
+
+    modules.services.nextcloud = {
+      enable = true;
+      adminpassFile = config.sops.secrets.nextcloud_admin_pass.path;
+      home = "/data/nextcloud";
     };
   };
 }
