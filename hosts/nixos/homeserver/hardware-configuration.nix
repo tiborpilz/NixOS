@@ -23,7 +23,6 @@
     fsType = "ntfs";
   };
 
-
   swapDevices = [
     { device = "/dev/disk/by-uuid/1d40a4a2-dca0-4328-b7cd-6d07149cda4d"; }
   ];
