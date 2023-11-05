@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 with lib;
 with lib.my;
 let
@@ -38,27 +38,15 @@ in
 
     users.users.nextcloud = {
       isSystemUser = true;
-      home = cfg.home;
       group = "nextcloud";
     };
     users.groups.nextcloud = {};
 
     containers.nextcloud = {
-      bindMounts."${cfg.home}" = {
-        hostPath = cfg.home;
-        isReadOnly = false;
-      };
-
       bindMounts."${cfg.adminpassFile}" = {
         hostPath = cfg.adminpassFile;
         isReadOnly = true;
       };
-
-      # forwardPorts = [{
-      #   containerPort = 80;
-      #   hostPort = cfg.publicPort;
-      #   protocol = "tcp";
-      # }];
 
       autoStart = true;
       privateNetwork = true;
@@ -67,48 +55,42 @@ in
       hostAddress6 = "fd00::10";
       localAddress6 = "fd00::11";
 
-      config = { pkgs, ... }: {
-        system.stateVersion = config.system.stateVersion;
+      config = { pkgs, system, ... }: {
+        system.activationScripts.init-nextcloud-secrets = stringAfter [ "var" ] ''
+          mkdir -p /tmp/nextcloud-secrets
+          cp ${cfg.adminpassFile} /tmp/nextcloud-secrets/adminpass
+          chown -R nextcloud:nextcloud /tmp/nextcloud-secrets
+        '';
 
+        system.stateVersion = config.system.stateVersion;
         services.nextcloud = {
           enable = true;
           hostName = "nextcloud.${config.modules.services.reverseProxy.hostname}";
-          package = pkgs.nextcloud27;
-          home = cfg.home;
 
           config = {
             adminuser = "admin";
-            adminpassFile = cfg.adminpassFile;
+            adminpassFile = "/tmp/nextcloud-secrets/adminpass";
           };
         };
-
         networking.firewall.allowedTCPPorts = [ 80 ];
         networking.firewall.enable = true;
-        networking.firewall.extraCommands = ''
-          iptables -F INPUT
-          iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-          iptables -A INPUT -s 192.168.100.10 -p tcp --dport 80 -j ACCEPT
-          iptables -A INPUT -j DROP
-        '';
-        networking.useHostResolvConf = true;
-
-        networking.defaultGateway.address = "192.168.100.10";
+        # networking.useHostResolvConf = true;
+        # networking.defaultGateway.address = "192.168.100.10";
       };
     };
 
     networking.nat = {
       enable = true;
       internalInterfaces = [ "ve-nextcloud" ];
-      externalInterface = "wlp4s0";
+      externalInterface = "wg0";
       enableIPv6 = true;
     };
 
-    networking.networkmanager.unmanaged = [ "interface-name:ve-nextcloud" ];
+    # networking.networkmanager.unmanaged = [ "interface-name:ve-nextcloud" ];
 
-    networking.firewall.enable = true;
-    networking.firewall.checkReversePath = false;
-    networking.firewall.trustedInterfaces = [ "ve-nextcloud" ];
-    networking.firewall.extraCommands ="iptables -t nat -A POSTROUTING -o wg0 -j MASQUERADE";
+    # networking.firewall.enable = false;
+    # networking.firewall.checkReversePath = false;
+    # networking.firewall.trustedInterfaces = [ "ve-nextcloud" ];
 
     modules.services.reverseProxy.proxies.nextcloud = {
       publicPort = 80;
