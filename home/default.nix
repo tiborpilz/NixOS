@@ -69,6 +69,8 @@ with mylib;
   modules.editors.emacs.enable = true;
   modules.editors.emacs.useNix = false;
 
+  modules.dev.rust.enable = true;
+
   # Bit of a catch-all for LSP stuff until I find a better spot
   # without having to create a new module for every one
   modules.editors.lsp.enable = true;
