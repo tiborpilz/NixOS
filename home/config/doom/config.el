@@ -279,6 +279,13 @@
       (append '(("\\.astro\\'" . astro-mode))
               auto-mode-alist))
 
+(with-eval-after-load 'lsp-mode
+  (add-to-list 'lsp-language-id-configuration '(astro-mode . "astro"))
+  (lsp-register-client
+    (make-lsp-client :new-connection (lsp-stdio-connection '("astro-ls"))
+                    :activation-fn (lsp-activate-on "astro")
+                    :server-id 'astro-ls)))
+
 (use-package! lsp-tailwindcss
   :defer t
   :init
