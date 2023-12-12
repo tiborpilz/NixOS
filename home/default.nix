@@ -28,6 +28,8 @@ with mylib;
     # bat is a better cat (as a program, at least)
     bat
 
+    mob
+
     htop
 
     pandoc

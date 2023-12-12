@@ -274,6 +274,11 @@
         (css "https://github.com/tree-sitter/tree-sitter-css")
         (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")))
 
+(define-derived-mode astro-mode web-mode "astro")
+(setq auto-mode-alist
+      (append '(("\\.astro\\'" . astro-mode))
+              auto-mode-alist))
+
 (use-package! lsp-tailwindcss
   :defer t
   :init
