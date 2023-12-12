@@ -617,6 +617,16 @@ Because ~astro-ts-mode~ uses treesitter, treesitter needs to be set up to handle
         (css "https://github.com/tree-sitter/tree-sitter-css")
         (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")))
 #+end_src
+
+Define Astro as a derived mode for ~.astro~ files.
+
+#+begin_src elisp
+(define-derived-mode astro-mode web-mode "astro")
+(setq auto-mode-alist
+      (append '(("\\.astro\\'" . astro-mode))
+              auto-mode-alist))
+#+end_src
+
 **** Tailwind
 Add the tailwind lsp package
 #+begin_src elisp :tangle packages.el
