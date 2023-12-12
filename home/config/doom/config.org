@@ -627,6 +627,18 @@ Define Astro as a derived mode for ~.astro~ files.
               auto-mode-alist))
 #+end_src
 
+Register the astro-ls binary for lsp support.
+
+#+begin_src elisp
+(with-eval-after-load 'lsp-mode
+  (add-to-list 'lsp-language-id-configuration '(astro-mode . "astro"))
+  (lsp-register-client
+    (make-lsp-client :new-connection (lsp-stdio-connection '("astro-ls"))
+                    :activation-fn (lsp-activate-on "astro")
+                    :server-id 'astro-ls)))
+#+end_src
+
+
 **** Tailwind
 Add the tailwind lsp package
 #+begin_src elisp :tangle packages.el
