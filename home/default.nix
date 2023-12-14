@@ -28,6 +28,7 @@ with mylib;
     # bat is a better cat (as a program, at least)
     bat
 
+    # mob.sh - git-powered pair/mob programming tool
     mob
 
     htop
