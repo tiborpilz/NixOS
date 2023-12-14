@@ -41,6 +41,15 @@ with mylib;
 
     # Bun is a Node alternative
     unstable.bun
+
+    # Latex stuff TODO: move to a module
+    # texlive.combined.scheme-full
+    # GNU roff - typesetting, pdf converting stuff
+    groff
+
+    # Haskell
+    cabal-install
+    ghc
   ];
 
   # Let Home Manager install and manage itself.
