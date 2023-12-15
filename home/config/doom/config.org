@@ -716,7 +716,6 @@ Improves display of store paths.
 Adds an emacs command to modify the buffer environment according to a Lisp
 expression buily by nix.
 
-
 *** Python
 **** Poetry
 After years of frustration, I'm finally content with setting up and managing
@@ -783,6 +782,17 @@ But still, ~terraform-lsp~ is a good alternative, with some nice- to- haves.
 (setq lsp-semantic-tokens-enable t)
 (setq lsp-semantic-tokens-honor-refresh-requests t)
 #+end_src
+*** Haskell
+There's a Doom-Emacs module for setting up haskell-mode together with Haskell's
+lsp, but currently, a bug prevents ~haskell-mode~ from working properly:
+https://github.com/haskell/haskell-mode/issues/1825
+
+A workaround is to explicitly set ~flymake-allowed-file-name-masks~ to nil.
+
+#+begin_src elisp
+(setq flymake-allowed-file-name-masks nil)
+#+end_src
+
 ** Tools
 *** Code Completion
 Since it's already integrated into Doom Emacs, I'm using company for code
