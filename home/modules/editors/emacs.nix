@@ -79,6 +79,9 @@ in
       # Astrojs language server
       nodePackages."@astrojs/language-server"
 
+      # Haskell language server
+      haskell-language-server
+
       # vue language server
       my."@vue/language-server"
 
