@@ -1,6 +1,5 @@
-<p align="center">
-  <a href="https://github.com/tiborpilz/NixOS/actions/workflows/build.yml"><img src="https://github.com/tiborpilz/nixos/actions/workflows/build.yml/badge.svg" /></a>
-</p>
+[![built with garnix](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Ftiborpilz%2Fnixos)](https://garnix.io)
+[![github actions](https://github.com/tiborpilz/nixos/actions/workflows/build.yml/badge.svg)](https://github.com/tiborpilz/NixOS/actions/workflows/build.yml)
   
 # NixOS & Homemanager configuration
 
