@@ -1,0 +1,16 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: nixos/nix
+    steps:
+      - checkout
+      - run:
+          name: "Build Home"
+          command: "nix --extra-experimental-features nix-command --extra-experimental-features flakes build .#homeConfigurations.tibor.activationPackage"
+
+workflows:
+  build-workflow:
+    jobs:
+      - build
