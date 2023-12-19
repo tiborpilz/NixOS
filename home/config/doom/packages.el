@@ -12,6 +12,8 @@
 
 (package! org-present)
 
+(package! org-gtd)
+
 (package! jest)
 
 (package! svelte-mode)

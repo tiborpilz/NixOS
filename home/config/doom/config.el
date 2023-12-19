@@ -254,6 +254,8 @@
         (set-window-parameter nil 'mode-line-format 'none)
         (org-capture)))
 
+(setq org-gtd-directory "~/org/gtd/")
+
 (setq projectile-project-search-path '(("~/Code/" . 1)))
 
 (use-package! jest
