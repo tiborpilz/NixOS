@@ -10,7 +10,18 @@ jobs:
           name: "Build Home"
           command: "nix --extra-experimental-features nix-command --extra-experimental-features flakes build .#homeConfigurations.tibor.activationPackage"
 
+  build_mac:
+    resource_class: macos.m1.medium.gen1
+    docker:
+      - image: nixos/nix
+    steps:
+      - checkout
+      - run:
+          name: "Build Home"
+          command: 'nix --extra-experimental-features nix-command --extra-experimental-features flakes build .#homeConfigurations."tibor.pilz".activationPackage"'
+
 workflows:
   build-workflow:
     jobs:
       - build
+      - build_mac
