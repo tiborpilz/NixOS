@@ -131,6 +131,7 @@
           enableSyncthing = (system == "x86_64-linux");
           hosts = if (isDarwin) then (lib.attrNames self.darwinConfigurations) else (lib.attrNames self.nixosConfigurations);
           mkHostAliases = map (h: "${user}@${h}") hosts;
+          # Remove dot from user name
           aliases = mkHostAliases;
           homeConfiguration = home-manager.lib.homeManagerConfiguration {
             inherit lib pkgs;
@@ -148,7 +149,7 @@
             ];
           };
           aliasConfigurations = lib.foldr (curr: prev: prev // { "${curr}" = homeConfiguration; }) {} aliases;
-        in { "${user}" = homeConfiguration; } // aliasConfigurations
+        in { "${user}" = homeConfiguration; } // aliasConfigurations // { "${builtins.replaceStrings ["."] [""] user}" = homeConfiguration; }
       ));
 
       nixosModules = lib.my.mapModulesRec (toString ./modules) import;
