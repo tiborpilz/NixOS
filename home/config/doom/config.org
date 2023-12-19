@@ -547,6 +547,19 @@ no modeline.
         (set-window-parameter nil 'mode-line-format 'none)
         (org-capture)))
 #+END_SRC
+** Org-GTD
+Org-GTD is a package to manage tasks in org-mode. It's based on "Getting Things
+Done". ([[https://en.wikipedia.org/wiki/Getting_Things_Done][Wiki]])
+
+Firstly, I'll install the package.
+#+begin_src elisp :tangle packages.el
+(package! org-gtd)
+#+end_src
+
+Secondly, I'll set up the files and directories.
+#+begin_src elisp
+(setq org-gtd-directory "~/org/gtd/")
+#+end_src
 * Projectile
 ** Project Search Path
 Search for projects in  ~~/Code/~, but only one level deep.
