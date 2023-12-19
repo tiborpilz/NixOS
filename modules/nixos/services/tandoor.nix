@@ -3,9 +3,9 @@ with lib;
 with lib.my;
 let
   publicPort = 8285;
-  db_user = "tandoor";
-  db_password = "tandoor";
-  db_db = "tandoor";
+  db_user = "recipes";
+  db_password = "recipes";
+  db_db = "recipes";
   cfg = config.modules.services.tandoor;
 in
 {
@@ -43,7 +43,7 @@ in
           "POSTGRES_DB" = db_db;
         };
         volumes = [
-          "/var/lib/tandoor/staticfiles:/opt/recipes/staticfiles"
+          "tandoor-staticfiles:/opt/recipes/staticfiles"
           "/var/lib/tandoor/mediafiles:/opt/recipes/mediafiles"
         ];
       };
