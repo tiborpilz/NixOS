@@ -4,4 +4,7 @@ builds:
     - '*.aarch64-darwin.*'
     - 'homeConfigurations.*'
   exclude:
-    - 'packages.aarch64-darwin.emacs*Xw*'
+    - 'packages.aarch64-darwin.emacsXw'
+    - 'packages.aarch64-darwin.emacsXwWrapped'
+    - 'packages.aarch64-darwin.emacsGitXw'
+    - 'packages.aarch64-darwin.emacsGitXwWrapped'
