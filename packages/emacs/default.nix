@@ -7,10 +7,6 @@ let
     withGTK3 = true;
   });
 
-  add-env = emacs: key: value: (emacs.overrideAttrs (old: {
-    postFixup = (old.postFixup or "") + "wrapProgram $out/bin/emacs --set ${key} ${value}";
-  }));
-
   emacsScript = emacsPkg: pkgs.writeShellScriptBin "emacs" ''
     #!/usr/bin/env bash
     . $HOME/.profile
@@ -52,9 +48,9 @@ let
   emacsPackages = lib.my.mapModules (toString ./.) (package: (import package) { inherit inputs pkgs lib; });
 in
 rec {
-  emacs27Patched = (patch-nul-char-bug pkgs.emacs);
-  emacs27Xw = (add-feature-flags emacs27Patched); #add-env (patch-nul-char-bug (add-feature-flags emacs));
-  emacs27XwWrapped = (wrap emacs27Xw);
+  emacsPatched = (patch-nul-char-bug pkgs.emacs);
+  emacsXw = (add-feature-flags emacsPatched); #add-env (patch-nul-char-bug (add-feature-flags emacs));
+  emacsXwWrapped = (wrap emacsXw);
   emacs29Wrapped = (wrap pkgs.emacs29);
   emacsGitXw = (add-feature-flags pkgs.emacs-git);
   emacsGitXwWrapped = (wrap emacsGitXw);

@@ -3,3 +3,5 @@ builds:
     - '*.x86_64-linux.*'
     - '*.aarch64-darwin.*'
     - 'homeConfigurations.*'
+  exclude:
+    - 'packages.aarch64-darwin.emacs*Xw*'
