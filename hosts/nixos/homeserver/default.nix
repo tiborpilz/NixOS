@@ -160,6 +160,7 @@ with lib;
       };
       komga.enable = true;
       plex.enable = true;
+      photoprism.enable = true;
     };
 
     modules.services.nextcloud = {
