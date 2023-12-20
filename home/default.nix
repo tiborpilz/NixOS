@@ -89,6 +89,7 @@ with mylib;
   modules.dev.web.enable = true;
   modules.dev.jsonnet.enable = true;
   modules.dev.dhall.enable = true;
+  modules.dev.cloud.enable = true;
 
   # Bit of a catch-all for LSP stuff until I find a better spot
   # without having to create a new module for every one

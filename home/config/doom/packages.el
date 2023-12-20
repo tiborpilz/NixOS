@@ -32,7 +32,8 @@
 
 (package! jsonnet-mode)
 
-(package! dhall-mode)
+(use-package dhall-mode
+  :config (setq dhall-use-header-line nil))
 
 (package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
 
@@ -45,6 +46,11 @@
 (package! gpt)
 
 (package! quarto-mode)
+
+(package! mermaid-mode)
+
+(package! simple-httpd)
+(package! impatient-mode)
 
 (package! doom-themes)
 

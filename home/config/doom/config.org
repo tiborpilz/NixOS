@@ -848,7 +848,8 @@ turing completeness.
 
 First, a package for a major mode.
 #+begin_src elisp :tangle packages.el
-(package! dhall-mode)
+(use-package dhall-mode
+  :config (setq dhall-use-header-line nil))
 #+end_src
 
 Then, lsp support:
@@ -1253,7 +1254,6 @@ Add keybindings under ~SPC o D~ ("o" for "open", "D" for "Devdocs").
        :desc "Install devdocs set" "i" #'devdocs-install))
 #+end_src
 
-
 **** Dash
 
 Dash-Docs (https://github.com/dash-docs-el/dash-docs) is a package for viewing
@@ -1298,7 +1298,90 @@ based on Pandoc.
 (use-package quarto-mode
   :mode (("\\.Rmd" . poly-quarto-mode)))
 #+end_src
-* UI
+*** Diagrams
+**** Mermaid
+~mermaid-mode~ is a package for live previewing mermaid diagrams.
+
+#+begin_src elisp :tangle packages.el
+(package! mermaid-mode)
+#+end_src
+*** Markdown / Org Preview
+There are multiple packages out there for previewing markdown, some of them not
+maintained, some of them relying on the github API (via grip). Ideally, I'd like
+to have a web browser open that auto reloads either based on me saving the file
+or on a certain idle time.
+
+~impatient-mode~ is a package for previewing HTML as you write it (including live-reload), so in theory,
+using pandoc to convert the current buffer's content to HTML should make it
+possible to preview anything that pandoc can convert.
+
+Inspiration: https://blog.bitsandbobs.net/blog/emacs-markdown-live-preview/
+
+First, I'll set up markdown-mode to use pandoc as ~markdown-command~.
+
+#+begin_src elisp
+(use-package markdown-mode
+  :mode ("\\.md\\'" . gfm-mode)
+  :commands (markdown-mode gfm-mode)
+  :config
+  (setq markdown-command "pandoc -f markdown -t html5"))
+#+end_src
+
+Now, ~impatient-mode~ as well as ~simple-httpd~.
+
+#+begin_src elisp :tangle packages.el
+(package! simple-httpd)
+(package! impatient-mode)
+#+end_src
+
+#+begin_src elisp
+(use-package simple-httpd
+  :config
+  (setq httpd-port 7070)
+  (setq httpd-host (system-name)))
+
+(use-package impatient-mode
+  :commands impatient-mode)
+#+end_src
+
+Now, I'm defining a filter to process the markdown buffer.
+
+TODO improve markdown filter
+
+#+begin_src elisp
+(defun markdown-html-filter (buffer)
+  (princ
+   (with-temp-buffer
+     (let ((tmp (buffer-name)))
+        (set-buffer buffer)
+        (set-buffer (markdown tmp))
+        (format "<!DOCTYPE html><html><title>Markdown Preview</title><link rel=\"stylesheet\" href = \"https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css\"/><body><article class=\"markdown-body\">%s</article></body></html>" (buffer-string))))
+    (current-buffer)))
+#+end_src
+
+And finally, a function to start previewing the markdown buffer.
+
+#+begin_src elisp
+(defun markdown-html-preview ()
+  "Preview Markdown in browser."
+  (interactive)
+  (unless (process-status "httpd")
+    (httpd-start))
+  (impatient-mode)
+  (imp-set-user-filter 'markdown-html-filter)
+  (imp-visit-buffer))
+
+(defun markdown-html-preview-stop ()
+  "Stop previewing Markdown in browser."
+  (interactive)
+  (imp-visit-buffer)
+  (impatient-mode -1))
+
+(map! :leader
+      (:prefix ("m" . "markdown")
+       :desc "Preview" "p" #'markdown-html-preview
+       :desc "Stop Preview" "s" #'markdown-html-preview-stop))
+#+end_src
 ** Theming
 *** Doom Themes
 #+begin_src elisp :tangle packages.el
