@@ -50,6 +50,10 @@ with mylib;
     # Haskell
     cabal-install
     ghc
+
+    # Terraform
+    terraform
+    unstable.terragrunt
   ];
 
   # Let Home Manager install and manage itself.
