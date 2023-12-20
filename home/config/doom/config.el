@@ -528,6 +528,49 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (use-package quarto-mode
   :mode (("\\.Rmd" . poly-quarto-mode)))
 
+(use-package markdown-mode
+  :mode ("\\.md\\'" . gfm-mode)
+  :commands (markdown-mode gfm-mode)
+  :config
+  (setq markdown-command "pandoc -f markdown -t html5"))
+
+(use-package simple-httpd
+  :config
+  (setq httpd-port 7070)
+  (setq httpd-host (system-name)))
+
+(use-package impatient-mode
+  :commands impatient-mode)
+
+(defun markdown-html-filter (buffer)
+  (princ
+   (with-temp-buffer
+     (let ((tmp (buffer-name)))
+        (set-buffer buffer)
+        (set-buffer (markdown tmp))
+        (format "<!DOCTYPE html><html><title>Markdown Preview</title><link rel=\"stylesheet\" href = \"https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css\"/><body><article class=\"markdown-body\">%s</article></body></html>" (buffer-string))))
+    (current-buffer)))
+
+(defun markdown-html-preview ()
+  "Preview Markdown in browser."
+  (interactive)
+  (unless (process-status "httpd")
+    (httpd-start))
+  (impatient-mode)
+  (imp-set-user-filter 'markdown-html-filter)
+  (imp-visit-buffer))
+
+(defun markdown-html-preview-stop ()
+  "Stop previewing Markdown in browser."
+  (interactive)
+  (imp-visit-buffer)
+  (impatient-mode -1))
+
+(map! :leader
+      (:prefix ("m" . "markdown")
+       :desc "Preview" "p" #'markdown-html-preview
+       :desc "Stop Preview" "s" #'markdown-html-preview-stop))
+
 (setq doom-theme 'catppuccin)
 (setq catppuccin-flavor 'frappe)
 
