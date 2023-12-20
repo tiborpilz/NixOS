@@ -107,6 +107,9 @@ Plug 'hrsh7th/nvim-compe'
 " Signatures
 Plug 'ray-x/lsp_signature.nvim'
 
+" Markdown preview
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npx --yes yarn install' }
+
 set completeopt=menuone,noselect
 let g:compe = {}
 let g:compe.enabled = v:true

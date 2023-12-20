@@ -113,6 +113,9 @@ in
       # Markdown conversion and live preview
       pandoc
 
+      # Mermaid diagramming
+      nodePackages.mermaid-cli
+
       # Typescript repl / execution
       nodePackages.ts-node
       nodePackages.typescript
