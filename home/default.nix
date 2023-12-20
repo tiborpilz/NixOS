@@ -88,6 +88,7 @@ with mylib;
   modules.dev.rust.enable = true;
   modules.dev.web.enable = true;
   modules.dev.jsonnet.enable = true;
+  modules.dev.dhall.enable = true;
 
   # Bit of a catch-all for LSP stuff until I find a better spot
   # without having to create a new module for every one

@@ -342,6 +342,24 @@
   ;; Start language server when jsonnet-mode is enabled
   (add-hook 'jsonnet-mode-hook #'lsp-deferred))
 
+(with-eval-after-load 'lsp-mode
+  ;; Configure lsp-mode-language identifiers
+  (add-to-list 'lsp-language-id-configuration '(dhall-mode . "dhall"))
+
+  ;; Register dhall-lsp-server with the LSP client
+  (lsp-register-client
+    (make-lsp-client
+      :new-connection (lsp-stdio-connection '("dhall-lsp-server"))
+      :activation-fn (lsp-activate-on "dhall")
+      :initialized-fn (lambda (workspace)
+                        (with-lsp-workspace workspace
+                          (lsp--set-configuration
+                            (lsp-configuration-section "dhall"))))
+                    :server-id 'dhall-lsp-server))
+
+  ;; Start language server when dhall-mode is enabled
+  (add-hook 'dhall-mode-hook #'lsp-deferred))
+
 (setq company-idle-delay 0.1 ;; How long to wait before popping up
       company-minimum-prefix-length 1 ;; Show the menu after one key press
       company-tooltip-limit 10 ;; Limit on how many options to display
