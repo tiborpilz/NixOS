@@ -26,6 +26,9 @@ in
 
     networking.firewall.allowedTCPPorts = [ port 22000 ];
     networking.firewall.allowedUDPPorts = [ 22000 21027 ];
-    modules.services.reverseProxy.proxies.syncthing.publicPort = port;
+    modules.services.reverseProxy.proxies.syncthing = {
+      publicPort = port;
+      auth = false;
+    };
   };
 }
