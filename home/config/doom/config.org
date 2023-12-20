@@ -806,6 +806,41 @@ A workaround is to explicitly set ~flymake-allowed-file-name-masks~ to nil.
 (setq flymake-allowed-file-name-masks nil)
 #+end_src
 
+*** Jsonnet
+Jsonnet is a data templating language.
+
+First, jsonnet-mode.
+#+begin_src elisp :tangle packages.el
+(package! jsonnet-mode)
+#+end_src
+
+Then, I'm setting up lsp support.
+
+#+begin_src elisp
+(defcustom lsp-jsonnet-executable "jsonnet-language-server"
+  "The jsonnet executable to use for the jsonnet language server."
+  :group 'lsp-jsonnet
+  :risky t
+  :type 'file)
+
+(with-eval-after-load 'lsp-mode
+  ;; Configure lsp-mode-language identifiers
+  (add-to-list 'lsp-language-id-configuration '(jsonnet-mode . "jsonnet"))
+
+  ;; Register jsonnet-language-server with the LSP client
+  (lsp-register-client
+    (make-lsp-client
+      :new-connection (lsp-stdio-connection (lambda () lsp-jsonnet-executable))
+      :activation-fn (lsp-activate-on "jsonnet")
+      :initialized-fn (lambda (workspace)
+                        (with-lsp-workspace workspace
+                          (lsp--set-configuration
+                            (lsp-configuration-section "jsonnet"))))
+                    :server-id 'jsonnet-language-server))
+
+  ;; Start language server when jsonnet-mode is enabled
+  (add-hook 'jsonnet-mode-hook #'lsp-deferred))
+#+end_src
 ** Tools
 *** Code Completion
 Since it's already integrated into Doom Emacs, I'm using company for code

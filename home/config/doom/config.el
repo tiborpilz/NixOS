@@ -318,6 +318,30 @@
 
 (setq flymake-allowed-file-name-masks nil)
 
+(defcustom lsp-jsonnet-executable "jsonnet-language-server"
+  "The jsonnet executable to use for the jsonnet language server."
+  :group 'lsp-jsonnet
+  :risky t
+  :type 'file)
+
+(with-eval-after-load 'lsp-mode
+  ;; Configure lsp-mode-language identifiers
+  (add-to-list 'lsp-language-id-configuration '(jsonnet-mode . "jsonnet"))
+
+  ;; Register jsonnet-language-server with the LSP client
+  (lsp-register-client
+    (make-lsp-client
+      :new-connection (lsp-stdio-connection (lambda () lsp-jsonnet-executable))
+      :activation-fn (lsp-activate-on "jsonnet")
+      :initialized-fn (lambda (workspace)
+                        (with-lsp-workspace workspace
+                          (lsp--set-configuration
+                            (lsp-configuration-section "jsonnet"))))
+                    :server-id 'jsonnet-language-server))
+
+  ;; Start language server when jsonnet-mode is enabled
+  (add-hook 'jsonnet-mode-hook #'lsp-deferred))
+
 (setq company-idle-delay 0.1 ;; How long to wait before popping up
       company-minimum-prefix-length 1 ;; Show the menu after one key press
       company-tooltip-limit 10 ;; Limit on how many options to display

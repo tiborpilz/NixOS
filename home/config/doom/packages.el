@@ -30,6 +30,8 @@
 
 (package! impatient-mode)
 
+(package! jsonnet-mode)
+
 (package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
 
 (package! nvm)
