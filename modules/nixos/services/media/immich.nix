@@ -38,8 +38,10 @@ in
 
       containers.immich-server = {
         image = "ghcr.io/immich-app/immich-server:${cfg.immich-version}";
+        cmd = [ "start-server.sh" ];
         volumes = [
           "${dataDir}/upload:/usr/src/app/upload"
+          "/data/media/photos:/data/media/photos"
           "/etc/localtime:/etc/localtime:ro"
         ];
         environment = {
@@ -57,6 +59,7 @@ in
         cmd = [ "start.sh" "microservices" ];
         volumes = [
           "${dataDir}/upload:/usr/src/app/upload"
+          "/data/media/photos:/data/media/photos"
           "/etc/localtime:/etc/localtime:ro"
         ];
         environment = {
