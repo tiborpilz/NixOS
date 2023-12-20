@@ -134,7 +134,7 @@ with lib;
     };
 
     modules.services.syncthing.enable = true;
-    modules.services.tandoor.enable = true;
+    modules.services.tandoor.enable = false;
     modules.services.paperless.enable = true;
     modules.services.firefly-iii.enable = true;
 
