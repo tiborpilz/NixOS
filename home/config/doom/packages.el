@@ -32,6 +32,8 @@
 
 (package! jsonnet-mode)
 
+(package! dhall-mode)
+
 (package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
 
 (package! nvm)
