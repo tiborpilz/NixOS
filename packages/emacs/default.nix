@@ -54,5 +54,5 @@ rec {
   emacs29Wrapped = (wrap pkgs.emacs29);
   emacsGitXw = (add-feature-flags pkgs.emacs-git);
   emacsGitXwWrapped = (wrap emacsGitXw);
-  emacsGitWrapped = (wrap pkgs.emacs-git);
+  emacsGitWrapped = (wrap pkgs.emacs-unstable);
 } // emacsPackages.packages

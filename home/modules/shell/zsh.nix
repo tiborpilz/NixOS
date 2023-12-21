@@ -42,7 +42,6 @@ in
       zsh-completions
       zsh-syntax-highlighting
       nix-zsh-completions
-      bat
       exa
       fasd
       fd
