@@ -2,8 +2,6 @@
 
 (package! editorconfig)
 
-(package! exec-path-from-shell)
-
 (unpin! org-roam)
 (package! org-roam-ui)
 (package! websocket) ; dependency of `org-roam-ui'
@@ -11,8 +9,6 @@
 (package! org-gcal)
 
 (package! org-present)
-
-(package! org-gtd)
 
 (package! jest)
 
@@ -36,8 +32,6 @@
   :config (setq dhall-use-header-line nil))
 
 (package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
-
-(package! nvm)
 
 (package! devdocs)
 
