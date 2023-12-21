@@ -1,12 +1,6 @@
-{ inputs, pkgs, lib, ... }:
+{ pkgs, ... }:
 
 let
-  add-feature-flags = emacs: (emacs.override {
-    withNativeCompilation = true;
-    withXwidgets = true;
-    withGTK3 = true;
-  });
-
   emacsScript = emacsPkg: pkgs.writeShellScriptBin "emacs" ''
     #!/usr/bin/env bash
     . $HOME/.profile
@@ -37,22 +31,7 @@ let
       fi
     '';
   });
-
-  patch-nul-char-bug = let
-    json-nul-char-patch = (pkgs.fetchpatch {
-
-    url = "https://github.com/emacs-mirror/emacs/commit/8b52d9f5f177ce76b9ebecadd70c6dbbf07a20c6.patch";
-      hash = "sha256-/W9yateE9UZ9a8CUjavQw0X7TgxigYzBuOvtAXdEsSA=";
-    });
-    in emacs: emacs.overrideAttrs (old: { patches = old.patches or [] ++ [ json-nul-char-patch ]; });
-  emacsPackages = lib.my.mapModules (toString ./.) (package: (import package) { inherit inputs pkgs lib; });
 in
-rec {
-  emacsPatched = (patch-nul-char-bug pkgs.emacs);
-  emacsXw = (add-feature-flags emacsPatched); #add-env (patch-nul-char-bug (add-feature-flags emacs));
-  emacsXwWrapped = (wrap emacsXw);
-  emacs29Wrapped = (wrap pkgs.emacs29);
-  emacsGitXw = (add-feature-flags pkgs.emacs-git);
-  emacsGitXwWrapped = (wrap emacsGitXw);
+{
   emacsGitWrapped = (wrap pkgs.emacs-unstable);
-} // emacsPackages.packages
+}
