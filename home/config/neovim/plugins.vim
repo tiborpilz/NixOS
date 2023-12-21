@@ -110,6 +110,10 @@ Plug 'ray-x/lsp_signature.nvim'
 " Markdown preview
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npx --yes yarn install' }
 
+" Neorg - Org in Neovim
+Plug 'nvim-neorg/neorg'
+Plug 'nvim-lua/plenary.nvim'
+
 set completeopt=menuone,noselect
 let g:compe = {}
 let g:compe.enabled = v:true
@@ -145,6 +149,9 @@ colorscheme nightfox
 " LSP settings
 lua require('lsp-config')
 
+" Mason settings
+lua require('mason')
+
 " Diagnostics Settings
 lua require('diagnostics')
 
@@ -158,6 +165,9 @@ lua require('lsp-signature')
 
 " Iron repl config
 lua require('iron-config')
+
+" Neorg setup
+lua require('neorg')
 
 " Dashboard settings
 let g:dashboard_custom_header = [
