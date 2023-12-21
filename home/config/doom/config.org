@@ -1763,6 +1763,12 @@ xwidget-webkit browser.
               ("f" . xwwp-ace-toggle)
               ("v" . xwwp-follow-link)))
 #+end_src
+** Kubernetes
+~kubernetes-mode~ brings a lot of snippets.
+
+#+begin_src elisp :tangle packages.el
+(package! k8s-mode)
+#+end_src
 * Performance
 Various tweaks to improve the overall performance.
 ** Raise the GC-Cons threshold

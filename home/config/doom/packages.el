@@ -87,6 +87,8 @@
 (package! xwwp-follow-link-ivy)
 (package! ctable)
 
+(package! k8s-mode)
+
 (package! dap-mode)
 
 ;; HTTP requests via babel

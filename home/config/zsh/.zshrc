@@ -57,9 +57,9 @@ python-init() {
   source "${projectPath}/.venv/bin/activate"
 
   # Activate venv and install kernelspec for jupyter
-  pip install ipykernel
-  python -m ipykernel install --user --name "$project"
-  pip install jupyter
+  # pip install ipykernel
+  # python -m ipykernel install --user --name "$project"
+  # pip install jupyter
 }
 
 # Select Git Branch interactively

@@ -122,7 +122,6 @@ in
 
       # doom emacs org :jupyter and :gnuplot
       gnuplot
-      jupyter
     ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];

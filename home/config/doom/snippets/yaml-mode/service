@@ -1,0 +1,21 @@
+# -*- mode: snippet -*-
+# name: service
+# key: service
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# --
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: $1
+  name: $1
+  namespace: $1
+spec:
+  ports:
+  - name: ${2:http}
+    port: ${3:80}
+    protocol: TCP
+    targetPort: ${4:8080}
+  selector:
+    app: $1
+  type: ClusterIP
