@@ -298,11 +298,6 @@
 ;; (use-package! polymode
 ;; (use-package! poly-markdown)
 
-(defun markdown-html (buffer)
-  (princ (with-current-buffer buffer
-    (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
-  (current-buffer)))
-
 (setq lsp-terraform-ls-enable-show-reference t)
 (setq lsp-semantic-tokens-enable t)
 (setq lsp-semantic-tokens-honor-refresh-requests t)
@@ -507,8 +502,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (use-package simple-httpd
   :config
-  (setq httpd-port 7070)
-  (setq httpd-host (system-name)))
+  (setq httpd-port 7070))
 
 (use-package impatient-mode
   :commands impatient-mode)

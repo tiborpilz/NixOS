@@ -42,7 +42,7 @@ in
       zsh-completions
       zsh-syntax-highlighting
       nix-zsh-completions
-      exa
+      eza
       fasd
       fd
       fzf

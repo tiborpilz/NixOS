@@ -1,4 +1,4 @@
-#+PROPERTY: header-args :elisp :tangle ./config.el :results silent
+: header-args :elisp :tangle ./config.el :results silent
 #+TITLE: Doom Emacs Config
 
 * Base Settings
@@ -730,30 +730,6 @@ To set up code-highlighting in markdown code blocks, I need multiple major modes
 ;; (use-package! poly-markdown)
 #+end_src
 
-**** Live Preview
-Impatient-Mode is a package to live-preview HTMl, and with a trick, it can be
-used to preview markdown.
-
-First, install the dependency.
-#+begin_src elisp :tangle packages.el
-(package! impatient-mode)
-#+end_src
-
-To use it:
-
-- Start an emacs' web server with M-x httpd-start.
-- Start impatient mode in the buffers you're interested to live preview: M-x impatient-mode.
-- Open your browser to localhost:8080/imp. You'll see the list of buffers with the mode enabled. Click on one: you see live rendering of the buffer.
-
-Then, set up a markdown-html function.
-
-#+begin_src elisp
-  (defun markdown-html (buffer)
-    (princ (with-current-buffer buffer
-      (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
-    (current-buffer)))
-#+end_src
-
 *** Terraform
 There are two competing lsp servers for Terraform with support in Emacs, but,
 although ~terraform-lsp~ is the more featurerich, I'm sticking with ~terraform-ls~
@@ -842,6 +818,8 @@ Then, lsp support:
   ;; Start language server when dhall-mode is enabled
   (add-hook 'dhall-mode-hook #'lsp-deferred))
 #+end_src
+*** TODO Go LSP
+The LSP is misbehaving, so I'll have to set it up manually.
 ** Tools
 *** Code Completion
 Since it's already integrated into Doom Emacs, I'm using company for code
@@ -1253,8 +1231,7 @@ Now, ~impatient-mode~ as well as ~simple-httpd~.
 #+begin_src elisp
 (use-package simple-httpd
   :config
-  (setq httpd-port 7070)
-  (setq httpd-host (system-name)))
+  (setq httpd-port 7070))
 
 (use-package impatient-mode
   :commands impatient-mode)
@@ -1263,6 +1240,13 @@ Now, ~impatient-mode~ as well as ~simple-httpd~.
 Now, I'm defining a filter to process the markdown buffer.
 
 TODO improve markdown filter
+
+To make my life easier when defining the HTML, I'll use a library to convert
+Lisp to XML/HTML
+
+#+begin_src elisp :tangle packages.el
+(package! esxml)
+#+End_src
 
 #+begin_src elisp
 (defun markdown-html-filter (buffer)
