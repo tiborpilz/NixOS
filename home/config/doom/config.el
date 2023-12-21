@@ -16,13 +16,6 @@
 
 (setq tab-width 2)
 
-(use-package! exec-path-from-shell
-  :ensure t
-  :if (memq window-system '(mac ns x))
-  :config
-  (setq exec-path-from-shell-variables '("PATH" "NVM_DIR" "NVM_BIN"))
-  (exec-path-from-shell-initialize))
-
 (setq org-directory "~/org/")
 (setq org-agenda-files (list org-directory))
 
@@ -254,8 +247,6 @@
         (set-window-parameter nil 'mode-line-format 'none)
         (org-capture)))
 
-(setq org-gtd-directory "~/org/gtd/")
-
 (setq projectile-project-search-path '(("~/Code/" . 1)))
 
 (use-package! jest
@@ -375,33 +366,13 @@
 
 (setq company-format-margin-function #'company-vscode-dark-icons-margin)
 
-(defun call-nvm (args &optional as-string)
-  (let ((nvm-command "source $XDG_CONFIG_HOME/zsh/.zshrc && nvm"))
-    (if as-string
-        (shell-command-to-string (concat nvm-command " " args))
-      (shell-command (concat nvm-command " " args)))))
-
-(defun install-node-if-missing ()
-  (if (not (eq 0 (call-nvm "ls 16")))
-      (call-nvm "install 16")))
-
-(defun load-copilot ()
-  (use-package! copilot
-    :hook ((prog-mode text-mode) . copilot-mode)
-    :bind (:map copilot-completion-map
-           ("C-SPC" . 'copilot-accept-completion)
-           ("C-<spc>" . 'copilot-accept-completion)
-           ("C-S-p" . 'copilot-previous-completion)
-           ("C-S-n" . 'copilot-next-completion))))
-
-(if (and (boundp 'copilot-node-executable) (file-exists-p copilot-node-executable))
-    (load-copilot)
-    (nvm-use "16" (lambda ()
-                   (setq copilot-node-executable
-                         (concat
-                          (nth 1 (nvm--find-exact-version-for "16"))
-                          "/bin/node"))
-                   (load-copilot))))
+(use-package! copilot
+          :hook (prog-mode . copilot-mode)
+          :bind (:map copilot-completion-map
+                ("C-SPC" . 'copilot-accept-completion)
+                ("C-<spc>" . 'copilot-accept-completion)
+                ("C-S-p" . 'copilot-previous-completion)
+                ("C-S-n" . 'copilot-next-completion)))
 
 (map! :leader
       (:prefix-map ("i" . "insert")
