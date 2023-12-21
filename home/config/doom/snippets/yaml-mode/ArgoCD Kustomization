@@ -1,0 +1,25 @@
+# -*- mode: snippet -*-
+# key: argocd-kustomization
+# name: ArgoCD Kustomization
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region nil))
+# --
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: $1
+  namespace: argocd
+spec:
+  destination:
+    namespace: $2
+    server: 'https://kubernetes.default.svc'
+  project: default
+  source:
+    path: $3
+    repoURL: $4
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - Validate=false
