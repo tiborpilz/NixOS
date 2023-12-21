@@ -118,7 +118,7 @@ with mylib;
       build-users-group = "nixbld";
       experimental-features = [ "nix-command flakes" ];
       cores = 0;
-      max-jobs = "16";
+      max-jobs = "32";
       trusted-users = [ "root" "tibor" "tibor.pilz" ];
       trusted-substituters = [ "https://cache.nixos.org/" "https://tiborpilz.cachix.org/" ];
       substituters = [
