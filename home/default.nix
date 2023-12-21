@@ -9,7 +9,7 @@ with mylib;
 {
   imports = mylib.mapModulesRec' (toString ./modules) import;
 
-  home.stateVersion = "23.05";
+  home.stateVersion = "23.11";
 
   fonts.fontconfig.enable = true;
 

@@ -24,8 +24,6 @@
 
 (package! poetry)
 
-(package! impatient-mode)
-
 (package! jsonnet-mode)
 
 (use-package dhall-mode
@@ -45,6 +43,8 @@
 
 (package! simple-httpd)
 (package! impatient-mode)
+
+(package! esxml)
 
 (package! doom-themes)
 
