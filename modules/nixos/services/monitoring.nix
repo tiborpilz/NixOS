@@ -6,7 +6,7 @@ let
   cfg = config.modules.services.monitoring;
 in
 {
-  options.modules.services.media.serviceName = {
+  options.modules.services.monitoring = {
     enable = mkBoolOpt false;
     grafanaPort = mkOption {
       type = types.int;
