@@ -18,7 +18,9 @@
     darwin.inputs.nixpkgs.follows = "nixpkgs";
 
     flake-utils.url = "github:numtide/flake-utils";
+    flake-utils.inputs.nixpkgs.follows = "nixpkgs";
     flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
+    flake-utils-plus.inputs.flake-utils.follows = "flake-utils";
 
     digga.url = "github:divnix/digga";
 
@@ -71,8 +73,8 @@
     flake-utils-plus.lib.mkFlake rec {
       inherit lib self inputs supportedSystems;
 
-      channels.nixpkgs-unstable.config = { allowUnfree = true; };
-      channels.nixpkgs.config = { allowUnfree = true; };
+      # channels.nixpkgs-unstable.config = { allowUnfree = true; };
+      # channels.nixpkgs.config = { allowUnfree = true; };
 
       hostDefaults = {
         channelName = "nixpkgs";

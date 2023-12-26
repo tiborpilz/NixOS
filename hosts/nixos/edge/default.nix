@@ -1,7 +1,6 @@
 { pkgs, ... }: {
   imports = [
     ./hardware-configuration.nix
-    # ./wireguard.nix
   ];
 
   boot.cleanTmpDir = true;
@@ -34,8 +33,6 @@
     wireguard-tools
   ];
   system.stateVersion = "22.05";
-  nixpkgs.config.allowUnfree = true;
-
 
   #Enable NAT
   networking.nat = {
@@ -60,16 +57,13 @@
     trustedInterfaces = [ "wg0" ];
   };
   networking.wg-quick.interfaces = {
-    # "wg0" is the network interface name. You can name the interface arbitrarily.
     wg0 = {
       # Determines the IP/IPv6 address and subnet of the client's end of the tunnel interface
       address = [ "10.0.0.1/24" "fdc9:281f:04d7:9ee9::1/64" ];
-      # The port that WireGuard listens to - recommended that this be changed from default
       listenPort = 51820;
-      # Path to the server's private key
       privateKeyFile = "/var/lib/wireguard/private.key";
 
-      # This allows the wireguard server to route your traffic to the internet and hence be like a VPN
+      # This allows the wireguard server to route the traffic to the internet and hence be like a VPN
       postUp = ''
         ${pkgs.iptables}/bin/iptables -A FORWARD -i wg0 -j ACCEPT
         ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 10.0.0.1/24 -o enp1s0 -j MASQUERADE
@@ -101,11 +95,4 @@
       interface=wg0
     '';
   };
-
-  # services.caddy = {
-  #   enable = true;
-  #   virtualHosts."*.tiborpilz.xyz".extraConfig = ''
-  #     reverse_proxy http://10.0.0.2:80
-  #   '';
-  # };
 }
