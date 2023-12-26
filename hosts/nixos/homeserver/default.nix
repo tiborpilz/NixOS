@@ -62,7 +62,7 @@ with lib;
     services.qemuGuest.enable = true;
 
     services.openssh.enable = true;
-    services.openssh.permitRootLogin = "yes";
+    services.openssh.settings.PermitRootLogin = "yes";
 
     programs.zsh.enable = true;
 
@@ -90,7 +90,6 @@ with lib;
 
     virtualisation.oci-containers.backend = "podman";
     system.stateVersion = "23.11";
-    nixpkgs.config.allowUnfree = true;
 
     services.avahi = {
       enable = true;
@@ -120,7 +119,7 @@ with lib;
     # Seems like a bug in systemd, more info: https://github.com/NixOS/nixpkgs/issues/180175#issuecomment-1273827251
     systemd.services.NetworkManager-wait-online.enable = false;
 
-    home.enable = true;
+    home.enable = false;
 
     modules.services.reverseProxy = {
       enable = true;
@@ -134,7 +133,7 @@ with lib;
     };
 
     modules.services.syncthing.enable = true;
-    modules.services.tandoor.enable = false;
+    modules.services.tandoor.enable = true;
     modules.services.paperless.enable = true;
     modules.services.firefly-iii.enable = true;
 
@@ -161,7 +160,7 @@ with lib;
       komga.enable = true;
       plex.enable = false;
       photoprism.enable = false;
-      immich.enable = true;
+      immich.enable = false;
     };
 
     modules.services.nextcloud = {
