@@ -23,9 +23,9 @@ in
       enable = true;
       settings = {
         server = {
-          http_addr = "127.0.0.1";
+          http_addr = "0.0.0.0";
           http_port = cfg.grafanaPort;
-          domain = "https://grafana.${config.services.reverseProxy.domain}";
+          domain = "https://grafana.${config.modules.services.reverseProxy.hostname}";
         };
       };
     };
@@ -37,14 +37,14 @@ in
       exporters = {
         node = {
           enable = true;
-          enableCollectors = [ "systemd" ];
+          enabledCollectors = [ "systemd" ];
         };
       };
 
       scrapeConfigs = [
         {
-          jobName = "node";
-          staticConfigs = [{
+          job_name = "node";
+          static_configs = [{
             targets = [ "127.0.0.1:${toString config.services.prometheus.exporters.node.port}" ];
           }];
         }
@@ -52,7 +52,7 @@ in
     };
 
     modules.services.reverseProxy.proxies.grafana = {
-      publicPort = publicPort;
+      publicPort = cfg.grafanaPort;
       auth = false;
     };
   };

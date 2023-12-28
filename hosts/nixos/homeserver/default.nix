@@ -132,11 +132,6 @@ with lib;
       };
     };
 
-    modules.services.syncthing.enable = true;
-    modules.services.tandoor.enable = true;
-    modules.services.paperless.enable = true;
-    modules.services.firefly-iii.enable = true;
-
     sops.secrets.firefly_import_configs_dkb-private = {
       sopsFile = ./secrets/secrets.yaml;
       path = "${config.modules.services.firefly-iii.configDir}/dkb-private.json";
@@ -151,22 +146,29 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
-    modules.services.media = {
-      calibre.enable = true;
-      deluge = {
-        enable = false;
-        sopsFile = config.sops.secrets.deluge.path;
-      };
-      komga.enable = true;
-      plex.enable = false;
-      photoprism.enable = false;
-      immich.enable = false;
-    };
+    modules.services = {
+      syncthing.enable = true;
+      tandoor.enable = true;
+      paperless.enable = true;
+      firefly-iii.enable = true;
+      monitoring.enable = true;
 
-    modules.services.nextcloud = {
-      enable = true;
-      adminpassFile = config.sops.secrets.nextcloud_admin_pass.path;
-      # home = "/nextcloud";
+      nextcloud = {
+        enable = false;
+        adminpassFile = config.sops.secrets.nextcloud_admin_pass.path;
+        # home = "/nextcloud";
+      };
+
+      media = {
+        calibre.enable = true;
+        deluge = {
+          enable = false;
+          sopsFile = config.sops.secrets.deluge.path;
+        };
+        komga.enable = true;
+        plex.enable = false;
+        immich.enable = true;
+      };
     };
 
     sops.secrets.nextcloud_admin_pass = mkIf config.modules.services.nextcloud.enable {
