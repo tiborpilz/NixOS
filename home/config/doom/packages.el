@@ -1,5 +1,3 @@
-(package! straight :pin "3eca39d")
-
 (package! editorconfig)
 
 (unpin! org-roam)
