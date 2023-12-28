@@ -48,6 +48,9 @@ in
         ];
       };
     };
-    modules.services.reverseProxy.proxies.tandoor.publicPort = publicPort;
+    modules.services.reverseProxy.proxies.tandoor = {
+      publicPort = publicPort;
+      auth = false;
+    };
   };
 }
