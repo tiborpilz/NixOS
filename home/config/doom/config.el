@@ -362,7 +362,10 @@
 (setq company-format-margin-function #'company-vscode-dark-icons-margin)
 
 (use-package! copilot
-          :hook (prog-mode . copilot-mode)
+          :hook
+          (prog-mode . copilot-mode)
+          (copilot-mode . (lambda ()
+                            (setq-local copilot--indent-warning-printed-p t)))
           :bind (:map copilot-completion-map
                 ("C-SPC" . 'copilot-accept-completion)
                 ("C-<spc>" . 'copilot-accept-completion)

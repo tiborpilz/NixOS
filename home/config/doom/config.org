@@ -864,9 +864,17 @@ those icons as what's being displayed.
 (package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
 #+end_src
 
+When enabling copilot, I'm hooking into ~prog-mode~ to enable it for all
+programming modes.
+Further, I'm disabling the warning about indentation (see
+https://github.com/zerolfx/copilot.el/issues/220), and binding some keys.
+
 #+begin_src elisp
 (use-package! copilot
-          :hook (prog-mode . copilot-mode)
+          :hook
+          (prog-mode . copilot-mode)
+          (copilot-mode . (lambda ()
+                            (setq-local copilot--indent-warning-printed-p t)))
           :bind (:map copilot-completion-map
                 ("C-SPC" . 'copilot-accept-completion)
                 ("C-<spc>" . 'copilot-accept-completion)
