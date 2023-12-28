@@ -29,14 +29,12 @@ running this config, and adjust certain settings accordingly.
 
 ** Font selection
 I'm a big fan of ligatures, and I've been using FiraCode for as long as I can remember.
-
 #+begin_src elisp
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14))
 #+end_src
 
 ** Line numbers
 Since I'm using Evil/vim-keybindings, I prefer relative line numbers as default.
-
 #+begin_src elisp
 (setq display-line-numbers-type 'relative)
 #+end_src
@@ -45,13 +43,6 @@ Since I'm using Evil/vim-keybindings, I prefer relative line numbers as default.
 2 spaces, suck it k&r
 #+begin_src elisp
 (setq tab-width 2)
-#+end_src
-
-** Fix straight.el
-https://github.com/doomemacs/doomemacs/issues/6960#issuecomment-1327514660
-
-#+begin_src elisp :tangle packages.el
-(package! straight :pin "3eca39d")
 #+end_src
 
 ** Editorconfig
@@ -869,7 +860,6 @@ those icons as what's being displayed.
 
 **** Snippets
 *** Copilot
-
 #+begin_src elisp :tangle packages.el
 (package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
 #+end_src
