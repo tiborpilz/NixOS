@@ -35,7 +35,11 @@
 
 ;; (package! dash-docs)
 
-(package! gpt)
+(package! gptel)
+
+(package! gptel-extensions
+  :recipe (:host github
+  :repo "kamushadenes/gptel-extensions.el"))
 
 (package! quarto-mode)
 

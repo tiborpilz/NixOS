@@ -1,9 +1,14 @@
+:PROPERTIES:
+:GPTEL_MODEL: gpt-4
+:GPTEL_BACKEND: ChatGPT
+:GPTEL_BOUNDS: nil
+:END:
 : header-args :elisp :tangle ./config.el :results silent
 #+TITLE: Doom Emacs Config
 
 * Base Settings
 ** Personal data
-Set Name and mail adress
+Set Name and mail adres s
 #+begin_src elisp
 (setq user-full-name "Tibor Pilz"
       user-mail-address "tibor@pilz.berlin")
@@ -1190,20 +1195,36 @@ Put Docsets in share dir
 #+begin_src elisp
 ;; (setq dash-docs-docsets-path "$HOME/.local/share/docsets")
 #+end_src
-*** GPT
-GPT.el (https://github.com/stuhlmueller/gpt.el) is a package for interacting
-with OpenAI's GPT-3 API.
+*** AI Assistance
 
-**** Install
+**** GPTel
+GPTel (https://github.com/karthink/gptel) is a package for interacting with
+various LLMs.
+
+***** Install
 #+begin_src elisp :tangle packages.el
-(package! gpt)
+(package! gptel)
 #+end_src
 
-**** Configuration
+***** Configuration
 #+begin_src elisp
-(setq gpt-openai-key (password-store-get "bitwarden/openai-gpt-key"))
-(setq gpt-openai-engine "code-davinci-002")
-(use-package! gpt)
+(use-package! gptel
+  :config
+  (setq! gptel-api-key (lambda () (password-store-get "bitwarden/openai-gpt-key")))
+  (setq! gptel-model "gpt-4"))
+#+end_src
+
+***** GPTel-extensions
+Extensions for asking about a document or refactoring the buffer.
+
+#+begin_src elisp :tangle packages.el
+(package! gptel-extensions
+  :recipe (:host github
+  :repo "kamushadenes/gptel-extensions.el"))
+#+end_src
+
+#+begin_src elisp
+(use-package! gptel-extensions :after gptel)
 #+end_src
 
 *** Quarto
