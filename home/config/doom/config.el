@@ -500,9 +500,12 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 ;; (setq dash-docs-docsets-path "$HOME/.local/share/docsets")
 
-(setq gpt-openai-key (password-store-get "bitwarden/openai-gpt-key"))
-(setq gpt-openai-engine "code-davinci-002")
-(use-package! gpt)
+(use-package! gptel
+  :config
+  (setq! gptel-api-key (lambda () (password-store-get "bitwarden/openai-gpt-key")))
+  (setq! gptel-model "gpt-4"))
+
+(use-package! gptel-extensions :after gptel)
 
 (use-package quarto-mode
   :mode (("\\.Rmd" . poly-quarto-mode)))
