@@ -15,7 +15,7 @@ with mylib;
     };
     dataDir = mkOption {
       type = types.str;
-      default = "/data/linkding";
+      default = "/var/lib/linkding";
     };
   };
   config = lib.mkIf cfg.enable {
