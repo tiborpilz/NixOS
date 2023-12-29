@@ -77,14 +77,6 @@ gch() {
   git checkout $(fzf-git-branch)
 }
 
-# Interactive npm run
-npr() {
-  command=$(jq -r '.scripts | keys | .[]' package.json | fzf-tmux --preview "jq -r '.scripts[\"{}\"]' package.json")
-  if [[ ! -z command ]]; then
-    print -z "npm run $command"
-  fi
-}
-
 source <(kubectl completion zsh)
 alias k=kubectl
 

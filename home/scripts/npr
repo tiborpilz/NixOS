@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Interactive npm run
+
+command=$(jq -r '.scripts | keys | .[]' package.json | fzf-tmux --query "$1" --preview "jq -r '.scripts[\"{}\"]' package.json")
+if [[ ! -z command ]]; then
+  npm run $command
+fi
