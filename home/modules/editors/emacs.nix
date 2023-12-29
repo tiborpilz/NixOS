@@ -48,6 +48,10 @@ in
     '';
 
     programs.emacs.package = pkgs.my.emacsGitWrapped;
+
+    services.emacs.enable = true;
+    home.sessionVariables.EDITOR = "${pkgs.my.emacsGitWrapped}/bin/emacsclient";
+
     home.packages = with pkgs; [
       # emacsWithNativeComp
 
