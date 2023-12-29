@@ -26,5 +26,7 @@ in
     modules.shell.zsh.rcInit = ''
       fpath+=($HOME/bin/completions)
     '';
+
+    modules.shell.zsh.aliases.ccd = ". $(which codedirs)";
   };
 }
