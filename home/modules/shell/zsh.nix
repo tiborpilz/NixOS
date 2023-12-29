@@ -30,12 +30,9 @@ in
   };
 
   config = mkIf cfg.enable {
-    # TODO    home.xdg.configFile."zsh/.zshrc".text = #
     programs.zsh = {
       enable = true;
     };
-
-    # targets.genericLinux.enable = true;
 
     home.packages = with pkgs; [
       zsh
@@ -55,7 +52,6 @@ in
       nodejs
       coreutils
       wakatime
-      thefuck
 
       #Markdown View
       glow
