@@ -85,11 +85,6 @@ npr() {
   fi
 }
 
-# Interactive cd to repo in ~/Code
-ccd() {
-  cd $(find ~/Code/* -type d -maxdepth 0 | fzf-tmux --preview 'if [ -f {}/README.md ]; then glow {}/README.md --style=dark; else ls {}; fi')
-}
-
 source <(kubectl completion zsh)
 alias k=kubectl
 

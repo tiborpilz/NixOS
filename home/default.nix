@@ -66,6 +66,8 @@ with mylib;
 
   programs.man.enable = true;
 
+  modules.scripts.enable = true;
+
   modules.shell.zsh.enable = true;
   modules.shell.zsh.aliases.ungron = "gron --ungron";
 
