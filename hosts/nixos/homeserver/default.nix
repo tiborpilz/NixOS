@@ -75,6 +75,7 @@ with lib;
       gparted
       hdparm
       python3
+      htop
     ];
 
     users.extraUsers.root.password = "";
@@ -90,6 +91,11 @@ with lib;
 
     virtualisation.oci-containers.backend = "podman";
     system.stateVersion = "23.11";
+
+    nix = {
+      package = pkgs.nix;
+      registry.nixpkgs.flake = pkgs;
+    };
 
     services.avahi = {
       enable = true;
@@ -155,8 +161,9 @@ with lib;
       linkding.enable = true;
 
       nextcloud = {
-        enable = false;
+        enable = true;
         adminpassFile = config.sops.secrets.nextcloud_admin_pass.path;
+        dataDir = "/data/nextcloud";
         # home = "/nextcloud";
       };
 

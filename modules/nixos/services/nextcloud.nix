@@ -21,19 +21,31 @@ in
         The port on which the service will be exposed.
       '';
     };
-    home = mkOption {
+    configDir = mkOption {
       type = types.str;
       default = "/var/lib/nextcloud";
       description = ''
-        The home directory of the service.
+        The config directory of the service.
+      '';
+    };
+    dataDir = mkOption {
+      type = types.str;
+      default = "";
+      description = ''
+        The data directory of the service.
       '';
     };
   };
 
   config = mkIf cfg.enable {
     system.activationScripts.init-nextcloud = stringAfter [ "var" ] ''
-      mkdir -p ${cfg.home}
-      chown -R nextcloud:nextcloud ${cfg.home}
+      mkdir -p ${cfg.configDir}
+      chown -R nextcloud:nextcloud ${cfg.configDir}
+
+      # if dataDir is set, create it
+      if [ -n "${cfg.dataDir}" ]; then
+        mkdir -p ${cfg.dataDir}
+      fi
     '';
 
     users.users.nextcloud = {
@@ -47,6 +59,10 @@ in
         hostPath = cfg.adminpassFile;
         isReadOnly = true;
       };
+      bindMounts."${cfg.dataDir}" = mkIf (cfg.dataDir != "") {
+        hostPath = cfg.dataDir;
+        isReadOnly = false;
+      };
 
       autoStart = true;
       privateNetwork = true;
@@ -55,16 +71,28 @@ in
       hostAddress6 = "fd00::10";
       localAddress6 = "fd00::11";
 
-      config = { pkgs, system, ... }: {
+      config = { pkgs, system, ... }@container: {
         system.activationScripts.init-nextcloud-secrets = stringAfter [ "var" ] ''
           mkdir -p /tmp/nextcloud-secrets
           cp ${cfg.adminpassFile} /tmp/nextcloud-secrets/adminpass
           chown -R nextcloud:nextcloud /tmp/nextcloud-secrets
+          chown -R nextcloud:nextcloud ${cfg.configDir}
+
+          # if dataDir is set, symlink it to ${cfg.configDir}/data
+          if [ -n "${cfg.dataDir}" ]; then
+            ln -s ${cfg.dataDir} ${container.config.services.nextcloud.datadir}/data
+          fi
         '';
 
         system.stateVersion = config.system.stateVersion;
         services.nextcloud = {
           enable = true;
+          package = pkgs.nextcloud27;
+          extraApps = with container.config.services.nextcloud.package.packages.apps; {
+            inherit news contacts calendar tasks bookmarks;
+          };
+          extraAppsEnable = true;
+
           hostName = "nextcloud.${config.modules.services.reverseProxy.hostname}";
 
           config = {
