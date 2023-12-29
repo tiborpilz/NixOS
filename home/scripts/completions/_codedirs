@@ -1,4 +1,4 @@
-#compdef ccd
+#compdef codedirs
 
 
 PROJECTS_DIR=${PROJECTS_DIR:-~/Code}
