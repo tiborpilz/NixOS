@@ -17,12 +17,18 @@ in
   };
 
   config = mkIf cfg.enable {
+    home.packages = [
+      pkgs.gitmux
+    ];
     programs.tmux = {
       enable = true;
       plugins = with pkgs; [
         tmuxPlugins.copycat
         tmuxPlugins.yank
         tmuxPlugins.prefix-highlight
+        tmuxPlugins.net-speed
+        tmuxPlugins.cpu
+        tmuxPlugins.sidebar
       ];
 
       baseIndex = 1;
@@ -60,18 +66,64 @@ in
 
         # Status Bar
         set -g status-position top
-        set -g status-justify centre
+        set -g status-justify left
         set -g status-bg colour8
         set -g status-fg white
 
         set -g window-status-format ' #W '
-        set -g window-status-current-style 'bg=default,fg=colour4'
+        set -g window-status-current-style 'bg=default,fg=colour15'
         set -g window-status-current-format ' #W '
 
-        set -g status-right-length 40
-        set -g status-right '#(${pkgs.gitmux}/bin/gitmux "#{pane_current_path}")'
+        set -g pane-border-status top
+        set -g pane-border-lines single
+        set -g pane-border-style 'fg=colour0'
+
+
+        # Set active pane border to dark gay, same as pane-border
+        set -g pane-active-border-style 'fg=colour0'
+
+        # Only show active pane border when there's more than one pane
+        is_many="if [ #{window_panes} -eq 1 ]; then exit 1; fi"
+        set-hook -g window-layout-changed 'if-shell "$is_many" "set-option -w pane-active-border-style fg=colour4" "set-option -w pane-active-border-style fg=colour0'
+        set-hook -g session-window-changed 'if-shell "$is_many" "set-option -w pane-active-border-style fg=colour4" "set-option -w pane-active-border-style fg=colour0'
+
+        set -g status-left-length 40
+        set -g status-left '#[fg=colour4]  #S | #[default]'
+
+        set -g status-right-length 120
+
+        # Normally, only show the current window name and the time
+        # set -g status-right #[fg=colour4] #(date +"%H:%M") | #S '
+
+        show_git="false"
+
+        status_git="#(${pkgs.gitmux}/bin/gitmux -cfg $HOME/.config/gitmux/gitmux.conf #{pane_current_path}) #[fg=colour4] | #(date +%H:%M)"
+        status_no_git="#[fg=colour4] #(date +%H:%M)"
+
+        # TODO: get toggle working
+        # set -g status-right "#[if:#{==:#{@show_git],true}]$status_git#[else]$status_no_git#[endif]"
+        set -g status-right "$status_git "
       '';
     };
+
+    xdg.configFile."gitmux/gitmux.conf".text = ''
+      tmux:
+        styles:
+          clear: '#[fg=colour4]'
+          state: '#[fg=colour4]'
+          branch: '#[fg=colour7]'
+          remote: '#[fg=colour4]'
+          divergence: '#[fg=colour4]'
+          staged: '#[fg=colour6]'
+          conflict: '#[fg=colour4]'
+          modified: '#[fg=colour4]'
+          untracked: '#[fg=colour4]'
+          stashed: '#[fg=colour4]'
+          clean: '#[fg=colour4]'
+          insertions: '#[fg=colour4]'
+          deletions: '#[fg=colour4]'
+        layout: [branch, ' ', divergence, '- ', flags]
+    '';
 
     home.sessionVariables = {
       TMUX_HOME = "${config.home.sessionVariables.XDG_CONFIG_HOME}/tmux";
