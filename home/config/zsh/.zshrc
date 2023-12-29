@@ -19,7 +19,6 @@ antigen use oh-my-zsh
 
 antigen bundle vi-mode
 
-antigen bundle wfxr/forgit
 antigen bundle git
 antigen bundle zsh-users/zsh-syntax-highlighting
 
