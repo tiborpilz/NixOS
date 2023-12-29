@@ -1,0 +1,7 @@
+#compdef npr
+
+zstyle ':completion:*' file-split-chars :
+scripts=($(jq -r '.scripts | keys | .[]' package.json | sed -e s/:/\\\\:/))
+_describe -t commands 'npm scripts' scripts
+
+return 0
