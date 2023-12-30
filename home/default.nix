@@ -11,10 +11,34 @@ with mylib;
 
   home.stateVersion = "23.11";
 
-  fonts.fontconfig.enable = true;
+  fonts = {
+    fontconfig.enable = true;
+  };
 
   home.packages = with pkgs; [
     (nerdfonts.override { fonts = [ "FiraCode" ]; })
+    iosevka
+    (iosevka.override {
+      set = "custom";
+      privateBuildPlan = ''
+        [buildPlans.iosevka-custom]
+        family = "Iosevka Custom"
+        spacing = "normal"
+        serifs = "sans"
+        noCvSs = true
+        exportGlyphNames = false
+
+        [buildPlans.iosevka-custom.weights.Regular]
+        shape = 400
+        menu = 400
+        css = 400
+
+        [buildPlans.iosevka-custom.weights.Medium]
+        shape = 500
+        menu = 500
+        css = 500
+    '';
+    })
     etBook
 
     # Need later version of bash for nix-shell to work correctly on macos
