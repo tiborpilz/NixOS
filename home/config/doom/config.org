@@ -1504,12 +1504,19 @@ contortions.
 (package! spacious-padding)
 #+end_src
 
-TO actually use it, I need to find a better color scheme, where the edges aren't
+To actually use it, I need to find a better color scheme, where the edges aren't
 as jarring, but it's very promising. The individual spacings can be adjusted
 with the following:$HOME
 
 #+begin_src elisp
-(setq spacious-padding-width '(:internal-border-width 10 :right-divider-width 30 :scroll-bar-width 5))
+(setq spacious-padding-width '(:internal-border-width 16 :header-line-width 8 :mode-line-width 4 :right-divider-width 30 :scroll-bar-width 5))
+(setq spacious-padding-subtle-mode-line t)
+      
+(setq spacious-padding-subtle-mode-line
+      `( :mode-line-active 'default
+         :mode-line-inactive vertical-border))
+
+(spacious-padding-moce 1)                
 #+end_src
 
 (The actual values obviously need to be tweaked though)
