@@ -48,6 +48,9 @@ in
         bind-key -T copy-mode-vi y send-keys -X copy-selection
         bind-key -T copy-mode-vi r send-keys -X rectangle-toggle
 
+        # Actually copy to clipboard (on Linux)
+        copy-mode-vi y send-keys -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
+
         # Attach current directory to session
         bind a attach -c "#{pane_current_path}"
 
