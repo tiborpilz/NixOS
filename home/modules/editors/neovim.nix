@@ -1,4 +1,4 @@
-{ inputs, config, options, lib, pkgs, ... }:
+{ inputs, config, lib, pkgs, ... }:
 
 with lib;
 let
@@ -12,10 +12,9 @@ in
 
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
-      # editorconfig-core-# c
       neovim
     ];
 
-    xdg.configFile."nvim" = { source = ../../config/neovim; recursive = true; };
+    # xdg.configFile."nvim" = { source = ../../config/neovim; recursive = true; };
   };
 }

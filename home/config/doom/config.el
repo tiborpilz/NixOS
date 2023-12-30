@@ -1,20 +1,14 @@
 (setq user-full-name "Tibor Pilz"
       user-mail-address "tibor@pilz.berlin")
 
-(defun is-mac ()
-  (string-equal system-type "darwin"))
-
-(defun is-linux ()
-  (string-equal system-type "gnu/linux"))
-
-(defun is-workstation ()
-  (string-equal (system-name) "workyMcWorkstation"))
-
-(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14))
-
 (setq display-line-numbers-type 'relative)
 
 (setq tab-width 2)
+
+(defun add-hooks (hook-list function)
+  "Add FUNCTION to all hooks in HOOK-LIST."
+  (dolist (hook hook-list)
+    (add-hook hook function)))
 
 (setq org-directory "~/org/")
 (setq org-agenda-files (list org-directory))
@@ -27,6 +21,51 @@
 (setq org-return-follows-link 1)
 (setq calendar-week-start-day 1) ;; start on monday
 (setq org-agenda-include-diary t)
+
+(setq doom-font (font-spec :family "Iosevka" :size 16 :weight 'normal :width 'expanded)
+      doom-big-font (font-spec :family "Iosevka" :size 28 :weight 'normal)
+      doom-unicode-font (font-spec :family "Iosevka" :size 16 :weight 'normal)
+      doom-variable-pitch-font (font-spec :family "ETBembo" :size 16 :weight 'demibold))
+
+(add-hook 'org-mode-hook #'mixed-pitch-mode)
+
+(defun set-line-spacing (size)
+  "Set line spacing"
+  (setq line-spacing size))
+
+(add-hooks '(comint-mode-hook
+             helm-mode-hook
+             ibuffer-mode-hook
+             prog-mode-hook
+             ranger-mode-hook
+             text-mode-hook
+             vterm-mode-hook)
+           (lambda () (set-line-spacing 0.1)))
+
+(add-hook 'org-mode-hook
+          (lambda () (set-line-spacing 0.2)))
+
+(add-hook 'org-mode-hook
+          (lambda () (setq header-line-format " ")))
+
+(defun clear-sides ()
+  "Setup gaps on left and right sides."
+  (setq left-margin-width 16
+        right-margin-width 16)
+  (set-window-buffer nil (current-buffer)))
+
+(clear-sides)
+
+(add-hooks '(org-mode-hook
+             org-agenda-mode-hook
+             comint-mode-hook
+             magit-diff-mode-hook
+             magit-log-mode-hook
+             magit-popup-mode-hook
+             magit-status-mode-hook
+             treemacs-mode-hook
+             vterm-mode-hook)
+            (lambda () (clear-sides)))
 
 (setq org-hide-leading-stars t)
 
@@ -574,7 +613,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (use-package! spacious-padding
   :config
-  (setq spacious-padding-width '(:internal-border-width 32 :header-line-width 16 :mode-line-width 16 :right-divider-width 30 :scroll-bar-width 5))
+  (setq spacious-padding-width '(:internal-border-width 32 :header-line-width 16 :mode-line-width 16 :right-divider-width 30 :scroll-bar-width 8))
   (setq spacious-padding-subtle-mode-line t))
 
 (spacious-padding-mode 1)
