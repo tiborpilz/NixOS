@@ -50,7 +50,7 @@
         +all
         +defaults)
        ;;tabs            ; a tab bar for Emacs
-       ;; (treemacs +lsp)   ; a project drawer, like neotree but cooler
+       (treemacs +lsp)   ; a project drawer, like neotree but cooler
        ;; unicode           ; extended unicode support for various languages
        vc-gutter         ; vcs diff in the fringe
        ;; vi-tilde-fringe   ; fringe tildes to mark beyond EOB
@@ -76,7 +76,7 @@
        (dired +icons)          ; making dired pretty [functional]
        electric          ; smarter, keyword-based electric-indent
        (ibuffer +icons)         ; interactive buffer management
-       ;; tramp
+       tramp
        undo              ; persistent, smarter undo for your inevitable mistakes
        vc                ; version-control and Emacs, sitting in a tree
 
@@ -101,7 +101,7 @@
        ; ein               ; tame Jupyter notebooks with emacs
        (eval +overlay)     ; run code, run (also, repls)
        ;; gist              ; interacting with github gists
-       ;; (lookup +dictionary +docsets +offline)              ; navigate your code and its documentation
+       (lookup +dictionary +docsets +offline)              ; navigate your code and its documentation
        (lookup +docsets)
        (lsp +peek)
        (magit +forge)             ; a git porcelain for Emacs

@@ -572,7 +572,14 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (setq doom-modeline-hud t)
 
-(setq spacious-padding-width '(:internal-border-width 10 :right-divider-width 30 :scroll-bar-width 5))
+(setq spacious-padding-width '(:internal-border-width 16 :header-line-width 8 :mode-line-width 4 :right-divider-width 30 :scroll-bar-width 5))
+(setq spacious-padding-subtle-mode-line t)
+      
+(setq spacious-padding-subtle-mode-line
+      `( :mode-line-active 'default
+         :mode-line-inactive vertical-border))
+
+(spacious-padding-moce 1)
 
 (setq fancy-splash-image (concat doom-private-dir "splash-logos/emacs-logo-cutout.svg"))
 
