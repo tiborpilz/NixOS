@@ -164,7 +164,6 @@
        (nix +lsp)              ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
        (org
-        +pretty
         +brain
         +dragndrop
         +gnuplot

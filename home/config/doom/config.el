@@ -22,10 +22,23 @@
 (setq calendar-week-start-day 1) ;; start on monday
 (setq org-agenda-include-diary t)
 
-(setq doom-font (font-spec :family "Iosevka" :size 16 :weight 'normal :width 'expanded)
+(setq doom-font (font-spec :family "Iosevka" :size 16)
       doom-big-font (font-spec :family "Iosevka" :size 28 :weight 'normal)
       doom-unicode-font (font-spec :family "Iosevka" :size 16 :weight 'normal)
-      doom-variable-pitch-font (font-spec :family "ETBembo" :size 16 :weight 'demibold))
+      doom-variable-pitch-font (font-spec :family "Iosevka" :size 16 :weight 'demibold))
+
+(let* ((variable-tuple '(:font "Iosevka Slab"))
+       (headline `(:inherit default :weight black)))
+  (custom-theme-set-faces 'user
+                          `(org-level-8 ((t (,@headline ,@variable-tuple))))
+                          `(org-level-7 ((t (,@headline ,@variable-tuple))))
+                          `(org-level-6 ((t (,@headline ,@variable-tuple))))
+                          `(org-level-5 ((t (,@headline ,@variable-tuple))))
+                          `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+                          `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
+                          `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
+                          `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
+                          `(org-document-title ((t (,@headline ,@variable-tuple :height 1.5 :underline nil))))))
 
 (add-hook 'org-mode-hook #'mixed-pitch-mode)
 
@@ -33,43 +46,41 @@
   "Set line spacing"
   (setq line-spacing size))
 
-(add-hooks '(comint-mode-hook
-             helm-mode-hook
-             ibuffer-mode-hook
-             prog-mode-hook
-             ranger-mode-hook
-             text-mode-hook
-             vterm-mode-hook)
-           (lambda () (set-line-spacing 0.1)))
-
 (add-hook 'org-mode-hook
           (lambda () (set-line-spacing 0.2)))
-
-(add-hook 'org-mode-hook
-          (lambda () (setq header-line-format " ")))
-
-(defun clear-sides ()
-  "Setup gaps on left and right sides."
-  (setq left-margin-width 16
-        right-margin-width 16)
-  (set-window-buffer nil (current-buffer)))
-
-(clear-sides)
-
-(add-hooks '(org-mode-hook
-             org-agenda-mode-hook
-             comint-mode-hook
-             magit-diff-mode-hook
-             magit-log-mode-hook
-             magit-popup-mode-hook
-             magit-status-mode-hook
-             treemacs-mode-hook
-             vterm-mode-hook)
-            (lambda () (clear-sides)))
 
 (setq org-hide-leading-stars t)
 
 (setq org-startup-indented t)
+
+(use-package! org-modern
+  :hook (org-mode . global-org-modern-mode)
+  :config
+  (setq org-modern-label-border 0.4))
+
+(setq
+  org-auto-align-tags nil
+  org-tags-column 0
+  org-catch-invisible-edits 'show-and-error
+  org-special-ctrl-a/e t
+  org-insert-heading-respect-content t
+
+  ;; Org styling, hide markup etc
+  org-hide-emphasis-markers t
+  org-pretty-entities t
+  org-ellipsis "..."
+
+  ;; Agenda styling
+  org-agenda-tags-column 0
+  org-agenda-block-separator ?─
+  org-agenda-time-grid
+  '((daily today require-timed)
+    (800 1000 1200 1400 1600 1800 2000)
+    " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+  org-agenda-current-time-string
+  "⭠ now ─────────────────────────────────────────────────")
+
+(global-org-modern-mode)
 
 (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
@@ -142,12 +153,7 @@
 
 (setq org-export-headline-levels 5)
 
-;(require 'ox-extra)
-;(ox-extras-activate '(ignore-headlines))
-
 (setq org-highlight-latex-and-related '(native script entities))
-
-;; (use-package! org-re-reveal)
 
 (setq org-roam-directory "~/org/roam")
 
@@ -162,38 +168,6 @@
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
-
-;; (use-package! org-roam-ui
-;;   :after org-roam
-;;   :commands org-roam-ui-open
-;;   :hook (org-roam . 'org-roam-ui-mode)
-;;   :config
-;;   (require 'org-roam) ; in case autoloaded
-;;   (defun org-roam-ui-open ()
-;;     "Ensure the server is active, then open the roam graph."
-;;     (interactive    )
-;;     (unless org-roam-ui-mode (org-roam-ui-mode 1))
-;;     (browse-url-xdg-open (format "http://localhost:%d" org-roam-ui-port))))
-
-;; (setq org-roam-ui-open-on-start nil)
-
-;; (use-package! org-gcal
-;;   :config
-;;   (setq org-gcal-client-id "CLIENT_ID"
-;;         org-gcal-client-secret "CLIENT_SECRET"
-;;         org-gcal-fetch-file-alit '(("tbrpilz@googlemail.com" . "~/org/schedule.org"))))
-
-(use-package! org-present
-  :hook (org-present-mode . (lambda ()
-                              (org-present-big)
-                              (org-display-inline-images)
-                              (org-present-hide-cursor)
-                              (org-present-read-only)))
-  :hook (org-present-mode-quit . (lambda ()
-                                   (org-present-small)
-                                   (org-remove-inline-images)
-                                   (org-present-show-cursor)
-                                   (org-present-read-write))))
 
 (map! :map org-mode-map
       :localleader
@@ -334,9 +308,6 @@
                 (setq-local python-pytest-executable
                             (executable-find "pytest")))))
 
-;; (use-package! polymode
-;; (use-package! poly-markdown)
-
 (setq lsp-terraform-ls-enable-show-reference t)
 (setq lsp-semantic-tokens-enable t)
 (setq lsp-semantic-tokens-honor-refresh-requests t)
@@ -366,24 +337,6 @@
 
   ;; Start language server when jsonnet-mode is enabled
   (add-hook 'jsonnet-mode-hook #'lsp-deferred))
-
-(with-eval-after-load 'lsp-mode
-  ;; Configure lsp-mode-language identifiers
-  (add-to-list 'lsp-language-id-configuration '(dhall-mode . "dhall"))
-
-  ;; Register dhall-lsp-server with the LSP client
-  (lsp-register-client
-    (make-lsp-client
-      :new-connection (lsp-stdio-connection '("dhall-lsp-server"))
-      :activation-fn (lsp-activate-on "dhall")
-      :initialized-fn (lambda (workspace)
-                        (with-lsp-workspace workspace
-                          (lsp--set-configuration
-                            (lsp-configuration-section "dhall"))))
-                    :server-id 'dhall-lsp-server))
-
-  ;; Start language server when dhall-mode is enabled
-  (add-hook 'dhall-mode-hook #'lsp-deferred))
 
 (setq company-idle-delay 0.1 ;; How long to wait before popping up
       company-minimum-prefix-length 1 ;; Show the menu after one key press
@@ -537,8 +490,6 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
        :desc "Search devdocs" "l" #'devdocs-lookup
        :desc "Install devdocs set" "i" #'devdocs-install))
 
-;; (setq dash-docs-docsets-path "$HOME/.local/share/docsets")
-
 (use-package! gptel
   :config
   (setq! gptel-api-key (lambda () (password-store-get "bitwarden/openai-gpt-key")))
@@ -599,9 +550,6 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (with-eval-after-load 'doom-themes
   (doom-themes-treemacs-config))
 
-;; (add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
-;; (setq doom-themes-treemacs-theme "doom-atom")
-
 (use-package ewal
   :init (setq ewal-use-built-in-always-p nil
               ewal-use-built-in-on-failure-p nil
@@ -613,17 +561,17 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (use-package! spacious-padding
   :config
-  (setq spacious-padding-width '(:internal-border-width 32 :header-line-width 16 :mode-line-width 16 :right-divider-width 30 :scroll-bar-width 8))
-  (setq spacious-padding-subtle-mode-line t))
+  (setq spacious-padding-width '(
+    :internal-border-width 15
+    :header-line-width 4
+    :mode-line-width 6
+    :tab-width 4
+    :right-divider-width 30
+    :scroll-bar-width 8)))
+
+(setq spacious-padding-subtle-mode-line t)
 
 (spacious-padding-mode 1)
-
-(setq fancy-splash-image (concat doom-private-dir "splash-logos/emacs-logo-cutout.svg"))
-
-;; (defun wjb/posframe-arghandler (buffer-or-name arg-name value)
-;;   (let ((info '(:internal-border-width 2 :width 500 :height 48)))
-;;     (or (plist-get info arg-name) value)))
-;; (setq posframe-arghandler #'wjb/posframe-arghandler)
 
 ;; (define-key ivy-minibuffer-map (kbd "TAB") 'ivy-partial)
 ;; (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
@@ -640,683 +588,6 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (use-package! treemacs-nerd-icons
   :after treemacs
   :config (treemacs-load-theme "nerd-icons"))
-
-;; (treemacs-modify-theme
-;;  "all-the-icons"
-;;  :config
-;;  (progn
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("src-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("src-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("test-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("test-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("bin-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("bin-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("build-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("build-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("git-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("git-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("github-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("github-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("public-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("public-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("private-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("private-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("temp-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("tmp-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("temp-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("tmp-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("readme-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("docs-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("readme-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("docs-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("screenshots-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("icons-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("screenshots-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("icons-open")
-;;    :fallback
-;;    'same-as-icon)))
 
 (defun minibuffer-format-candidate (orig cand prefix suffix index _start)
   (let ((prefix (if (= vertico--index index)

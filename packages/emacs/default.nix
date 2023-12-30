@@ -36,5 +36,5 @@ let
   });
 in
 {
-  emacsGitWrapped = (wrap pkgs.emacs-git);
+  emacsGitWrapped = (wrap pkgs.emacs-unstable);
 }
