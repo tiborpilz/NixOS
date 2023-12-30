@@ -89,10 +89,12 @@ Since I'm using Evil/vim-keybindings, I prefer relative line numbers as default.
    `(org-document-title ((t (,@headline ,@variable-tuple :height 1.4 :underline nil))))))
 #+end_src
 
-*** Hide leading stars except for currently selected headline
+*** Hide leading stars
 #+begin_src elisp
 (setq org-hide-leading-stars t)
 #+end_src
+
+How can I show the leading stars for the currently selected headline?
 
 *** Don't indent content based on headline level
 #+begin_src elisp
@@ -1494,7 +1496,7 @@ it.
 
 I'll keep it around for a bit, but I'm going back to doom modeline.
 
-** Spacing
+** UI
 *** General Padding
 The way windows have been close together always kind of botheres me. Luckily,
 there's a package that seems to halp with simple padding, without any
@@ -1509,15 +1511,16 @@ as jarring, but it's very promising. The individual spacings can be adjusted
 with the following:$HOME
 
 #+begin_src elisp
-(setq spacious-padding-width '(:internal-border-width 16 :header-line-width 8 :mode-line-width 4 :right-divider-width 30 :scroll-bar-width 5))
-(setq spacious-padding-subtle-mode-line t)
-      
-(setq spacious-padding-subtle-mode-line
-      `( :mode-line-active 'default
-         :mode-line-inactive vertical-border))
+(use-package! spacious-padding
+  :config
+  (setq spacious-padding-width '(:internal-border-width 32 :header-line-width 16 :mode-line-width 16 :right-divider-width 30 :scroll-bar-width 5))
+  (setq spacious-padding-subtle-mode-line t))
 
-(spacious-padding-moce 1)                
+(spacious-padding-mode 1)
 #+end_src
+
+#+RESULTS:
+: t
 
 (The actual values obviously need to be tweaked though)
 
