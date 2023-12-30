@@ -49,7 +49,9 @@ in
 
     programs.emacs.package = pkgs.my.emacsGitWrapped;
 
-    services.emacs.enable = true;
+
+    services.emacs.enable = lib.mkIf (pkgs.stdenv.hostPlatform.isLinux) true;
+
     home.sessionVariables.EDITOR = "${pkgs.my.emacsGitWrapped}/bin/emacsclient";
 
     home.packages = with pkgs; [
