@@ -1,5 +1,3 @@
-;; (package! org-modern)
-
 ;; (modify-all-frames-parameters
 ;;  '((right-divider-width . 10)
 ;;    (internal-border-width . 10)))

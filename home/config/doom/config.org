@@ -37,8 +37,6 @@ Small utility to add a function to multiple hooks at once.
     (add-hook hook function)))
 #+end_src
 
-This is a *test* and /another/ one.
-
 * Org Mode
 ** Base Settings
 #+begin_src elisp
@@ -57,11 +55,29 @@ This is a *test* and /another/ one.
 
 ** Visual improvements
 *** Typography
+Base font settings
 #+begin_src elisp
-(setq doom-font (font-spec :family "Iosevka" :size 16 :weight 'normal :width 'expanded)
+(setq doom-font (font-spec :family "Iosevka" :size 16)
       doom-big-font (font-spec :family "Iosevka" :size 28 :weight 'normal)
       doom-unicode-font (font-spec :family "Iosevka" :size 16 :weight 'normal)
-      doom-variable-pitch-font (font-spec :family "ETBembo" :size 16 :weight 'demibold))
+      doom-variable-pitch-font (font-spec :family "Iosevka" :size 16 :weight 'demibold))
+#+end_src
+
+Headline adjustments. They should be different in sice, not in color.
+
+#+begin_src elisp
+(let* ((variable-tuple '(:font "Iosevka Slab"))
+       (headline `(:inherit default :weight black)))
+  (custom-theme-set-faces 'user
+                          `(org-level-8 ((t (,@headline ,@variable-tuple))))
+                          `(org-level-7 ((t (,@headline ,@variable-tuple))))
+                          `(org-level-6 ((t (,@headline ,@variable-tuple))))
+                          `(org-level-5 ((t (,@headline ,@variable-tuple))))
+                          `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+                          `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
+                          `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
+                          `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
+                          `(org-document-title ((t (,@headline ,@variable-tuple :height 1.5 :underline nil))))))
 #+end_src
 
 *** Start Org in mixed-pitch-mode
@@ -80,69 +96,22 @@ respective hooks
   (setq line-spacing size))
 #+end_src
 
-For all monospoace/code buffers, I'm going with a low, but non-zero value.
-#+begin_src elisp
-(add-hooks '(comint-mode-hook
-             helm-mode-hook
-             ibuffer-mode-hook
-             prog-mode-hook
-             ranger-mode-hook
-             text-mode-hook
-             vterm-mode-hook)
-           (lambda () (set-line-spacing 0.1)))
-#+end_src
-
 For org-mode, I'm going with a higher value of 0.2.
 #+begin_src elisp
 (add-hook 'org-mode-hook
           (lambda () (set-line-spacing 0.2)))
 #+end_src
 
-**** Top padding
-Using ~header-line~ to be empty, I can fake top padding.
-
-#+begin_src elisp
-(add-hook 'org-mode-hook
-          (lambda () (setq header-line-format " ")))
-#+end_src
-
-**** Side padding
-
-Additionally, I'm adding a helper function to setup gaps on both sides of the
-buffer.
-#+begin_src elisp
-(defun clear-sides ()
-  "Setup gaps on left and right sides."
-  (setq left-margin-width 16
-        right-margin-width 16)
-  (set-window-buffer nil (current-buffer)))
-
-(clear-sides)
-#+end_src
-
-I'm using ~clear-sides~ in ~org-mode~ and some others to start.
-
-#+begin_src elisp
-(add-hooks '(org-mode-hook
-             org-agenda-mode-hook
-             comint-mode-hook
-             magit-diff-mode-hook
-             magit-log-mode-hook
-             magit-popup-mode-hook
-             magit-status-mode-hook
-             treemacs-mode-hook
-             vterm-mode-hook)
-            (lambda () (clear-sides)))
-#+end_src
-
-#+RESULTS:
-
-*** Center text
+*** TODO Fix this - Center text
 Olivetti is a minor mode for centering the text in a buffer.
+
+Sadly, when opening i.e. this ~org~ file or a random small ~ts~ file, this no
+longer works.
 
 #+begin_src elisp :tangle packages.el
 (package! olivetti)
 #+end_src
+
 *** Improve Headlines
 **** Hide leading stars
 #+begin_src elisp
@@ -156,19 +125,56 @@ How can I show the leading stars for the currently selected headline?
 (setq org-startup-indented t)
 #+end_src
 
-*** Make Org-Modern look good
-**** TODO actually implement this :emacs:
-Currently, this has some issues with doom emacs.
-
+*** Use Org-Modern
 Org-modern (https://github.com/minad/org-modern) contains a lot of nice visual
 improvements for org-mode.
 
-(I Need to adjust the style to fit into my theme)
+This is the most basic setup:
 
-#+begin_src elisp :tangle none
-;; (package! org-modern)
+#+begin_src elisp :tangle packages.el
+(package! org-modern)
 #+end_src
 
+#+begin_src elisp
+(use-package! org-modern
+  :hook (org-mode . global-org-modern-mode)
+  :config
+  (setq org-modern-label-border 0.4))
+#+end_src
+
+Set up org-modern
+
+#+begin_src elisp
+(setq
+  org-auto-align-tags nil
+  org-tags-column 0
+  org-catch-invisible-edits 'show-and-error
+  org-special-ctrl-a/e t
+  org-insert-heading-respect-content t
+
+  ;; Org styling, hide markup etc
+  org-hide-emphasis-markers t
+  org-pretty-entities t
+  org-ellipsis "..."
+
+  ;; Agenda styling
+  org-agenda-tags-column 0
+  org-agenda-block-separator ?─
+  org-agenda-time-grid
+  '((daily today require-timed)
+    (800 1000 1200 1400 1600 1800 2000)
+    " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+  org-agenda-current-time-string
+  "⭠ now ─────────────────────────────────────────────────")
+
+(global-org-modern-mode)
+#+end_src
+
+Though the author has more examples for theming in theriy README.
+**** TODO actually implement this :emacs:
+Currently, this has some issues with doom emacs.
+
+(I Need to adjust the style to fit into my theme)
 
 Use it globally and tweak it some more.
 #+begin_src elisp :tangle none
@@ -265,7 +271,8 @@ See https://org-babel.readthedocs.io/en/latest/header-args/
         (:tangle . "no")
         (:comments . "link")))
 #+end_src
-*** Auto-Tangling TODO: make this work
+
+*** Auto-Tangling
 I want org to tangle my config.org on file save, regardless whether it's the one
 loaded or in a different repo.
 
@@ -324,17 +331,10 @@ loaded or in a different repo.
 (setq org-export-headline-levels 5)
 #+end_src
 
-*** Ignore tag
-Add `:ignore:` tag to headings, so only the headings will be ignored for an export
-#+begin_src elisp
-;(require 'ox-extra)
-;(ox-extras-activate '(ignore-headlines))
-#+end_src
-
 *** automatic latex rendering
-#+begin_code elisp :tangle packages.el
+#+begin_src elisp :tangle packages.el
 (package! org-fragtog)
-#+end_code
+#+end_src
 
 #+begin_src elisp :tangle none
 (use-package! org-fragtog
@@ -346,11 +346,6 @@ Add `:ignore:` tag to headings, so only the headings will be ignored for an expo
 (setq org-highlight-latex-and-related '(native script entities))
 #+end_src
 
-*** Presentation
-**** Export to Reveal.js
-#+begin_src elisp none
-;; (use-package! org-re-reveal)
-#+end_src
 ** Extensions
 *** Roam
 **** Use the same directory as org
@@ -382,55 +377,8 @@ The closest comparison to org-roam-ui is Obsidian.
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
-
-;; (use-package! org-roam-ui
-;;   :after org-roam
-;;   :commands org-roam-ui-open
-;;   :hook (org-roam . 'org-roam-ui-mode)
-;;   :config
-;;   (require 'org-roam) ; in case autoloaded
-;;   (defun org-roam-ui-open ()
-;;     "Ensure the server is active, then open the roam graph."
-;;     (interactive    )
-;;     (unless org-roam-ui-mode (org-roam-ui-mode 1))
-;;     (browse-url-xdg-open (format "http://localhost:%d" org-roam-ui-port))))
-
-;; (setq org-roam-ui-open-on-start nil)
 #+end_src
 
-*** Google Calendar integration
-#+begin_src elisp :tangle packages.el
-(package! org-gcal)
-#+end_src
-
-#+begin_src elisp
-;; (use-package! org-gcal
-;;   :config
-;;   (setq org-gcal-client-id "CLIENT_ID"
-;;         org-gcal-client-secret "CLIENT_SECRET"
-;;         org-gcal-fetch-file-alit '(("tbrpilz@googlemail.com" . "~/org/schedule.org"))))
-#+end_src
-
-*** Presentation
-**** Org-Present
-Org-Present is a package to present org files right out of emacs.
-#+begin_src elisp :tangle packages.el
-(package! org-present)
-#+end_src
-
-#+begin_src elisp
-(use-package! org-present
-  :hook (org-present-mode . (lambda ()
-                              (org-present-big)
-                              (org-display-inline-images)
-                              (org-present-hide-cursor)
-                              (org-present-read-only)))
-  :hook (org-present-mode-quit . (lambda ()
-                                   (org-present-small)
-                                   (org-remove-inline-images)
-                                   (org-present-show-cursor)
-                                   (org-present-read-write))))
-#+end_src
 ** Fixes and miscellanious improvements
 *** Add shortcut for inserting  source, quote and example blocks
 
@@ -452,7 +400,6 @@ I'm adjusting the bindings just for ~org-mode~.
       (:prefix-map ("B" . "babel")
        (:desc "Insert structure template" "c" #'org-insert-structure-template)))
 #+end_src
-
 
 *** Visual-line-mode messes with with plaintext (markdow, latex)
 #+begin_src elisp
@@ -510,11 +457,13 @@ corresponding GH issue has a fix.
 #+begin_src elisp
 (add-hook! 'emacs-startup-hook #'doom-init-ui-h)
 #+end_src
+
 *** Faster insertion of org structures (i.e. source blocks)
 For some reason, ~org-tempo~ does not start at launch, so I'm  loading it here.
 #+begin_src elisp
 (use-package! org-tempo)
 #+end_src
+
 ** Capture
 *** Add / change cappture templates
 Some other tools (like orgzly) work better with ~TODO~ instead of ~[ ]~ (and
@@ -547,9 +496,6 @@ Some other tools (like orgzly) work better with ~TODO~ instead of ~[ ]~ (and
          ("oc" "Project changelog" entry #'+org-capture-central-project-changelog-file
           "* %U %?\n %i\n %a" :heading "Changelog" :prepend t))))
 #+end_src
-
-#+RESULTS:
-| t | Personal todo | entry | (file+headline +org-capture-todo-file Inbox) | * TODO %? |
 
 *** Improve org-capture dialog
 #+BEGIN_SRC elisp
@@ -585,12 +531,14 @@ no modeline.
         (set-window-parameter nil 'mode-line-format 'none)
         (org-capture)))
 #+END_SRC
+
 * Projectile
 ** Project Search Path
 Search for projects in  ~~/Code/~, but only one level deep.
 #+begin_src elisp
 (setq projectile-project-search-path '(("~/Code/" . 1)))
 #+end_src
+
 * Development
 ** Language-Specific Settings
 *** Web Dev (JS/TS/CSS)
@@ -777,14 +725,6 @@ plays nicely with direnv.
                             (executable-find "pytest")))))
 #+end_src
 
-*** Markdown
-**** Code blocks
-To set up code-highlighting in markdown code blocks, I need multiple major modes in one buffer. The package polymode promises to allow that:
-#+begin_src elisp
-;; (use-package! polymode
-;; (use-package! poly-markdown)
-#+end_src
-
 *** Terraform
 There are two competing lsp servers for Terraform with support in Emacs, but,
 although ~terraform-lsp~ is the more featurerich, I'm sticking with ~terraform-ls~
@@ -796,6 +736,7 @@ But still, ~terraform-lsp~ is a good alternative, with some nice- to- haves.
 (setq lsp-semantic-tokens-enable t)
 (setq lsp-semantic-tokens-honor-refresh-requests t)
 #+end_src
+
 *** Haskell
 There's a Doom-Emacs module for setting up haskell-mode together with Haskell's
 lsp, but currently, a bug prevents ~haskell-mode~ from working properly:
@@ -843,38 +784,6 @@ Then, I'm setting up lsp support.
   (add-hook 'jsonnet-mode-hook #'lsp-deferred))
 #+end_src
 
-*** Dhall
-Dhall is a configuration language, a bit like Jsonnet or Nix, but without the
-turing completeness.
-
-First, a package for a major mode.
-#+begin_src elisp :tangle packages.el
-(use-package dhall-mode
-  :config (setq dhall-use-header-line nil))
-#+end_src
-
-Then, lsp support:
-#+begin_src elisp
-(with-eval-after-load 'lsp-mode
-  ;; Configure lsp-mode-language identifiers
-  (add-to-list 'lsp-language-id-configuration '(dhall-mode . "dhall"))
-
-  ;; Register dhall-lsp-server with the LSP client
-  (lsp-register-client
-    (make-lsp-client
-      :new-connection (lsp-stdio-connection '("dhall-lsp-server"))
-      :activation-fn (lsp-activate-on "dhall")
-      :initialized-fn (lambda (workspace)
-                        (with-lsp-workspace workspace
-                          (lsp--set-configuration
-                            (lsp-configuration-section "dhall"))))
-                    :server-id 'dhall-lsp-server))
-
-  ;; Start language server when dhall-mode is enabled
-  (add-hook 'dhall-mode-hook #'lsp-deferred))
-#+end_src
-*** TODO Go LSP
-The LSP is misbehaving, so I'll have to set it up manually.
 ** Tools
 *** Code Completion
 Since it's already integrated into Doom Emacs, I'm using company for code
@@ -922,7 +831,6 @@ those icons as what's being displayed.
 (setq company-format-margin-function #'company-vscode-dark-icons-margin)
 #+end_src
 
-**** Snippets
 *** Copilot
 #+begin_src elisp :tangle packages.el
 (package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
@@ -1238,22 +1146,6 @@ Add keybindings under ~SPC o D~ ("o" for "open", "D" for "Devdocs").
        :desc "Install devdocs set" "i" #'devdocs-install))
 #+end_src
 
-**** Dash
-
-Dash-Docs (https://github.com/dash-docs-el/dash-docs) is a package for viewing
-Dash docsets.
-
-***** Install
-
-#+begin_src elisp :tangle packages.el
-;; (package! dash-docs)
-#+end_src
-
-***** Configuration
-Put Docsets in share dir
-#+begin_src elisp
-;; (setq dash-docs-docsets-path "$HOME/.local/share/docsets")
-#+end_src
 *** AI Assistance
 
 **** GPTel
@@ -1420,19 +1312,6 @@ Since the default is a bit too vibrant for my taste, I'm setting the flavor to ~
 (with-eval-after-load 'doom-themes
   (doom-themes-treemacs-config))
 #+end_src
-*** Nano
-Nano is a minimalistic theme for emacs, and it is absolutely gorgeous. Although
-it lacks the features I need, I was always a fan of the look. Now, it's possible
-to enjoy the best of both worlds by theming Doom to look like Nano.
-
-The only issue is that loading ~doom-nano-testing~ currently does more than just
-adjust the colorscheme, and while I like the minimal top modeline, I'd like to
-have a choice. In the future, I will pick and choose from Nano to adjust the layout.
-
-#+begin_src elisp
-;; (add-to-list 'load-path "~/Code/doom-nano-testing") (require 'load-nano)
-;; (setq doom-themes-treemacs-theme "doom-atom")
-#+end_src
 
 *** Misc Themes
 **** Grayscale
@@ -1440,6 +1319,7 @@ have a choice. In the future, I will pick and choose from Nano to adjust the lay
 (package! grayscale-theme)
 #+end_src
 It leetle much on the warm side for my tastes...
+
 **** Tao Themes
 Very appealing, minimalistic themes.
 
@@ -1463,8 +1343,6 @@ colors of your wallpaper. (Or other pictures).
               ewal-use-built-in-on-failure-p nil
               ewal-built-in-palette "sexy-material"))
 #+end_src
-
-
 
 *** Theme Magic
 In a stark difference to the other solutions, which wants to adjust Emacs to the buty of the
@@ -1518,41 +1396,6 @@ Allow for more characters in the branch name
 (setq doom-modeline-hud t)
 #+end_src
 
-*** Nano Modeline
-:PROPERTIES:
-:header-args: :tangle no
-:END:
-Nicolas P. Rougier spent a lot of effort creating beautiful, minimalistic themes
-for Emacs - some geared for scientific work, some for writing prose. While they
-are really pretty to look at, in my day to day business, they are a bit too
-minimalistic.
-
-One thing however that always stuck out for me was the brilliant NANO modeline.
-
-Ronisbr (https://github.com/ronisbr/doom-nano-modeline) attempted to port it to
-DOOM Emacs.
-
-#+begin_src elisp :tangle packages.el
-(package! doom-nano-modeline
-  :recipe (:host github
-  :repo "ronisbr/doom-nano-modeline"))
-#+end_src
-
-#+begin_src elisp
-(use-package! doom-nano-modeline
-  :config
-  (doom-nano-modeline-mode 1)
-  (global-hide-mode-line-mode 1))
-#+end_src
-
-**** Result:
-I'm a bit disappointed. It's very minimalistic, but without the colorscheme
-hiding the rough edges between e.g. treemacs and the modeline (which is still
-squished to the top of the page), the loss in useful information is not worth
-it.
-
-I'll keep it around for a bit, but I'm going back to doom modeline.
-
 ** UI
 *** General Padding
 The way windows have been close together always kind of botheres me. Luckily,
@@ -1565,99 +1408,36 @@ contortions.
 
 To actually use it, I need to find a better color scheme, where the edges aren't
 as jarring, but it's very promising. The individual spacings can be adjusted
-with the following:$HOME
+with the following:
 
 #+begin_src elisp
 (use-package! spacious-padding
   :config
-  (setq spacious-padding-width '(:internal-border-width 32 :header-line-width 16 :mode-line-width 16 :right-divider-width 30 :scroll-bar-width 8))
-  (setq spacious-padding-subtle-mode-line t))
+  (setq spacious-padding-width '(
+    :internal-border-width 15
+    :header-line-width 4
+    :mode-line-width 6
+    :tab-width 4
+    :right-divider-width 30
+    :scroll-bar-width 8)))
+#+end_src
 
+Furthermore, there's a "subtle mode line setting", Which subdues the modelines a
+bit. There's the possibility to target individual faces of the modelines and
+change them based on whether they're active or not  - but I'm content with just
+setting the modeline to have the window's background color.
+
+#+begin_src elisp
+(setq spacious-padding-subtle-mode-line t)
+#+end_src
+
+Now that everything's set up, I'm enabling the mode.
+
+#+begin_src elisp
 (spacious-padding-mode 1)
 #+end_src
 
-#+RESULTS:
-: t
-
 (The actual values obviously need to be tweaked though)
-
-** Dashboard
-
-I prefer something more simpler - also the dashboard can display SVGs:
-#+begin_src elisp
-(setq fancy-splash-image (concat doom-private-dir "splash-logos/emacs-logo-cutout.svg"))
-#+end_src
-# I don't really have much use for the Doom dashboard, so I'm replacing it with
-# the package [[https://github.com/emacs-dashboard/emacs-dashboard][Emacs Dashboard]].
-
-# - Install the package.
-# #+begin_src elisp :tangle packages.el
-# (package! dashboard)
-# #+end_src
-
-# Initialize the package
-# #+begin_src elisp
-# (use-package! dashboard
-#   :ensure t
-#   :config
-#   (dashboard-setup-startup-hook))
-
-# #+end_src
-
-# #+RESULTS:
-# : t
-
-# Show just a small text as startup banner, center the content and add a mix of widgets.
-# #+begin_src  elisp
-# (setq dashboard-startup-banner-logo-title "(emacs)")
-# (setq dashboard-startup-banner 2)
-# (setq dashboard-set-navigator t)
-# (setq dashboard-center-content t)
-# (setq dashboard-items '((bookmarks . 5)
-#                         (agenda . 5)))
-# (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-# (setq dashboard-set-heading-icons t)
-# (setq dashboard-set-file-icons t)
-# (setq dashboard-set-navigator t)
-# (setq dashboard-set-init-info t)
-# (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-#                                                    :height 1.1
-#                                                    :v-adjust -0.05
-#                                                    :face 'font-lock-keyword-face))
-# (setq dashboard-projects-switch-function 'projectile-persp-switch-project)
-# (setq doom-fallback-buffer-name "*dashboard*")
-# #+end_src
-
-# #+RESULTS:
-# : *dashboard*
-
-** Which-Key
-Which Key is a package that displays the keybindings for the current command in
-a popup. Especially in combination with evil-mode - which has a fantastic
-integration, it is very useful, especially for rarely used commands.
-
-Per default, which-key displays the keybindings for the current command in a
-popup at the bottom of the screen. This can be changed to either the side or the
-minibuffer, but all of those options don't appeal to me. Luckily, there is a
-[[https://github.com/tumashu/posframe][Posframe]] integration. Posframe is a package that displays a buffer in a child
-frame. This allows for much more flexibility in the placement of the popup.
-
-#+begin_src elisp :tangle packages.el
-;; (package! which-key-posframe)
-#+end_src
-
-There are some issues regarding the frame's height - sometimes the content is
-cut off. This seems to be an ongoing issue, as per [[https://github.com/yanghaoxie/which-key-posframe/issues/5][this Github issue]].
-
-The mentioned solution to use posframe's arghandler does not work anymore, as
-it is depcrecated. The recommended alternative is to use advise.
-
-#+begin_src elisp
-;; (defun wjb/posframe-arghandler (buffer-or-name arg-name value)
-;;   (let ((info '(:internal-border-width 2 :width 500 :height 48)))
-;;     (or (plist-get info arg-name) value)))
-;; (setq posframe-arghandler #'wjb/posframe-arghandler)
-#+end_src
 
 ** Ivy
 Ivy is a package that provides a completion framework for Emacs. It is
@@ -1741,685 +1521,6 @@ https://github.com/Alexander-Miller/treemacs/issues/1016
 
 There's a fix outlined in the GH issues, which I'm applying manually.
 
-#+begin_src elisp
-;; (treemacs-modify-theme
-;;  "all-the-icons"
-;;  :config
-;;  (progn
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("src-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("src-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("test-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("test-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("bin-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("bin-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("build-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("build-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("git-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("git-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("github-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("github-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("public-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("public-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("private-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("private-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("temp-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("tmp-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("temp-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("tmp-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("readme-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("docs-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("readme-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("docs-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("screenshots-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-right"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("icons-closed")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("screenshots-open")
-;;    :fallback
-;;    'same-as-icon)
-;;   (treemacs-create-icon
-;;    :icon
-;;    (format
-;;     "%s%s%s%s"
-;;     (all-the-icons-octicon
-;;      "chevron-down"
-;;      :height
-;;      0.75
-;;      :v-adjust
-;;      0.1
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab
-;;     (all-the-icons-octicon
-;;      "file-directory"
-;;      :v-adjust
-;;      0
-;;      :face
-;;      'treemacs-all-the-icons-file-face)
-;;     treemacs-all-the-icons-tab)
-;;    :extensions
-;;    ("icons-open")
-;;    :fallback
-;;    'same-as-icon)))
-#+end_src
-
 ** Vertico
 Prefix the current candidte with an arrow
 #+begin_src elisp
@@ -2469,6 +1570,7 @@ xwidget-webkit browser.
 #+begin_src elisp :tangle packages.el
 (package! k8s-mode)
 #+end_src
+
 * Performance
 Various tweaks to improve the overall performance.
 ** Raise the GC-Cons threshold
@@ -2495,16 +1597,5 @@ Various tweaks to improve the overall performance.
 
 ;; export github markdown
 (package! ox-gfm :pin "99f93011b069e02b37c9660b8fcb45dab086a07f")
-
-;; K8s
-(package! k8s-mode)
-
-;; Copilot
-;; (package! copilot
-;;   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
-
-;; Multiple major modes in one buffer
-(package! polymode)
-(package! poly-markdown)
 
 #+end_src

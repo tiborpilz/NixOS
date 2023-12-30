@@ -2,13 +2,13 @@
 
 (package! olivetti)
 
+(package! org-modern)
+
+(package! org-fragtog)
+
 (unpin! org-roam)
 (package! org-roam-ui)
 (package! websocket) ; dependency of `org-roam-ui'
-
-(package! org-gcal)
-
-(package! org-present)
 
 (package! jest)
 
@@ -26,16 +26,11 @@
 
 (package! jsonnet-mode)
 
-(use-package dhall-mode
-  :config (setq dhall-use-header-line nil))
-
 (package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
 
 (package! lab)
 
 (package! devdocs)
-
-;; (package! dash-docs)
 
 (package! gptel)
 
@@ -71,13 +66,7 @@
 
 (package! kurecolor)
 
-(package! doom-nano-modeline
-  :recipe (:host github
-  :repo "ronisbr/doom-nano-modeline"))
-
 (package! spacious-padding)
-
-;; (package! which-key-posframe)
 
 (package! all-the-icons-ivy-rich)
 
@@ -100,14 +89,3 @@
 
 ;; export github markdown
 (package! ox-gfm :pin "99f93011b069e02b37c9660b8fcb45dab086a07f")
-
-;; K8s
-(package! k8s-mode)
-
-;; Copilot
-;; (package! copilot
-;;   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
-
-;; Multiple major modes in one buffer
-(package! polymode)
-(package! poly-markdown)
