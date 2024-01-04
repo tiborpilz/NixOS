@@ -5,7 +5,7 @@ PROJECTS_DIR=${PROJECTS_DIR:-~/Code}
 
 # Test
 project_dirs() {
-  find "$PROJECTS_DIR" -maxdepth 1 -type d -not -path "$PROJECTS_DIR" | sort | xargs --max-lines=1 basename
+  find "$PROJECTS_DIR" -maxdepth 1 -type d -not -path "$PROJECTS_DIR" | sort | xargs -L 1 basename
 }
 
 query=${1:-''}

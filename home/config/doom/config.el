@@ -22,10 +22,10 @@
 (setq calendar-week-start-day 1) ;; start on monday
 (setq org-agenda-include-diary t)
 
-(setq doom-font (font-spec :family "Iosevka" :size 16)
-      doom-big-font (font-spec :family "Iosevka" :size 28 :weight 'normal)
-      doom-unicode-font (font-spec :family "Iosevka" :size 16 :weight 'normal)
-      doom-variable-pitch-font (font-spec :family "Iosevka" :size 16 :weight 'demibold))
+(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
+      doom-big-font (font-spec :family "FiraCode Nerd Font" :size 28 :weight 'normal)
+      doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'normal)
+      doom-variable-pitch-font (font-spec :family "Iosevka Slab" :size 14 :weight 'demibold))
 
 (let* ((variable-tuple '(:font "Iosevka Slab"))
        (headline `(:inherit default :weight black)))
