@@ -71,7 +71,7 @@ in
         set -g status-position top
         set -g status-justify left
         set -g status-bg colour8
-        set -g status-fg white
+        set -g status-fg colour4
 
         set -g window-status-format ' #W '
         set -g window-status-current-style 'bg=default,fg=colour15'
