@@ -20,13 +20,6 @@
 
   programs.zsh.enable = true;
 
-  users.users.tibor = {
-    uid = 1000;
-    extraGroups = [ "wheel" ];
-    isNormalUser = true;
-    password = "password";
-  };
-
   environment.systemPackages = with pkgs; [
     tmux
     vim
