@@ -9,6 +9,14 @@ Set Name and mail adress
       user-mail-address "tibor@pilz.berlin")
 #+end_src
 
+** Font settings
+#+begin_src elisp
+(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
+      doom-big-font (font-spec :family "FiraCode Nerd Font" :size 28 :weight 'normal)
+      doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'normal)
+      doom-variable-pitch-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'normal))
+#+end_src
+
 ** Line numbers
 Since I'm using Evil/vim-keybindings, I prefer relative line numbers as default.
 #+begin_src elisp
@@ -24,6 +32,14 @@ Since I'm using Evil/vim-keybindings, I prefer relative line numbers as default.
 ** Editorconfig
 #+begin_src elisp :tangle packages.el
 (package! editorconfig)
+#+end_src
+
+** Splash Screen
+*** Splash Image
+I've created a custom SVG with transparency and shadow effects that should go
+well with a variety of color schemes.
+#+begin_src elisp
+(setq fancy-splash-image (concat doom-private-dir "splash-logos/emacs-logo-cutout.svg"))
 #+end_src
 
 * Utils
@@ -55,16 +71,7 @@ Small utility to add a function to multiple hooks at once.
 
 ** Visual improvements
 *** Typography
-Base font settings
-#+begin_src elisp
-(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
-      doom-big-font (font-spec :family "FiraCode Nerd Font" :size 28 :weight 'normal)
-      doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'normal)
-      doom-variable-pitch-font (font-spec :family "Iosevka Slab" :size 14 :weight 'demibold))
-#+end_src
-
-Headline adjustments. They should be different in sice, not in color.
-
+Change font sizes for diferent headline levels.
 #+begin_src elisp
 (let* ((variable-tuple '(:font "Iosevka Slab"))
        (headline `(:inherit default :weight black)))
