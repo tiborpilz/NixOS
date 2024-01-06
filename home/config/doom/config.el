@@ -1,9 +1,16 @@
 (setq user-full-name "Tibor Pilz"
       user-mail-address "tibor@pilz.berlin")
 
+(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
+      doom-big-font (font-spec :family "FiraCode Nerd Font" :size 28 :weight 'normal)
+      doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'normal)
+      doom-variable-pitch-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'normal))
+
 (setq display-line-numbers-type 'relative)
 
 (setq tab-width 2)
+
+(setq fancy-splash-image (concat doom-private-dir "splash-logos/emacs-logo-cutout.svg"))
 
 (defun add-hooks (hook-list function)
   "Add FUNCTION to all hooks in HOOK-LIST."
@@ -21,11 +28,6 @@
 (setq org-return-follows-link 1)
 (setq calendar-week-start-day 1) ;; start on monday
 (setq org-agenda-include-diary t)
-
-(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
-      doom-big-font (font-spec :family "FiraCode Nerd Font" :size 28 :weight 'normal)
-      doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'normal)
-      doom-variable-pitch-font (font-spec :family "Iosevka Slab" :size 14 :weight 'demibold))
 
 (let* ((variable-tuple '(:font "Iosevka Slab"))
        (headline `(:inherit default :weight black)))
