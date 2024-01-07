@@ -39,8 +39,7 @@ in
       zsh-completions
       zsh-syntax-highlighting
       nix-zsh-completions
-      eza
-      fasd
+      eza # drop-in replacement for ls
       fd
       fzf
       jq
@@ -51,7 +50,6 @@ in
       krew
       nodejs
       coreutils
-      wakatime
 
       #Markdown View
       glow
@@ -74,9 +72,13 @@ in
       # eval $(thefuck --alias)
     '';
 
-    modules.shell.zsh.aliases.xclip = "xclip -selection clipboard";
+    modules.shell.zsh.aliases = {
+      xclip = "xclip -selection clipboard";
+      nix-shell = "nix-shell --run zsh"; # keep using zsh in nix shell
 
-    modules.shell.zsh.aliases.nix-shell = "nix-shell --run zsh";
+      # Tools that can be used as drop-in replacements
+      ls = "eza";
+    };
 
     xdg.configFile."zsh" = { source = "${configDir}/zsh"; recursive = true; };
 
@@ -96,13 +98,13 @@ in
     '';
 
     # Picks up all files in all `home.packages` that contain '#compdef' and puts them into one completion directory.
-    # xdg.configFile."zsh/vendor-completions".source = with pkgs;
-    #   runCommandNoCC "vendored-zsh-completions" {} ''
-    #     mkdir -p $out
-    #     ${fd}/bin/fd -t f '^_[^.]+$' \
-    #       ${lib.escapeShellArgs home.packages} \
-    #       --exec ${ripgrep}/bin/rg -0l '^#compdef' {} \
-    #       | xargs -0 cp -n -t $out/
-    #   '';
+    xdg.configFile."zsh/vendor-completions".source = with pkgs;
+      runCommandNoCC "vendored-zsh-completions" {} ''
+        mkdir -p $out
+        ${fd}/bin/fd -t f '^_[^.]+$' \
+          ${lib.escapeShellArgs home.packages} \
+          --exec ${ripgrep}/bin/rg -0l '^#compdef' {} \
+          | xargs -0 cp -n -t $out/
+      '';
   };
 }
