@@ -591,6 +591,8 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
   :after treemacs
   :config (treemacs-load-theme "nerd-icons"))
 
+(add-hook 'treemacs-mode-hook #'hide-mode-line-mode)
+
 (defun minibuffer-format-candidate (orig cand prefix suffix index _start)
   (let ((prefix (if (= vertico--index index)
                     "  " "   ")))

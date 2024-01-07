@@ -1530,6 +1530,12 @@ https://github.com/Alexander-Miller/treemacs/issues/1016
 
 There's a fix outlined in the GH issues, which I'm applying manually.
 
+*** Modeline
+I don't really need the modeline in the treemacs buffer, so I'm disabling it.
+
+#+begin_src elisp
+(add-hook 'treemacs-mode-hook #'hide-mode-line-mode)
+#+end_src
 ** Vertico
 Prefix the current candidte with an arrow
 #+begin_src elisp
