@@ -633,7 +633,6 @@ Register the astro-ls binary for lsp support.
                     :server-id 'astro-ls)))
 #+end_src
 
-
 **** Tailwind
 Add the tailwind lsp package
 #+begin_src elisp :tangle packages.el
@@ -651,9 +650,10 @@ Add the tailwind lsp package
 #+end_src
 
 **** Code formatting
-Set typescript file indentation to be 2 levels by default.
+Set typescript, javascript and json file indentation to be 2 levels by default.
 #+begin_src elisp
 (setq typescript-indent-level 2)
+(setq js-indent-level 2)
 #+end_src
 
 **** TODO Typescript REPL
@@ -1039,7 +1039,7 @@ Set ~capf~ as completion provider.
 Don't show completion item detail
 
 #+begin_src elisp
-;; (setq lsp-completion-show-detail t)
+(setq lsp-completion-show-detail t)
 #+end_src
 
 Show completion item kind
@@ -1050,8 +1050,8 @@ Show completion item kind
 
 Automatically start LSP on file open, guess root.
 #+begin_src elisp
-;; (setq lsp-auto-guess-root t)
-;; (add-hook 'prog-mode-hook #'lsp-deferred)
+(setq lsp-auto-guess-root t)
+(add-hook 'prog-mode-hook #'lsp-deferred)
 #+end_src
 
 **** UI
@@ -1087,7 +1087,7 @@ Same with signature help, as well as help documentation
 
 Set lsp-ui-doc sizing
 #+begin_src elisp
-(setq lsp-ui-doc-max-height 20
+(setq lsp-ui-doc-max-height 40
       lsp-ui-doc-max-width 80)
 #+end_src
 
