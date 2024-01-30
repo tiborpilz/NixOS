@@ -300,6 +300,7 @@
   (setq lsp-tailwindcss-add-on-mode t))
 
 (setq typescript-indent-level 2)
+(setq js-indent-level 2)
 
 (use-package! nix-mode
   :mode "\\.nix\\'")
@@ -447,12 +448,12 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (setq lsp-completion-provider :capf)
 
-;; (setq lsp-completion-show-detail t)
+(setq lsp-completion-show-detail t)
 
 (setq lsp-completion-show-kind t)
 
-;; (setq lsp-auto-guess-root t)
-;; (add-hook 'prog-mode-hook #'lsp-deferred)
+(setq lsp-auto-guess-root t)
+(add-hook 'prog-mode-hook #'lsp-deferred)
 
 (map! :leader
       (:prefix ("c" . "code")
@@ -467,7 +468,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (setq lsp-signature-auto-activate nil)
 (setq lsp-signature-render-documentation nil)
 
-(setq lsp-ui-doc-max-height 20
+(setq lsp-ui-doc-max-height 40
       lsp-ui-doc-max-width 80)
 
 (eval-after-load 'git-timemachine
