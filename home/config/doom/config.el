@@ -568,7 +568,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
     :internal-border-width 15
     :header-line-width 4
     :mode-line-width 6
-    :tab-width 4
+    :tab-width 8
     :right-divider-width 30
     :scroll-bar-width 8)))
 
