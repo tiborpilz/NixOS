@@ -1598,6 +1598,10 @@ Various tweaks to improve the overall performance.
 (setq read-process-output-max (* 4 1024 1024)) ;; 4mb
 #+end_src
 
+** Ignore JSONRPC logs
+#+begin_src elisp
+(fset #'jsonrpc--log-event #'ignore)
+#+end_src
 * Unsorted Packages
 #+begin_src elisp :tangle packages.el
 
