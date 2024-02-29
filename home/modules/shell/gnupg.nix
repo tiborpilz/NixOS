@@ -47,7 +47,6 @@ in
     };
     home.file.".gnupg/scdaemon.conf" = {
       text = ''
-        pcsc-driver /usr/lib/libpcsclite.so
         card-timeout 5
         disable-ccid
       '';
