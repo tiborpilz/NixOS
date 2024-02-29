@@ -2,3 +2,4 @@
 .gitlab-ci-local
 **/.DS_Store
 .volarrc
+.dir-locals.el
