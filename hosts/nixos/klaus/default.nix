@@ -27,22 +27,22 @@ with lib;
 
     networking.useDHCP = false;
 
-    # networking.wg-quick.interfaces = {
-    #  wg0 = {
-    #    address = [ "10.0.0.2/24" "fdc9:281f:04d7:9ee9::2/64" ];
-    #    dns = [ "10.0.0.1" "fdc9:281f:04d7:9ee9::1" ];
-    #    privateKeyFile = "/var/lib/wireguard/private.key";
+    networking.wg-quick.interfaces = {
+     wg0 = {
+       address = [ "10.0.0.2/24" "fdc9:281f:04d7:9ee9::2/64" ];
+       dns = [ "10.0.0.1" "fdc9:281f:04d7:9ee9::1" ];
+       privateKeyFile = "/var/lib/wireguard/private.key";
 
-    #    peers = [
-    #      {
-    #        publicKey = "QzJm9puVez50UZbCUAJYZnqBdW19o1tBU0Q/WXZsbyw=";
-    #        allowedIPs = [ "0.0.0.0/0" "::/0" ];
-    #        endpoint = "159.69.194.44:51820";
-    #        persistentKeepalive = 25;
-    #      }
-    #    ];
-    #  };
-    #};
+       peers = [
+         {
+           publicKey = "QzJm9puVez50UZbCUAJYZnqBdW19o1tBU0Q/WXZsbyw=";
+           allowedIPs = [ "0.0.0.0/0" "::/0" ];
+           endpoint = "159.69.194.44:51820";
+           persistentKeepalive = 25;
+         }
+       ];
+     };
+    };
 
     # networking.useNetworkd = false;
 
