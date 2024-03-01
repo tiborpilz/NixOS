@@ -31,10 +31,10 @@ set updatetime=1000
 let mapleader = ","
 
 " Install Plugins automatically if they're missing.
-autocmd VimEnter *
-  \ if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
-  \|  PlugInstall --sync | q
-  \| endif
+" autocmd VimEnter *
+"   \ if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
+"   \|  PlugInstall --sync | q
+"   \| endif
 
 " Load plugins
 source $HOME/.config/nvim/plugins.vim

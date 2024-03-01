@@ -15,6 +15,10 @@ in
       neovim
     ];
 
-    # xdg.configFile."nvim" = { source = ../../config/neovim; recursive = true; };
+    modules.shell.zsh.aliases = {
+      vim = "nvim";
+    };
+
+    xdg.configFile."nvim" = { source = ../../config/neovim; recursive = true; };
   };
 }

@@ -76,6 +76,9 @@ in
       xclip = "xclip -selection clipboard";
       nix-shell = "nix-shell --run zsh"; # keep using zsh in nix shell
 
+      # speeds up non-scoped npm installs
+      nci = "npm_config_registry=https://registry.npmjs.org/ npm ci";
+
       # Tools that can be used as drop-in replacements
       ls = "eza";
     };
