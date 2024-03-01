@@ -8,6 +8,7 @@ let
   calibreWebPort = 8083;
   calibreConfigDir = "/var/lib/calibre/config";
   calibreWebConfigDir = "/var/lib/calibre-web/config";
+  mediaDir = "/data/media";
   cfg = config.modules.services.media.calibre;
 in
 {
@@ -19,6 +20,7 @@ in
     system.activationScripts.makeCalibreDir = stringAfter [ "var" ] ''
       mkdir -p ${calibreConfigDir}
       mkdir -p ${calibreWebConfigDir}
+      mkdir -p ${mediaDir}/books
     '';
 
     virtualisation.oci-containers.containers.calibre = {
@@ -29,7 +31,7 @@ in
       ];
       volumes = [
         "${calibreConfigDir}:/config"
-        "/data/media/books:/books"
+        "${mediaDir}/books:/books"
       ];
       environment = {
         "TZ" = "Europe/Berlin";
