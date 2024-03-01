@@ -20,7 +20,7 @@ in
 
     virtualisation.oci-containers.containers.komga = {
       image = "gotson/komga:latest";
-      ports = [ "${toString publicPort}:8080" ];
+      ports = [ "${toString publicPort}:25600" ];
       volumes = [
         "${configDir}:/config"
         "${dataDir}:/data"
