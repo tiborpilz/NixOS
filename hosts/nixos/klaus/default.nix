@@ -15,34 +15,33 @@ with lib;
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
 
+    boot.supportedFilesystems = [ "zfs" ];
+    boot.zfs.forceImportRoot = false;
+
     networking.hostName = "klaus";
+    networking.hostId = "a5fdeadb";
+
     time.timeZone = "Europe/Berlin";
 
 
     networking.useDHCP = false;
-    networking.interfaces.enp8s0.useDHCP = false;
 
-    networking.interfaces.wlp4s0.ipv4.addresses = [{
-      address = "192.168.2.68";
-      prefixLength = 24;
-    }];
+    # networking.wg-quick.interfaces = {
+    #  wg0 = {
+    #    address = [ "10.0.0.2/24" "fdc9:281f:04d7:9ee9::2/64" ];
+    #    dns = [ "10.0.0.1" "fdc9:281f:04d7:9ee9::1" ];
+    #    privateKeyFile = "/var/lib/wireguard/private.key";
 
-    networking.wg-quick.interfaces = {
-      wg0 = {
-        address = [ "10.0.0.2/24" "fdc9:281f:04d7:9ee9::2/64" ];
-        dns = [ "10.0.0.1" "fdc9:281f:04d7:9ee9::1" ];
-        privateKeyFile = "/var/lib/wireguard/private.key";
-
-        peers = [
-          {
-            publicKey = "QzJm9puVez50UZbCUAJYZnqBdW19o1tBU0Q/WXZsbyw=";
-            allowedIPs = [ "0.0.0.0/0" "::/0" ];
-            endpoint = "159.69.194.44:51820";
-            persistentKeepalive = 25;
-          }
-        ];
-      };
-    };
+    #    peers = [
+    #      {
+    #        publicKey = "QzJm9puVez50UZbCUAJYZnqBdW19o1tBU0Q/WXZsbyw=";
+    #        allowedIPs = [ "0.0.0.0/0" "::/0" ];
+    #        endpoint = "159.69.194.44:51820";
+    #        persistentKeepalive = 25;
+    #      }
+    #    ];
+    #  };
+    #};
 
     # networking.useNetworkd = false;
 
@@ -75,8 +74,7 @@ with lib;
       htop
     ];
 
-    users.extraUsers.root.password = "";
-    users.mutableUsers = false;
+    users.mutableUsers = true;
 
     users.users.tibor = {
       uid = 1000;
