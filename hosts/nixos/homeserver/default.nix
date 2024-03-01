@@ -174,7 +174,7 @@ with lib;
           sopsFile = config.sops.secrets.deluge.path;
         };
         komga.enable = true;
-        plex.enable = false;
+        plex.enable = true;
         immich.enable = true;
       };
     };
