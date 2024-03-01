@@ -4,6 +4,7 @@ with lib.my;
 
 let
   dataDir = "/data/media/immich";
+  photoDir = "/data/media/photos";
   publicPort = 2283;
   cfg = config.modules.services.media.immich;
 in
@@ -31,6 +32,7 @@ in
   config = mkIf cfg.enable {
     system.activationScripts.immich = stringAfter [ "var" ] ''
       mkdir -p ${dataDir}/upload
+      mkdir -p ${photoDir}
     '';
 
     modules.podgroups.pods.immich = {
@@ -41,7 +43,7 @@ in
         cmd = [ "start-server.sh" ];
         volumes = [
           "${dataDir}/upload:/usr/src/app/upload"
-          "/data/media/photos:/data/media/photos"
+          "${photoDir}:/data/media/photos"
           "/etc/localtime:/etc/localtime:ro"
         ];
         environment = {
