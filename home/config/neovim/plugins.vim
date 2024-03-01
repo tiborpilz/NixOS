@@ -150,7 +150,7 @@ colorscheme nightfox
 lua require('lsp-config')
 
 " Mason settings
-lua require('mason')
+lua require('mason-setup')
 
 " Diagnostics Settings
 lua require('diagnostics')
@@ -167,7 +167,7 @@ lua require('lsp-signature')
 lua require('iron-config')
 
 " Neorg setup
-lua require('neorg')
+lua require('neorg-setup')
 
 " Dashboard settings
 let g:dashboard_custom_header = [
