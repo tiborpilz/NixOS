@@ -17,6 +17,7 @@ with lib;
 
     boot.supportedFilesystems = [ "zfs" ];
     boot.zfs.forceImportRoot = false;
+    boot.zfs.extraPools = [ "zpool" ];
 
     networking.hostName = "klaus";
     networking.hostId = "a5fdeadb";
@@ -51,7 +52,9 @@ with lib;
 
     i18n.defaultLocale = "en_US.UTF-8";
 
-    services.logind.lidSwitch = "ignore";
+    services.zfs.autoScrub.enable = true;
+
+    services.nfs.server.enable = true;
 
     fileSystems = {
       "/".label = "nixos-root";
