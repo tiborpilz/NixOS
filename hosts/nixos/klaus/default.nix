@@ -19,6 +19,8 @@ with lib;
     boot.zfs.forceImportRoot = false;
     boot.zfs.extraPools = [ "zpool" ];
 
+    boot.kernelParams = [ "cpufreq.default_governor=conservative" ];
+
     networking.hostName = "klaus";
     networking.hostId = "a5fdeadb";
 
@@ -26,7 +28,6 @@ with lib;
 
 
     networking.useDHCP = false;
-
     networking.wg-quick.interfaces = {
      wg0 = {
        address = [ "10.0.0.2/24" "fdc9:281f:04d7:9ee9::2/64" ];
@@ -43,12 +44,25 @@ with lib;
        ];
      };
     };
-
-    # networking.useNetworkd = false;
-
     networking.firewall.enable = false;
-
     networking.networkmanager.enable = true;
+
+
+    hardware.opengl = {
+      enable = true;
+      driSupport = true;
+      driSupport32Bit = true;
+    };
+
+    services.xserver.videoDrivers = ["nvidia"];
+
+    hardware.nvidia = {
+      modesetting.enable = true;
+      powerManagement.enable = true;
+      open = false; # The proprietary one is just better :(
+      nvidiaSettings = true;
+      package = config.boot.kernelPackages.nvidiaPackages.stable;
+    };
 
     i18n.defaultLocale = "en_US.UTF-8";
 
@@ -171,7 +185,7 @@ with lib;
           sopsFile = config.sops.secrets.deluge.path;
         };
         komga.enable = true;
-        plex.enable = false;
+        plex.enable = true;
         immich.enable = true;
       };
     };
