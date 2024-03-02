@@ -163,6 +163,9 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
+    # TODO: turn this into a custom module with reverse proxy settings
+    services.jellyfin.enable = true;
+
     modules.services = {
       syncthing.enable = true;
       tandoor.enable = true;
