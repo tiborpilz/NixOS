@@ -188,7 +188,10 @@ with lib;
           sopsFile = config.sops.secrets.deluge.path;
         };
         komga.enable = true;
-        plex.enable = true;
+        plex = {
+          enable = true;
+          allowedNetworks = "192.168.2.1/24";
+        };
         immich.enable = true;
       };
     };
