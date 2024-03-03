@@ -31,19 +31,20 @@ with lib;
     networking.wg-quick.interfaces = {
      wg0 = {
        address = [ "10.0.0.2/24" "fdc9:281f:04d7:9ee9::2/64" ];
-       dns = [ "10.0.0.1" "fdc9:281f:04d7:9ee9::1" ];
+       # dns = [ "10.0.0.1" "fdc9:281f:04d7:9ee9::1" ];
        privateKeyFile = "/var/lib/wireguard/private.key";
 
        # Route Plex traffic differently - plex IP is hardcoded and might break
-       preUp = "ip route add 54.246.167.176/32 via 192.168.2.1 dev enp8s0";
-       postDown = "ip route del 54.246.167.176/32 via 192.168.2.1 dev enp8s0";
+       # preUp = "ip route add 54.246.167.176/32 via 192.168.2.1 dev enp8s0";
+       # postDown = "ip route del 54.246.167.176/32 via 192.168.2.1 dev enp8s0";
 
        peers = [
          {
            publicKey = "QzJm9puVez50UZbCUAJYZnqBdW19o1tBU0Q/WXZsbyw=";
 
            # TODO: we actually only want to set wireguard for *incoming* connections to klaus
-           allowedIPs = [ "0.0.0.0/0" "::/0" ];
+           # allowedIPs = [ "0.0.0.0/0" "::/0" ];
+           allowedIPs = [ "10.0.0.0/24" "fdc9:281f:04d7:9ee9::/64" ];
            endpoint = "159.69.194.44:51820";
            persistentKeepalive = 25;
          }
@@ -138,6 +139,8 @@ with lib;
         '';
       };
     };
+
+    services.cloudflared.enable = false;
 
     # Seems like a bug in systemd, more info: https://github.com/NixOS/nixpkgs/issues/180175#issuecomment-1273827251
     systemd.services.NetworkManager-wait-online.enable = false;
