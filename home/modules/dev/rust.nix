@@ -10,7 +10,7 @@ in
   config = lib.mkIf cfg.enable {
     # Packages for rust development
     home.packages = with pkgs; [
-      rustup # contains rustc, cargo, rustdoc, rustfmt, etc.
+      unstable.rustup # contains rustc, cargo, rustdoc, rustfmt, etc.
       cargo-watch # cargo subcommand for watching files and running commands
       cargo-make # cargo subcommand for running tasks defined in a toml file
     ];
