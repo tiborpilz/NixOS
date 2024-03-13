@@ -9,11 +9,24 @@ in
   };
   config = lib.mkIf cfg.enable {
     home.packages = with pkgs; [
+      # it's pronounced kubernetes not kubernetes
       kubectl
+      kubernetes-helm
+      kustomize
       # backup management
       velero
       # plugins
       krew
+
+      # Rancher Kubernetes Engine
+      rke
+
+      # iac n stuff
+      terraform
+      opentofu
+      # Terraform
+      terraform
+      unstable.terragrunt
     ];
   };
 }
