@@ -19,6 +19,9 @@ in
   config = mkIf cfg.enable {
     system.activationScripts.makePlexDir = stringAfter [ "var" ] ''
       mkdir -p ${plexConfigDir}
+      mkdir -p /data/media/tv
+      mkdir -p /data/media/movies
+      mkdir -p /data/media/anime
     '';
 
     modules.services.reverseProxy.proxies.plex.publicPort = 32400;
@@ -29,6 +32,7 @@ in
         "${plexConfigDir}:/config"
         "/data/media/tv:/tv"
         "/data/media/movies:/movies"
+        "/data/media/anime:/anime"
       ];
       environment = {
         "TZ" = "Europe/Berlin";
