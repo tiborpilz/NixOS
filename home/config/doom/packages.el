@@ -30,6 +30,8 @@
 
 (package! lab)
 
+(package! diff-ansi)
+
 (package! devdocs)
 
 (package! gptel)

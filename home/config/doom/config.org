@@ -1130,6 +1130,10 @@ Add some keybindings und ~SPC g~ (Git)
       :desc "List all owned projects" "g l o" #'lab-list-all-owned-projects)
 #+end_src
 
+**** Delta as Git Diff
+#+begin_src elisp :tangle packages.el
+(package! diff-ansi)
+#+end_src
 *** Documentation
 **** Devdocs
 Devdocs (https://elpa.gnu.org/packages/devdocs.html) is a package for viewing

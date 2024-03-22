@@ -76,7 +76,6 @@
        (dired +icons)          ; making dired pretty [functional]
        electric          ; smarter, keyword-based electric-indent
        (ibuffer +icons)         ; interactive buffer management
-       tramp
        undo              ; persistent, smarter undo for your inevitable mistakes
        vc                ; version-control and Emacs, sitting in a tree
 
@@ -116,8 +115,8 @@
        ;;upload            ; map local to remote projects via ssh/ftp
 
        :os
-       (macos)  ; improve compatibility with macOS
-       (tty +osc)               ; improve the terminal Emacs experience
+       (macos)             ; improve compatibility with macOS
+       (tty +osc)          ; improve the terminal Emacs experience
 
        :lang
        ;;agda              ; types of types of types of types...

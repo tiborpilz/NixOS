@@ -18,6 +18,7 @@ in
       gitAndTools.git-open
       gitAndTools.diff-so-fancy
       gitAndTools.git-crypt
+      difftastic
       act
     ];
 
