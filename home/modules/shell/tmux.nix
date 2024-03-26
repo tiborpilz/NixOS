@@ -29,6 +29,7 @@ in
         tmuxPlugins.net-speed
         tmuxPlugins.cpu
         tmuxPlugins.sidebar
+        tmuxPlugins.tmux-fzf
       ];
 
       baseIndex = 1;
@@ -53,6 +54,12 @@ in
 
         # Attach current directory to session
         bind a attach -c "#{pane_current_path}"
+
+        # Use tmux-fzf to switch sessions
+        bind-key S run-shell -b "${pkgs.tmuxPlugins.tmux-fzf}/share/tmux-plugins/tmux-fzf/scripts/session.sh switch"
+
+        # Use tmux-fzf to switch windows
+        bind-key W run-shell -b "${pkgs.tmuxPlugins.tmux-fzf}/share/tmux-plugins/tmux-fzf/scripts/window.sh switch"
 
         # Reload tmux config with prefix + r
         bind-key r source-file $XDG_CONFIG_HOME/tmux/tmux.conf
@@ -134,6 +141,7 @@ in
       TMUX_HOME = "${config.home.sessionVariables.XDG_CONFIG_HOME}/tmux";
       TMUXIFIER = "${config.home.sessionVariables.XDG_CONFIG_HOME}/tmuxifier";
       TMUXIFIER_LAYOUT_PATH = "${config.home.sessionVariables.XDG_CONFIG_HOME}/tmuxifier";
+      TMUX_FZF_OPTIONS = "-p -w 75% -h 66% -m";
     };
   };
 }
