@@ -297,7 +297,9 @@
 (use-package! lsp-tailwindcss
   :defer t
   :init
-  (setq lsp-tailwindcss-add-on-mode t))
+  (setq lsp-tailwindcss-add-on-mode t)
+  (setq lsp-tailwindcss-major-modes '(rjsx-mode web-mode html-mode css-mode typescript-mode typescript-tsx-mode rust-mode rustic-mode))
+  )
 
 (setq typescript-indent-level 2)
 (setq js-indent-level 2)
@@ -341,6 +343,8 @@
   ;; Start language server when jsonnet-mode is enabled
   (add-hook 'jsonnet-mode-hook #'lsp-deferred))
 
+(setq lsp-rust-features "all")
+
 (setq company-idle-delay 0.1 ;; How long to wait before popping up
       company-minimum-prefix-length 1 ;; Show the menu after one key press
       company-tooltip-limit 10 ;; Limit on how many options to display
@@ -362,10 +366,10 @@
           (copilot-mode . (lambda ()
                             (setq-local copilot--indent-warning-printed-p t)))
           :bind (:map copilot-completion-map
-                ("C-SPC" . 'copilot-accept-completion)
-                ("C-<spc>" . 'copilot-accept-completion)
-                ("C-S-p" . 'copilot-previous-completion)
-                ("C-S-n" . 'copilot-next-completion)))
+              ("C-<space>" . 'copilot-accept-completion)
+              ("C-SPC" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)))
 
 (map! :leader
       (:prefix-map ("i" . "insert")

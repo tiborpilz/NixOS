@@ -646,7 +646,9 @@ Add the tailwind lsp package
 (use-package! lsp-tailwindcss
   :defer t
   :init
-  (setq lsp-tailwindcss-add-on-mode t))
+  (setq lsp-tailwindcss-add-on-mode t)
+  (setq lsp-tailwindcss-major-modes '(rjsx-mode web-mode html-mode css-mode typescript-mode typescript-tsx-mode rust-mode rustic-mode))
+  )
 #+end_src
 
 **** Code formatting
@@ -793,6 +795,11 @@ Then, I'm setting up lsp support.
   (add-hook 'jsonnet-mode-hook #'lsp-deferred))
 #+end_src
 
+*** Rust
+**** Set LSP features to "all"
+#+begin_src elisp
+(setq lsp-rust-features "all")
+#+end_src
 ** Tools
 *** Code Completion
 Since it's already integrated into Doom Emacs, I'm using company for code
@@ -857,10 +864,10 @@ https://github.com/zerolfx/copilot.el/issues/220), and binding some keys.
           (copilot-mode . (lambda ()
                             (setq-local copilot--indent-warning-printed-p t)))
           :bind (:map copilot-completion-map
-                ("C-SPC" . 'copilot-accept-completion)
-                ("C-<spc>" . 'copilot-accept-completion)
-                ("C-S-p" . 'copilot-previous-completion)
-                ("C-S-n" . 'copilot-next-completion)))
+              ("C-<space>" . 'copilot-accept-completion)
+              ("C-SPC" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)))
 #+end_src
 
 In insert mode, I'm binding  ~C-SPC~ to accept the complete suggestion. I'm also binding ~C-S-p~ and ~C-S-n~ to navigate through the suggestions.
