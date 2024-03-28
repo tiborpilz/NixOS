@@ -84,10 +84,3 @@
 
 ;; HTTP requests via babel
 (package! ob-http :pin "b1428ea2a63bcb510e7382a1bf5fe82b19c104a7")
-
-;; OrgRoam visualization / webapp
-
-;; automatic latex rendering
-
-;; export github markdown
-(package! ox-gfm :pin "99f93011b069e02b37c9660b8fcb45dab086a07f")

@@ -264,9 +264,15 @@
 
 (setq projectile-project-search-path '(("~/Code/" . 1)))
 
+(setq +workspaces-on-switch-project-behavior nil)
+
 (use-package! jest
   :after (typescript-mode js-mode typescript-tsx-mode)
   :hook (typescript-mode . jest-minor-mode))
+
+;; (advice-add 'lsp
+;;             :before (lambda (&rest _args)
+;;                       (setf (lsp-session-server-id->folders (lsp-session)) (ht))))
 
 (use-package! svelte-mode
     :mode "\\.svelte\\'")
@@ -566,6 +572,10 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (setq doom-modeline-hud t)
 
+(setq doom-modeline-buffer-encoding nil)
+(setq doom-modeline-modal nil)
+(setq doom-modeline-column-format "")
+
 (use-package! spacious-padding
   :config
   (setq spacious-padding-width '(
@@ -600,7 +610,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (defun minibuffer-format-candidate (orig cand prefix suffix index _start)
   (let ((prefix (if (= vertico--index index)
-                    "  " "   ")))
+                    " > " "   ")))
     (funcall orig cand prefix suffix index _start)))
 
 (advice-add #'vertico--format-candidate
@@ -609,6 +619,11 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (setq vertico-count-format nil)
 
 (setq vertico-posframe-width 200)
+
+(setq vertico-posframe-parameters
+      '((left-fringe . 16)
+        (right-fringe . 8)
+        (border-width . 16)))
 
 (use-package! xwwp-full
   :after xwidget-webkit
