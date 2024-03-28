@@ -541,13 +541,19 @@ no modeline.
         (org-capture)))
 #+END_SRC
 
-* Projectile
-** Project Search Path
+* Workspaces & Projects
+** Projectile Project Search Path
 Search for projects in  ~~/Code/~, but only one level deep.
 #+begin_src elisp
 (setq projectile-project-search-path '(("~/Code/" . 1)))
 #+end_src
+** Disable Automatic Workspace Creation
+Per default, emacs creates a workspace for every project - prohibiting, for
+instance, side-by-side editing. I'm disabling this behavior.
 
+#+begin_src elisp
+(setq +workspaces-on-switch-project-behavior nil)
+#+end_src
 * Development
 ** Language-Specific Settings
 *** Web Dev (JS/TS/CSS)
@@ -562,6 +568,22 @@ Search for projects in  ~~/Code/~, but only one level deep.
   :after (typescript-mode js-mode typescript-tsx-mode)
   :hook (typescript-mode . jest-minor-mode))
 #+end_src
+**** TODO Eslint
+Eslint keeps track of all projects it has been run in, and - even if only one
+workspace is open, will start to run in all of them.
+The following sets it to run only in the current session.
+
+#+begin_src elisp
+;; (advice-add 'lsp
+;;             :before (lambda (&rest _args)
+;;                       (setf (lsp-session-server-id->folders (lsp-session)) (ht))))
+#+end_src
+
+Now, this runs into the issue that switching workspaces will not automatically
+switch the client, so I'm adding a hook to restart all lsp clients when I'm
+switching workspaces.
+
+First, I need to define a function to restart all clients.
 **** Svelte
 #+begin_src elisp :tangle packages.el
 (package! svelte-mode)
@@ -1407,7 +1429,6 @@ create a color scheme with more nuance via color correcting the applied colors.
 ** Modeline
 *** Doom Modeline
 Allow for more characters in the branch name
-
 #+begin_src elisp
 (setq doom-modeline-vcs-max-length 50)
 #+end_src
@@ -1416,6 +1437,12 @@ Allow for more characters in the branch name
 (setq doom-modeline-hud t)
 #+end_src
 
+Disable additional unnecessary information
+#+begin_src elisp
+(setq doom-modeline-buffer-encoding nil)
+(setq doom-modeline-modal nil)
+(setq doom-modeline-column-format "")
+#+end_src
 ** UI
 *** General Padding
 The way windows have been close together always kind of botheres me. Luckily,
@@ -1548,11 +1575,11 @@ I don't really need the modeline in the treemacs buffer, so I'm disabling it.
 (add-hook 'treemacs-mode-hook #'hide-mode-line-mode)
 #+end_src
 ** Vertico
-Prefix the current candidte with an arrow
+Prefix the current candidate with an arrow
 #+begin_src elisp
 (defun minibuffer-format-candidate (orig cand prefix suffix index _start)
   (let ((prefix (if (= vertico--index index)
-                    "  " "   ")))
+                    " > " "   ")))
     (funcall orig cand prefix suffix index _start)))
 
 (advice-add #'vertico--format-candidate
@@ -1567,6 +1594,14 @@ Don't show results count
 Make vertico-posframe a little wider
 #+begin_src elisp
 (setq vertico-posframe-width 200)
+#+end_src
+
+Add fringe to vertico-posframea
+#+begin_src elisp
+(setq vertico-posframe-parameters
+      '((left-fringe . 16)
+        (right-fringe . 8)
+        (border-width . 16)))
 #+end_src
 
 ** Xwidget Webkit
@@ -1620,12 +1655,4 @@ Various tweaks to improve the overall performance.
 
 ;; HTTP requests via babel
 (package! ob-http :pin "b1428ea2a63bcb510e7382a1bf5fe82b19c104a7")
-
-;; OrgRoam visualization / webapp
-
-;; automatic latex rendering
-
-;; export github markdown
-(package! ox-gfm :pin "99f93011b069e02b37c9660b8fcb45dab086a07f")
-
 #+end_src

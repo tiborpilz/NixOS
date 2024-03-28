@@ -28,7 +28,7 @@
        (company +childframe)           ; the ultimate code completion backend
        ;;ido               ; the other *other* search engine...
        ;;(ivy +fuzzy +icons)               ; a search engine for love and lifoe
-       ;;(helm +fuzzy)      ; the *other* search engine for love and life
+       ;; (helm +fuzzy +icons +childframe)      ; the *other* search engine for love and life
        (vertico +icons)           ; the search engine of the future
 
        :ui
@@ -131,10 +131,10 @@
        ;;(dart +flutter)   ; paint ui and not much else
        dhall
        ;;elixir            ; erlang done right
-       elm               ; care for a cup of TEA?
+       ;; elm               ; care for a cup of TEA?
        emacs-lisp
        ;;erlang            ; an elegant language for a more civilized age
-       ess               ; emacs speaks statistics
+       ;; ess               ; emacs speaks statistics
        ;;factor
        faust             ; dsp, but you get to keep your soul
        ;;fortran           ; in FORTRAN, GOD is REAL (unless declared INTEGER)
@@ -163,14 +163,14 @@
        (nix +lsp)              ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
        (org
-        +brain
+        ;; +brain
         +dragndrop
         +gnuplot
-        +hugo
+        ;; +hugo
         +ipython
         +journal
-        ;+jupyter
-        +noter
+        ; +jupyter
+        ;; +noter
         +pandoc
         +pomodoro
         +present
