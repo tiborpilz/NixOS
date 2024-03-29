@@ -18,71 +18,8 @@ with mylib;
   home.packages = with pkgs; [
     # TODO: move fonts to own module
     (nerdfonts.override { fonts = [ "FiraCode" ]; })
-    iosevka
-    (iosevka.override {
-      set = "custom";
-      privateBuildPlan = ''
-        [buildPlans.iosevka-custom]
-        family = "Iosevka Custom"
-        spacing = "normal"
-        serifs = "sans"
-        noCvSs = true
-        exportGlyphNames = false
-
-        [buildPlans.iosevka-custom.weights.Regular]
-        shape = 400
-        menu = 400
-        css = 400
-
-        [buildPlans.iosevka-custom.weights.Medium]
-        shape = 500
-        menu = 500
-        css = 500
-    '';
-    })
-
-    (iosevka.override {
-      set = "slab";
-      privateBuildPlan = ''
-        [buildPlans.IosekaSlab]
-        family = "Ioseka Slab"
-        spacing = "quasi-proportional"
-        serifs = "slab"
-        noCvSs = true
-        exportGlyphNames = false
-        noLigation = true
-
-        [buildPlans.IosekaSlab.variants]
-        inherits = "ss20"
-
-        [buildPlans.IosekaSlab.weights.ExtraLight]
-        shape = 200
-        menu = 200
-        css = 200
-
-        [buildPlans.IosekaSlab.weights.Regular]
-        shape = 400
-        menu = 400
-        css = 400
-
-        [buildPlans.IosekaSlab.weights.SemiBold]
-        shape = 600
-        menu = 600
-        css = 600
-
-        [buildPlans.IosekaSlab.weights.Heavy]
-        shape = 900
-        menu = 900
-        css = 900
-
-        [buildPlans.IosekaSlab.widths.Normal]
-        shape = 500
-        menu = 5
-        css = "normal"
-    '';
-
-    })
     etBook
+    dejavu_fonts
 
     # Need later version of bash for nix-shell to work correctly on macos
     bash
