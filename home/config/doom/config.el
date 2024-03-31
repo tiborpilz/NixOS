@@ -29,19 +29,6 @@
 (setq calendar-week-start-day 1) ;; start on monday
 (setq org-agenda-include-diary t)
 
-;; (let* ((variable-tuple '(:font "Iosevka Slab"))
-;;        (headline `(:inherit default :weight black)))
-;;   (custom-theme-set-faces 'user
-;;                           `(org-level-8 ((t (,@headline ,@variable-tuple))))
-;;                           `(org-level-7 ((t (,@headline ,@variable-tuple))))
-;;                           `(org-level-6 ((t (,@headline ,@variable-tuple))))
-;;                           `(org-level-5 ((t (,@headline ,@variable-tuple))))
-;;                           `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
-;;                           `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
-;;                           `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.33))))
-;;                           `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.5))))
-;;                           `(org-document-title ((t (,@headline ,@variable-tuple :height 1.5 :underline nil))))))
-
 (add-hook 'org-mode-hook #'mixed-pitch-mode)
 
 (defun set-line-spacing (size)
