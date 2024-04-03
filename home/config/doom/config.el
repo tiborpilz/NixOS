@@ -12,6 +12,8 @@
 
 (setq fancy-splash-image (concat doom-private-dir "splash-logos/emacs-logo-cutout.svg"))
 
+(setq frame-title-format "%b - Emacs")
+
 (defun add-hooks (hook-list function)
   "Add FUNCTION to all hooks in HOOK-LIST."
   (dolist (hook hook-list)

@@ -41,6 +41,12 @@ well with a variety of color schemes.
 (setq fancy-splash-image (concat doom-private-dir "splash-logos/emacs-logo-cutout.svg"))
 #+end_src
 
+** Title
+I'm setting the title to be just "Emacs"
+
+#+begin_src elisp
+(setq frame-title-format "%b - Emacs")
+#+end_src
 * Utils
 For efficiently writing my config, I need some utils.
 ** Add-Hooks
@@ -1630,6 +1636,11 @@ Various tweaks to improve the overall performance.
 (fset #'jsonrpc--log-event #'ignore)
 #+end_src
 * Unsorted Packages
+** Discord Presence
+#+begin_src elisp :tangle packages.el
+(package! elcord)
+#+end_src
+** Misc
 #+begin_src elisp :tangle packages.el
 
 (package! dap-mode)

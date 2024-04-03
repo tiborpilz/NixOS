@@ -80,6 +80,8 @@
 
 (package! k8s-mode)
 
+(package! elcord)
+
 (package! dap-mode)
 
 ;; HTTP requests via babel
