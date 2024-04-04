@@ -626,3 +626,8 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (setq read-process-output-max (* 4 1024 1024)) ;; 4mb
 
 (fset #'jsonrpc--log-event #'ignore)
+
+(use-package! elcord
+  :config
+  (setq elcord-editor-icon "emacs_icon")
+  :hook (after-init . elcord-mode))
