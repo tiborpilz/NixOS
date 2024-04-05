@@ -3,7 +3,7 @@ on:
   pull_request:
   push:
 jobs:
-  build-linux:
+  build-home:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -15,9 +15,42 @@ jobs:
         name: tiborpilz
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: nix build .#homeConfigurations.tibor.activationPackage
+  build-edge:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v22
+      with:
+        nix_path: nixpkgs=channel:nixos-unstable
+    - uses: cachix/cachix-action@v12
+      with:
+        name: tiborpilz
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: nix build .#nixosConfigurations.edge.config.system.build.toplevel
-    - run: nix build .#nixosConfigurations.homeserver.config.system.build.toplevel
-    - run: nix build .#nixosConfigurations.thinkyMcThinkpad.config.system.build.toplevel
+  build-klaus:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v22
+      with:
+        nix_path: nixpkgs=channel:nixos-unstable
+    - uses: cachix/cachix-action@v12
+      with:
+        name: tiborpilz
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: nix build .#nixosConfigurations.klaus.config.system.build.toplevel
+  build-thinkyMcThinkpad:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v22
+      with:
+        nix_path: nixpkgs=channel:nixos-unstable
+    - uses: cachix/cachix-action@v12
+      with:
+        name: tiborpilz
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: nix build .#nixosConfigurations.klaus.config.system.build.toplevel
 
   # TODO: Fix for apple silicon
   # build-macos:
