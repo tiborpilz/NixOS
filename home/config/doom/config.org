@@ -1644,8 +1644,7 @@ Various tweaks to improve the overall performance.
 #+begin_src elisp
 (use-package! elcord
   :config
-  (setq elcord-editor-icon "emacs_icon")
-  :hook (after-init . elcord-mode))
+  (setq elcord-editor-icon "emacs_icon"))
 #+end_src
 ** Misc
 #+begin_src elisp :tangle packages.el

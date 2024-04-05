@@ -629,5 +629,4 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (use-package! elcord
   :config
-  (setq elcord-editor-icon "emacs_icon")
-  :hook (after-init . elcord-mode))
+  (setq elcord-editor-icon "emacs_icon"))
