@@ -10,6 +10,6 @@ stdenv.mkDerivation rec {
       mkdir -p $out/bin
       cp $src $out/bin/bw2pass
       wrapProgram $out/bin/bw2pass \
-        --prefix PATH : ${lib.makeBinPath [ bash jq ]}
+        --prefix PATH : ${lib.makeBinPath [ bash jq bitwarden-cli ]}
     '';
 }

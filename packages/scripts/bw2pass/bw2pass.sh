@@ -69,5 +69,5 @@ get_items() {
     done
 }
 
-# check_bw_login
+check_bw_login
 get_items
