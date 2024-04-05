@@ -1,0 +1,30 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: nixos/nix
+    steps:
+      - checkout
+      - run:
+          name: "Build Home"
+          command: "nix --extra-experimental-features nix-command --extra-experimental-features flakes build .#homeConfigurations.tibor.activationPackage"
+
+  # TODO: Not yet in free plan, check again in May 2024
+  # build_mac:
+  #   macos:
+  #     xcode: 12.5.1
+  #   resource_class: macos.m1.medium.gen1
+  #   docker:
+  #     - image: nixos/nix
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: "Build Home"
+  #         command: 'nix --extra-experimental-features nix-command --extra-experimental-features flakes build .#homeConfigurations."tibor.pilz".activationPackage"'
+
+workflows:
+  build-workflow:
+    jobs:
+      - build
+      - build_mac
