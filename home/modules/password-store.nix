@@ -1,4 +1,4 @@
-{ config, options, lib, pkgs, inputs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 with lib;
 let
@@ -12,6 +12,8 @@ in {
 
   config.home.packages = mkIf cfg.enable [
     pkgs.pass2csv
+    pkgs.bitwarden-cli
+    pkgs.my.bw2pass # custom script that imports bitwarden to pass
   ];
 
   config.programs.password-store = mkIf cfg.enable {
