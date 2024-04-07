@@ -15,6 +15,10 @@ For reproducibility, I'm using modules defined in the `modules` directory for my
 
 To automatically inject the modules into the configuration, I'm using custom functions defined in `lib`.
 
+## Emacs Config
+
+This repository contains my [literate emacs config](https://github.com/tiborpilz/NixOS/blob/main/home/config/doom/config.org).
+
 ## CI
 
 ### Garnix
