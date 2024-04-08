@@ -113,3 +113,6 @@ if [[ $TERM != dumb  ]]; then
   autoload -Uz compinit && compinit -u -d $ZSH_CACHE/zcompdump
   source $ZDOTDIR/extra.zshrc
 fi
+
+# thefuck initialization
+eval $(thefuck --alias)
