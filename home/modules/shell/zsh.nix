@@ -50,6 +50,7 @@ in
       krew
       nodejs
       coreutils
+      thefuck
 
       #Markdown View
       glow
@@ -69,7 +70,7 @@ in
       fpath=(${pkgs.zsh-completions}/share/zsh/site-functions $fpath)
 
       # thefuck initialization
-      # eval $(thefuck --alias)
+      eval $(thefuck --alias)
     '';
 
     modules.shell.zsh.aliases = {
