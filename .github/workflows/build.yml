@@ -16,7 +16,7 @@ jobs:
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: nix build .#homeConfigurations.tibor.activationPackage
   build-home-mac:
-    runs-on: macos-latest
+    runs-on: macos-14
     steps:
     - uses: actions/checkout@v3
     - uses: cachix/install-nix-action@v22
@@ -26,7 +26,7 @@ jobs:
       with:
         name: tiborpilz
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-    - run: nix build .#darwinConfigurations."tibor.pilz".activationPackage
+    - run: nix build '.#homeConfigurations."tibor.pilz".activationPackage'
   build-edge:
     runs-on: ubuntu-latest
     steps:
