@@ -73,7 +73,7 @@ in
       sqlite
 
       # :lang latex & :lang org (late previews)
-      texlive.combined.scheme-medium
+      texlive.combined.scheme-small
 
       # alternative lsp server for nix
       nil
