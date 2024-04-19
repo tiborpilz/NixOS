@@ -11,8 +11,8 @@ Set Name and mail adress
 ** Font settings
 #+begin_src elisp
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
-      doom-big-font (font-spec :family "FiraCode Nerd Font" :size 28 :weight 'normal)
-      doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'normal)
+      doom-big-font (font-spec :family "FiraCode Nerd Font" :size 28 :weight 'light)
+      doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
       doom-variable-pitch-font (font-spec :family "DejaVu Serif" :size 16 :weight 'normal))
 #+end_src
 
@@ -46,6 +46,15 @@ I'm setting the title to be just "Emacs"
 
 #+begin_src elisp
 (setq frame-title-format "%b - Emacs")
+#+end_src
+** TODO Password Store location
+I'm using ~pass~ (synced to my Bitwarden via a custom utility) to store/retrieve
+secrets. Instead of the default location, my password storage lives at
+~$HOME/.local/share/password-store~.
+
+I need to set the env variable ~$PASSWORD_STORE_DIR~ to this location.
+#+begin_src elisp
+(setenv "PASSWORD_STORE_DIR" "~/.local/share/password-store")
 #+end_src
 * Utils
 For efficiently writing my config, I need some utils.
@@ -283,6 +292,12 @@ loaded or in a different repo.
             (add-hook 'after-save-hook #'org-babel-tangle-config)))
 #+end_src
 
+*** Typescript
+To execute typescript code blocks, I'm using the ~ob-typescript~ package.
+
+#+begin_src elisp :tangle packages.el
+(package! ob-typescript)
+#+end_src
 ** Import/Export
 *** View exported file
 #+begin_src elisp
@@ -1473,6 +1488,25 @@ Now that everything's set up, I'm enabling the mode.
 
 (The actual values obviously need to be tweaked though)
 
+*** Better Error DIsplay
+The posframe that flycheck-posframe is using for error display seems to linger
+for a while, and does not disappear until you stop moving the cursor.
+
+This snippet makes it disappear instantly:
+
+#+begin_src elisp
+(when (featurep! :checkers syntax +childframe)
+  (defun flycheck-posframe-monitor-post-command ()
+    (when (not (flycheck-posframe-check-position))
+      (posframe-hide flycheck-posframe-buffer)))
+
+  (defun fix-flycheck-posframe-not-hide-immediately ()
+    (cond (flycheck-posframe-mode
+           (add-hook 'post-command-hook 'flycheck-posframe-monitor-post-command nil t))
+          ((not flycheck-posframe-mode)
+           (remove-hook 'post-command-hook 'flycheck-posframe-monitor-post-command t))))
+  (add-hook! flycheck-posframe-mode #'fix-flycheck-posframe-not-hide-immediately))
+#+end_src
 ** Ivy
 Ivy is a package that provides a completion framework for Emacs. It is
 particularly useful for commands that require a lot of input, such as ~M-x~ or

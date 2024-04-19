@@ -2,8 +2,8 @@
       user-mail-address "tibor@pilz.berlin")
 
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
-      doom-big-font (font-spec :family "FiraCode Nerd Font" :size 28 :weight 'normal)
-      doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'normal)
+      doom-big-font (font-spec :family "FiraCode Nerd Font" :size 28 :weight 'light)
+      doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
       doom-variable-pitch-font (font-spec :family "DejaVu Serif" :size 16 :weight 'normal))
 
 (setq display-line-numbers-type 'relative)
@@ -13,6 +13,8 @@
 (setq fancy-splash-image (concat doom-private-dir "splash-logos/emacs-logo-cutout.svg"))
 
 (setq frame-title-format "%b - Emacs")
+
+(setenv "PASSWORD_STORE_DIR" "~/.local/share/password-store")
 
 (defun add-hooks (hook-list function)
   "Add FUNCTION to all hooks in HOOK-LIST."
@@ -579,6 +581,18 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (setq spacious-padding-subtle-mode-line t)
 
 (spacious-padding-mode 1)
+
+(when (featurep! :checkers syntax +childframe)
+  (defun flycheck-posframe-monitor-post-command ()
+    (when (not (flycheck-posframe-check-position))
+      (posframe-hide flycheck-posframe-buffer)))
+
+  (defun fix-flycheck-posframe-not-hide-immediately ()
+    (cond (flycheck-posframe-mode
+           (add-hook 'post-command-hook 'flycheck-posframe-monitor-post-command nil t))
+          ((not flycheck-posframe-mode)
+           (remove-hook 'post-command-hook 'flycheck-posframe-monitor-post-command t))))
+  (add-hook! flycheck-posframe-mode #'fix-flycheck-posframe-not-hide-immediately))
 
 ;; (define-key ivy-minibuffer-map (kbd "TAB") 'ivy-partial)
 ;; (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
