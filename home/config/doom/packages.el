@@ -4,6 +4,8 @@
 
 (package! org-modern)
 
+(package! ob-typescript)
+
 (package! org-fragtog)
 
 (unpin! org-roam)
