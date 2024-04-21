@@ -172,9 +172,6 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
-    # TODO: turn this into a custom module with reverse proxy settings
-    services.jellyfin.enable = true;
-
     modules.services = {
       syncthing.enable = true;
       tandoor.enable = true;
@@ -197,11 +194,8 @@ with lib;
           sopsFile = config.sops.secrets.deluge.path;
         };
         komga.enable = true;
-        plex = {
-          enable = true;
-          allowedNetworks = "192.168.2.1/24";
-        };
         immich.enable = true;
+        jellyfin.enable = true;
       };
     };
 
