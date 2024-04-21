@@ -85,11 +85,11 @@ in
       };
 
       containers.redis = {
-        image = "redis:6.2-alpine@sha256:b6124ab2e45cc332e16398022a411d7e37181f21ff7874835e0180f56a09e82a";
+        image = "redis:6.2";
       };
 
       containers.db = {
-        image = "tensorchord/pgvecto-rs:pg14-v0.1.11@sha256:0335a1a22f8c5dd1b697f14f079934f5152eaaa216c09b61e293be285491f8ee";
+        image = "tensorchord/pgvecto-rs:pg14-v0.2.0";
         environment = {
           POSTGRES_USER = cfg.db_user;
           POSTGRES_PASSWORD = cfg.db_password;
