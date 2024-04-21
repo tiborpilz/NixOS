@@ -17,11 +17,11 @@ generate_node_packages: ## Generate nix node packages based on packages/node/nod
 
 packages/node/node-packages.nix: generate_node_packages
 
-deploy_homeserver: ## Deploy the homeserver nixos configuration to 192.168.2.68 (local adress)
-	nix run nixpkgs#nixos-rebuild -- switch --flake .#homeserver --target-host root@192.168.2.68
+deploy_klaus: ## Deploy the klaus nixos configuration to 192.168.2.134 (local adress)
+	nix run nixpkgs#nixos-rebuild -- switch --flake .#klaus --target-host root@192.168.2.134
 
-deploy_homeserver_dry_run:
-	nix run nixpkgs#nixos-rebuild -- dry-run --flake .#homeserver --target-host root@192.168.2.68
+deploy_klaus_dry_run:
+	nix run nixpkgs#nixos-rebuild -- dry-run --flake .#klaus --target-host root@192.168.2.34
 
 deploy_edge: ## Deploy the edge nixos configuration to the hetzner vm
 	nix run nixpkgs#nixos-rebuild -- switch --flake .#edge --target-host root@159.69.194.44
