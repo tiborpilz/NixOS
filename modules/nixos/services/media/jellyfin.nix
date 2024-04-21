@@ -7,7 +7,7 @@ let
   cfg = config.modules.services.media.jellyfin;
 in
 {
-  options.modules.services.jellyinf = {
+  options.modules.services.media.jellyfin = {
     enable = mkBoolOpt false;
   };
 
