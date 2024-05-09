@@ -202,7 +202,10 @@ with lib;
           sopsFile = config.sops.secrets.deluge.path;
         };
         komga.enable = true;
-        immich.enable = true;
+        immich = {
+          immich-version = "v1.103.1";
+          enable = true;
+        };
         jellyfin.enable = true;
       };
     };
