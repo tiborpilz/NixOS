@@ -13,7 +13,8 @@ with lib;
     sops.age.generateKey = true;
 
     sops.secrets.cloudflared = {
-      sopsFile = secrets/cloudflared.json;
+      sopsFile = secrets/secrets.yaml;
+      owner = "cloudflared";
     };
 
     sops.secrets.firefly_import_configs_dkb-private = {
@@ -158,18 +159,6 @@ with lib;
       };
     };
 
-    services.cloudflared = {
-      enable = true;
-      tunnels = {
-        "14a104ab-2541-4142-ab22-12908058f156" = {
-          credentialsFile = config.sops.secrets.cloudflared.path;
-          ingress = {
-            "*.tiborpilz.xyz" = "http://localhost:80";
-          };
-        };
-      };
-    };
-
     # Seems like a bug in systemd, more info: https://github.com/NixOS/nixpkgs/issues/180175#issuecomment-1273827251
     systemd.services.NetworkManager-wait-online.enable = false;
 
@@ -179,6 +168,7 @@ with lib;
       enable = true;
       hostname = "tiborpilz.xyz";
       email = "tibor@pilz.berlin";
+      tunnelId = "14a104ab-2541-4142-ab22-12908058f156";
       basicAuth = {
         enable = true;
         username = "tibor";
