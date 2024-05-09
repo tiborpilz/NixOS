@@ -12,6 +12,24 @@ with lib;
     sops.age.keyFile = "/var/lib/sops-nix/key.txt";
     sops.age.generateKey = true;
 
+    sops.secrets.cloudflared = {
+      sopsFile = secrets/cloudflared.json;
+    };
+
+    sops.secrets.firefly_import_configs_dkb-private = {
+      sopsFile = ./secrets/secrets.yaml;
+      path = "${config.modules.services.firefly-iii.configDir}/dkb-private.json";
+    };
+
+    sops.secrets.firefly_import_configs_dkb-savings = {
+      sopsFile = ./secrets/secrets.yaml;
+      path = "${config.modules.services.firefly-iii.configDir}/dkb-savings.json";
+    };
+
+    sops.secrets.deluge = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
 
@@ -140,7 +158,17 @@ with lib;
       };
     };
 
-    services.cloudflared.enable = false;
+    services.cloudflared = {
+      enable = true;
+      tunnels = {
+        "14a104ab-2541-4142-ab22-12908058f156" = {
+          credentialsFile = config.sops.secrets.cloudflared.path;
+          ingress = {
+            "*.tiborpilz.xyz" = "http://localhost:80";
+          };
+        };
+      };
+    };
 
     # Seems like a bug in systemd, more info: https://github.com/NixOS/nixpkgs/issues/180175#issuecomment-1273827251
     systemd.services.NetworkManager-wait-online.enable = false;
@@ -156,20 +184,6 @@ with lib;
         username = "tibor";
         password = "$2y$05$hchzpHMV8QabeLBTgSjIa.3Nqc7uqblFiQ8WTLKq4xSl4ZmR9rDGu";
       };
-    };
-
-    sops.secrets.firefly_import_configs_dkb-private = {
-      sopsFile = ./secrets/secrets.yaml;
-      path = "${config.modules.services.firefly-iii.configDir}/dkb-private.json";
-    };
-
-    sops.secrets.firefly_import_configs_dkb-savings = {
-      sopsFile = ./secrets/secrets.yaml;
-      path = "${config.modules.services.firefly-iii.configDir}/dkb-savings.json";
-    };
-
-    sops.secrets.deluge = {
-      sopsFile = ./secrets/secrets.yaml;
     };
 
     modules.services = {
