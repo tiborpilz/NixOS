@@ -97,9 +97,31 @@ in
         example = "JDJhJDE0JGFXdjZMeTVsYnZueDZpckpQazFkSE9zN283WnZUQmc4NmQydi5rV04wYmdOZ3F0cE4zb3NP";
       };
     };
+    # Mapping of hosts to services (like "test.example.com" = "http://localhost:8001")
+    tunnelId = mkOption {
+      # string type
+      type = types.str;
+      description = "Cloudflare Tunnel ID";
+    };
   };
 
   config = mkIf cfg.enable {
+    # modules.services.cloudflared.tunnels.${cfg.tunnelId}.ingress = mkIf (cfg.proxies != { }) (mkMerge [
+    #   mapAttrs' (n: v: nameValuePair "${n}.${cfg.hostname}" "http://localhost:${v.publicPort}") cfg.proxies
+    # ]);
+
+    services.cloudflared = mkIf (cfg.proxies != { }) {
+      enable = true;
+      tunnels = {
+        ${cfg.tunnelId} = {
+          credentialsFile = config.sops.secrets.cloudflared.path;
+          default = "http_status:404";
+          ingress = mapAttrs' (n: v: nameValuePair "${n}.${cfg.hostname}" "http://localhost:${toString v.publicPort}") cfg.proxies;
+        };
+      };
+    };
+
+
     services.caddy = mkIf (cfg.proxies != { }) (mkMerge [
       {
         virtualHosts = mapAttrs'
@@ -116,7 +138,7 @@ in
               extraConfig = "respond \"OK\"";
             };
           };
-        enable = true;
+        enable = false;
         email = cfg.email;
         globalConfig = ''
         '';
