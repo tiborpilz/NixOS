@@ -44,6 +44,8 @@ with lib;
 
     boot.kernelParams = [ "cpufreq.default_governor=powersave" ];
 
+    powerManagement.cpuFreqGovernor = "powersave";
+
     networking.hostName = "klaus";
     networking.hostId = "a5fdeadb";
 
