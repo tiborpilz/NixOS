@@ -116,11 +116,10 @@ in
         ${cfg.tunnelId} = {
           credentialsFile = config.sops.secrets.cloudflared.path;
           default = "http_status:404";
-          ingress = mapAttrs' (n: v: nameValuePair "${n}.${cfg.hostname}" "http://localhost:${toString v.publicPort}") cfg.proxies;
+          ingress = mapAttrs' (n: v: nameValuePair "${n}.${cfg.hostname}" "http://${v.targetHost}:${toString v.publicPort}") cfg.proxies;
         };
       };
     };
-
 
     services.caddy = mkIf (cfg.proxies != { }) (mkMerge [
       {

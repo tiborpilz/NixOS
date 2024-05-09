@@ -31,6 +31,10 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
+    sops.secrets.nextcloud_admin_pass = mkIf config.modules.services.nextcloud.enable {
+      owner = "nextcloud";
+    };
+
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
 
@@ -201,10 +205,6 @@ with lib;
         immich.enable = true;
         jellyfin.enable = true;
       };
-    };
-
-    sops.secrets.nextcloud_admin_pass = mkIf config.modules.services.nextcloud.enable {
-      owner = "nextcloud";
     };
 
     # sops.secrets.storagebox_nextcloud_smb_secrets = {
