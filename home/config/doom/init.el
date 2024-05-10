@@ -132,7 +132,7 @@
        dhall
        ;;elixir            ; erlang done right
        ;; elm               ; care for a cup of TEA?
-       emacs-lisp
+       (emacs-lisp +lsp)
        ;;erlang            ; an elegant language for a more civilized age
        ;; ess               ; emacs speaks statistics
        ;;factor
