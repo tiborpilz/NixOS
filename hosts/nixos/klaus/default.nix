@@ -200,7 +200,7 @@ with lib;
       media = {
         calibre.enable = true;
         deluge = {
-          enable = false;
+          enable = true;
           sopsFile = config.sops.secrets.deluge.path;
         };
         komga.enable = true;
