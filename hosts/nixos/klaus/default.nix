@@ -197,8 +197,6 @@ with lib;
         # home = "/nextcloud";
       };
 
-      bitmagnet.enable = true;
-
       media = {
         calibre.enable = true;
         deluge = {
