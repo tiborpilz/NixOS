@@ -12,7 +12,7 @@ with mylib;
   };
   config = lib.mkIf cfg.enable {
     home.packages = [ pkgs.colima ];
-    home.sessionVariables.DOCKER_HOST= "unix://${config.home.sessionVariables.HOME}/.colima/default/docker.sock";
-    home.activation.startColima = "colima start";
+    home.sessionVariables.DOCKER_HOST = "unix://$HOME/.colima/default/docker.sock";
+    home.activation.startColima = "${pkgs.colima}/bin/colima start";
   };
 }
