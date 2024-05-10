@@ -95,6 +95,8 @@ with mylib;
   modules.dev.dhall.enable = true;
   modules.dev.cloud.enable = true;
 
+  modules.dev.colima.enable = pkgs.stdenv.isDarwin; # I only need a docker runtime on MacOs
+
   # Bit of a catch-all for LSP stuff until I find a better spot
   # without having to create a new module for every one
   modules.editors.lsp.enable = true;
