@@ -1,7 +1,7 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 
 let
-  cfg = config.services.bitmagnet;
+  cfg = config.modules.services.bitmagnet;
 in
 {
   options.modules.services.bitmagnet = {
