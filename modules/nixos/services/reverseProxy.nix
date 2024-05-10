@@ -137,7 +137,7 @@ in
               extraConfig = "respond \"OK\"";
             };
           };
-        enable = false;
+        enable = true;
         email = cfg.email;
         globalConfig = ''
         '';
