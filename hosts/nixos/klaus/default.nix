@@ -42,9 +42,9 @@ with lib;
     boot.zfs.forceImportRoot = false;
     boot.zfs.extraPools = [ "zpool" ];
 
-    boot.kernelParams = [ "cpufreq.default_governor=powersave" ];
+    boot.kernelParams = [ "cpufreq.default_governor=conservative" ];
 
-    powerManagement.cpuFreqGovernor = "powersave";
+    powerManagement.cpuFreqGovernor = "conservative";
 
     networking.hostName = "klaus";
     networking.hostId = "a5fdeadb";
