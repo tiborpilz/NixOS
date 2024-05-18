@@ -138,6 +138,11 @@ with lib;
     nix = {
       package = pkgs.nix;
       registry.nixpkgs.flake = pkgs;
+      gc =  {
+        enable = true;
+        automatic = true;
+        options = "--delete-older-than 30d";
+      };
     };
 
     services.avahi = {
@@ -180,6 +185,12 @@ with lib;
         username = "tibor";
         password = "$2y$05$hchzpHMV8QabeLBTgSjIa.3Nqc7uqblFiQ8WTLKq4xSl4ZmR9rDGu";
       };
+    };
+
+    modules.services.reverseProxy.proxies.homeassistant = {
+      publicPort = 8123;
+      targetHost = "192.168.2.138";
+      auth = false;
     };
 
     modules.services = {
