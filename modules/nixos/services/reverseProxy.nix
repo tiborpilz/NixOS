@@ -52,12 +52,18 @@ let
     serverAliases = [ "http://${host}" ];
     extraConfig =
       if enableauth then ''
-        reverse_proxy http://${targetHost}:${toString port}
+        reverse_proxy http://${targetHost}:${toString port} {
+            header_up X-Forwarded-Proto {scheme}
+        }
         basicauth /* bcrypt {
             ${username} ${password}
         }
       ''
-      else "reverse_proxy http://${targetHost}:${toString port}";
+      else ''
+        reverse_proxy http://${targetHost}:${toString port} {
+            header_up X-Forwarded-Proto https
+        }
+      '';
   };
 in
 {
