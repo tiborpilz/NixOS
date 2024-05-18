@@ -138,11 +138,6 @@ with lib;
     nix = {
       package = pkgs.nix;
       registry.nixpkgs.flake = pkgs;
-      gc =  {
-        enable = true;
-        automatic = true;
-        options = "--delete-older-than 30d";
-      };
     };
 
     services.avahi = {
