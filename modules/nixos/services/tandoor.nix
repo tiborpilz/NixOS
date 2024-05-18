@@ -41,6 +41,8 @@ in
           "POSTGRES_USER" = db_user;
           "POSTGRES_PASSWORD" = db_password;
           "POSTGRES_DB" = db_db;
+          "ALLOWED_HOSTS" = "*";
+          "CSRF_TRUSTED_ORIGINS" = "https://tandoor.${config.modules.services.reverseProxy.hostname}";
         };
         volumes = [
           "tandoor-staticfiles:/opt/recipes/staticfiles"
