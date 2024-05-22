@@ -1,4 +1,4 @@
-{ inputs, config, options, pkgs, lib, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   cfg = config.modules.terminal.kitty;
@@ -14,10 +14,13 @@ with lib;
       enable = true;
       font = {
         package = pkgs.fira-code;
-        size = 16;
+        size = 14;
         name = "Fira Code";
       };
-      theme = "Space Gray Eighties";
+      theme = "Catppuccin-Macchiato";
+      extraConfig = ''
+        window_margin_width 16
+      '';
     };
   };
 }
