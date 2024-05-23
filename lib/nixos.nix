@@ -1,4 +1,4 @@
-{ inputs, lib , ... }:
+{ inputs, lib, pkgs, ... }:
 
 with lib;
 with lib.my;
@@ -14,6 +14,7 @@ in {
       modules = [
         {
           networking.hostName = mkDefault (removeSuffix ".nix" (baseNameOf path));
+          nix.package = pkgs.nix;
         }
         (filterAttrs (n: v: !elem n [ "system" "modules" ]) attrs)
         ../. # /default.nix
