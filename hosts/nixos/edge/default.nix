@@ -29,6 +29,11 @@
   ];
   system.stateVersion = "22.05";
 
+  nix = {
+    package = pkgs.nix;
+    registry.nixpkgs.flake = pkgs;
+  };
+
   #Enable NAT
   networking.nat = {
     enable = true;
