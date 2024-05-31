@@ -27,6 +27,9 @@ with mylib;
     # Setuptools is missing from python
     python3Packages.setuptools
 
+    # GNU Parallel my beloved
+    parallel
+
     cmake
 
     # bat is a better cat (as a program, at least)
