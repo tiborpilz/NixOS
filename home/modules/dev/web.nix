@@ -18,6 +18,9 @@ with mylib;
       nodePackages.yarn
       nodePackages.prettier
       nodePackages."@vue/cli"
+
+      # Load Testing
+      k6
     ];
   };
 }
