@@ -200,6 +200,9 @@
 
 (use-package! org-tempo)
 
+(use-package! org-autolist
+  :hook (org-mode . org-autolist-mode))
+
 (after! org
   (setq org-capture-templates
         '(("t" "Personal todo" entry (file+headline +org-capture-todo-file "Inbox")
