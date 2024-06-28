@@ -474,6 +474,19 @@ For some reason, ~org-tempo~ does not start at launch, so I'm  loading it here.
 (use-package! org-tempo)
 #+end_src
 
+*** Automatic list item insertion
+The package ~org-autolist~ makes org lists behave more like traditional text
+editors, meaning ~<Return>~ will insert a list item first, ~<Return><Return>~ will insert a
+newline, etc.
+
+#+begin_src elisp :tangle packages.el
+(package! org-autolist)
+#+end_src
+
+#+begin_src elisp
+(use-package! org-autolist
+  :hook (org-mode . org-autolist-mode))
+#+end_src
 ** Capture
 *** Add / change cappture templates
 Some other tools (like orgzly) work better with ~TODO~ instead of ~[ ]~ (and

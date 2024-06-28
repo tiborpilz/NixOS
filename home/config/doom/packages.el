@@ -12,6 +12,8 @@
 (package! org-roam-ui)
 (package! websocket) ; dependency of `org-roam-ui'
 
+(package! org-autolist)
+
 (package! jest)
 
 (package! svelte-mode)
