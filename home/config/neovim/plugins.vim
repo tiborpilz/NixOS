@@ -1,4 +1,4 @@
-call plug#begin('~/.config/nvim/plugged')
+call plug#begin('~/.config/nvim/plugged')  
 
 " Copilot
 Plug 'github/copilot.vim'
@@ -145,6 +145,10 @@ call plug#end()
 
 " let g:nightfox_style = 'nordfox'
 colorscheme nightfox
+
+" Copilot settings
+imap <silent><script><expr> <C-Space> copilot#Accept("\<CR>")
+let g:copilot_no_tab_map = v:true
 
 " LSP settings
 lua require('lsp-config')
