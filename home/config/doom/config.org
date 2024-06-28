@@ -91,19 +91,11 @@ Small utility to add a function to multiple hooks at once.
 
 *** Padding
 **** Line spacing
-Line spacing should be higher in org-mode than in "code" modes. So I'll define a
-function first to set the spacing, and then call it with different values in the
-respective hooks
-#+begin_src elisp
-(defun set-line-spacing (size)
-  "Set line spacing"
-  (setq line-spacing size))
-#+end_src
-
+Line spacing should be higher in org-mode than in "code" modes.
 For org-mode, I'm going with a higher value of 0.2.
 #+begin_src elisp
 (add-hook 'org-mode-hook
-          (lambda () (set-line-spacing 0.2)))
+          (lambda () (setq line-spacing 0.2)))
 #+end_src
 
 *** TODO Fix this - Center text
@@ -123,7 +115,6 @@ longer works.
 #+end_src
 
 How can I show the leading stars for the currently selected headline?
-
 **** Indent content based on headline level
 #+begin_src elisp
 (setq org-startup-indented t)
@@ -132,8 +123,6 @@ How can I show the leading stars for the currently selected headline?
 *** Use Org-Modern
 Org-modern (https://github.com/minad/org-modern) contains a lot of nice visual
 improvements for org-mode.
-
-This is the most basic setup:
 
 #+begin_src elisp :tangle packages.el
 (package! org-modern)
@@ -169,12 +158,16 @@ Set up org-modern
     (800 1000 1200 1400 1600 1800 2000)
     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
   org-agenda-current-time-string
-  "⭠ now ─────────────────────────────────────────────────")
+  "⭠ now ─────────────────────────────────────────────────"
+
+  ;; Org-Modern settings
+  org-modern-star 'replace ;; Use old org-modern star icons
+)
 
 (global-org-modern-mode)
 #+end_src
 
-Though the author has more examples for theming in theriy README.
+(It's pretty bare-bones for now, though the author has more examples for theming in their README.)
 **** TODO actually implement this :emacs:
 Currently, this has some issues with doom emacs.
 
@@ -228,7 +221,6 @@ Use it globally and tweak it some more.
 #+begin_src elisp
 (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 #+end_src
-
 *** Miscellanious improvements
 **** Show passed deadlines as error
 #+begin_src elisp
@@ -361,6 +353,7 @@ To execute typescript code blocks, I'm using the ~ob-typescript~ package.
 **** Use the same directory as org
 #+begin_src elisp
 (setq org-roam-directory "~/org/roam")
+(add-to-list 'org-agenda-files org-roam-directory)
 #+end_src
 
 **** Add Org-Roam UI
