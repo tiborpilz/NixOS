@@ -27,8 +27,8 @@ set nofoldenable
 "" Smoother update
 set updatetime=1000
 
-" Leader
-let mapleader = ","
+" Space as Leader
+let mapleader = "\<Space>"
 
 " Install Plugins automatically if they're missing.
 " autocmd VimEnter *
