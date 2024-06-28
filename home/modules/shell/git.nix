@@ -13,6 +13,7 @@ in
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
       git
+      git-cliff
       gitAndTools.gh
       gitAndTools.glab
       gitAndTools.git-open
