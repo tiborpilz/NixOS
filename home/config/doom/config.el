@@ -35,12 +35,8 @@
 
 (add-hook 'org-mode-hook #'mixed-pitch-mode)
 
-(defun set-line-spacing (size)
-  "Set line spacing"
-  (setq line-spacing size))
-
 (add-hook 'org-mode-hook
-          (lambda () (set-line-spacing 0.2)))
+          (lambda () (setq line-spacing 0.2)))
 
 (setq org-hide-leading-stars t)
 
@@ -71,7 +67,11 @@
     (800 1000 1200 1400 1600 1800 2000)
     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
   org-agenda-current-time-string
-  "⭠ now ─────────────────────────────────────────────────")
+  "⭠ now ─────────────────────────────────────────────────"
+
+  ;; Org-Modern settings
+  org-modern-star 'replace ;; Use old org-modern star icons
+)
 
 (global-org-modern-mode)
 
@@ -149,6 +149,7 @@
 (setq org-highlight-latex-and-related '(native script entities))
 
 (setq org-roam-directory "~/org/roam")
+(add-to-list 'org-agenda-files org-roam-directory)
 
 (use-package! websocket
   :after org-roam
