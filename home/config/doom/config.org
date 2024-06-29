@@ -223,9 +223,7 @@ This package indents the headline indicators to the left, keeping the content al
 
 #+begin_src elisp
 (use-package! org-outer-indent
-  :defer t
-  :hook (org-mode . org-outer-indent-mode)       
-  :config (setq org-num-mode nil))
+  :after org)
 #+end_src
 
 *** Miscellanious improvements
@@ -377,9 +375,8 @@ and it also needs the websocket package as dependency.
 The closest comparison to org-roam-ui is Obsidian.
 
 #+begin_src elisp :tangle packages.el
-;; (unpin! org-roam)
 (package! org-roam-ui)
-(package! websocket) ; dependency of `org-roam-ui'
+(package! websocket)
 #+end_src
 
 #+begin_src elisp
