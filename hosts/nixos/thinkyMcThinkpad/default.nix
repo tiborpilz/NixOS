@@ -53,7 +53,7 @@
 
     # Enable the KDE Plasma Desktop Environment.
     services.xserver.displayManager.sddm.enable = true;
-    # services.xserver.desktopManager.plasma5.enable = true;
+    services.xserver.desktopManager.plasma5.enable = true;
     # modules.desktop.bspwm.enable = true;
 
     # Configure keymap in X11
@@ -134,6 +134,6 @@
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
     nix.settings.system-features = [ "big-parallel" "kvm" "recursive-nix" ];
-    system.stateVersion = "23.11";
+    system.stateVersion = "22.11";
   };
 }

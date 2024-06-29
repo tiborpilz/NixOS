@@ -21,7 +21,7 @@ in
     home-manager.useUserPackages = true;
     # home-manager.extraSpecialArgs = { inherit lib; };
     home-manager.users."tibor.pilz" = mkMerge [
-      inputs.nix-doom-emacs.hmModule
+      inputs.nix-doom-emacs-unstraightened.hmModule
       {
         _module.args.inputs = inputs;
         _module.args.lib.my = lib.my;
