@@ -21,7 +21,9 @@ let
     nativeBuildInputs = [ makeBinaryWrapper ];
     meta = {
       platforms = emacsPkg.meta.platforms;
+      mainProgram = emacsPkg.meta.mainProgram;
     };
+    src = emacsPkg.src;
     postBuild = ''
     wrapProgram $out/bin/emacs \
       --set LSP_USE_PLISTS true \

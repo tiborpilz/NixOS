@@ -56,7 +56,7 @@
   :hook (org-mode . global-org-modern-mode)
   :config
   (setq org-modern-label-border 0.1
-        org-modern-star nil))
+        org-modern-star 'replace))
 
 (setq
   org-auto-align-tags nil
@@ -93,9 +93,6 @@
       '(("CLOCK:" . ?)
         (":LOGBOOK:" . ?)
         (":END:" . ?-)))
-
-(use-package! org-outer-indent
-  :after org)
 
 (setq org-agenda-deadline-faces
       '((1.001 . error)
@@ -614,3 +611,17 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (use-package! elcord
   :config
   (setq elcord-editor-icon "emacs_icon"))
+
+(defun org-indent-use-stars-for-strings ()
+  "Initialize the indentation strings with stars instead of spaces."
+  (message "it's doing it!")
+  (setq org-indent-strings (make-vector (1+ org-indent-max) nil))
+  (aset org-indent-strings 0 nil)
+  (loop for i from 1 to org-indent-max do
+    (aset org-indent-strings i
+          (org-add-props
+          (concat (make-string (1- i) ?*) ; <- THIS IS THE ONLY CHANGE
+              (char-to-string org-indent-boundary-char))
+          nil 'face 'org-indent))))
+
+(advice-add 'org-indent-initialize :after #'org-indent-use-stars-for-strings)

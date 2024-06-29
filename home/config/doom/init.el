@@ -99,7 +99,6 @@
        (editorconfig)      ; let someone else argue about tabs vs spaces
        ; ein               ; tame Jupyter notebooks with emacs
        (eval +overlay)     ; run code, run (also, repls)
-       ;; gist              ; interacting with github gists
        (lookup +dictionary +docsets +offline)              ; navigate your code and its documentation
        (lookup +docsets)
        (lsp +peek)
@@ -112,6 +111,7 @@
        ; taskrunner        ; taskrunner for all your projects
        terraform         ; infrastructure as code
        tmux              ; an API for interacting with tmux
+       tree-sitter
        ;;upload            ; map local to remote projects via ssh/ftp
 
        :os
@@ -147,7 +147,7 @@
        ;;idris             ; a language you can depend on
        (json +lsp)              ; At least it ain't XML
        ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
-       (javascript +lsp)
+       (javascript +lsp +tree-sitter)
        (julia +lsp)
        ;;kotlin            ; a better, slicker Java(Script)
        (latex             ; writing papers in Emacs has never been so fun
@@ -163,7 +163,6 @@
        (nix +lsp)              ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
        (org
-        +pretty
         ;; +brain
         +dragndrop
         +gnuplot
@@ -185,7 +184,11 @@
        ;;raku              ; the artist formerly known as perl6
        (rest)              ; Emacs as a REST client
        rst               ; ReST in peace
-       (ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
+       (ruby
+        +chruby
+        +lsp
+        +rails
+        +tree-sitter)
        (rust +lsp)       ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala             ; java, but good
        ;;(scheme +guile)   ; a fully conniving family of lisps
@@ -194,7 +197,7 @@
        ;;solidity          ; do you need a blockchain? No.
        ;;swift             ; who asked for emoji variables?
        ;;terra             ; Earth and Moon in alignment for performance.
-       web               ; the tubes
+       (web +lsp +tree-sitter)               ; the tubes
        (yaml +lsp)              ; JSON, but readable
        ;;zig               ; C, but simpler
 

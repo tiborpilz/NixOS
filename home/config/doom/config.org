@@ -30,15 +30,8 @@ a different way of relative line numbers, where folded lines are not counted.
 
 ** Tab width
 
-2 spaces, suck it k&r
 #+begin_src elisp
 (setq tab-width 2)
-#+end_src
-
-** Editorconfig
-
-#+begin_src elisp :tangle packages.el
-(package! editorconfig)
 #+end_src
 
 ** Splash Screen
@@ -160,7 +153,7 @@ improvements for org-mode.
   :hook (org-mode . global-org-modern-mode)
   :config
   (setq org-modern-label-border 0.1
-        org-modern-star nil))
+        org-modern-star 'replace))
 #+end_src
 
 Set up org-modern
@@ -210,20 +203,6 @@ enabling it.
       '(("CLOCK:" . ?)
         (":LOGBOOK:" . ?)
         (":END:" . ?-)))
-#+end_src
-*** Outer Indent
-This package indents the headline indicators to the left, keeping the content aligned.
-
-
-#+begin_src elisp :tangle packages.el
-(package! org-outer-indent
-  :recipe (:host github :repo "rougier/org-outer-indent")
-  :pin "9c5aef47f259a13baae73e50f9f897f85767718f")
-#+end_src
-
-#+begin_src elisp
-(use-package! org-outer-indent
-  :after org)
 #+end_src
 
 *** Miscellanious improvements
@@ -892,11 +871,11 @@ those icons as what's being displayed.
 This package adds Github Copilot functionality to Emacs:
 
 #+begin_src elisp :tangle packages.el
-(package! copilot)
-  ;; :pin
-  ;; :recipe (:host github
-  ;;          :repo "copilot-emacs/copilot.el"
-  ;;          :files ("*.el" "dist")))
+(package! copilot
+  :pin "c6b31f640eca89bb68d3c5005f22c27d033cc92e"
+  :recipe (:host github
+           :repo "copilot-emacs/copilot.el"
+           :files ("*.el" "dist")))
 #+end_src
 
 When enabling copilot, I'm hooking into ~prog-mode~ to enable it for all programming modes.
@@ -1636,6 +1615,15 @@ Ignore JSONRPC logs
 #+end_src
 
 * Unsorted Packages
+** pcre2el
+
+pcre2el is included with doom emacs but pinned to a version that is currently throwing warnings because of an
+obsolete variable.
+
+#+begin_src elisp :tangle packages.el
+(unpin! pcre2el)
+#+end_src
+
 ** Discord Presence
 #+begin_src elisp :tangle packages.el
 (package! elcord)
@@ -1648,3 +1636,19 @@ Ignore JSONRPC logs
 #+end_src
 
 ** Home Assistant
+
+#+begin_src elisp
+(defun org-indent-use-stars-for-strings ()
+  "Initialize the indentation strings with stars instead of spaces."
+  (message "it's doing it!")
+  (setq org-indent-strings (make-vector (1+ org-indent-max) nil))
+  (aset org-indent-strings 0 nil)
+  (loop for i from 1 to org-indent-max do
+    (aset org-indent-strings i
+          (org-add-props
+          (concat (make-string (1- i) ?*) ; <- THIS IS THE ONLY CHANGE
+              (char-to-string org-indent-boundary-char))
+          nil 'face 'org-indent))))
+
+(advice-add 'org-indent-initialize :after #'org-indent-use-stars-for-strings)
+#+end_src
