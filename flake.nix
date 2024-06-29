@@ -60,7 +60,11 @@
 
       nixosHosts = mapModules ./hosts/nixos (hostPath: lib.my.mkHostAttrs hostPath {
         system = "x86_64-linux";
-        modules = lib.my.mapModulesRec' (toString ./modules/nixos) import;
+        modules = [
+          {
+            nix.package = self.channels.x86_64-linux.nixpkgs.nix;
+          }
+        ] ++ lib.my.mapModulesRec' (toString ./modules/nixos) import;
       });
 
       darwinHosts = mapModules ./hosts/darwin (hostPath: lib.my.mkHostAttrs hostPath {
