@@ -6,7 +6,7 @@
       doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
       doom-variable-pitch-font (font-spec :family "DejaVu Serif" :size 16 :weight 'normal))
 
-(setq display-line-numbers-type 'relative)
+(setq display-line-numbers-type 'visual)
 
 (setq tab-width 2)
 
@@ -33,14 +33,21 @@
 (setq calendar-week-start-day 1) ;; start on monday
 (setq org-agenda-include-diary t)
 
+(defun set-org-headline-color ()
+  "Set the org headline colors to darker variants of the foreground color."
+  (dotimes (i 8)
+    (set-face-foreground (intern (format "org-level-%d" (1+ i))) (doom-darken 'fg (* i 0.1)))))
+
+(add-hook 'org-mode-hook 'set-org-headline-color)
+
+(setq org-hide-leading-stars nil)
+
+(setq org-startup-indented t)
+
 (add-hook 'org-mode-hook #'mixed-pitch-mode)
 
 (add-hook 'org-mode-hook
           (lambda () (setq line-spacing 0.2)))
-
-(setq org-hide-leading-stars t)
-
-(setq org-startup-indented t)
 
 (use-package! org-modern
   :hook (org-mode . global-org-modern-mode)
@@ -75,7 +82,12 @@
 
 (global-org-modern-mode)
 
-(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+(setq prettify-symbols-alist
+      '(("CLOCK:" . ?)
+        (":LOGBOOK:" . ?)
+        (":END:" . ?-)))
+
+;; (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
 (setq org-agenda-deadline-faces
       '((1.001 . error)
@@ -90,6 +102,13 @@
   (when (> (buffer-size) 50000)
     (setq-local jit-lock-defer-time 0.05
                 jit-lock-stealth-time 1)))
+
+(use-package! org-tidy
+  :defer t
+  :hook (org-mode . org-tidy-mode)
+  :config (map! :map org-mode-map
+                :localleader
+                :desc "Toggle org-tidy" "z" #'org-tidy-mode))
 
 (use-package! ob-http
   :commands org-babel-execute:http)
@@ -270,7 +289,8 @@
 ;;                       (setf (lsp-session-server-id->folders (lsp-session)) (ht))))
 
 (use-package! svelte-mode
-    :mode "\\.svelte\\'")
+  :defer t
+  :mode "\\.svelte\\'")
 
 (with-eval-after-load 'web-mode
   (setq web-mode-script-padding 0)

@@ -1,12 +1,10 @@
 (package! editorconfig)
 
-(package! olivetti)
-
 (package! org-modern)
 
-(package! ob-typescript)
+(package! org-tidy)
 
-(package! org-fragtog)
+(package! ob-typescript)
 
 (unpin! org-roam)
 (package! org-roam-ui)
@@ -30,7 +28,7 @@
 
 (package! jsonnet-mode)
 
-(package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+(package! copilot :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el" "dist")))
 
 (package! lab)
 
