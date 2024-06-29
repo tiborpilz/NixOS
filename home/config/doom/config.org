@@ -64,10 +64,11 @@ I'm using ~pass~ (synced to my Bitwarden via a custom utility) to store/retrieve
 secrets. Instead of the default location, my password storage lives at
 ~$HOME/.local/share/password-store~.
 
-I need to set the env variable ~$PASSWORD_STORE_DIR~ to this location.
+For ~password-store~ to work correctly, this needs to be set up
 
 #+begin_src elisp
-(setenv "PASSWORD_STORE_DIR" "~/.local/share/password-store")
+(setq auth-source-pass-filename
+      (concat (getenv "HOME") "/.local/share/password-store"))
 #+end_src
 
 * Utils

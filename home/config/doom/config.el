@@ -14,7 +14,8 @@
 
 (setq frame-title-format "%b - Emacs")
 
-(setenv "PASSWORD_STORE_DIR" "~/.local/share/password-store")
+(setq auth-source-pass-filename
+      (concat (getenv "HOME") "/.local/share/password-store"))
 
 (defun add-hooks (hook-list function)
   "Add FUNCTION to all hooks in HOOK-LIST."
