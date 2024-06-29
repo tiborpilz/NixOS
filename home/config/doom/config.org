@@ -1,7 +1,9 @@
 #+PROPERTY: header-args elisp :tangle ./config.el :results silent
 #+TITLE: Doom Emacs Config
+
 * Base Settings
 ** Personal data
+
 Set Name and mail adress
 #+begin_src elisp
 (setq user-full-name "Tibor Pilz"
@@ -9,6 +11,7 @@ Set Name and mail adress
 #+end_src
 
 ** Font settings
+
 #+begin_src elisp
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
       doom-big-font (font-spec :family "FiraCode Nerd Font" :size 28 :weight 'light)
@@ -17,24 +20,30 @@ Set Name and mail adress
 #+end_src
 
 ** Line numbers
-Since I'm using Evil/vim-keybindings, I prefer relative line numbers as default.
+
+Since I'm using Evil/vim-keybindings, I prefer relative line numbers. ~'visual~ is
+a different way of relative line numbers, where folded lines are not counted.
+
 #+begin_src elisp
-(setq display-line-numbers-type 'relative)
+(setq display-line-numbers-type 'visual)
 #+end_src
 
 ** Tab width
+
 2 spaces, suck it k&r
 #+begin_src elisp
 (setq tab-width 2)
 #+end_src
 
 ** Editorconfig
+
 #+begin_src elisp :tangle packages.el
 (package! editorconfig)
 #+end_src
 
 ** Splash Screen
 *** Splash Image
+
 I've created a custom SVG with transparency and shadow effects that should go
 well with a variety of color schemes.
 #+begin_src elisp
@@ -42,24 +51,33 @@ well with a variety of color schemes.
 #+end_src
 
 ** Title
+
 I'm setting the title to be just "Emacs"
 
 #+begin_src elisp
 (setq frame-title-format "%b - Emacs")
 #+end_src
+
 ** TODO Password Store location
+
 I'm using ~pass~ (synced to my Bitwarden via a custom utility) to store/retrieve
 secrets. Instead of the default location, my password storage lives at
 ~$HOME/.local/share/password-store~.
 
 I need to set the env variable ~$PASSWORD_STORE_DIR~ to this location.
+
 #+begin_src elisp
 (setenv "PASSWORD_STORE_DIR" "~/.local/share/password-store")
 #+end_src
+
 * Utils
+
 For efficiently writing my config, I need some utils.
+
 ** Add-Hooks
+
 Small utility to add a function to multiple hooks at once.
+
 #+begin_src elisp
 (defun add-hooks (hook-list function)
   "Add FUNCTION to all hooks in HOOK-LIST."
@@ -69,6 +87,7 @@ Small utility to add a function to multiple hooks at once.
 
 * Org Mode
 ** Base Settings
+
 #+begin_src elisp
 (setq org-directory "~/org/")
 (setq org-agenda-files (list org-directory))
@@ -84,43 +103,48 @@ Small utility to add a function to multiple hooks at once.
 #+end_src
 
 ** Visual improvements
-*** Start Org in mixed-pitch-mode
+*** Headlines
+
+Set headlines to the foreground color, successively darkened:
+
+#+begin_src elisp
+(defun set-org-headline-color ()
+  "Set the org headline colors to darker variants of the foreground color."
+  (dotimes (i 8)
+    (set-face-foreground (intern (format "org-level-%d" (1+ i))) (doom-darken 'fg (* i 0.1)))))
+
+(add-hook 'org-mode-hook 'set-org-headline-color)
+#+end_src
+
+Hide leading stars:
+
+#+begin_src elisp
+(setq org-hide-leading-stars nil)
+#+end_src
+
+Indent content based on headline level:
+
+#+begin_src elisp
+(setq org-startup-indented t)
+#+end_src
+
+*** Fonts
+
+Org mode should use a variable pitch font for better readability.
+
 #+begin_src elisp
 (add-hook 'org-mode-hook #'mixed-pitch-mode)
 #+end_src
 
-*** Padding
-**** Line spacing
 Line spacing should be higher in org-mode than in "code" modes.
-For org-mode, I'm going with a higher value of 0.2.
+
 #+begin_src elisp
 (add-hook 'org-mode-hook
           (lambda () (setq line-spacing 0.2)))
 #+end_src
 
-*** TODO Fix this - Center text
-Olivetti is a minor mode for centering the text in a buffer.
+*** Org-Modern
 
-Sadly, when opening i.e. this ~org~ file or a random small ~ts~ file, this no
-longer works.
-
-#+begin_src elisp :tangle packages.el
-(package! olivetti)
-#+end_src
-
-*** Improve Headlines
-**** Hide leading stars
-#+begin_src elisp
-(setq org-hide-leading-stars t)
-#+end_src
-
-How can I show the leading stars for the currently selected headline?
-**** Indent content based on headline level
-#+begin_src elisp
-(setq org-startup-indented t)
-#+end_src
-
-*** Use Org-Modern
 Org-modern (https://github.com/minad/org-modern) contains a lot of nice visual
 improvements for org-mode.
 
@@ -168,61 +192,86 @@ Set up org-modern
 #+end_src
 
 (It's pretty bare-bones for now, though the author has more examples for theming in their README.)
-**** TODO actually implement this :emacs:
-Currently, this has some issues with doom emacs.
-
-(I Need to adjust the style to fit into my theme)
 
 Use it globally and tweak it some more.
+
 #+begin_src elisp :tangle none
-;; (modify-all-frames-parameters
-;;  '((right-divider-width . 10)
-;;    (internal-border-width . 10)))
-;; (dolist (face '(window-divider
-;;                 window-divider-first-pixel
-;;                 window-divider-last-pixel))
-;;   (face-spec-reset-face face)
-;;   (set-face-foreground face (face-attribute 'default :background)))
-;; (set-face-background 'fringe (face-attribute 'default :background))
+(modify-all-frames-parameters
+ '((right-divider-width . 10)
+   (internal-border-width . 10)))
 
-;; (use-package! org-modern
-;;   :after org
-;;   :custom
-;;   (org-modern-star '("◉" "○" "◈" "◇" "•"))
-;;   (org-modern-timestamp '(" %d.%m.%Y " . " %H:%M ")))
+(dolist (face '(window-divider
+                window-divider-first-pixel
+                window-divider-last-pixel))
+  (face-spec-reset-face face)
+  (set-face-foreground face (face-attribute 'default :background)))
 
-;; (setq
-;;  ;; Edit settings
-;;  org-auto-align-tags nil
-;;  org-tags-column 0
-;;  org-catch-invisible-edits 'show-and-error
-;;  org-special-ctrl-a/e t
-;;  org-insert-heading-respect-content t
+(set-face-background 'fringe (face-attribute 'default :background))
 
-;;  ;; Org styling, hide markup etc.
-;;  org-hide-emphasis-markers t
-;;  org-pretty-entities t
-;;  org-ellipsis "…"
+(use-package! org-modern
+  :after org
+  :custom
+  (org-modern-star '("◉" "○" "◈" "◇" "•"))
+  (org-modern-timestamp '(" %d.%m.%Y " . " %H:%M ")))
 
-;;  ;; Agenda styling
-;;  org-agenda-tags-column 0
-;;  org-agenda-block-separator ?─
-;;  org-agenda-time-grid
-;;  '((daily today require-timed)
-;;    (800 1000 1200 1400 1600 1800 2000)
-;;    " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
-;;  org-agenda-current-time-string
-;;  "⭠ now ─────────────────────────────────────────────────")
+(setq
+ ;; Edit settings
+ org-auto-align-tags nil
+ org-tags-column 0
+ org-catch-invisible-edits 'show-and-error
+ org-special-ctrl-a/e t
+ org-insert-heading-respect-content t
 
-;; (global-org-modern-mode)
+ ;; Org styling, hide markup etc.
+ org-hide-emphasis-markers t
+ org-pretty-entities t
+ org-ellipsis "…"
+
+ ;; Agenda styling
+ org-agenda-tags-column 0
+ org-agenda-block-separator ?─
+ org-agenda-time-grid
+ '((daily today require-timed)
+   (800 1000 1200 1400 1600 1800 2000)
+   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+ org-agenda-current-time-string
+ "⭠ now ─────────────────────────────────────────────────")
+
+;; customize org-modern-date-inactive face
+(custom-set-faces!
+  `(org-modern-date-inactive
+    :foreground ,(doom-color 'base6)
+    :background ,(doom-color 'bg-alt))
+  `(org-modern-time-inactive
+    :foreground ,(doom-color 'base6)
+    :background ,(doom-lighten 'bg-alt 0.1)))
+
+(global-org-modern-mode)
 #+end_src
 
-*** Vastly improve the tree's display
+Org-modern comes with prettify-symbols mode, so I'm defining some symbols and
+enabling it.
+
 #+begin_src elisp
-(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+(setq prettify-symbols-alist
+      '(("CLOCK:" . ?)
+        (":LOGBOOK:" . ?)
+        (":END:" . ?-)))
 #+end_src
+
+**** TODO Test
+:LOGBOOK:
+CLOCK: [2024-06-29 Sat 09:35]--[2024-06-29 Sat 09:43] =>  0:08
+:END:
+*** Vastly improve the tree's display
+
+#+begin_src elisp
+;; (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+#+end_src
+
 *** Miscellanious improvements
 **** Show passed deadlines as error
+
 #+begin_src elisp
 (setq org-agenda-deadline-faces
       '((1.001 . error)
@@ -232,12 +281,15 @@ Use it globally and tweak it some more.
 #+end_src
 
 **** Show quote blocks in italic
+
 #+begin_src elisp
 (setq org-fontify-quote-and-verse-blocks t)
 #+end_src
 
 **** Defer font-lock
+
 For a more responsive editing experience
+
 #+begin_src elisp
 (defun locally-defer-font-lock ()
   "Set jit-lock defer and stealth, when buffer is over a certain size."
@@ -246,14 +298,55 @@ For a more responsive editing experience
                 jit-lock-stealth-time 1)))
 #+end_src
 
+*** Hide ~:PROPERTY:~ Drawers
+
+org-tidy is a package for hiding all ~:PROPERTY:~ drawers.
+
+#+begin_src elisp :tangle packages.el
+(package! org-tidy)
+#+end_src
+
+I want to enable it per default in org-mode, but be able to toggle it with
+~<localleader>-z~
+
+#+begin_src elisp
+(use-package! org-tidy
+  :defer t
+  :hook (org-mode . org-tidy-mode)
+  :config (map! :map org-mode-map
+                :localleader
+                :desc "Toggle org-tidy" "z" #'org-tidy-mode))
+#+end_src
+
 ** Babel
 *** HTTP requests via babel
+
+ob-http is a package that allows for making HTTP requests from within org-mode
+using babel.
+
 #+begin_src elisp
 (use-package! ob-http
   :commands org-babel-execute:http)
 #+end_src
 
+Example usage:
+
+#+begin_example
+#+begin_src http :pretty
+GET https://jsonplaceholder.typicode.com/posts/1
+#+end_src
+
+#+RESULTS:
+: {
+:   "userId": 1,
+:   "id": 1,
+:   "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+:   "body": "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"
+: }
+#+end_example
+
 *** Babel header args
+
 See https://org-babel.readthedocs.io/en/latest/header-args/
 
 #+begin_src elisp
@@ -269,6 +362,7 @@ See https://org-babel.readthedocs.io/en/latest/header-args/
 #+end_src
 
 *** Auto-Tangling
+
 I want org to tangle my config.org on file save, regardless whether it's the one
 loaded or in a different repo.
 
@@ -285,13 +379,16 @@ loaded or in a different repo.
 #+end_src
 
 *** Typescript
+
 To execute typescript code blocks, I'm using the ~ob-typescript~ package.
 
 #+begin_src elisp :tangle packages.el
 (package! ob-typescript)
 #+end_src
+
 ** Import/Export
 *** View exported file
+
 #+begin_src elisp
 (map! :map org-mode-map
       :localleader
@@ -320,27 +417,18 @@ To execute typescript code blocks, I'm using the ~ob-typescript~ package.
   "Search for output files with these extensions, in order, viewing the first that matches")
 (defvar org-view-external-file-extensions '("html")
   "File formats that should be opened externally.")
-
 #+end_src
 
 *** use github markdown
+
 #+begin_src elisp
 (use-package! ox-gfm :after ox :defer t)
 #+end_src
 
 *** Export headings up to five levels deep
+
 #+begin_src elisp
 (setq org-export-headline-levels 5)
-#+end_src
-
-*** automatic latex rendering
-#+begin_src elisp :tangle packages.el
-(package! org-fragtog)
-#+end_src
-
-#+begin_src elisp :tangle none
-(use-package! org-fragtog
-  :hook (org-mode . 'org-fragtog-mode))
 #+end_src
 
 *** Latex fragments
@@ -351,6 +439,7 @@ To execute typescript code blocks, I'm using the ~ob-typescript~ package.
 ** Extensions
 *** Roam
 **** Use the same directory as org
+
 #+begin_src elisp
 (setq org-roam-directory "~/org/roam")
 (add-to-list 'org-agenda-files org-roam-directory)
@@ -405,18 +494,21 @@ I'm adjusting the bindings just for ~org-mode~.
 #+end_src
 
 *** Visual-line-mode messes with with plaintext (markdow, latex)
+
 #+begin_src elisp
 (remove-hook 'text-mode-hook #'visual-line-mode)
 (add-hook 'text-mode-hook #'auto-fill-mode)
 #+end_src
 
 *** Prevent org-block face for latex fragments, since they look weird
+
 #+begin_src elisp
 (require 'org-src)
 (add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t)))
 #+end_src
 
 *** Function to create an org buffer
+
 #+begin_src elisp
 (evil-define-command evil-buffer-org-new (count file)
   "creates a new ORG buffer replacing the current window, optionally
@@ -435,6 +527,7 @@ I'm adjusting the bindings just for ~org-mode~.
 #+end_src
 
 *** Insert cdlatex enviornments and edit immediately
+
 #+begin_src elisp
 (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
 
@@ -444,6 +537,7 @@ I'm adjusting the bindings just for ~org-mode~.
 #+end_src
 
 *** Disable auto-fill-mode
+
 Auto-fill-mode automatically adds line breaks while typing in markdown and org files.
 Since those files are going to be exported to pdf or html, which take care of proper formatting, I'm disabling this.
 
@@ -453,6 +547,7 @@ For Markdown, add a hook setting auto-fill-mode to -1.
 #+end_src
 
 *** Nix-Doom-Emacs messes with dashboard
+
 I'm using the nix-doom-emacs package to install emacs & dependencies, and for
 some reason, using that binary, the Dashboard is disabled. [[https://github.com/nix-community/nix-doom-emacs/issues/88#issuecomment-1115500602][This comment]] in a
 corresponding GH issue has a fix.
@@ -462,12 +557,15 @@ corresponding GH issue has a fix.
 #+end_src
 
 *** Faster insertion of org structures (i.e. source blocks)
+
 For some reason, ~org-tempo~ does not start at launch, so I'm  loading it here.
+
 #+begin_src elisp
 (use-package! org-tempo)
 #+end_src
 
 *** Automatic list item insertion
+
 The package ~org-autolist~ makes org lists behave more like traditional text
 editors, meaning ~<Return>~ will insert a list item first, ~<Return><Return>~ will insert a
 newline, etc.
@@ -482,6 +580,7 @@ newline, etc.
 #+end_src
 ** Capture
 *** Add / change cappture templates
+
 Some other tools (like orgzly) work better with ~TODO~ instead of ~[ ]~ (and
 ~DONE~ instead of ~[X]~).
 
@@ -514,6 +613,7 @@ Some other tools (like orgzly) work better with ~TODO~ instead of ~[ ]~ (and
 #+end_src
 
 *** Improve org-capture dialog
+
 #+BEGIN_SRC elisp
 (after! org-capture
     (defun org-capture-select-template-prettier (&optional keys)
@@ -538,6 +638,7 @@ Some other tools (like orgzly) work better with ~TODO~ instead of ~[ ]~ (and
 
 The [[file:~/.emacs.d/bin/org-capture][org-capture bin]] is rather nice, but It would be even nicer with a smaller frame, and
 no modeline.
+
 #+BEGIN_SRC emacs-lisp
 (setf (alist-get 'height +org-capture-frame-parameters) 15)
       ;; (alist-get 'name +org-capture-frame-parameters) "❖ Capture") ;; ATM hardcoded in other places, so changing breaks stuff
@@ -550,22 +651,29 @@ no modeline.
 
 * Workspaces & Projects
 ** Projectile Project Search Path
+
 Search for projects in  ~~/Code/~, but only one level deep.
+
 #+begin_src elisp
 (setq projectile-project-search-path '(("~/Code/" . 1)))
 #+end_src
+
 ** Disable Automatic Workspace Creation
+
 Per default, emacs creates a workspace for every project - prohibiting, for
 instance, side-by-side editing. I'm disabling this behavior.
 
 #+begin_src elisp
 (setq +workspaces-on-switch-project-behavior nil)
 #+end_src
+
 * Development
 ** Language-Specific Settings
 *** Web Dev (JS/TS/CSS)
 **** Testing
-***** Jest.el
+
+Add a package for Jest testing
+
 #+begin_src elisp :tangle packages.el
 (package! jest)
 #+end_src
@@ -575,7 +683,9 @@ instance, side-by-side editing. I'm disabling this behavior.
   :after (typescript-mode js-mode typescript-tsx-mode)
   :hook (typescript-mode . jest-minor-mode))
 #+end_src
+
 **** TODO Eslint
+
 Eslint keeps track of all projects it has been run in, and - even if only one
 workspace is open, will start to run in all of them.
 The following sets it to run only in the current session.
@@ -591,19 +701,24 @@ switch the client, so I'm adding a hook to restart all lsp clients when I'm
 switching workspaces.
 
 First, I need to define a function to restart all clients.
+
 **** Svelte
+
 #+begin_src elisp :tangle packages.el
 (package! svelte-mode)
 #+end_src
 
 #+begin_src elisp
 (use-package! svelte-mode
-    :mode "\\.svelte\\'")
+  :defer t
+  :mode "\\.svelte\\'")
 #+end_src
 
 **** Vue
-***** LSP
-The package lsp-mode has an issue with volar in version 8.0.0, so until the
+Vue SFC files are recognized and handled by ~web-mode~, so I only need to set up
+some tweaks regarding the lsp and indentation.
+
+The package ~lsp-mode~ has an issue with volar in version 8.0.0, so until the
 issues are in the next release of lsp-mode (and doom), I'm unpinning the
 package.
 
@@ -611,12 +726,10 @@ package.
 (unpin! lsp-mode)
 #+end_src
 
-To get lsp support working, there needs to be a ~.volarrc~ file in the project's
+⚠️ To get lsp support working, there needs to be a ~.volarrc~ file in the project's
 root directory.
 
-***** Formatting
-
-Remove 1 space padding from <script> tags, set indent to 2.
+Remove 1 space padding from ~<script>~ tags, set indent to 2.
 
 #+begin_src elisp
 (with-eval-after-load 'web-mode
@@ -626,8 +739,10 @@ Remove 1 space padding from <script> tags, set indent to 2.
   (setq web-mode-markup-indent-offset 2))
 #+end_src
 
-***** Folding
 **** Astro
+
+Add a package for a dedicated ~astro~ mode:
+
 #+begin_src elisp :tangle packages.el
 (package! astro-ts-mode)
 #+end_src
@@ -663,7 +778,9 @@ Register the astro-ls binary for lsp support.
 #+end_src
 
 **** Tailwind
+
 Add the tailwind lsp package
+
 #+begin_src elisp :tangle packages.el
 (package! lsp-tailwindcss
   :recipe (:host github
@@ -671,6 +788,7 @@ Add the tailwind lsp package
 #+end_src
 
 ...and use it
+
 #+begin_src elisp
 (use-package! lsp-tailwindcss
   :defer t
@@ -681,7 +799,9 @@ Add the tailwind lsp package
 #+end_src
 
 **** Code formatting
+
 Set typescript, javascript and json file indentation to be 2 levels by default.
+
 #+begin_src elisp
 (setq typescript-indent-level 2)
 (setq js-indent-level 2)
@@ -689,14 +809,19 @@ Set typescript, javascript and json file indentation to be 2 levels by default.
 
 **** TODO Typescript REPL
 *** Nix
-**** nix-mode.el
-[[https://github.com/NixOS/nix-mode][Nix-mode]] is a major mode for editing nix expressions. It comes with a variaty of submodules
+
+[[https://github.com/NixOS/nix-mode][Nix-mode]] is a major mode for editing nix expressions.
+
 #+begin_src elisp
 (use-package! nix-mode
   :mode "\\.nix\\'")
 #+end_src
 
-***** nix.el
+It comes with a variaty of
+submodules:
+
+**** nix.el
+
 Nix.el contains some miscellanious tools. Interactive functions include:
 
 - nix-unpack - unpack source of a Nix attribute.
@@ -717,33 +842,30 @@ provided to point to Nix binaries that can be used in Lisp code.
 Also, a function ~nix-system~ is provided to get the current system (the way Nix
 detects it).
 
-***** nix-flake.el
+**** nix-flake.el
 
 Uses transient.el to provide a magit-like interface for supporting flake
 commands.
 Using ~M-x nix-flake~ commands can be run on the current flake, whereas ~M-x
 ~nix-flake-init~ can initialize a flake from a atemplate.
 
-***** nix-repls.el
+**** nix-repls.el
 
 Provides an interface for completion, nused by nix-company.el. Secondly it
 provides an interactive function to open a repl via ~M-x nix-repl~
 
-***** nix-store.el
+**** nix-store.el
 
 Displays information about the store path including logs associated with a
 derivation.
 
-***** nix-prettify-mode.el
+**** nix-prettify-mode.el
 
 Improves display of store paths.
 
-**** nix-buffer
-Adds an emacs command to modify the buffer environment according to a Lisp
-expression buily by nix.
-
 *** Python
 **** Poetry
+
 After years of frustration, I'm finally content with setting up and managing
 projects in the Python ecosystem, thanks to Poetry. It's a great tool, and
 luckily, there is excellent integration with Emacs.
@@ -753,6 +875,7 @@ luckily, there is excellent integration with Emacs.
 #+end_src
 
 **** Run pytest in virtualenv
+
 python-pytest does not use the virtualenv's binary by default. As a fix, I'm
 adding a hook to python-mode to set the correct executable - since python-mode
 plays nicely with direnv.
@@ -766,10 +889,10 @@ plays nicely with direnv.
 #+end_src
 
 *** Terraform
+
 There are two competing lsp servers for Terraform with support in Emacs, but,
 although ~terraform-lsp~ is the more featurerich, I'm sticking with ~terraform-ls~
-since it's not only more reliable, but seems to not work with TF versions above 0.12.
-But still, ~terraform-lsp~ is a good alternative, with some nice- to- haves.
+for now, but, ~terraform-lsp~ is a good alternative, with some nice- to- haves.
 
 #+begin_src elisp
 (setq lsp-terraform-ls-enable-show-reference t)
@@ -778,6 +901,7 @@ But still, ~terraform-lsp~ is a good alternative, with some nice- to- haves.
 #+end_src
 
 *** Haskell
+
 There's a Doom-Emacs module for setting up haskell-mode together with Haskell's
 lsp, but currently, a bug prevents ~haskell-mode~ from working properly:
 https://github.com/haskell/haskell-mode/issues/1825
@@ -789,14 +913,16 @@ A workaround is to explicitly set ~flymake-allowed-file-name-masks~ to nil.
 #+end_src
 
 *** Jsonnet
+
 Jsonnet is a data templating language.
 
-First, jsonnet-mode.
+First, a package for a jsonnet mode:
+
 #+begin_src elisp :tangle packages.el
 (package! jsonnet-mode)
 #+end_src
 
-Then, I'm setting up lsp support.
+Then, lsp support:
 
 #+begin_src elisp
 (defcustom lsp-jsonnet-executable "jsonnet-language-server"
@@ -825,16 +951,23 @@ Then, I'm setting up lsp support.
 #+end_src
 
 *** Rust
-**** Set LSP features to "all"
+
+Rust projects have multiple "features", for instance, in Leptos there are
+backend and frontend features. Per default, I want all of them to be enabled for
+the lsp:
+
 #+begin_src elisp
 (setq lsp-rust-features "all")
 #+end_src
+
 ** Tools
 *** Code Completion
+
 Since it's already integrated into Doom Emacs, I'm using company for code
 completion.
 
 **** Handling
+
 I don't want any delay in showing suggestions, unless I'm writing a string or a
 comment, then I want company to not show any suggestions at all.
 
@@ -849,6 +982,7 @@ comment, then I want company to not show any suggestions at all.
 #+end_src
 
 **** Backends
+
 A backend is responsible for providing the completion suggestions. As I'm using
 LSP where possible, and I don't want to use snippets in that way, I'm going to
 keep the list of backends very short.
@@ -858,7 +992,6 @@ keep the list of backends very short.
   (setq company-backends '(company-capf)))
 #+end_src
 
-***** Mode-Specific Backends
 The dictionary completion in ~org-mode~ just annoys me, and it seems to
 significantly slow down typing, so I'm disabling ~company-ispell~ (hopefully) everywhere.
 
@@ -867,8 +1000,9 @@ significantly slow down typing, so I'm disabling ~company-ispell~ (hopefully) ev
 #+end_src
 
 **** Looks
+
 For the icons, I'm using VSCode icons. The nomenclature is a little confusing,
-to determine, what to put in the margin, company has to execute a function. So
+to determine what to put in the margin, company has to execute a function. So
 using the function ~company-vscode-dark-icons-margin~ here means just setting
 those icons as what's being displayed.
 
@@ -877,14 +1011,16 @@ those icons as what's being displayed.
 #+end_src
 
 *** Copilot
+
+This package adds Github Copilot functionality to Emacs:
+
 #+begin_src elisp :tangle packages.el
-(package! copilot :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+(package! copilot :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el" "dist")))
 #+end_src
 
-When enabling copilot, I'm hooking into ~prog-mode~ to enable it for all
-programming modes.
-Further, I'm disabling the warning about indentation (see
-https://github.com/zerolfx/copilot.el/issues/220), and binding some keys.
+When enabling copilot, I'm hooking into ~prog-mode~ to enable it for all programming modes.
+Further, I'm disabling the warning about indentation (see https://github.com/zerolfx/copilot.el/issues/220),
+and binding some keys.
 
 #+begin_src elisp
 (use-package! copilot
