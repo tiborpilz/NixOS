@@ -51,13 +51,13 @@ I'm setting the title to be just "Emacs"
 (setq frame-title-format "%b - Emacs")
 #+end_src
 
-** TODO Password Store location
+** Password Store location
 
 I'm using ~pass~ (synced to my Bitwarden via a custom utility) to store/retrieve
 secrets. Instead of the default location, my password storage lives at
 ~$HOME/.local/share/password-store~.
 
-For ~password-store~ to work correctly, this needs to be set up
+For ~password-store~ to work correctly, this needs to be set up.
 
 #+begin_src elisp
 (setq auth-source-pass-filename
@@ -105,8 +105,8 @@ Set headlines to the foreground color, successively darkened:
 (defun set-org-headline-color ()
   "Set the org headline colors to darker variants of the foreground color."
   (dotimes (i 8)
-    (set-face-foreground (intern (format "org-level-%d" (1+ i))) nil))
-  (set-face-foreground 'org-document-title nil))
+    (set-face-foreground (intern (format "org-level-%d" (1+ i))) (doom-color 'fg)))
+  (set-face-foreground 'org-document-title (doom-color 'fg)))
 
 (add-hook 'org-mode-hook 'set-org-headline-color)
 #+end_src
@@ -1331,8 +1331,16 @@ And finally, a function to start previewing the markdown buffer.
 #+end_src
 ** Theming
 *** Doom Themes
+
 #+begin_src elisp :tangle packages.el
 (package! doom-themes)
+#+end_src
+
+Doom Themes require ~all-the-icons~ to be installed (even though Doom itself moved on to nerd-icons).
+To keep compatibility, I'm installing the package manually
+
+#+begin_src elisp :tangle packages.el
+(package! all-the-icons)
 #+end_src
 
 *** Catppuccin
@@ -1433,7 +1441,7 @@ create a color scheme with more nuance via color correcting the applied colors.
 
 **** TODO: Implement more complex color schemes based on base16 colors
 
-** Modeline
+** UI
 *** Doom Modeline
 
 Allow for more characters in the branch name
@@ -1455,7 +1463,6 @@ Disable additional unnecessary information
 (setq size-indication-mode nil)
 #+end_src
 
-** UI
 *** General Padding
 
 The way windows have been close together always kind of botheres me. Luckily,
@@ -1633,22 +1640,4 @@ obsolete variable.
 (use-package! elcord
   :config
   (setq elcord-editor-icon "emacs_icon"))
-#+end_src
-
-** Home Assistant
-
-#+begin_src elisp
-(defun org-indent-use-stars-for-strings ()
-  "Initialize the indentation strings with stars instead of spaces."
-  (message "it's doing it!")
-  (setq org-indent-strings (make-vector (1+ org-indent-max) nil))
-  (aset org-indent-strings 0 nil)
-  (loop for i from 1 to org-indent-max do
-    (aset org-indent-strings i
-          (org-add-props
-          (concat (make-string (1- i) ?*) ; <- THIS IS THE ONLY CHANGE
-              (char-to-string org-indent-boundary-char))
-          nil 'face 'org-indent))))
-
-(advice-add 'org-indent-initialize :after #'org-indent-use-stars-for-strings)
 #+end_src
