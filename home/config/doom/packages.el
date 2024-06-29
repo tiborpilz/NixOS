@@ -58,6 +58,8 @@
 
 (package! doom-themes)
 
+(package! all-the-icons)
+
 (package! catppuccin-theme)
 
 (package! grayscale-theme)

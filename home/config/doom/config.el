@@ -37,8 +37,8 @@
 (defun set-org-headline-color ()
   "Set the org headline colors to darker variants of the foreground color."
   (dotimes (i 8)
-    (set-face-foreground (intern (format "org-level-%d" (1+ i))) nil))
-  (set-face-foreground 'org-document-title nil))
+    (set-face-foreground (intern (format "org-level-%d" (1+ i))) (doom-color 'fg)))
+  (set-face-foreground 'org-document-title (doom-color 'fg)))
 
 (add-hook 'org-mode-hook 'set-org-headline-color)
 
@@ -611,17 +611,3 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (use-package! elcord
   :config
   (setq elcord-editor-icon "emacs_icon"))
-
-(defun org-indent-use-stars-for-strings ()
-  "Initialize the indentation strings with stars instead of spaces."
-  (message "it's doing it!")
-  (setq org-indent-strings (make-vector (1+ org-indent-max) nil))
-  (aset org-indent-strings 0 nil)
-  (loop for i from 1 to org-indent-max do
-    (aset org-indent-strings i
-          (org-add-props
-          (concat (make-string (1- i) ?*) ; <- THIS IS THE ONLY CHANGE
-              (char-to-string org-indent-boundary-char))
-          nil 'face 'org-indent))))
-
-(advice-add 'org-indent-initialize :after #'org-indent-use-stars-for-strings)
