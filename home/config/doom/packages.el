@@ -1,10 +1,4 @@
-(package! editorconfig)
-
 (package! org-modern)
-
-(package! org-outer-indent
-  :recipe (:host github :repo "rougier/org-outer-indent")
-  :pin "9c5aef47f259a13baae73e50f9f897f85767718f")
 
 (package! org-tidy)
 
@@ -34,11 +28,11 @@
 
 (package! jsonnet-mode)
 
-(package! copilot)
-  ;; :pin
-  ;; :recipe (:host github
-  ;;          :repo "copilot-emacs/copilot.el"
-  ;;          :files ("*.el" "dist")))
+(package! copilot
+  :pin "c6b31f640eca89bb68d3c5005f22c27d033cc92e"
+  :recipe (:host github
+           :repo "copilot-emacs/copilot.el"
+           :files ("*.el" "dist")))
 
 (package! lab)
 
@@ -86,5 +80,7 @@
 (package! treemacs-nerd-icons :pin "9876cb478145a0ec4e36f64ff6583f3de7126216")
 
 (package! k8s-mode)
+
+(unpin! pcre2el)
 
 (package! elcord)

@@ -9,7 +9,7 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     emacs-overlay.url = "github:nix-community/emacs-overlay";
-    nix-doom-emacs.url = "github:nix-community/nix-doom-emacs";
+    nix-doom-emacs-unstraightened.url = "github:marienz/nix-doom-emacs-unstraightened";
 
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
@@ -32,6 +32,7 @@
 
     lsp-mode.url = "github:emacs-lsp/lsp-mode";
     lsp-mode.flake = false;
+
   };
 
   outputs =
@@ -137,7 +138,7 @@
 
             modules = [
               ./home
-              inputs.nix-doom-emacs.hmModule
+              inputs.nix-doom-emacs-unstraightened.hmModule
               {
                 _module.args.inputs = inputs;
                 home.username = user;

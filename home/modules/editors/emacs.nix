@@ -11,36 +11,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    programs.doom-emacs = mkIf cfg.useNix rec {
-      enable = true;
-      doomPrivateDir = ../../config/doom;
-      doomPackageDir = let
-        filteredPath = builtins.path {
-          path = doomPrivateDir;
-          name = "doom-private-dir-filtered";
-          filter = path: type:
-            builtins.elem (baseNameOf path) [ "init.el" "packages.el" ];
-        };
-      in pkgs.linkFarm "doom-packages-dir" [
-        { name = "init.el"; path = "${filteredPath}/init.el"; }
-        { name = "packages.el"; path = "${filteredPath}/packages.el"; }
-        { name = "config.el"; path = pkgs.emptyFile; }
-      ];
-      emacsPackage = pkgs.my.emacsGitWrapped;
-
-      emacsPackagesOverlay = self: super: {
-        copilot = pkgs.my.copilot;
-        emacs = emacsPackage;
-      };
-
-      extraPackages = with pkgs; [ nodejs-16_x ];
-
-      extraConfig = ''
-        (setenv "LSP_USE_PLISTS" "true")
-        (setq lsp-use-plists t)
-        (setq copilot-node-executable "${pkgs.nodejs-16_x}/bin/node")
-      '';
-    };
     programs.emacs.enable = true;
     programs.emacs.extraConfig = ''
       (setenv "LSP_USE_PLISTS" "true")
@@ -49,6 +19,11 @@ in
 
     programs.emacs.package = pkgs.my.emacsGitWrapped;
 
+    programs.doom-emacs = mkIf cfg.useNix {
+      enable = true;
+      doomDir = ../../config/doom;
+      emacs = pkgs.my.emacsGitWrapped;
+    };
 
     services.emacs.enable = lib.mkIf (pkgs.stdenv.hostPlatform.isLinux) true;
 
@@ -132,10 +107,9 @@ in
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
 
-
     xdg.configFile."doom" = { source = ../../config/doom; recursive = true; };
 
-    # home.sessionVariables.DOOMDIR = (if !cfg.useNix then "${config.home.homeDirectory}/.config/nixos/home/config/doom" else "");
+    home.sessionVariables.DOOMDIR = (if !cfg.useNix then "${config.home.homeDirectory}/.config/nixos/home/config/doom" else "");
 
     home.activation.installDoomEmacs =
       let activationScript = ''
