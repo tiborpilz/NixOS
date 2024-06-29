@@ -16,7 +16,7 @@ Set Name and mail adress
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
       doom-big-font (font-spec :family "FiraCode Nerd Font" :size 28 :weight 'light)
       doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
-      doom-variable-pitch-font (font-spec :family "DejaVu Serif" :size 16 :weight 'normal))
+      doom-variable-pitch-font (font-spec :family "DejaVu Serif" :size 16 :weight 'light))
 #+end_src
 
 ** Line numbers
@@ -112,7 +112,8 @@ Set headlines to the foreground color, successively darkened:
 (defun set-org-headline-color ()
   "Set the org headline colors to darker variants of the foreground color."
   (dotimes (i 8)
-    (set-face-foreground (intern (format "org-level-%d" (1+ i))) (doom-darken 'fg (* i 0.1)))))
+    (set-face-foreground (intern (format "org-level-%d" (1+ i))) nil))
+  (set-face-foreground 'org-document-title nil))
 
 (add-hook 'org-mode-hook 'set-org-headline-color)
 #+end_src
@@ -126,7 +127,7 @@ Hide leading stars:
 Indent content based on headline level:
 
 #+begin_src elisp
-(setq org-startup-indented t)
+(setq org-startup-indented nil)
 #+end_src
 
 *** Fonts
@@ -155,9 +156,11 @@ improvements for org-mode.
 
 #+begin_src elisp
 (use-package! org-modern
+  :defer t
   :hook (org-mode . global-org-modern-mode)
   :config
-  (setq org-modern-label-border 0.4))
+  (setq org-modern-label-border 0.1
+        org-modern-star nil))
 #+end_src
 
 Set up org-modern
@@ -185,8 +188,11 @@ Set up org-modern
   org-agenda-current-time-string
   "⭠ now ─────────────────────────────────────────────────"
 
+  org-modern-block-name
+  '(("src" . ""))
+
   ;; Org-Modern settings
-  org-modern-star 'replace ;; Use old org-modern star icons
+  org-modern-star 'nil ;; Use old org-modern star icons
 )
 
 (global-org-modern-mode)
@@ -195,60 +201,6 @@ Set up org-modern
 (It's pretty bare-bones for now, though the author has more examples for theming in their README.)
 
 Use it globally and tweak it some more.
-
-#+begin_src elisp :tangle none
-(modify-all-frames-parameters
- '((right-divider-width . 10)
-   (internal-border-width . 10)))
-
-(dolist (face '(window-divider
-                window-divider-first-pixel
-                window-divider-last-pixel))
-  (face-spec-reset-face face)
-  (set-face-foreground face (face-attribute 'default :background)))
-
-(set-face-background 'fringe (face-attribute 'default :background))
-
-(use-package! org-modern
-  :after org
-  :custom
-  (org-modern-star '("◉" "○" "◈" "◇" "•"))
-  (org-modern-timestamp '(" %d.%m.%Y " . " %H:%M ")))
-
-(setq
- ;; Edit settings
- org-auto-align-tags nil
- org-tags-column 0
- org-catch-invisible-edits 'show-and-error
- org-special-ctrl-a/e t
- org-insert-heading-respect-content t
-
- ;; Org styling, hide markup etc.
- org-hide-emphasis-markers t
- org-pretty-entities t
- org-ellipsis "…"
-
- ;; Agenda styling
- org-agenda-tags-column 0
- org-agenda-block-separator ?─
- org-agenda-time-grid
- '((daily today require-timed)
-   (800 1000 1200 1400 1600 1800 2000)
-   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
- org-agenda-current-time-string
- "⭠ now ─────────────────────────────────────────────────")
-
-;; customize org-modern-date-inactive face
-(custom-set-faces!
-  `(org-modern-date-inactive
-    :foreground ,(doom-color 'base6)
-    :background ,(doom-color 'bg-alt))
-  `(org-modern-time-inactive
-    :foreground ,(doom-color 'base6)
-    :background ,(doom-lighten 'bg-alt 0.1)))
-
-(global-org-modern-mode)
-#+end_src
 
 Org-modern comes with prettify-symbols mode, so I'm defining some symbols and
 enabling it.
@@ -259,15 +211,21 @@ enabling it.
         (":LOGBOOK:" . ?)
         (":END:" . ?-)))
 #+end_src
+*** Outer Indent
+This package indents the headline indicators to the left, keeping the content aligned.
 
-**** TODO Test
-:LOGBOOK:
-CLOCK: [2024-06-29 Sat 09:35]--[2024-06-29 Sat 09:43] =>  0:08
-:END:
-*** Vastly improve the tree's display
+
+#+begin_src elisp :tangle packages.el
+(package! org-outer-indent
+  :recipe (:host github :repo "rougier/org-outer-indent")
+  :pin "9c5aef47f259a13baae73e50f9f897f85767718f")
+#+end_src
 
 #+begin_src elisp
-;; (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+(use-package! org-outer-indent
+  :defer t
+  :hook (org-mode . org-outer-indent-mode)       
+  :config (setq org-num-mode nil))
 #+end_src
 
 *** Miscellanious improvements
@@ -325,8 +283,13 @@ I want to enable it per default in org-mode, but be able to toggle it with
 ob-http is a package that allows for making HTTP requests from within org-mode
 using babel.
 
+#+begin_src elisp :tangle packages.el
+(package! ob-http)
+#+end_src
+
 #+begin_src elisp
 (use-package! ob-http
+  :defer t
   :commands org-babel-execute:http)
 #+end_src
 
@@ -387,45 +350,6 @@ To execute typescript code blocks, I'm using the ~ob-typescript~ package.
 (package! ob-typescript)
 #+end_src
 
-** Import/Export
-*** View exported file
-
-#+begin_src elisp
-(map! :map org-mode-map
-      :localleader
-      :desc "View exported file" "v" #'org-view-output-file)
-
-(defun org-view-output-file (&optional org-file-path)
-  "Visit buffer open on the first output file (if any) found, using `org-view-output-file-extensions'"
-  (interactive)
-  (let* ((org-file-path (or org-file-path (buffer-file-name) ""))
-         (dir (file-name-directory org-file-path))
-         (basename (file-name-base org-file-path))
-         (output-file nil))
-    (dolist (ext org-view-output-file-extensions)
-      (unless output-file
-        (when (file-exists-p
-               (concat dir basename "." ext))
-          (setq output-file (concat dir basename "." ext)))))
-    (if output-file
-        (if (member (file-name-extension output-file) org-view-external-file-extensions)
-            (browse-url-xdg-open output-file)
-          (pop-to-buffer (or (find-buffer-visiting output-file)
-                             (find-file-noselect output-file))))
-      (message "No exported file found"))))
-
-(defvar org-view-output-file-extensions '("pdf" "md" "rst" "txt" "tex" "html")
-  "Search for output files with these extensions, in order, viewing the first that matches")
-(defvar org-view-external-file-extensions '("html")
-  "File formats that should be opened externally.")
-#+end_src
-
-*** use github markdown
-
-#+begin_src elisp
-(use-package! ox-gfm :after ox :defer t)
-#+end_src
-
 *** Export headings up to five levels deep
 
 #+begin_src elisp
@@ -453,7 +377,7 @@ and it also needs the websocket package as dependency.
 The closest comparison to org-roam-ui is Obsidian.
 
 #+begin_src elisp :tangle packages.el
-(unpin! org-roam)
+;; (unpin! org-roam)
 (package! org-roam-ui)
 (package! websocket) ; dependency of `org-roam-ui'
 #+end_src
@@ -473,34 +397,6 @@ The closest comparison to org-roam-ui is Obsidian.
 #+end_src
 
 ** Fixes and miscellanious improvements
-*** Add shortcut for inserting  source, quote and example blocks
-
-For some reqson, ~<S <TAB>~ has stopped working, but I stumbled across
-~org-insert-structure-template~ which has the added benefit of choice.
-
-Right now it's stuck on a simple emacs-y keybinding, so I'm changing it to a
-more Evil-like one.
-
-It seems that ~localleader~ is pretty swamped, especially in org-mode, so I guess
-I waill try to cluster a few keybindings I want to add for aome time now - since
-it's Babel related, ~<SPC> [localleader] B~ should fit as an entrypoint.
-
-I'm adjusting the bindings just for ~org-mode~.
-
-#+begin_src elisp
-(map! :map org-mode-map
-      :localleader
-      (:prefix-map ("B" . "babel")
-       (:desc "Insert structure template" "c" #'org-insert-structure-template)))
-#+end_src
-
-*** Visual-line-mode messes with with plaintext (markdow, latex)
-
-#+begin_src elisp
-(remove-hook 'text-mode-hook #'visual-line-mode)
-(add-hook 'text-mode-hook #'auto-fill-mode)
-#+end_src
-
 *** Prevent org-block face for latex fragments, since they look weird
 
 #+begin_src elisp
@@ -525,26 +421,6 @@ I'm adjusting the bindings just for ~org-mode~.
 (map! :leader
       (:prefix "b"
        :desc "new empty ORG buffer" "o" #'evil-buffer-org-new))
-#+end_src
-
-*** Insert cdlatex enviornments and edit immediately
-
-#+begin_src elisp
-(add-hook 'org-mode-hook 'turn-on-org-cdlatex)
-
-(defadvice! org-edit-latex-env-after-insert ()
-  :after #'org-cdlatex-environment-indent
-  (org-edit-latex-environment))
-#+end_src
-
-*** Disable auto-fill-mode
-
-Auto-fill-mode automatically adds line breaks while typing in markdown and org files.
-Since those files are going to be exported to pdf or html, which take care of proper formatting, I'm disabling this.
-
-For Markdown, add a hook setting auto-fill-mode to -1.
-#+begin_src elisp
-(add-hook! markdown-mode (auto-fill-mode -1))
 #+end_src
 
 *** Nix-Doom-Emacs messes with dashboard
@@ -579,10 +455,12 @@ newline, etc.
 (use-package! org-autolist
   :hook (org-mode . org-autolist-mode))
 #+end_src
-** Capture
-*** Add / change cappture templates
 
-Some other tools (like orgzly) work better with ~TODO~ instead of ~[ ]~ (and
+** Capture
+*** Add / change capture templates
+
+Some other tools (like orgzly) work better with ~TODO~ instead of ~[ ]~ (and test another thing wow now it works yay
+something
 ~DONE~ instead of ~[X]~).
 
 #+begin_src elisp
@@ -724,7 +602,7 @@ issues are in the next release of lsp-mode (and doom), I'm unpinning the
 package.
 
 #+begin_src elisp :tangle packages.el
-(unpin! lsp-mode)
+;; (unpin! lsp-mode)
 #+end_src
 
 ⚠️ To get lsp support working, there needs to be a ~.volarrc~ file in the project's
@@ -784,6 +662,7 @@ Add the tailwind lsp package
 
 #+begin_src elisp :tangle packages.el
 (package! lsp-tailwindcss
+  :pin "3e3cc80a448e9dd24663eaa41742cda686dac5ab"
   :recipe (:host github
            :repo "merrickluo/lsp-tailwindcss"))
 #+end_src
@@ -1016,7 +895,11 @@ those icons as what's being displayed.
 This package adds Github Copilot functionality to Emacs:
 
 #+begin_src elisp :tangle packages.el
-(package! copilot :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el" "dist")))
+(package! copilot)
+  ;; :pin
+  ;; :recipe (:host github
+  ;;          :repo "copilot-emacs/copilot.el"
+  ;;          :files ("*.el" "dist")))
 #+end_src
 
 When enabling copilot, I'm hooking into ~prog-mode~ to enable it for all programming modes.
@@ -1025,11 +908,12 @@ and binding some keys.
 
 #+begin_src elisp
 (use-package! copilot
-          :hook
-          (prog-mode . copilot-mode)
-          (copilot-mode . (lambda ()
-                            (setq-local copilot--indent-warning-printed-p t)))
-          :bind (:map copilot-completion-map
+  :defer t
+  :hook
+  (prog-mode . copilot-mode)
+  (copilot-mode . (lambda ()
+                    (setq-local copilot--indent-warning-printed-p t)))
+  :bind (:map copilot-completion-map
               ("C-<space>" . 'copilot-accept-completion)
               ("C-SPC" . 'copilot-accept-completion)
               ("C-TAB" . 'copilot-accept-completion-by-word)
@@ -1338,12 +1222,12 @@ Add keybindings under ~SPC o D~ ("o" for "open", "D" for "Devdocs").
 GPTel (https://github.com/karthink/gptel) is a package for interacting with
 various LLMs.
 
-***** Install
+Install
 #+begin_src elisp :tangle packages.el
 (package! gptel)
 #+end_src
 
-***** Configuration
+Configure
 #+begin_src elisp
 (use-package! gptel
   :config
@@ -1356,8 +1240,9 @@ Extensions for asking about a document or refactoring the buffer.
 
 #+begin_src elisp :tangle packages.el
 (package! gptel-extensions
+  :pin "671e5186153fc9bf105c91effb1ed7db06508677"
   :recipe (:host github
-  :repo "kamushadenes/gptel-extensions.el"))
+           :repo "kamushadenes/gptel-extensions.el"))
 #+end_src
 
 #+begin_src elisp
@@ -1373,9 +1258,11 @@ based on Pandoc.
 #+end_src
 
 #+begin_src elisp
-(use-package quarto-mode
+(use-package! quarto-mode
+  :defer t
   :mode (("\\.Rmd" . poly-quarto-mode)))
 #+end_src
+
 *** Diagrams
 **** Mermaid
 ~mermaid-mode~ is a package for live previewing mermaid diagrams.
@@ -1572,7 +1459,9 @@ create a color scheme with more nuance via color correcting the applied colors.
 
 ** Modeline
 *** Doom Modeline
+
 Allow for more characters in the branch name
+
 #+begin_src elisp
 (setq doom-modeline-vcs-max-length 50)
 #+end_src
@@ -1582,14 +1471,17 @@ Allow for more characters in the branch name
 #+end_src
 
 Disable additional unnecessary information
+
 #+begin_src elisp
 (setq doom-modeline-buffer-encoding nil)
 (setq doom-modeline-modal nil)
 (setq doom-modeline-column-format "")
 (setq size-indication-mode nil)
 #+end_src
+
 ** UI
 *** General Padding
+
 The way windows have been close together always kind of botheres me. Luckily,
 there's a package that seems to halp with simple padding, without any
 contortions.
@@ -1632,6 +1524,7 @@ Now that everything's set up, I'm enabling the mode.
 (The actual values obviously need to be tweaked though)
 
 *** Better Error DIsplay
+
 The posframe that flycheck-posframe is using for error display seems to linger
 for a while, and does not disappear until you stop moving the cursor.
 
@@ -1649,58 +1542,6 @@ This snippet makes it disappear instantly:
           ((not flycheck-posframe-mode)
            (remove-hook 'post-command-hook 'flycheck-posframe-monitor-post-command t))))
   (add-hook! flycheck-posframe-mode #'fix-flycheck-posframe-not-hide-immediately))
-#+end_src
-** Ivy
-Ivy is a package that provides a completion framework for Emacs. It is
-particularly useful for commands that require a lot of input, such as ~M-x~ or
-~find-file~.
-
-It is fast and leightweight, and there are a lot of packages that integrate with
-it.
-
-*** Keybindings
-
-Some of the default keybindings feel odd to me, for instance the tab key
-behavior. I'm still trying for a way to have the same behavior as in a terminal,
-i.e. multiple tab presses start cycling through the completion candidates.
-
-#+begin_src elisp
-;; (define-key ivy-minibuffer-map (kbd "TAB") 'ivy-partial)
-;; (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
-#+end_src
-
-*** Looks
-**** All-The-Icons Ivy Rich
-
-Per default, Ivy looks a little bland. All-The-Icons-Ivy Richt is an alternative
-to All-The-icons-Ivy (which had some issues with my setup)
-
-
-#+begin_src elisp :tangle packages.el
-(package! all-the-icons-ivy-rich)
-#+end_src
-
-#+begin_src elisp
-(use-package! all-the-icons-ivy-rich
-  :defer t
-  :after counsel-projectile
-  :init (all-the-icons-ivy-rich-mode +1)
-  :config
-  (setq all-the-icons-ivy-rich-icon-size 0.8))
-#+end_src
-
-**** Ivy-Postframe
-:LOGBOOK:
-CLOCK: [2023-02-10 Fri 12:39]--[2023-02-10 Fri 12:41] =>  0:02
-:END:
-
-Doom Emacs already has Ivy-Postframe enabled, so there are just some tweaks to
-be made.
-
-Per default, the window has a dynamic width, which means that when typing, it
-will rapidly change its width, which is not very pleasant to look at.
-#+begin_src elisp
-(setq ivy-posframe-width 80)
 #+end_src
 
 ** Treemacs
@@ -1721,6 +1562,7 @@ though the icons look weird per default. For some reason, the fix discussed [[ht
 
 #+begin_src elisp
 (use-package! treemacs-nerd-icons
+  :defer t
   :after treemacs
   :config (treemacs-load-theme "nerd-icons"))
 #+end_src
@@ -1733,12 +1575,15 @@ https://github.com/Alexander-Miller/treemacs/issues/1016
 There's a fix outlined in the GH issues, which I'm applying manually.
 
 *** Modeline
+
 I don't really need the modeline in the treemacs buffer, so I'm disabling it.
 
 #+begin_src elisp
 (add-hook 'treemacs-mode-hook #'hide-mode-line-mode)
 #+end_src
+
 ** Vertico
+
 Prefix the current candidate with an arrow
 #+begin_src elisp
 (defun minibuffer-format-candidate (orig cand prefix suffix index _start)
@@ -1768,27 +1613,6 @@ Add fringe to vertico-posframea
         (border-width . 16)))
 #+end_src
 
-** Xwidget Webkit
-*** Emacs xwidget-webkit enhancement suite
-
-Xwwp (https://github.com/BlueFlo0d/xwwp) is a package that enhances the
-xwidget-webkit browser.
-
-#+begin_src elisp :tangle packages.el
-(package! xwwp :recipe (:host github :repo "BlueFlo0d/xwwp"))
-(package! xwwp-follow-link-ivy)
-(package! ctable)
-#+end_src
-
-#+begin_src elisp
-(use-package! xwwp-full
-  :after xwidget-webkit
-  :custom
-  (xwwp-follow-link-completion-system 'ivy)
-  :bind (:map xwidget-webkit-mode-map
-              ("f" . xwwp-ace-toggle)
-              ("v" . xwwp-follow-link)))
-#+end_src
 ** Kubernetes
 ~kubernetes-mode~ brings a lot of snippets.
 
@@ -1798,20 +1622,22 @@ xwidget-webkit browser.
 
 * Performance
 Various tweaks to improve the overall performance.
-** Raise the GC-Cons threshold
+
+Raise the GC-Cons threshold
 #+begin_example elisp
 (setq gc-cons-threshold (* 1024 1024 1024)) ;; 1G
 #+end_example
 
-** Increase the amount of data which Emacs reads from the process
+Increase the amount of data which Emacs reads from the process
 #+begin_src elisp
 (setq read-process-output-max (* 4 1024 1024)) ;; 4mb
 #+end_src
 
-** Ignore JSONRPC logs
+Ignore JSONRPC logs
 #+begin_src elisp
 (fset #'jsonrpc--log-event #'ignore)
 #+end_src
+
 * Unsorted Packages
 ** Discord Presence
 #+begin_src elisp :tangle packages.el
@@ -1823,11 +1649,5 @@ Various tweaks to improve the overall performance.
   :config
   (setq elcord-editor-icon "emacs_icon"))
 #+end_src
-** Misc
-#+begin_src elisp :tangle packages.el
 
-(package! dap-mode)
-
-;; HTTP requests via babel
-(package! ob-http :pin "b1428ea2a63bcb510e7382a1bf5fe82b19c104a7")
-#+end_src
+** Home Assistant

@@ -4,7 +4,7 @@
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
       doom-big-font (font-spec :family "FiraCode Nerd Font" :size 28 :weight 'light)
       doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
-      doom-variable-pitch-font (font-spec :family "DejaVu Serif" :size 16 :weight 'normal))
+      doom-variable-pitch-font (font-spec :family "DejaVu Serif" :size 16 :weight 'light))
 
 (setq display-line-numbers-type 'visual)
 
@@ -37,13 +37,14 @@
 (defun set-org-headline-color ()
   "Set the org headline colors to darker variants of the foreground color."
   (dotimes (i 8)
-    (set-face-foreground (intern (format "org-level-%d" (1+ i))) (doom-darken 'fg (* i 0.1)))))
+    (set-face-foreground (intern (format "org-level-%d" (1+ i))) nil))
+  (set-face-foreground 'org-document-title nil))
 
 (add-hook 'org-mode-hook 'set-org-headline-color)
 
 (setq org-hide-leading-stars nil)
 
-(setq org-startup-indented t)
+(setq org-startup-indented nil)
 
 (add-hook 'org-mode-hook #'mixed-pitch-mode)
 
@@ -51,9 +52,11 @@
           (lambda () (setq line-spacing 0.2)))
 
 (use-package! org-modern
+  :defer t
   :hook (org-mode . global-org-modern-mode)
   :config
-  (setq org-modern-label-border 0.4))
+  (setq org-modern-label-border 0.1
+        org-modern-star nil))
 
 (setq
   org-auto-align-tags nil
@@ -77,8 +80,11 @@
   org-agenda-current-time-string
   "⭠ now ─────────────────────────────────────────────────"
 
+  org-modern-block-name
+  '(("src" . ""))
+
   ;; Org-Modern settings
-  org-modern-star 'replace ;; Use old org-modern star icons
+  org-modern-star 'nil ;; Use old org-modern star icons
 )
 
 (global-org-modern-mode)
@@ -88,7 +94,10 @@
         (":LOGBOOK:" . ?)
         (":END:" . ?-)))
 
-;; (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+(use-package! org-outer-indent
+  :defer t
+  :hook (org-mode . org-outer-indent-mode)       
+  :config (setq org-num-mode nil))
 
 (setq org-agenda-deadline-faces
       '((1.001 . error)
@@ -112,6 +121,7 @@
                 :desc "Toggle org-tidy" "z" #'org-tidy-mode))
 
 (use-package! ob-http
+  :defer t
   :commands org-babel-execute:http)
 
 (setq org-babel-default-header-args
@@ -134,36 +144,6 @@
           (lambda ()
             (add-hook 'after-save-hook #'org-babel-tangle-config)))
 
-(map! :map org-mode-map
-      :localleader
-      :desc "View exported file" "v" #'org-view-output-file)
-
-(defun org-view-output-file (&optional org-file-path)
-  "Visit buffer open on the first output file (if any) found, using `org-view-output-file-extensions'"
-  (interactive)
-  (let* ((org-file-path (or org-file-path (buffer-file-name) ""))
-         (dir (file-name-directory org-file-path))
-         (basename (file-name-base org-file-path))
-         (output-file nil))
-    (dolist (ext org-view-output-file-extensions)
-      (unless output-file
-        (when (file-exists-p
-               (concat dir basename "." ext))
-          (setq output-file (concat dir basename "." ext)))))
-    (if output-file
-        (if (member (file-name-extension output-file) org-view-external-file-extensions)
-            (browse-url-xdg-open output-file)
-          (pop-to-buffer (or (find-buffer-visiting output-file)
-                             (find-file-noselect output-file))))
-      (message "No exported file found"))))
-
-(defvar org-view-output-file-extensions '("pdf" "md" "rst" "txt" "tex" "html")
-  "Search for output files with these extensions, in order, viewing the first that matches")
-(defvar org-view-external-file-extensions '("html")
-  "File formats that should be opened externally.")
-
-(use-package! ox-gfm :after ox :defer t)
-
 (setq org-export-headline-levels 5)
 
 (setq org-highlight-latex-and-related '(native script entities))
@@ -183,14 +163,6 @@
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
 
-(map! :map org-mode-map
-      :localleader
-      (:prefix-map ("B" . "babel")
-       (:desc "Insert structure template" "c" #'org-insert-structure-template)))
-
-(remove-hook 'text-mode-hook #'visual-line-mode)
-(add-hook 'text-mode-hook #'auto-fill-mode)
-
 (require 'org-src)
 (add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t)))
 
@@ -208,14 +180,6 @@
 (map! :leader
       (:prefix "b"
        :desc "new empty ORG buffer" "o" #'evil-buffer-org-new))
-
-(add-hook 'org-mode-hook 'turn-on-org-cdlatex)
-
-(defadvice! org-edit-latex-env-after-insert ()
-  :after #'org-cdlatex-environment-indent
-  (org-edit-latex-environment))
-
-(add-hook! markdown-mode (auto-fill-mode -1))
 
 (add-hook! 'emacs-startup-hook #'doom-init-ui-h)
 
@@ -383,11 +347,12 @@
 (setq company-format-margin-function #'company-vscode-dark-icons-margin)
 
 (use-package! copilot
-          :hook
-          (prog-mode . copilot-mode)
-          (copilot-mode . (lambda ()
-                            (setq-local copilot--indent-warning-printed-p t)))
-          :bind (:map copilot-completion-map
+  :defer t
+  :hook
+  (prog-mode . copilot-mode)
+  (copilot-mode . (lambda ()
+                    (setq-local copilot--indent-warning-printed-p t)))
+  :bind (:map copilot-completion-map
               ("C-<space>" . 'copilot-accept-completion)
               ("C-SPC" . 'copilot-accept-completion)
               ("C-TAB" . 'copilot-accept-completion-by-word)
@@ -526,7 +491,8 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (use-package! gptel-extensions :after gptel)
 
-(use-package quarto-mode
+(use-package! quarto-mode
+  :defer t
   :mode (("\\.Rmd" . poly-quarto-mode)))
 
 (use-package markdown-mode
@@ -619,19 +585,8 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
            (remove-hook 'post-command-hook 'flycheck-posframe-monitor-post-command t))))
   (add-hook! flycheck-posframe-mode #'fix-flycheck-posframe-not-hide-immediately))
 
-;; (define-key ivy-minibuffer-map (kbd "TAB") 'ivy-partial)
-;; (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
-
-(use-package! all-the-icons-ivy-rich
-  :defer t
-  :after counsel-projectile
-  :init (all-the-icons-ivy-rich-mode +1)
-  :config
-  (setq all-the-icons-ivy-rich-icon-size 0.8))
-
-(setq ivy-posframe-width 80)
-
 (use-package! treemacs-nerd-icons
+  :defer t
   :after treemacs
   :config (treemacs-load-theme "nerd-icons"))
 
@@ -653,14 +608,6 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
       '((left-fringe . 16)
         (right-fringe . 8)
         (border-width . 16)))
-
-(use-package! xwwp-full
-  :after xwidget-webkit
-  :custom
-  (xwwp-follow-link-completion-system 'ivy)
-  :bind (:map xwidget-webkit-mode-map
-              ("f" . xwwp-ace-toggle)
-              ("v" . xwwp-follow-link)))
 
 (setq read-process-output-max (* 4 1024 1024)) ;; 4mb
 

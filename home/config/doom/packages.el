@@ -2,11 +2,17 @@
 
 (package! org-modern)
 
+(package! org-outer-indent
+  :recipe (:host github :repo "rougier/org-outer-indent")
+  :pin "9c5aef47f259a13baae73e50f9f897f85767718f")
+
 (package! org-tidy)
+
+(package! ob-http)
 
 (package! ob-typescript)
 
-(unpin! org-roam)
+;; (unpin! org-roam)
 (package! org-roam-ui)
 (package! websocket) ; dependency of `org-roam-ui'
 
@@ -16,11 +22,12 @@
 
 (package! svelte-mode)
 
-(unpin! lsp-mode)
+;; (unpin! lsp-mode)
 
 (package! astro-ts-mode)
 
 (package! lsp-tailwindcss
+  :pin "3e3cc80a448e9dd24663eaa41742cda686dac5ab"
   :recipe (:host github
            :repo "merrickluo/lsp-tailwindcss"))
 
@@ -28,7 +35,11 @@
 
 (package! jsonnet-mode)
 
-(package! copilot :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el" "dist")))
+(package! copilot)
+  ;; :pin
+  ;; :recipe (:host github
+  ;;          :repo "copilot-emacs/copilot.el"
+  ;;          :files ("*.el" "dist")))
 
 (package! lab)
 
@@ -39,8 +50,9 @@
 (package! gptel)
 
 (package! gptel-extensions
+  :pin "671e5186153fc9bf105c91effb1ed7db06508677"
   :recipe (:host github
-  :repo "kamushadenes/gptel-extensions.el"))
+           :repo "kamushadenes/gptel-extensions.el"))
 
 (package! quarto-mode)
 
@@ -72,19 +84,8 @@
 
 (package! spacious-padding)
 
-(package! all-the-icons-ivy-rich)
-
 (package! treemacs-nerd-icons :pin "9876cb478145a0ec4e36f64ff6583f3de7126216")
-
-(package! xwwp :recipe (:host github :repo "BlueFlo0d/xwwp"))
-(package! xwwp-follow-link-ivy)
-(package! ctable)
 
 (package! k8s-mode)
 
 (package! elcord)
-
-(package! dap-mode)
-
-;; HTTP requests via babel
-(package! ob-http :pin "b1428ea2a63bcb510e7382a1bf5fe82b19c104a7")
