@@ -95,9 +95,7 @@
         (":END:" . ?-)))
 
 (use-package! org-outer-indent
-  :defer t
-  :hook (org-mode . org-outer-indent-mode)       
-  :config (setq org-num-mode nil))
+  :after org)
 
 (setq org-agenda-deadline-faces
       '((1.001 . error)

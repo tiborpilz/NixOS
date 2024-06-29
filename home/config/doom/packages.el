@@ -12,9 +12,8 @@
 
 (package! ob-typescript)
 
-;; (unpin! org-roam)
 (package! org-roam-ui)
-(package! websocket) ; dependency of `org-roam-ui'
+(package! websocket)
 
 (package! org-autolist)
 
