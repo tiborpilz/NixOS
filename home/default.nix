@@ -30,7 +30,8 @@ with mylib;
     # GNU Parallel my beloved
     parallel
 
-    cmake
+    gnumake
+    gcc
 
     # bat is a better cat (as a program, at least)
     bat
