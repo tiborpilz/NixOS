@@ -109,7 +109,7 @@ in
 
     xdg.configFile."doom" = { source = ../../config/doom; recursive = true; };
 
-    home.sessionVariables.DOOMDIR = (if !cfg.useNix then "${config.home.homeDirectory}/.config/nixos/home/config/doom" else "");
+    # home.sessionVariables.DOOMDIR = (if !cfg.useNix then "${config.home.homeDirectory}/.config/nixos/home/config/doom" else "");
 
     home.activation.installDoomEmacs =
       let activationScript = ''
