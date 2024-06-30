@@ -1,15 +1,7 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
-  imports =
-    [
-      # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  imports = [./hardware-configuration.nix];
 
   config = {
     # Bootloader.
@@ -17,24 +9,14 @@
     boot.loader.grub.device = "/dev/sda";
     boot.loader.grub.useOSProber = true;
 
-    # boot.loader.systemd-boot.enable = true;
-    # boot.loader.efi.canTouchEfiVariables = true;
-
     networking.hostName = "minithink";
     networking.hostId = "3fa82cd1";
-    # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-    # Configure network proxy if necessary
-    # networking.proxy.default = "http://user:password@proxy:port/";
-    # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
     # Enable networking
     networking.networkmanager.enable = true;
 
-    # Set your time zone.
     time.timeZone = "Europe/Berlin";
 
-    # Select internationalisation properties.
     i18n.defaultLocale = "en_US.utf8";
 
     i18n.extraLocaleSettings = {
@@ -49,16 +31,14 @@
       LC_TIME = "de_DE.utf8";
     };
 
-    # Enable the X11 windowing system.
-    services.xserver.enable = true;
-
-    # Enable the KDE Plasma Desktop Environment.
-    services.xserver.displayManager.sddm.enable = true;
-    services.xserver.desktopManager.plasma5.enable = true;
-    # modules.desktop.bspwm.enable = true;
-
-    # Configure keymap in X11
+    # Xserver
     services.xserver = {
+      enable = true;
+
+      displayManager.sddm.enable = true;
+      desktopManager.plasma5.enable = true;
+
+      # Keyboard
       layout = "us";
       xkbVariant = "";
       xkbOptions = "caps:swapescape";
@@ -101,14 +81,8 @@
       #media-session.enable = true;
     };
 
-
-
-    # Enable touchpad support (enabled default in most desktopManager).
-    # services.xserver.libinput.enable = true;
-
     programs.zsh.enable = true;
 
-    # Define a user account. Don't forget to set a password with ‘passwd’.
     users.users.tibor = {
       isNormalUser = true;
       description = "Tibor Pilz";
@@ -125,8 +99,6 @@
 
     # modules.services.paperless.enable = true;
 
-    # List packages installed in system profile. To search, run:
-    # $ nix search wget
     environment.systemPackages = with pkgs; [
       git
       tmux
