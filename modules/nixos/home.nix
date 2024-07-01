@@ -19,6 +19,9 @@ in
   config = mkIf cfg.enable {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
+    home-manager.sharedModules = [
+      inputs.plasma-manager.homeManagerModules.plasma-manager
+    ];
     # home-manager.extraSpecialArgs = { inherit lib; };
     home-manager.users.tibor = mkMerge [
       inputs.nix-doom-emacs-unstraightened.hmModule
