@@ -30,8 +30,12 @@ with mylib;
     # GNU Parallel my beloved
     parallel
 
+    # C stuff
     gnumake
     gcc
+
+    # Task runner
+    just
 
     # bat is a better cat (as a program, at least)
     bat
