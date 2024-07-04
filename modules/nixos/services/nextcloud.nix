@@ -87,9 +87,9 @@ in
         system.stateVersion = config.system.stateVersion;
         services.nextcloud = {
           enable = true;
-          package = pkgs.nextcloud27;
+          package = pkgs.nextcloud28;
           extraApps = with container.config.services.nextcloud.package.packages.apps; {
-            inherit news contacts calendar tasks bookmarks;
+            inherit contacts calendar tasks bookmarks;
           };
           extraAppsEnable = true;
 
