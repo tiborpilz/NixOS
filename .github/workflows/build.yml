@@ -1,7 +1,9 @@
-name: "Build Configurations"
+name: 'Build Configurations'
 on:
   pull_request:
   push:
+    branches:
+      - main
 jobs:
   build-home:
     runs-on: ubuntu-latest
