@@ -48,30 +48,31 @@
       LC_TIME = "de_DE.utf8";
     };
 
-    # Enable the X11 windowing system.
-    services.xserver.enable = true;
 
-    # Enable the KDE Plasma Desktop Environment.
-    services.xserver.displayManager.sddm.enable = true;
-    services.xserver.desktopManager.plasma5.enable = true;
-    # modules.desktop.bspwm.enable = true;
+    services.displayManager.sddm.enable = true;
 
     # Configure keymap in X11
     services.xserver = {
-      layout = "us";
-      xkbVariant = "";
-      xkbOptions = "caps:swapescape";
+      enable = true;
 
-      libinput = {
-        enable = true;
+      desktopManager.plasma5.enable = true;
 
-        mouse = {
-          accelProfile = "flat";
-        };
+      xkb = {
+        layout = "us";
+        variant = "";
+        options = "caps:swapescape";
+      };
+    };
 
-        touchpad = {
-          accelProfile = "flat";
-        };
+    services.libinput = {
+      enable = true;
+
+      mouse = {
+        accelProfile = "flat";
+      };
+
+      touchpad = {
+        accelProfile = "flat";
       };
     };
 
@@ -131,6 +132,15 @@
       hdparm
       python3
     ];
+
+    virtualisation = {
+      containers.enable = true;
+      podman = {
+        enable = true;
+        dockerCompat = true;
+        defaultNetwork.settings.dns_enabled = true;
+      };
+    };
 
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
     nix.settings.system-features = [ "big-parallel" "kvm" "recursive-nix" ];
