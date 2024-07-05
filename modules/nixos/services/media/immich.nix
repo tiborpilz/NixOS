@@ -40,7 +40,6 @@ in
 
       containers.immich-server = {
         image = "ghcr.io/immich-app/immich-server:${cfg.immich-version}";
-        cmd = [ "start-server.sh" ];
         volumes = [
           "${dataDir}/upload:/usr/src/app/upload"
           "${photoDir}:/data/media/photos"
@@ -51,24 +50,7 @@ in
           "DB_PASSWORD" = cfg.db_password;
           "DB_USERNAME" = cfg.db_user;
           "DB_DATABASE_NAME" = cfg.db_name;
-          "DB_HOSTNAME" = "localhost";
-          "REDIS_HOSTNAME" = "localhost";
-        };
-      };
-
-      containers.immich-microservices = {
-        image = "ghcr.io/immich-app/immich-server:${cfg.immich-version}";
-        cmd = [ "start.sh" "microservices" ];
-        volumes = [
-          "${dataDir}/upload:/usr/src/app/upload"
-          "/data/media/photos:/data/media/photos"
-          "/etc/localtime:/etc/localtime:ro"
-        ];
-        environment = {
-          "UPLOAD_LOCATION" = "./library";
-          "DB_PASSWORD" = cfg.db_password;
-          "DB_USERNAME" = cfg.db_user;
-          "DB_DATABASE_NAME" = cfg.db_name;
+          "IMMICH_VERSION" = cfg.immich-version;
           "DB_HOSTNAME" = "localhost";
           "REDIS_HOSTNAME" = "localhost";
         };

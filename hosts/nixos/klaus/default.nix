@@ -211,7 +211,7 @@ with lib;
         };
         komga.enable = true;
         immich = {
-          immich-version = "v1.103.1";
+          immich-version = "v1.107.2";
           enable = true;
         };
         jellyfin.enable = true;
