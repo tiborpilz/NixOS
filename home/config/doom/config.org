@@ -82,6 +82,9 @@ Small utility to add a function to multiple hooks at once.
 * Org Mode
 ** Base Settings
 
+I'm using ~~/org~ as my base directory for org files. (This is then synced across devices).
+
+
 #+begin_src elisp
 (setq org-directory "~/org/")
 (setq org-agenda-files (list org-directory))
@@ -338,16 +341,17 @@ To execute typescript code blocks, I'm using the ~ob-typescript~ package.
 (setq org-highlight-latex-and-related '(native script entities))
 #+end_src
 
-** Extensions
-*** Roam
-**** Use the same directory as org
+** Roam
+*** Use the same directory as org
+
+All roam files should be under a subdirectory of my org directory - so I can sync them with the same mechanism.
 
 #+begin_src elisp
-(setq org-roam-directory "~/org/roam")
-(add-to-list 'org-agenda-files org-roam-directory)
+(setq org-roam-directory (concat org-directory "roam"))
 #+end_src
 
-**** Add Org-Roam UI
+*** Add Org-Roam UI
+
 Org-Roam UI is a web-based interface for Org-roam. It is a separate package -
 and it also needs the websocket package as dependency.
 
@@ -371,6 +375,10 @@ The closest comparison to org-roam-ui is Obsidian.
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
 #+end_src
+
+*** TODO Capture to Org Roam Dailies
+
+I want to be able to use ~org-capture~ to capture stuff in the current date's roam daily file.
 
 ** Fixes and miscellanious improvements
 *** Prevent org-block face for latex fragments, since they look weird
@@ -541,8 +549,9 @@ Add a package for Jest testing
 
 **** TODO Eslint
 
-Eslint keeps track of all projects it has been run in, and - even if only one
-workspace is open, will start to run in all of them.
+Eslint keeps track of all projects it has been run in, and - even if only one workspace is open,
+will start to run in all of them.
+
 The following sets it to run only in the current session.
 
 #+begin_src elisp
