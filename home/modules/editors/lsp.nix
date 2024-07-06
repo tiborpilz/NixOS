@@ -1,4 +1,4 @@
-{ lib, pkgs, inputs, config, ...}:
+{ lib, pkgs, inputs, config, ... }:
 with lib;
 let
   cfg = config.modules.editors.lsp;

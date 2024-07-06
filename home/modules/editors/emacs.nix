@@ -112,7 +112,8 @@ in
     # home.sessionVariables.DOOMDIR = (if !cfg.useNix then "${config.home.homeDirectory}/.config/nixos/home/config/doom" else "");
 
     home.activation.installDoomEmacs =
-      let activationScript = ''
+      let
+        activationScript = ''
           if [ ! -d ".config/emacs" ]; then
               ${pkgs.git}/bin/git clone --depth=1 --single-branch https://github.com/doomemacs/doomemacs ".config/emacs"
           fi
@@ -128,6 +129,7 @@ in
           # fi
           # .config/emacs/bin/doom sync
         '';
-      in (lib.hm.dag.entryAfter ["WriteBoundary"] (if cfg.useNix then "" else activationScript ));
+      in
+      (lib.hm.dag.entryAfter [ "WriteBoundary" ] (if cfg.useNix then "" else activationScript));
   };
 }

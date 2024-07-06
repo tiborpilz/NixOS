@@ -5,7 +5,8 @@
 
 {
   imports =
-    [ (modulesPath + "/installer/scan/not-detected.nix")
+    [
+      (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
@@ -14,7 +15,7 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { 
+    {
       device = "/dev/disk/by-uuid/bb4ae743-fe70-4f6c-9524-20e824755caa";
       fsType = "ext4";
     };
@@ -26,10 +27,10 @@
     };
 
   fileSystems."/data" =
-   {
-     device = "zpool/data";
-     fsType = "zfs";
-   };
+    {
+      device = "zpool/data";
+      fsType = "zfs";
+    };
 
   swapDevices = [ ];
 

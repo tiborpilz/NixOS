@@ -107,8 +107,8 @@
             inherit lib inputs;
             pkgs = channels.nixpkgs;
           }))) // {
-            default = packages.bw2pass;
-          };
+          default = packages.bw2pass;
+        };
 
 
         apps = (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages) // {
@@ -147,8 +147,9 @@
               }
             ];
           };
-          aliasConfigurations = lib.foldr (curr: prev: prev // { "${curr}" = homeConfiguration; }) {} aliases;
-        in { "${user}" = homeConfiguration; } // aliasConfigurations
+          aliasConfigurations = lib.foldr (curr: prev: prev // { "${curr}" = homeConfiguration; }) { } aliases;
+        in
+        { "${user}" = homeConfiguration; } // aliasConfigurations
       ));
 
       nixosModules = lib.my.mapModulesRec (toString ./modules) import;

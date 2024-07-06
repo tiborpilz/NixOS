@@ -4,7 +4,8 @@ with lib;
 let
   cfg = config.modules.bitwarden;
   mylib = import ../../lib { inherit inputs pkgs lib; };
-in {
+in
+{
   options.modules.bitwarden = {
     enable = mylib.mkBoolOpt false;
   };

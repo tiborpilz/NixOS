@@ -17,7 +17,7 @@ let
       ports = mkOption {
         type = types.listOf types.str;
         description = "Port bindings";
-        example = ["80:8080"];
+        example = [ "80:8080" ];
       };
 
       containers = mkOption {
@@ -44,18 +44,19 @@ let
   #   };
   # };
 
-  mkService = name: pod: let
-    ports = if pod.port != "" then [ pod.port ] else pod.ports;
-    portFlags = concatMapStringsSep " " (port: "-p ${port}") ports;
-  in
+  mkService = name: pod:
+    let
+      ports = if pod.port != "" then [ pod.port ] else pod.ports;
+      portFlags = concatMapStringsSep " " (port: "-p ${port}") ports;
+    in
     {
       serviceConfig.Type = "oneshot";
       wantedBy = map (containerName: "podman-${containerName}.service")
         (podContainerNames name pod);
       script = ''
-      ${pkgs.podman}/bin/podman pod exists ${name}-pod || \
-      ${pkgs.podman}/bin/podman pod create -n ${name}-pod ${portFlags}
-    '';
+        ${pkgs.podman}/bin/podman pod exists ${name}-pod || \
+        ${pkgs.podman}/bin/podman pod create -n ${name}-pod ${portFlags}
+      '';
     };
 
   mkContainers = pods:

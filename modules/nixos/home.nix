@@ -1,4 +1,4 @@
-{ config, options, inputs, lib, home-manager, ... }:
+{ config, options, inputs, lib, ... }:
 
 with lib;
 with lib.my;
@@ -14,6 +14,7 @@ in
     enable = mkBoolOpt true;
     file = mkOpt' attrs { } "Files to place directly in $HOME";
     configFile = mkOpt' attrs { } "Files to place in $XDG_CONFIG_HOME";
+    graphical = mkBoolOpt false;
   };
 
   config = mkIf cfg.enable {
@@ -31,6 +32,7 @@ in
         imports = [ ../../home ];
         home.file = mkAliasDefinitions options.home.file;
         xdg.configFile = mkAliasDefinitions options.home.configFile;
+        graphical = cfg.graphical;
       }
     ];
 

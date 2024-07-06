@@ -4,7 +4,7 @@ with lib;
 with lib.my;
 let sys = "x86_64-linux";
 in {
-  mkHostAttrs = path: attrs @ { system ? sys, modules ? [], ... }:
+  mkHostAttrs = path: attrs @ { system ? sys, modules ? [ ], ... }:
     let isDarwin = system == "x86_64-darwin";
     in {
       inherit system;

@@ -2,7 +2,7 @@
 
 let
   cfg = config.modules.alacritty;
-  in
+in
 with lib;
 {
   # options.modules.gui.alacritty = {

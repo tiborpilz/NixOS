@@ -4,7 +4,8 @@ with lib;
 let
   cfg = config.modules.password-store;
   mylib = import ../../lib { inherit inputs lib pkgs; };
-in {
+in
+{
   options.modules.password-store = {
     enable = mylib.mkBoolOpt false;
     enable-sync = mylib.mkBoolOpt false;

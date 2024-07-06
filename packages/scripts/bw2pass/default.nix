@@ -7,9 +7,9 @@ stdenv.mkDerivation rec {
   buildInputs = [ bash coreutils jq bitwarden-cli ];
   nativeBuildInputs = [ makeWrapper ];
   installPhase = ''
-      mkdir -p $out/bin
-      cp $src $out/bin/bw2pass
-      wrapProgram $out/bin/bw2pass \
-        --prefix PATH : ${lib.makeBinPath [ bash jq bitwarden-cli ]}
-    '';
+    mkdir -p $out/bin
+    cp $src $out/bin/bw2pass
+    wrapProgram $out/bin/bw2pass \
+      --prefix PATH : ${lib.makeBinPath [ bash jq bitwarden-cli ]}
+  '';
 }
