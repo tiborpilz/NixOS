@@ -3,7 +3,7 @@
     ./hardware-configuration.nix
   ];
 
-  boot.cleanTmpDir = true;
+  boot.cleanOnBoot = true;
 
   boot.kernelModules = [
     "iptable_nat"
@@ -28,11 +28,6 @@
     wireguard-tools
   ];
   system.stateVersion = "22.05";
-
-  nix = {
-    package = pkgs.nix;
-    registry.nixpkgs.flake = pkgs;
-  };
 
   #Enable NAT
   networking.nat = {

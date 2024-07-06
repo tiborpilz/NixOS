@@ -120,9 +120,6 @@
       };
     };
 
-    nix.settings.experimental-features = [ "nix-command" "flakes" ];
-    nix.settings.system-features = [ "big-parallel" "kvm" "recursive-nix" ];
-    nix.package = pkgs.nix;
     system.stateVersion = "22.05";
   };
 }

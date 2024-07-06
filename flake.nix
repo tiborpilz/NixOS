@@ -24,8 +24,6 @@
     flake-utils.url = "github:numtide/flake-utils";
     flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
 
-    digga.url = "github:divnix/digga";
-
     deno2nix.url = "github:SnO2WMaN/deno2nix";
     devshell.url = "github:numtide/devshell";
 
@@ -47,7 +45,6 @@
     , sops-nix
     , flake-utils
     , flake-utils-plus
-    , digga
     , deploy-rs
     , ...
     } @ inputs:
@@ -82,8 +79,6 @@
       hostDefaults = {
         channelName = "nixpkgs";
         modules = [
-          digga.nixosModules.bootstrapIso
-          digga.nixosModules.nixConfig
           home-manager.nixosModules.home-manager
           sops-nix.nixosModules.sops
         ] ++ lib.my.mapModulesRec' (toString ./modules/shared) import;
