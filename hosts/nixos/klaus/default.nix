@@ -31,10 +31,6 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
-    sops.secrets.openvpn-pia = {
-      sopsFile = ./secrets/secrets.yaml;
-    };
-
     sops.secrets.nextcloud_admin_pass = mkIf config.modules.services.nextcloud.enable {
       owner = "nextcloud";
     };
