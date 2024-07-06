@@ -23,7 +23,7 @@ in
       volumes = [
         "${sonarrConfigDir}:/config"
         "/data/media/tv:/tv"
-        "/data/downloads:/downloads"
+        "/data/downloads/deluge:/data"
       ];
       environment = {
         "TZ" = "Europe/Berlin";

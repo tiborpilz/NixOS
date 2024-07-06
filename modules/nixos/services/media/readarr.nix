@@ -23,7 +23,7 @@ in
       volumes = [
         "${readarrConfigDir}:/config"
         "/data/media/books:/books"
-        "/data/downloads:/downloads"
+        "/data/downloads/deluge:/data"
       ];
       environment = {
         "TZ" = "Europe/Berlin";
