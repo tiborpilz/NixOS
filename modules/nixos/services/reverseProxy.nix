@@ -27,43 +27,20 @@ let
     };
   };
 
-  basicAuthOptions = { ... }: {
-    options = {
-      enable = mkOption {
-        type = types.bool;
-        description = "Enable basic auth (globally)";
-        example = true;
-        default = false;
-      };
-      username = mkOption {
-        type = types.string;
-        description = "Username";
-        example = "admin";
-      };
-      password = mkOption {
-        type = types.string;
-        description = "Hashed Password";
-        example = "JDJhJDE0JGFXdjZMeTVsYnZueDZpckpQazFkSE9zN283WnZUQmc4NmQydi5rV04wYmdOZ3F0cE4zb3NP";
-      };
-    };
-  };
-
-  mkProxyConfig = { port, enableauth, username, password, host, targetHost, ... }: {
-    serverAliases = [ "http://${host}" ];
-    extraConfig =
-      if enableauth then ''
+  mkProxyConfig = { port, enableauth, username, password, host, targetHost, localDomain, ... }: {
+    serverAliases = [ "http://${host}" "http://${localDomain}" ];
+    extraConfig = let
+      reverseProxy = ''
         reverse_proxy http://${targetHost}:${toString port} {
             header_up X-Forwarded-Proto {scheme}
         }
+      '';
+      basicAuth = if enableauth then ''
         basicauth /* bcrypt {
             ${username} ${password}
         }
-      ''
-      else ''
-        reverse_proxy http://${targetHost}:${toString port} {
-            header_up X-Forwarded-Proto https
-        }
-      '';
+      '' else "";
+      in reverseProxy + basicAuth;
   };
 in
 {
@@ -74,6 +51,12 @@ in
       type = types.str;
       description = "Host name";
       example = "example.com";
+    };
+    localDomain = mkOption {
+      default = "";
+      type = types.nullOr types.str;
+      description = "Local domain to use additionally";
+      example = "example.local";
     };
     email = mkOption {
       type = types.str;
@@ -139,6 +122,7 @@ in
             username = cfg.basicAuth.username;
             password = cfg.basicAuth.password;
             host = "${n}.${cfg.hostname}";
+            localDomain = if cfg.localDomain != null then "${n}.${cfg.localDomain}" else "";
             targetHost = v.targetHost;
           }))
           cfg.proxies // {
