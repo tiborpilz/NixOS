@@ -72,13 +72,6 @@ with mylib;
     # Let Home Manager install and manage itself.
     programs.home-manager.enable = true;
 
-    home.file.test-graphical = {
-      text =
-        if config.graphical
-        then "Graphical :D"
-        else "Not Graphical :(";
-    };
-
     # Regardlass of whether I'm using Bash (I'm not),
     # I need an up-to-date binary for nix-shell and some other settings in ".profile" that
     # are only there when `bash` is enabled.
@@ -125,14 +118,14 @@ with mylib;
     modules.bitwarden.enable = false;
     modules.password-store.enable = true;
 
-    modules.colorschemes.enable = false;
-
     modules.tools.container.enable = true;
     modules.tools.aws.enable = true;
 
     modules.terminal.kitty.enable = true;
 
     modules.shell.manix.enable = true;
+
+    modules.gui.plasma.enable = config.graphical;
 
     nix = {
       registry.nixpkgs.flake = inputs.nixpkgs;
