@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 with lib;
 with lib.my;
 
@@ -29,6 +29,9 @@ in
         "TZ" = "Europe/Berlin";
       };
     };
-    modules.services.reverseProxy.proxies.jackett.publicPort = publicPort;
+    modules.services.reverseProxy.proxies.jackett = {
+      publicPort = publicPort;
+      auth = false;
+    };
   };
 }
