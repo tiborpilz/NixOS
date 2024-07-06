@@ -150,6 +150,7 @@ with lib;
     modules.services.reverseProxy = {
       enable = true;
       hostname = "tiborpilz.xyz";
+      localDomain = "klaus.tbr.gg";
       email = "tibor@pilz.berlin";
       tunnelId = "14a104ab-2541-4142-ab22-12908058f156";
       basicAuth = {
