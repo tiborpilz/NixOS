@@ -4,6 +4,7 @@ with lib.my;
 
 let
   delugeConfigDir = "/var/lib/deluge/config";
+  delugeDataDir = "/data/downloads/deluge";
   # envFile = "${delugeConfigDir}/deluge.env";
   publicPort = 8112;
 
@@ -19,66 +20,72 @@ in
         The country to connect to.
       '';
     };
-    sopsFile = mkOption {
+    credentialsFile = mkOption {
       type = types.nullOr types.str;
       default = null;
       description = ''
         Path to a sops-encrypted file containing env variables for the VPN connection.
       '';
     };
+    delugePassword = mkOption {
+      type = types.str;
+      default = "deluge";
+      description = ''
+        The password for the deluge web interface.
+      '';
+    };
   };
 
   config = mkIf cfg.enable {
-    # system.activationScripts.generateSecretEnv = stringAfter [ "setupSecrets" ] ''
-    #   echo VPN_USER=$(cat ${config.sops.secrets.deluge_vpn_user.path}) > ${envFile}
-    #   echo VPN_PASS=$(cat ${config.sops.secrets.deluge_vpn_pass.path}) >> ${envFile}
-    #   echo PASSWORD=$(cat ${config.sops.secrets.deluge_password.path}) >> ${envFile}
-    #   # ${config.sops.secrets.deluge_vpn_user.path}
-    #   # ${config.sops.secrets.deluge_vpn_pass.path}
-    #   # ${config.sops.secrets.deluge_password.path}
-    # '';
-
-    virtualisation.oci-containers.containers.vpn = {
-      image = "thrnz/docker-wireguard-pia";
-      ports = [
-        "${toString publicPort}:8112"
-        "8118:8118"
-        "6881:6881"
-        "58846:58846"
-        "53559:53559"
-      ];
-      environment = {
-        "USER" = "p4147401";
-        "PASS" = "D!0n4r4p23";
-        "LOC" = "swiss";
-        "PORT_FORWARDING" = "1";
-        "PORT_PERSIST" = "1";
-      };
-      extraOptions = [
-        "--privileged=true"
-        "--cap-add=net_admin"
-      ];
-    };
+    system.activationScripts.createDelugeDirs = stringAfter [ "var" ] ''
+      mkdir -p ${delugeConfigDir}
+      mkdir -p ${delugeDataDir}
+    '';
 
     virtualisation.oci-containers.containers.deluge = {
-      image = "linuxserver/deluge";
+      image = "binhex/arch-delugevpn";
+      ports = [
+        "8112:8112"
+        "8118:8118"
+        "9118:9118"
+        "58846:58846"
+        "58946:58946"
+        "58946:58946/udp"
+      ];
       volumes = [
-        "/data/downloads:/downloads"
+        "${delugeDataDir}:/data"
         "${delugeConfigDir}:/config"
         "/etc/localtime:/etc/localtime:ro"
       ];
       environment = {
-        "TZ" = "Europe/Berlin";
-        "PUID" = "1000";
-        "PGID" = "1000";
+        "VPN_ENABLED" = "yes";
+        "VPN_USER" = "p4147401";
+        "VPN_PASS" = "D!0n4r4p23";
+        "VPN_PROV" = "pia";
+        "VPN_CLIENT" = "wireguard";
+        "ENABLE_STARTUP_SCRIPTS" = "no";
+        "ENABLE_PRIVOXY" = "yes";
+        "STRICT_PORT_FORWARD" = "yes";
+        "USERSPACE_WIREGUARD" = "no";
+        "ENABLE_SOCKS" = "yes";
+        "SOCKS_USER" = "admin";
+        "SOCKS_PASS" = "socks";
+        "LAN_NETWORK" = "192.168.2.0/24";
+        "NAME_SERVERS" = "84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1";
+        "DELUGE_DAEMON_LOG_LEVEL" = "info";
+        "DELUGE_WEB_LOG_LEVEL" = "info";
+        "DELUGE_ENABLE_WEBUI_PASSWORD" = "yes";
+        "DEBUG" = "false";
+        "UMASK" = "000";
+        "PUID" = "0";
+        "PGID" = "0";
       };
       extraOptions = [
-        "--network=container:vpn"
+        "--sysctl=net.ipv4.conf.all.src_valid_mark=1"
+        "--privileged=true"
       ];
     };
 
-    systemd.services.podman-vpn.serviceConfig.wantedBy = ["podman-deluge.service"];
-    systemd.services.podman-vpn.serviceConfig.requiredBy = ["podman-deluge.service"];
     modules.services.reverseProxy.proxies.deluge.publicPort = publicPort;
   };
 }
