@@ -52,7 +52,7 @@ in
       isSystemUser = true;
       group = "nextcloud";
     };
-    users.groups.nextcloud = {};
+    users.groups.nextcloud = { };
 
     containers.nextcloud = {
       bindMounts."${cfg.adminpassFile}" = {

@@ -1,5 +1,6 @@
 { inputs, pkgs, lib, ... }:
-let taskFileSkeleton = lib.replaceStrings ["\"" "\n"] ["\\\"" ""] ''
+let
+  taskFileSkeleton = lib.replaceStrings [ "\"" "\n" ] [ "\\\"" "" ] ''
     {
       "version": "3",
       "tasks": {
@@ -8,8 +9,9 @@ let taskFileSkeleton = lib.replaceStrings ["\"" "\n"] ["\\\"" ""] ''
         }
       }
     }
-'';
-in pkgs.writeShellScriptBin "generateTaskFile" ''
+  '';
+in
+pkgs.writeShellScriptBin "generateTaskFile" ''
   base='{ "version": "3" }'
   defaultTask='{ "default": { "cmds": ["${pkgs.nix}/bin/nix flake check"] } }'
   nixosMachines=$(${pkgs.nix}/bin/nix flake show --json | ${pkgs.jq}/bin/jq -r '.nixosConfigurations | keys')

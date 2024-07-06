@@ -140,12 +140,13 @@ in
             password = cfg.basicAuth.password;
             host = "${n}.${cfg.hostname}";
             targetHost = v.targetHost;
-          })) cfg.proxies // {
-            health = {
-              serverAliases = [ "http://health.${cfg.hostname}" ];
-              extraConfig = "respond \"OK\"";
-            };
+          }))
+          cfg.proxies // {
+          health = {
+            serverAliases = [ "http://health.${cfg.hostname}" ];
+            extraConfig = "respond \"OK\"";
           };
+        };
         enable = true;
         email = cfg.email;
         globalConfig = ''

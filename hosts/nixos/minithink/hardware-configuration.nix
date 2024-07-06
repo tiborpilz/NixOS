@@ -4,7 +4,7 @@
 { config, lib, pkgs, modulesPath, ... }:
 
 {
-  imports = [(modulesPath + "/installer/scan/not-detected.nix")];
+  imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
   boot.initrd.availableKernelModules = [ "ehci_pci" "ahci" "usb_storage" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
@@ -12,27 +12,32 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "rpool/local/root";
+    {
+      device = "rpool/local/root";
       fsType = "zfs";
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/b4dcebdd-300c-419a-9ab7-56ec66271074";
+    {
+      device = "/dev/disk/by-uuid/b4dcebdd-300c-419a-9ab7-56ec66271074";
       fsType = "ext4";
     };
 
   fileSystems."/nix" =
-    { device = "rpool/local/nix";
+    {
+      device = "rpool/local/nix";
       fsType = "zfs";
     };
 
   fileSystems."/home" =
-    { device = "rpool/safe/home";
+    {
+      device = "rpool/safe/home";
       fsType = "zfs";
     };
 
   fileSystems."/persist" =
-    { device = "rpool/safe/persist";
+    {
+      device = "rpool/safe/persist";
       fsType = "zfs";
     };
 

@@ -26,14 +26,16 @@ in
 
     # Automatically import public key from keyserver and, if connected, yubikey
     home.activation = {
-      importGpgKeys = let
-        gpg = "${pkgs.gnupg}/bin/gpg";
-        keyid = cfg.public_key;
-      in mkIf (cfg.public_key != "")
-        (lib.hm.dag.entryAfter [ "linkGeneration"] ''
-          ${gpg} --list-keys ${keyid} > /dev/null 2>&1 || ${gpg} --recv-keys ${keyid} > /dev/null 2>&1 || echo "Error during gpg import: No key!"
-          ${gpg} --list-secret-keys ${keyid} > /dev/null 2>&1 || ${gpg} --card-status > /dev/null 2>&1 || echo "Error during gpg import: No card!"
-        '');
+      importGpgKeys =
+        let
+          gpg = "${pkgs.gnupg}/bin/gpg";
+          keyid = cfg.public_key;
+        in
+        mkIf (cfg.public_key != "")
+          (lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+            ${gpg} --list-keys ${keyid} > /dev/null 2>&1 || ${gpg} --recv-keys ${keyid} > /dev/null 2>&1 || echo "Error during gpg import: No key!"
+            ${gpg} --list-secret-keys ${keyid} > /dev/null 2>&1 || ${gpg} --card-status > /dev/null 2>&1 || echo "Error during gpg import: No card!"
+          '');
     };
 
     home.file.".gnupg/gpg-agent.conf" = {

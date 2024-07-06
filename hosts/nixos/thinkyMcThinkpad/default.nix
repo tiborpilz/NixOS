@@ -55,7 +55,7 @@
     services.xserver = {
       enable = true;
 
-      desktopManager.plasma5.enable = true;
+      desktopManager.plasma6.enable = true;
 
       xkb = {
         layout = "us";
@@ -116,7 +116,9 @@
     };
 
     # Use home-manager
+    # (./modules/nixos/home.nix)
     home.enable = true;
+    home.graphical = true;
 
     # modules.services.paperless.enable = true;
 

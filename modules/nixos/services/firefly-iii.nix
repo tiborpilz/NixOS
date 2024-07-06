@@ -17,7 +17,7 @@ in
       default = "/data/firefly-iii";
     };
     fints = mkOption {
-      default = {};
+      default = { };
       description = ''
         Paths to sops-encrypted files containing the configuration for the respective bank.
       '';
@@ -66,8 +66,8 @@ in
 
     virtualisation.oci-containers.containers.firefly-iii = {
       image = "docker.io/fireflyiii/core:latest";
-      ports = ["${toString fireflyPort}:8080"];
-      extraOptions = ["--network=firefly-iii"];
+      ports = [ "${toString fireflyPort}:8080" ];
+      extraOptions = [ "--network=firefly-iii" ];
       volumes = [
         "${cfg.baseDir}/storage/upload:/var/www/html/storage/upload"
         "${cfg.baseDir}/storage/database:/var/www/html/storage/database"
@@ -90,8 +90,8 @@ in
 
     virtualisation.oci-containers.containers.firefly-fints-importer = {
       image = "docker.io/benkl/firefly-iii-fints-importer:latest";
-      extraOptions = ["--network=firefly-iii"];
-      ports = ["${toString fintsPort}:8080"];
+      extraOptions = [ "--network=firefly-iii" ];
+      ports = [ "${toString fintsPort}:8080" ];
       volumes = [
         "${cfg.configDir}/copies:/app/configurations"
       ];
