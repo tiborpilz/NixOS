@@ -112,11 +112,6 @@ with lib;
     virtualisation.oci-containers.backend = "podman";
     system.stateVersion = "23.11";
 
-    nix = {
-      package = pkgs.nix;
-      registry.nixpkgs.flake = pkgs;
-    };
-
     services.avahi = {
       enable = true;
       publish = {
