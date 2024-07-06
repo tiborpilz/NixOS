@@ -31,6 +31,10 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
+    sops.secrets.openvpn-pia = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
     sops.secrets.nextcloud_admin_pass = mkIf config.modules.services.nextcloud.enable {
       owner = "nextcloud";
     };
@@ -53,29 +57,6 @@ with lib;
 
 
     networking.useDHCP = false;
-    networking.wg-quick.interfaces = {
-     wg0 = {
-       address = [ "10.0.0.2/24" "fdc9:281f:04d7:9ee9::2/64" ];
-       # dns = [ "10.0.0.1" "fdc9:281f:04d7:9ee9::1" ];
-       privateKeyFile = "/var/lib/wireguard/private.key";
-
-       # Route Plex traffic differently - plex IP is hardcoded and might break
-       # preUp = "ip route add 54.246.167.176/32 via 192.168.2.1 dev enp8s0";
-       # postDown = "ip route del 54.246.167.176/32 via 192.168.2.1 dev enp8s0";
-
-       peers = [
-         {
-           publicKey = "QzJm9puVez50UZbCUAJYZnqBdW19o1tBU0Q/WXZsbyw=";
-
-           # TODO: we actually only want to set wireguard for *incoming* connections to klaus
-           # allowedIPs = [ "0.0.0.0/0" "::/0" ];
-           allowedIPs = [ "10.0.0.0/24" "fdc9:281f:04d7:9ee9::/64" ];
-           endpoint = "159.69.194.44:51820";
-           persistentKeepalive = 25;
-         }
-       ];
-     };
-    };
     networking.firewall.enable = false;
     networking.networkmanager.enable = true;
 
@@ -204,11 +185,18 @@ with lib;
       };
 
       media = {
-        calibre.enable = true;
         deluge = {
           enable = true;
-        };
-        komga.enable = true;
+          credentialsFile = config.sops.secrets.deluge.path;
+        }; # downloader
+        sonarr.enable = true; # search & download tv shows
+        radarr.enable = true; # search & download movies
+        readarr.enable = true; # search & download books
+        jackett.enable = true; # indexer for media
+
+        komga.enable = true; # comic reader
+        calibre.enable = true; # book reader
+
         immich = {
           immich-version = "v1.107.2";
           enable = true;
