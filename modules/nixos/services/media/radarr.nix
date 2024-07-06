@@ -23,7 +23,7 @@ in
       volumes = [
         "${radarrConfigDir}:/config"
         "/data/media/movies:/movies"
-        "/data/downloads:/downloads"
+        "/data/downloads/deluge:/data"
       ];
       environment = {
         "TZ" = "Europe/Berlin";
