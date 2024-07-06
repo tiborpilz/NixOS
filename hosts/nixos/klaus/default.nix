@@ -207,7 +207,6 @@ with lib;
         calibre.enable = true;
         deluge = {
           enable = true;
-          sopsFile = config.sops.secrets.deluge.path;
         };
         komga.enable = true;
         immich = {
