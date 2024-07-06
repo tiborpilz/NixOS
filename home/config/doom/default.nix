@@ -5,7 +5,7 @@ stdenv.mkDerivation {
   inherit version;
   src = lib.sourceByRegex ./. [ "config.org" "init.el" ];
 
-  buildInputs = [emacs];
+  buildInputs = [ emacs ];
 
   buildPhase = ''
     cp $src/* .

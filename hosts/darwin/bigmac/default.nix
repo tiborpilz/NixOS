@@ -5,7 +5,7 @@ with lib;
   options = {
     systemd = mkOption {
       type = types.attrs;
-      default = {};
+      default = { };
     };
   };
 

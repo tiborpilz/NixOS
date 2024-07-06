@@ -33,7 +33,7 @@ with mylib;
         LD_CONTAINER_NAME = "linkding";
         LD_HOST_PORT = "9090";
         LD_HOST_DATA_DIR = "./data";
-        LD_SUPERUSER_NAME= "admin";
+        LD_SUPERUSER_NAME = "admin";
         LD_SUPERUSER_PASSWORD = "changeme";
         LD_DISABLE_BACKGROUND_TASKS = "False";
         LD_DISABLE_URL_VALIDATION = "False";
