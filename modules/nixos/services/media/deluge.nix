@@ -26,33 +26,9 @@ in
         Path to a sops-encrypted file containing env variables for the VPN connection.
       '';
     };
-
   };
 
   config = mkIf cfg.enable {
-    system.activationScripts.initDeluge = stringAfter [ "var" ] ''
-      # Create config directory
-      mkdir -p ${delugeConfigDir}/openvpn
-
-      # Write PIA WG config
-#       cat > ${delugeConfigDir}/openvpn/pia.conf << EOF
-# client
-# dev tun
-# proto udp
-# remote swiss.privateinternetaccess.com 1198
-# resolv-retry infinite
-# nobind
-
-      # # Re-Download PIA OpenVPN config files
-      # rm ${delugeConfigDir}/openvpn/*
-      # mkdir -p ${delugeConfigDir}/openvpn
-      # tempdir=$(mktemp -d)
-      # ${pkgs.wget}/bin/wget -O $tempdir/openvpn.zip https://www.privateinternetaccess.com/openvpn/openvpn.zip
-      # ${pkgs.unzip}/bin/unzip -d $tempdir $tempdir/openvpn.zip
-      # mv $tempdir/${cfg.piaCountry}.ovpn ${delugeConfigDir}/openvpn
-      # rm -rf $tempdir
-    '';
-
     # system.activationScripts.generateSecretEnv = stringAfter [ "setupSecrets" ] ''
     #   echo VPN_USER=$(cat ${config.sops.secrets.deluge_vpn_user.path}) > ${envFile}
     #   echo VPN_PASS=$(cat ${config.sops.secrets.deluge_vpn_pass.path}) >> ${envFile}
@@ -62,41 +38,47 @@ in
     #   # ${config.sops.secrets.deluge_password.path}
     # '';
 
-    virtualisation.oci-containers.containers.deluge = {
-      image = "docker.io/binhex/arch-delugevpn:2.1.1-3-02";
+    virtualisation.oci-containers.containers.vpn = {
+      image = "thrnz/docker-wireguard-pia";
       ports = [
         "${toString publicPort}:8112"
         "8118:8118"
+        "6881:6881"
         "58846:58846"
-        "59846:58946"
+        "53559:53559"
       ];
+      environment = {
+        "USER" = "p4147401";
+        "PASS" = "D!0n4r4p23";
+        "LOC" = "swiss";
+        "PORT_FORWARDING" = "1";
+        "PORT_PERSIST" = "1";
+      };
+      extraOptions = [
+        "--privileged=true"
+        "--cap-add=net_admin"
+      ];
+    };
+
+    virtualisation.oci-containers.containers.deluge = {
+      image = "linuxserver/deluge";
       volumes = [
         "/data/downloads:/downloads"
         "${delugeConfigDir}:/config"
         "/etc/localtime:/etc/localtime:ro"
       ];
       environment = {
-        "VPN_ENABLED" = "yes";
-        "VPN_PROV" = "pia";
-        "VPN_CLIENT" = "wireguard";
-        "STRICT_PORT_FORWARD" = "no";
-        "ENABLE_PRIVOXY" = "no";
-        "LAN_NETWORK" = "84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1";
-        "NAME_SERVERS" = "1.1.1.1";
-        "DELUGE_DAEMON_LOG_LEVEL" = "info";
-        "DELUGE_WEB_LOG_LEVEL" = "info";
-        "DEBUG" = "false";
-        "PUID" = "0";
-        "PGID" = "0";
+        "TZ" = "Europe/Berlin";
+        "PUID" = "1000";
+        "PGID" = "1000";
       };
-      environmentFiles = mkIf (cfg.sopsFile != null) [
-        (/. + builtins.toPath cfg.sopsFile)
-      ];
       extraOptions = [
-        "--sysctl=\"net.ipv4.conf.all.src_valid_mark=1\""
-        "--privileged=true"
+        "--network=container:vpn"
       ];
     };
+
+    systemd.services.podman-vpn.serviceConfig.wantedBy = ["podman-deluge.service"];
+    systemd.services.podman-vpn.serviceConfig.requiredBy = ["podman-deluge.service"];
     modules.services.reverseProxy.proxies.deluge.publicPort = publicPort;
   };
 }
