@@ -127,6 +127,8 @@ with mylib;
 
     modules.gui.plasma.enable = config.graphical;
 
+    modules.firefox.enable = true;
+
     nix = {
       registry.nixpkgs.flake = inputs.nixpkgs;
       settings = {
