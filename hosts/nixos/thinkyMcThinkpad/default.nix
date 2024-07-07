@@ -50,12 +50,14 @@
 
 
     services.displayManager.sddm.enable = true;
+    services.desktopManager.plasma6.enable = true;
+
 
     # Configure keymap in X11
     services.xserver = {
       enable = true;
 
-      desktopManager.plasma6.enable = true;
+      windowManager.bspwm.enable = true;
 
       xkb = {
         layout = "us";
