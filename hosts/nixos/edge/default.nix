@@ -3,7 +3,7 @@
     ./hardware-configuration.nix
   ];
 
-  boot.cleanOnBoot = true;
+  boot.cleanTmpDir = true;
 
   boot.kernelModules = [
     "iptable_nat"
