@@ -127,7 +127,7 @@ with mylib;
 
     modules.gui.plasma.enable = config.graphical;
 
-    modules.firefox.enable = true;
+    modules.firefox.enable = !pkgs.stdenv.isDarwin; # Firefox package doesn't work on Darwin :(
 
     nix = {
       registry.nixpkgs.flake = inputs.nixpkgs;
