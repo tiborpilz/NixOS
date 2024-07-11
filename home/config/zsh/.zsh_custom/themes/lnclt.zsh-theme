@@ -4,7 +4,7 @@ local ret_status="%(?:%{$fg_bold[green]%}:%{$fg_bold[red]%}%s)"
 
 function git_prompt_info() {
   ref=$(git symbolic-ref HEAD 2> /dev/null) || return
-  echo "$ZSH_THEME_GIT_PROMPT_PREFIX  $(current_branch)$ZSH_THEME_GIT_PROMPT_SUFFIX$(parse_git_dirty)"
+  echo "$ZSH_THEME_GIT_PROMPT_PREFIX  $(current_branch | sed 's/\(.\{35\}\).*/\1.../')$ZSH_THEME_GIT_PROMPT_SUFFIX$(parse_git_dirty)"
 }
 
 function get_pwd(){
