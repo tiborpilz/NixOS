@@ -38,7 +38,6 @@
        ;; doom-quit         ; DOOM quit-message prompts when you quit Emacs
                                         ; (emoji +unicode)  ; 🙂
        hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
-       hydra
        ;; indent-guides  ; highlighted indent columns
        (ligatures +fira)        ; ligatures and symbols to make your code pretty again
        minimap           ; show a map of the code on the side
@@ -107,7 +106,6 @@
        (pass +auth)              ; password manager for nerds
        pdf               ; pdf enhancements
        ;; prodigy           ; FIXME managing external services & code builders
-       rgb               ; creating color strings
        ; taskrunner        ; taskrunner for all your projects
        terraform         ; infrastructure as code
        tmux              ; an API for interacting with tmux
