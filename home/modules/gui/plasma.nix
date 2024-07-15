@@ -62,6 +62,8 @@ in
               "org.kde.plasma.systemtray"
               "org.kde.plasma.digitalclock"
             ];
+            height = 20;
+            floating = true;
           }
         ];
       };
