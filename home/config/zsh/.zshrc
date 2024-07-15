@@ -95,6 +95,29 @@ urlencode () {
   LC_COLLATE=$old_lc_collate
 }
 
+# Show current pipeline state abbreviated
+# TODO: move this into its own package and use in tmux, prompt, nvim or emacs
+cistatus() {
+    local pipeline_output=$(glab ci status 2>/dev/null)
+
+    echo "$pipeline_output" | awk '
+    {
+        if ($1 ~ /\(created\)/) state="<0001f7e1>"
+        else if ($1 ~ /\(running\)/) state="<0001f7e2>"
+        else if ($1 ~ /\(success\)/) state="✅"
+        else if ($1 ~ /\(failed\)/) state="❌"
+        else state="❓"
+
+        if ($1 ~ /\(running\)/) {
+            printf "%s %s (%s) | ", state, $6, $2
+        } else {
+            printf "%s %s | ", state, $6
+        }
+    }
+    '
+}
+
+
 source <(kubectl completion zsh)
 alias k=kubectl
 
