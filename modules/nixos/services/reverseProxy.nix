@@ -32,7 +32,7 @@ let
     extraConfig = let
       reverseProxy = ''
         reverse_proxy http://${targetHost}:${toString port} {
-            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-Proto https
         }
       '';
       basicAuth = if enableauth then ''
