@@ -22,7 +22,6 @@
   cmd = vim -f -c "Gvdiffsplit" "$MERGED"
   trustExitCode = true
 [gpg]
-  program = gpg
   format = ssh
 [commit]
   gpgsign = true
