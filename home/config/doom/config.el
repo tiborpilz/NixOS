@@ -534,10 +534,10 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (setq doom-theme 'catppuccin)
 (setq catppuccin-flavor 'frappe)
 
-(setq doom-themes-treemacs-theme "doom-colors")
+;; (setq doom-themes-treemacs-theme "doom-colors")
 
-(with-eval-after-load 'doom-themes
-  (doom-themes-treemacs-config))
+;; (with-eval-after-load 'doom-themes
+;;   (doom-themes-treemacs-config))
 
 (use-package ewal
   :init (setq ewal-use-built-in-always-p nil
@@ -578,11 +578,6 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
           ((not flycheck-posframe-mode)
            (remove-hook 'post-command-hook 'flycheck-posframe-monitor-post-command t))))
   (add-hook! flycheck-posframe-mode #'fix-flycheck-posframe-not-hide-immediately))
-
-(use-package! treemacs-nerd-icons
-  :defer t
-  :after treemacs
-  :config (treemacs-load-theme "nerd-icons"))
 
 (add-hook 'treemacs-mode-hook #'hide-mode-line-mode)
 

@@ -79,8 +79,6 @@
 
 (package! spacious-padding)
 
-(package! treemacs-nerd-icons :pin "9876cb478145a0ec4e36f64ff6583f3de7126216")
-
 (package! k8s-mode)
 
 (unpin! pcre2el)
