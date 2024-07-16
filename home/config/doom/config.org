@@ -1373,10 +1373,10 @@ Since the default is a bit too vibrant for my taste, I'm setting the flavor to ~
 (setq doom-theme 'catppuccin)
 (setq catppuccin-flavor 'frappe)
 
-(setq doom-themes-treemacs-theme "doom-colors")
+;; (setq doom-themes-treemacs-theme "doom-colors")
 
-(with-eval-after-load 'doom-themes
-  (doom-themes-treemacs-config))
+;; (with-eval-after-load 'doom-themes
+;;   (doom-themes-treemacs-config))
 #+end_src
 
 *** Misc Themes
@@ -1543,28 +1543,6 @@ NerdTree, but largely inspired by the Project Explorer in Eclipse.
 It shows the file system outlines of your projects in a simple tree layout
 allowing quick navigation
 and exploration, while also possessing basic file management utilities.
-
-*** Icons
-Doom switched from ~treemacs-all-the-icons~ to ~treemacs-nerd-icons~ recently -
-though the icons look weird per default. For some reason, the fix discussed [[https://discourse.doomemacs.org/t/ugly-icons-in-treemacs/4147][here]] does not work, so I'm applying it manually.
-
-#+begin_src elisp :tangle packages.el
-(package! treemacs-nerd-icons :pin "9876cb478145a0ec4e36f64ff6583f3de7126216")
-#+end_src
-
-#+begin_src elisp
-(use-package! treemacs-nerd-icons
-  :defer t
-  :after treemacs
-  :config (treemacs-load-theme "nerd-icons"))
-#+end_src
-
-**** Inconsistent directory icons
-
-Some directory icons are inconsistent, more discussion here:
-https://github.com/Alexander-Miller/treemacs/issues/1016
-
-There's a fix outlined in the GH issues, which I'm applying manually.
 
 *** Modeline
 
