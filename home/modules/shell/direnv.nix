@@ -19,7 +19,7 @@ in
 
     xdg.configFile."direnv/direnv.toml".text = ''
       [global]
-      load_dotenv = true
+      load_dotenv = false
     '';
   };
 }
