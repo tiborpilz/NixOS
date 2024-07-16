@@ -1,6 +1,7 @@
 [user]
 	email = tibor.pilz@iu.org
 	name = Tibor Pilz
+	signingkey = ~/.ssh/id_rsa.pub
 [author]
 	email = tibor.pilz@iu.org
 [filter "lfs"]
@@ -22,8 +23,9 @@
   trustExitCode = true
 [gpg]
 	program = gpg
+	format = ssh
 [commit]
-	gpgSign = false
+	gpgSign = true
 [push]
 	default = current
 [pull]
