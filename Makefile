@@ -1,4 +1,4 @@
-.PHONY: help build
+.PHONY: help build generate_node_packages deploy_klaus deploy_klaus_dry_run deploy_edge homemanager switch
 
 help: ## Show this help.
 	@sed -ne '/@sed/!s/## //p' $(MAKEFILE_LIST)
@@ -28,6 +28,15 @@ deploy_edge: ## Deploy the edge nixos configuration to the hetzner vm
 
 homemanager: ## Swith the home-manager configuration for the current user
 	home-manager switch --flake .
+
+switch: ## Automatically switch configuration based on the system type
+	@if [ -f /etc/os-release ] && grep -q "ID=nixos" /etc/os-release; then \
+        @echo "NixOS detected - running nixos-rebuild"; \
+		nixos-rebuild switch --flake .; \
+	else \
+		@echo "Non-NixOS detected - running home-manager"; \
+		home-manager switch --flake .; \
+	fi
 
 %:
 	@:
