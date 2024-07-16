@@ -1,34 +1,34 @@
 [user]
-	email = tibor.pilz@iu.org
-	name = Tibor Pilz
-	signingkey = ~/.ssh/id_rsa.pub
+  email = tibor.pilz@iu.org
+  name = Tibor Pilz
+  signingkey = ~/.ssh/id_rsa.pub
 [author]
-	email = tibor.pilz@iu.org
+  email = tibor.pilz@iu.org
 [filter "lfs"]
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
-	required = true
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
 [core]
   editor = vim
 [merge]
-	tool = diffconflicts
+  tool = diffconflicts
 [mergetool]
   keepBackup = false
 [mergetool "diffconflicts"]
   cmd = vim -c DiffConflicts "$MERGED" "$BASE" "$LOCAL" "$REMOTE"
   trustExitCode = true
 [mergetool "fugitive"]
-	cmd = vim -f -c "Gvdiffsplit" "$MERGED"
+  cmd = vim -f -c "Gvdiffsplit" "$MERGED"
   trustExitCode = true
 [gpg]
-	program = gpg
-	format = ssh
+  program = gpg
+  format = ssh
 [commit]
-	gpgSign = true
+  gpgSign = true
 [push]
-	default = current
+  default = current
 [pull]
-	rebase = true
+  rebase = true
 [init]
-	defaultBranch = main
+  defaultBranch = main
