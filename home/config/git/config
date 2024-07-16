@@ -25,7 +25,7 @@
   program = gpg
   format = ssh
 [commit]
-  gpgSign = true
+  gpgsign = true
 [push]
   default = current
 [pull]
