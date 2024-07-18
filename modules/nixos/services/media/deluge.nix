@@ -61,6 +61,7 @@ in
         "VPN_ENABLED" = "yes";
         "VPN_PROV" = "pia";
         "VPN_CLIENT" = "wireguard";
+        "VPN_REMOTE_SERVER" = "swiss.privacy.network";
         "ENABLE_STARTUP_SCRIPTS" = "no";
         "ENABLE_PRIVOXY" = "yes";
         "STRICT_PORT_FORWARD" = "yes";
