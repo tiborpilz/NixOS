@@ -1,19 +1,16 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:base"
+  "extends": ["config:recommended"
   ],
-  "nix": {
-    "enabled": true,
-  },
-  "regexManagers": [
+  "nix": { "enabled": true },
+  "customManagers": [
     {
+      "customType": "regex",
       "fileMatch": ["\\.nix$"],
       "matchStrings": [
         "image\\s*=\\s*\"(?<depName>[\\w./-]+):(?<currentValue>[\\w.-]+)\""
       ],
       "depNameTemplate": "{{depName}}",
-      "versioning": "regex:^(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?$",
       "datasourceTemplate": "docker"
     }
   ]
