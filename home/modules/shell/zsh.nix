@@ -50,7 +50,6 @@ in
       krew
       nodejs
       coreutils
-      thefuck
 
       #Markdown View
       glow
@@ -68,10 +67,9 @@ in
       fpath=(${pkgs.nix-zsh-completions}/share/zsh/site-functions $fpath)
       fpath=(${pkgs.nix}/share/zsh/site-functions $fpath)
       fpath=(${pkgs.zsh-completions}/share/zsh/site-functions $fpath)
-
-      # thefuck initialization
-      eval $(thefuck --alias)
     '';
+
+    programs.thefuck.enable = true;
 
     modules.shell.zsh.aliases = {
       xclip = "xclip -selection clipboard";
