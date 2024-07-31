@@ -133,9 +133,11 @@ export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
 export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
 
 if [[ $TERM != dumb  ]]; then
-  autoload -Uz compinit && compinit -u -d $ZSH_CACHE/zcompdump
+  autoload -Uz compinit
+  if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
+    compinit
+  else
+    compinit -C
+  fi
   source $ZDOTDIR/extra.zshrc
 fi
-
-# thefuck initialization
-eval $(thefuck --alias)
