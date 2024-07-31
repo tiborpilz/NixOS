@@ -3,7 +3,6 @@ PATH=$PATH:$HOME/bin
 PATH=$PATH:$HOME/.npm-global/bin
 PATH=$PATH:$HOME/go/bin
 
-
 # Antigen Plugin Manager
 if [[ ! -a $HOME/.antigen/antigen.zsh ]]; then
   git clone --branch master https://github.com/zsh-users/antigen.git ~/.antigen
