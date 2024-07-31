@@ -80,9 +80,9 @@ in
         set -g status-bg colour8
         set -g status-fg colour4
 
-        set -g window-status-format ' #W '
-        set -g window-status-current-style 'bg=default,fg=colour15'
-        set -g window-status-current-format ' #W '
+        set -g window-status-format '| ○ #W '
+        set -g window-status-current-style 'bg=default,fg=colour7'
+        set -g window-status-current-format '| ● #W '
 
 
         set -g pane-border-format ""
@@ -100,7 +100,7 @@ in
         set-hook -g session-window-changed 'if-shell "$is_many" "set-option -w pane-active-border-style fg=colour4" "set-option -w pane-active-border-style fg=colour0'
 
         set -g status-left-length 40
-        set -g status-left '#[fg=colour4]  #S | #[default]'
+        set -g status-left '#[fg=colour4]  #S #[default]'
 
         set -g status-right-length 120
 
