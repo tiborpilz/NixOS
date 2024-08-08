@@ -825,6 +825,19 @@ the lsp:
 (setq lsp-rust-features "all")
 #+end_src
 
+*** MDX
+
+MDX is a format combining JSX and Markdown (More info: https://v0.mdxjs.com/).
+Sadly, there is no real emacs support via major-mode or LSP, but I can approximate
+something.
+
+First, I'm setting the auto-mode for ~.mdx~ files to be ~markdown-mode~:
+
+#+begin_src elisp
+(setq auto-mode-alist
+      (append '(("\\.mdx\\'" . markdown-mode))
+              auto-mode-alist))
+#+end_src
 ** Tools
 *** Code Completion
 
