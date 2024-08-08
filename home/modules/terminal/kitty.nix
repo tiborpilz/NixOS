@@ -18,6 +18,9 @@ with lib;
         name = "Fira Code";
       };
       theme = "Catppuccin-Macchiato";
+      settings = {
+        enable_audio_bell = false;
+      };
       extraConfig = ''
         window_margin_width 16
       '';
