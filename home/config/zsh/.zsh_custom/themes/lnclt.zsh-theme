@@ -1,6 +1,6 @@
 #!/usr/bin/env
 
-local ret_status="%(?:%{$fg_bold[green]%}:%{$fg_bold[red]%}%s)"
+local ret_status="%(?:%{$fg_bold[green]%}▸:%{$fg_bold[red]%}▸%s)"
 
 function git_prompt_info() {
   ref=$(git symbolic-ref HEAD 2> /dev/null) || return
@@ -23,11 +23,13 @@ function get_pwd(){
 }
 
 function nix_shell_prompt() {
-  if [[ -z $NIX_SHELL_PACKAGES ]]; then
-    return
+  if [[ -n $NIX_SHELL_PACKAGES ]]; then
+    nix_indicator="%{$fg_bold[blue]%}%{$reset_color%} ($NIX_SHELL_PACKAGES) "
+    echo $nix_indicator
+  elif [[ -n $IN_NIX_SHELL ]]; then
+    nix_indicator="%{$fg_bold[blue]%}%{$reset_color%} "
+    echo $nix_indicator
   fi
-  nix_indicator="%{$fg_bold[blue]%}%{$reset_color%} ($NIX_SHELL_PACKAGES) "
-  echo $nix_indicator
 }
 
 # We use our own venv prompt, so we can disable the default
