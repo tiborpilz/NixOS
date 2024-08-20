@@ -67,6 +67,9 @@ with mylib;
       # Haskell
       cabal-install
       ghc
+
+      # Better nix cli
+      unstable.nh
     ];
 
     # Let Home Manager install and manage itself.
