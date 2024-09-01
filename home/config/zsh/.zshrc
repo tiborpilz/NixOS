@@ -21,6 +21,7 @@ antigen bundle vi-mode
 antigen bundle git
 antigen bundle docker
 antigen bundle docker-compose
+antigen bundle kubectl
 
 antigen bundle zsh-users/zsh-syntax-highlighting
 
@@ -117,7 +118,6 @@ cistatus() {
 }
 
 
-source <(kubectl completion zsh)
 alias k=kubectl
 
 export PATH="/usr/local/opt/mysql-client/bin:$PATH"
@@ -132,11 +132,12 @@ export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
 export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
 
 if [[ $TERM != dumb  ]]; then
-  autoload -Uz compinit
+  autoload -Uz +X compinit
   if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
     compinit
   else
     compinit -C
   fi
   source $ZDOTDIR/extra.zshrc
+  source <(kubectl completion zsh)
 fi
