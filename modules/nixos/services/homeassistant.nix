@@ -40,7 +40,7 @@ in
     '';
 
     virtualisation.oci-containers.containers.homeassistant = {
-      image = "ghcr.io/home-assistant/home-assistant:2020.1.0";
+      image = "ghcr.io/home-assistant/home-assistant:2024.8.3";
       volumes = [ "${homeassistant_config_dir}:/config" ];
       environment = { };
       extraOptions = [
