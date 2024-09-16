@@ -31,10 +31,10 @@ homemanager: ## Swith the home-manager configuration for the current user
 
 switch: ## Automatically switch configuration based on the system type
 	@if [ -f /etc/os-release ] && grep -q "ID=nixos" /etc/os-release; then \
-        @echo "NixOS detected - running nixos-rebuild"; \
+        echo "NixOS detected - running nixos-rebuild"; \
 		nixos-rebuild switch --flake .; \
 	else \
-		@echo "Non-NixOS detected - running home-manager"; \
+		echo "Non-NixOS detected - running home-manager"; \
 		home-manager switch --flake .; \
 	fi
 
