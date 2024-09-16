@@ -487,6 +487,10 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
   (setq! gptel-api-key (lambda () (password-store-get "bitwarden/openai-gpt-key")))
   (setq! gptel-model "gpt-4"))
 
+(map! :leader
+      (:prefix ("o" . "open")
+       :desc "Open GPTel" "g" #'gptel))
+
 (use-package! gptel-extensions :after gptel)
 
 (use-package! quarto-mode
