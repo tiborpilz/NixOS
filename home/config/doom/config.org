@@ -1231,6 +1231,10 @@ Configure
   :config
   (setq! gptel-api-key (lambda () (password-store-get "bitwarden/openai-gpt-key")))
   (setq! gptel-model "gpt-4"))
+
+(map! :leader
+      (:prefix ("o" . "open")
+       :desc "Open GPTel" "g" #'gptel))
 #+end_src
 
 ***** GPTel-extensions
