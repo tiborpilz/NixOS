@@ -33,6 +33,9 @@
   rebase = true
 [init]
   defaultBranch = main
+[core]
+  excludesfile = ~/.gitignore_global
+
 [alias]
   difft = "-c diff.external=difft diff"
   dlog = "-c diff.external=difft log -p --ext-diff"
