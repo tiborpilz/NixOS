@@ -24,8 +24,11 @@ in
       pkgs.unstable.aider-chat
     ];
 
-    modules.shell.zsh.envInit = ''
-      export OPENAI_API_KEY=$(pass ${cfg.passApiKey})
-    '';
+    programs.zsh = {
+      enable = true;
+      aliases = {
+        aider = "OPENAI_API_KEY=$(pass ${cfg.passApiKey}) aider";
+      };
+    };
   };
 }
