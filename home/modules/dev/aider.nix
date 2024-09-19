@@ -24,10 +24,8 @@ in
       pkgs.unstable.aider-chat
     ];
 
-    programs.zsh = {
-      aliases = {
-        aider = "OPENAI_API_KEY=$(pass ${cfg.passApiKey}) aider";
-      };
+    modules.shell.zsh.aliases = {
+      aider = "OPENAI_API_KEY=$(pass ${cfg.passApiKey}) aider";
     };
   };
 }
