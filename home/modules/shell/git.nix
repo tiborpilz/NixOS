@@ -28,6 +28,7 @@ in
       "git/ignore".source = ../../config/git/ignore;
       "git/attributes".source = ../../config/git/attributes;
       "git/gitk".source = ../../config/git/gitk;
+      "git/ignore_global".source = ../../config/git/ignore_global;
     };
   };
 }
