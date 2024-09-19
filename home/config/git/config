@@ -34,7 +34,7 @@
 [init]
   defaultBranch = main
 [core]
-  excludesfile = ~/.gitignore_global
+  excludesfile = ${configDir}/git/ignore_global
 
 [alias]
   difft = "-c diff.external=difft diff"
