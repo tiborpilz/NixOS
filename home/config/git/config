@@ -10,7 +10,8 @@
   process = git-lfs filter-process
   required = true
 [core]
-  editor = vim
+  editor = nvim
+  excludesfile = ~/.config/git/ignore_global
 [merge]
   tool = diffconflicts
 [mergetool]
@@ -33,8 +34,6 @@
   rebase = true
 [init]
   defaultBranch = main
-[core]
-  excludesfile = ${configDir}/git/ignore_global
 
 [alias]
   difft = "-c diff.external=difft diff"
