@@ -25,7 +25,6 @@ in
     ];
 
     programs.zsh = {
-      enable = true;
       aliases = {
         aider = "OPENAI_API_KEY=$(pass ${cfg.passApiKey}) aider";
       };
