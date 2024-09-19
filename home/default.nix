@@ -132,6 +132,11 @@ with mylib;
 
     modules.firefox.enable = !pkgs.stdenv.isDarwin; # Firefox package doesn't work on Darwin :(
 
+    modules.dev.aider = {
+      enable = true;
+      passApiKey = "bitwarden/openai-api-key";
+    };
+
     nix = {
       registry.nixpkgs.flake = inputs.nixpkgs;
       settings = {
