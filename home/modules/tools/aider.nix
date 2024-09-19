@@ -6,11 +6,11 @@
 # It expects the password to be available in `pass` via a given key.
 { inputs, config, lib, pkgs, ... }:
 let
-  cfg = config.modules.dev.aider;
+  cfg = config.modules.tools.aider;
   mylib = import ../../../lib { inherit inputs lib pkgs; };
 in
 {
-  options.modules.dev.aider = {
+  options.modules.tools.aider = {
     enable = mylib.mkBoolOpt false;
     passApiKey = lib.mkOption {
       type = lib.types.str;
