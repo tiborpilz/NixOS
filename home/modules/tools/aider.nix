@@ -25,7 +25,7 @@ in
     ];
 
     modules.shell.zsh.aliases = {
-      aider = "OPENAI_API_KEY=$(pass ${cfg.passApiKey}) aider";
+      aider = "eval 'OPENAI_API_KEY=\\$(pass ${cfg.passApiKey}) aider'";
     };
   };
 }
