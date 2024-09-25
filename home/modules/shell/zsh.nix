@@ -43,6 +43,7 @@ in
       fd
       fzf
       jq
+      yq
       ripgrep
       gron
       tldr
