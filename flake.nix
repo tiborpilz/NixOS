@@ -129,7 +129,7 @@
           homeDirectory = if (isDarwin) then "/Users/${user}" else "/home/${user}";
           pkgs = self.channels.${system}.nixpkgs;
           enableSyncthing = (system == "x86_64-linux");
-          hosts = if (isDarwin) then (lib.attrNames self.darwinConfigurations) else (lib.attrNames self.nixosConfigurations);
+          hosts = lib.attrNames self.nixosConfigurations;
           mkHostAliases = map (h: "${user}@${h}") hosts;
           aliases = mkHostAliases;
           homeConfiguration = home-manager.lib.homeManagerConfiguration {
