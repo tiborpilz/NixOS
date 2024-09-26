@@ -79,6 +79,9 @@
 
 (package! spacious-padding)
 
+(package! solaire-mode :disable t)
+
+(package! k8s-mode)
 (package! k8s-mode)
 
 (unpin! pcre2el)
