@@ -1,6 +1,6 @@
 # NixOS & Homemanager configuration
 
-[![built with garnix](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Ftiborpilz%2FNixOS)](https://garnix.io)
+[![built with garnix](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Ftiborpilz%2FNixOS)](https://garnix.io/repo/tiborpilz/NixOS)
 [![github actions](https://github.com/tiborpilz/nixos/actions/workflows/build.yml/badge.svg)](https://github.com/tiborpilz/NixOS/actions/workflows/build.yml)
 
 
