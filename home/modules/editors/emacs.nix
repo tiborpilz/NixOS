@@ -17,17 +17,17 @@ in
       (setq lsp-use-plists t)
     '';
 
-    programs.emacs.package = pkgs.my.emacsGitWrapped;
+    programs.emacs.package = pkgs.my.emacsWrapped;
 
     programs.doom-emacs = mkIf cfg.useNix {
       enable = true;
       doomDir = ../../config/doom;
-      emacs = pkgs.my.emacsGitWrapped;
+      emacs = pkgs.my.emacsWrapped;
     };
 
     services.emacs.enable = lib.mkIf (pkgs.stdenv.hostPlatform.isLinux) true;
 
-    home.sessionVariables.EDITOR = "${pkgs.my.emacsGitWrapped}/bin/emacsclient";
+    home.sessionVariables.EDITOR = "${pkgs.my.emacsWrapped}/bin/emacsclient";
 
     home.packages = with pkgs; [
       # emacsWithNativeComp
