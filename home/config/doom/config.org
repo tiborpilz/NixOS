@@ -1234,7 +1234,7 @@ Configure
 
 (map! :leader
       (:prefix ("o" . "open")
-       :desc "Open GPTel" "g" #'gptel))
+       :desc "Open GPTel" "g" #'gptel)))
 #+end_src
 
 ***** GPTel-extensions
@@ -1532,7 +1532,7 @@ Now that everything's set up, I'm enabling the mode.
 
 (The actual values obviously need to be tweaked though)
 
-*** Better Error DIsplay
+*** Better Error Display
 
 The posframe that flycheck-posframe is using for error display seems to linger
 for a while, and does not disappear until you stop moving the cursor.
@@ -1553,16 +1553,23 @@ This snippet makes it disappear instantly:
   (add-hook! flycheck-posframe-mode #'fix-flycheck-posframe-not-hide-immediately))
 #+end_src
 
-** Treemacs
-
-Treemacs is a file and project explorer similar to NeoTree or vim’s NerdTree.
-
-*** Modeline
+*** Treemacs Modeline
 
 I don't really need the modeline in the treemacs buffer, so I'm disabling it.
 
 #+begin_src elisp
 (add-hook 'treemacs-mode-hook #'hide-mode-line-mode)
+#+end_src
+
+*** Solaire-Mode
+Solaire-Mode provides a way to change the background color of buffers that are
+not the current buffer, making the current buffer stand out more.
+
+This is enabled per default in Doom Emacs, but it results in issues with Treemacs,
+so I'm disabling it.
+
+#+begin_src elisp :tangle packages.el
+(package! solaire-mode :disable t)
 #+end_src
 
 ** Vertico
@@ -1600,6 +1607,7 @@ Add fringe to vertico-posframea
 ~kubernetes-mode~ brings a lot of snippets.
 
 #+begin_src elisp :tangle packages.el
+(package! k8s-mode)
 (package! k8s-mode)
 #+end_src
 
