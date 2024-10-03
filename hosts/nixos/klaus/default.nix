@@ -44,13 +44,22 @@ with lib;
 
     boot.kernelParams = [ "cpufreq.default_governor=conservative" ];
 
+
+    systemd.services.refresh-flake = {
+      description = "Update the remote flake used for system configuration";
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${pkgs.nixFlakes}/bin/nix flake prefetch github:tiborpilz/nixos --refresh";
+      };
+    };
+
+    systemd.services.nixos-upgrade.wants = [ "refresh-flake.service" ];
+
     system.autoUpgrade = {
       enable = true;
       flake = "github:tiborpilz/nixos";
       flags = [
-        "--update-input"
-        "nixpkgs"
-        "--no-write-lock-file"
         "-L"
       ];
       dates = "02:00";
