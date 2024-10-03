@@ -11,24 +11,25 @@ with mylib;
     enable = mkBoolOpt false;
   };
   config = lib.mkIf cfg.enable {
-    programs.bun = {
-      enable = true;
-      # package = pkgs.unstable.bun;
-    };
-
     modules.shell.zsh.fpathDirs = "{pkgs.unstable.bun}/share/zsh/site-functions";
 
     # Packages for web development, mostly for JavaScript
-    home.packages = with pkgs; [
+    home.packages = with pkgs.unstable; [
+      # Package Managers
       nodePackages.pnpm
       nodePackages.yarn
-      nodePackages.prettier
-      nodePackages."@vue/cli"
+      bun
 
-      # typescript & typescript language server
+      # Linting
+      nodePackages.prettier
+
+      # Typescript
       nodePackages.typescript
       nodePackages.typescript-language-server
       nodePackages.ts-node
+
+      # Vue
+      vue-language-server
 
       # Astrojs language server
       nodePackages."@astrojs/language-server"
