@@ -53,9 +53,6 @@ in
       # Haskell language server
       haskell-language-server
 
-      # vue language server
-      unstable.vue-language-server
-
       # Python Language Server
       python3Packages.python-lsp-server
 
