@@ -44,6 +44,9 @@ with lib;
 
     boot.kernelParams = [ "cpufreq.default_governor=conservative" ];
 
+    system.autoUpgrade.enable = true;
+    system.autoUpgrade.flake = "github:tiborpilz/nixos";
+
     powerManagement.cpuFreqGovernor = "conservative";
 
     networking.hostName = "klaus";
