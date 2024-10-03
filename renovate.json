@@ -12,6 +12,15 @@
       ],
       "depNameTemplate": "{{depName}}",
       "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["\\.nix$"],
+      "matchStrings": [
+        "immich-version\\s*=\\s*\"(?<currentValue>[\\w./-]+)\""
+      ],
+      "depNameTemplate": "ghcr.io/immich-app/immich-server",
+      "datasourceTemplate": "docker"
     }
   ]
 }
