@@ -11,7 +11,7 @@ with mylib;
     enable = mkBoolOpt false;
   };
   config = lib.mkIf cfg.enable {
-    modules.shell.zsh.fpathDirs = "{pkgs.unstable.bun}/share/zsh/site-functions";
+    modules.shell.zsh.fpathDirs = "${pkgs.unstable.bun}/share/zsh/site-functions";
 
     # Packages for web development, mostly for JavaScript
     home.packages = with pkgs.unstable; [
