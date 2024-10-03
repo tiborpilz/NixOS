@@ -11,9 +11,17 @@ with mylib;
     enable = mkBoolOpt false;
   };
   config = lib.mkIf cfg.enable {
+    programs.bun = {
+      enable = true;
+      # package = pkgs.unstable.bun;
+    };
+
+    modules.shell.zsh.rcInit = ''
+      fpath=(${pkgs.unstable.bun}/share/zsh/site-functions $fpath)
+    '';
+
     # Packages for web development, mostly for JavaScript
     home.packages = with pkgs; [
-      unstable.bun
       nodePackages.pnpm
       nodePackages.yarn
       nodePackages.prettier
