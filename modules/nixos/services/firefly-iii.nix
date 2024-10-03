@@ -59,7 +59,7 @@ in
       wantedBy = [ "podman-firefly-fints-importer.service" "podman-firefly-iii.service" ];
       after = [ "network.target" ];
       serviceConfig = {
-        ExecStart = "${pkgs.podman}/bin/podman network create firefly-iii";
+        ExecStart = "${pkgs.podman}/bin/podman network create --ignore firefly-iii";
         RemainAfterExit = true;
       };
     };
