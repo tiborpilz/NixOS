@@ -1364,13 +1364,15 @@ variable.
 
 Since the default is a bit too vibrant for my taste, I'm setting the flavor to ~frappe~.
 #+begin_src elisp
-(setq doom-theme 'catppuccin)
 (setq catppuccin-flavor 'frappe)
+#+end_src
 
-;; (setq doom-themes-treemacs-theme "doom-colors")
+*** Current Theme
 
-;; (with-eval-after-load 'doom-themes
-;;   (doom-themes-treemacs-config))
+The theme I'm using for now is Doom-Nord-Aurora. It's included in ~doom-themes~, looks pretty similar to Doom Nord, but has a bit more muted colors.
+
+#+begin_src elisp
+(setq doom-theme 'doom-nord-aurora)
 #+end_src
 
 *** Misc Themes
