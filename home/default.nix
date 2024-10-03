@@ -62,9 +62,6 @@ with mylib;
       # Haskell
       cabal-install
       ghc
-
-      # Better nix cli
-      unstable.nh
     ];
 
     # Let Home Manager install and manage itself.
@@ -101,6 +98,7 @@ with mylib;
     modules.dev.jsonnet.enable = true;
     modules.dev.dhall.enable = true;
     modules.dev.cloud.enable = true;
+    modules.dev.nix.enable = true;
 
     modules.dev.colima.enable = pkgs.stdenv.isDarwin; # I only need a docker runtime on MacOs
 
