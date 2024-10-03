@@ -44,8 +44,18 @@ with lib;
 
     boot.kernelParams = [ "cpufreq.default_governor=conservative" ];
 
-    system.autoUpgrade.enable = true;
-    system.autoUpgrade.flake = "github:tiborpilz/nixos";
+    system.autoUpgrade = {
+      enable = true;
+      flake = "github:tiborpilz/nixos";
+      flags = [
+        "--update-input"
+        "nixpkgs"
+        "--no-write-lock-file"
+        "-L"
+      ];
+      dates = "02:00";
+      "randomizedDelaySec" = "45min";
+    };
 
     powerManagement.cpuFreqGovernor = "conservative";
 
@@ -190,7 +200,7 @@ with lib;
         jackett.enable = true; # indexer for media
 
         komga.enable = true; # comic reader
-        calibre.enable = true; # book reader
+        calibre.enable = false; # book reader
 
         immich = {
           immich-version = "v1.117.0";
