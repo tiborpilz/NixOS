@@ -23,7 +23,7 @@ in
       port = "${toString publicPort}:8000";
 
       containers.broker = {
-        image = "docker.io/redis:6.0";
+        image = "docker.io/redis:6.2";
         volumes = [
           "paperless-redis:/data"
         ];
