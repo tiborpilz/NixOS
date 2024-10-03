@@ -537,13 +537,9 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
        :desc "Preview" "p" #'markdown-html-preview
        :desc "Stop Preview" "s" #'markdown-html-preview-stop))
 
-(setq doom-theme 'catppuccin)
 (setq catppuccin-flavor 'frappe)
 
-;; (setq doom-themes-treemacs-theme "doom-colors")
-
-;; (with-eval-after-load 'doom-themes
-;;   (doom-themes-treemacs-config))
+(setq doom-theme 'doom-nord-aurora)
 
 (use-package ewal
   :init (setq ewal-use-built-in-always-p nil
