@@ -54,11 +54,6 @@ with mylib;
       php82
       php82Packages.composer
 
-      # Bun is a Node alternative
-      unstable.bun
-
-      esbuild
-
       # Latex stuff TODO: move to a module
       # texlive.combined.scheme-full
       # GNU roff - typesetting, pdf converting stuff
