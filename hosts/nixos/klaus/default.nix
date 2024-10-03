@@ -190,7 +190,7 @@ with lib;
         calibre.enable = true; # book reader
 
         immich = {
-          immich-version = "v1.107.2";
+          immich-version = "v1.117.0";
           enable = true;
         };
         jellyfin.enable = true;
