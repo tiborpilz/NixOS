@@ -1,5 +1,3 @@
 [
-    "@vue/language-server",
-    "emmet-ls",
-    "@previewjs/cli"
+    "@vue/language-server"
 ]

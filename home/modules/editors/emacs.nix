@@ -64,7 +64,7 @@ in
       haskell-language-server
 
       # vue language server
-      my."@vue/language-server"
+      unstable.vue-language-server
 
       # Python Language Server
       python3Packages.python-lsp-server
