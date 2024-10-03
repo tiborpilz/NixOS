@@ -22,7 +22,7 @@ in
       port = "${toString publicPort}:8080";
 
       containers.db = {
-        image = "postgres:13";
+        image = "docker.io/postgres:13";
         volumes = [ "tandoor-pgdata:/var/lib/postgresql/data" ];
         environment = {
           "POSTGRES_DB" = db_db;
@@ -32,7 +32,7 @@ in
       };
 
       containers.tandoor = {
-        image = "vabene1111/recipes:1.5";
+        image = "docker.io/vabene1111/recipes:1.5";
         environment = {
           "SECRET_KEY" = "secretkey";
           "DB_ENGINE" = "django.db.backends.postgresql";
