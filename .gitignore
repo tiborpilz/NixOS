@@ -1,3 +1,4 @@
 *.qcow2
 result
 home/config/doom/custom.el
+home/config/neovim/plugged
