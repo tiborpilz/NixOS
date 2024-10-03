@@ -107,7 +107,10 @@ in
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
 
-    xdg.configFile."doom" = { source = ../../config/doom; recursive = true; };
+    xdg.configFile."doom" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Code/nixos/home/config/doom";
+      recursive = true;
+    };
 
     # home.sessionVariables.DOOMDIR = (if !cfg.useNix then "${config.home.homeDirectory}/.config/nixos/home/config/doom" else "");
 
