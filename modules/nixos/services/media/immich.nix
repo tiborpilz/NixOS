@@ -67,7 +67,7 @@ in
       };
 
       containers.redis = {
-        image = "redis:6.2";
+        image = "redis:7.4";
       };
 
       containers.db = {
