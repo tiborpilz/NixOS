@@ -2,7 +2,7 @@
 with lib;
 with lib.my;
 let
-  publicPort = 8010;
+  publicPort = 8012;
   db_user = "paperless";
   db_password = "paperless";
   db_db = "paperless";
@@ -51,6 +51,7 @@ in
           "/data/media/paperless/export:/usr/src/paperless/export"
         ];
         environment = {
+          "PAPERLESS_AUDIT_LOG_ENABLED" = "true";
           "PAPERLESS_REDIS" = "redis://localhost:6379";
           "PAPERLESS_DBHOST" = "localhost";
           "PAPERLESS_CONSUMPTION_DIR" = "/usr/src/paperless/consume";
