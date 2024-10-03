@@ -19,6 +19,9 @@ in
       vim = "nvim";
     };
 
-    xdg.configFile."nvim" = { source = ../../config/neovim; recursive = true; };
+    xdg.configFile."nvim" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Code/nixos/home/config/neovim";
+      recursive = true;
+    };
   };
 }
