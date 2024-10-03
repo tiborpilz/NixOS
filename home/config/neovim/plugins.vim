@@ -36,7 +36,7 @@ Plug 'AckslD/nvim-whichkey-setup.lua'
 Plug 'tpope/vim-fugitive'
 
 " Folds
-Plug 'scr1pt0r/crease.vim'
+" Plug 'scr1pt0r/crease.vim'
 
 " Statusline
 if !exists('g:started_by_firenvim')
@@ -111,7 +111,7 @@ Plug 'ray-x/lsp_signature.nvim'
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npx --yes yarn install' }
 
 " Neorg - Org in Neovim
-Plug 'nvim-neorg/neorg'
+" Plug 'nvim-neorg/neorg'
 Plug 'nvim-lua/plenary.nvim'
 
 set completeopt=menuone,noselect
@@ -171,7 +171,7 @@ lua require('lsp-signature')
 lua require('iron-config')
 
 " Neorg setup
-lua require('neorg-setup')
+" lua require('neorg-setup')
 
 " Dashboard settings
 let g:dashboard_custom_header = [
