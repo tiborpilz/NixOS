@@ -50,16 +50,6 @@ in
       # :lang latex & :lang org (late previews)
       texlive.combined.scheme-small
 
-      # alternative lsp server for nix
-      nil
-
-      # typescript & typescript language server
-      nodePackages.typescript
-      nodePackages.typescript-language-server
-
-      # Astrojs language server
-      nodePackages."@astrojs/language-server"
-
       # Haskell language server
       haskell-language-server
 
@@ -96,10 +86,6 @@ in
 
       # Mermaid diagramming
       nodePackages.mermaid-cli
-
-      # Typescript repl / execution
-      nodePackages.ts-node
-      nodePackages.typescript
 
       # doom emacs org :jupyter and :gnuplot
       gnuplot
