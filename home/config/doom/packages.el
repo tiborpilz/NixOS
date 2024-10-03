@@ -15,8 +15,6 @@
 
 (package! svelte-mode)
 
-;; (unpin! lsp-mode)
-
 (package! astro-ts-mode)
 
 (package! lsp-tailwindcss
@@ -29,7 +27,6 @@
 (package! jsonnet-mode)
 
 (package! copilot
-  :pin "c6b31f640eca89bb68d3c5005f22c27d033cc92e"
   :recipe (:host github
            :repo "copilot-emacs/copilot.el"
            :files ("*.el" "dist")))
@@ -41,11 +38,6 @@
 (package! devdocs)
 
 (package! gptel)
-
-(package! gptel-extensions
-  :pin "671e5186153fc9bf105c91effb1ed7db06508677"
-  :recipe (:host github
-           :repo "kamushadenes/gptel-extensions.el"))
 
 (package! quarto-mode)
 
