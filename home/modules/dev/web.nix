@@ -16,9 +16,7 @@ with mylib;
       # package = pkgs.unstable.bun;
     };
 
-    modules.shell.zsh.rcInit = ''
-      fpath=(${pkgs.unstable.bun}/share/zsh/site-functions $fpath)
-    '';
+    modules.shell.zsh.fpathDirs = "{pkgs.unstable.bun}/share/zsh/site-functions";
 
     # Packages for web development, mostly for JavaScript
     home.packages = with pkgs; [
@@ -26,6 +24,14 @@ with mylib;
       nodePackages.yarn
       nodePackages.prettier
       nodePackages."@vue/cli"
+
+      # typescript & typescript language server
+      nodePackages.typescript
+      nodePackages.typescript-language-server
+      nodePackages.ts-node
+
+      # Astrojs language server
+      nodePackages."@astrojs/language-server"
 
       # Load Testing
       k6
