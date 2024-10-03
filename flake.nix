@@ -97,7 +97,7 @@
         inputs.emacs-overlay.overlays.default
       ];
 
-      hosts = nixosHosts // darwinHosts;
+      hosts = nixosHosts;
 
       outputsBuilder = channels: rec {
         inherit channels;
@@ -107,9 +107,9 @@
             inherit lib inputs;
             pkgs = channels.nixpkgs;
           }))) // {
-          default = packages.bw2pass;
+          testTandoor = pkgs.testers.runNixOSTest ./tests/tandoor.nix;
+          # testPaperless = pkgs.testers.runNixOSTest ./tests/paperless.nix;
         };
-
 
         apps = (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages) // {
           default = apps.flakeRepl;
@@ -120,6 +120,8 @@
         };
 
         formatter = pkgs.nixpkgs-fmt;
+
+
       };
 
       homeConfigurations = lib.my.mergeAttrs (lib.forEach supportedSystems (system:
