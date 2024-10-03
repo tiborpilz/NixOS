@@ -35,6 +35,12 @@ with lib;
       owner = "nextcloud";
     };
 
+    sops.secrets.nixAccessTokens = {
+      sopsFile = ./secrets/secrets.yaml;
+      mode = "0400";
+      group = config.users.groups.keys.name;
+    };
+
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
 
@@ -121,6 +127,10 @@ with lib;
       python3
       htop
     ];
+
+    nix.extraOptions = ''
+      !include ${config.sops.secrets.nixAccessTokens.path}
+    '';
 
     users.mutableUsers = true;
 
