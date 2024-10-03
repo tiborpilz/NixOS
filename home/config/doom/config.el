@@ -489,7 +489,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (map! :leader
       (:prefix ("o" . "open")
-       :desc "Open GPTel" "g" #'gptel)))
+       :desc "Open GPTel" "g" #'gptel))
 
 (use-package! quarto-mode
   :defer t
