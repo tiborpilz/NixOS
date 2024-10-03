@@ -1225,7 +1225,7 @@ Configure
 
 (map! :leader
       (:prefix ("o" . "open")
-       :desc "Open GPTel" "g" #'gptel)))
+       :desc "Open GPTel" "g" #'gptel))
 #+end_src
 
 *** Quarto
