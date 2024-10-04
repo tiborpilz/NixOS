@@ -27,6 +27,7 @@
     devshell.url = "github:numtide/devshell";
 
     deploy-rs.url = "github:serokell/deploy-rs";
+    authentik-nix.url = "github:nix-community/authentik-nix";
   };
 
   outputs =
@@ -38,6 +39,7 @@
     , flake-utils
     , flake-utils-plus
     , deploy-rs
+    , authentik-nix
     , ...
     } @ inputs:
     let
@@ -73,6 +75,7 @@
         modules = [
           home-manager.nixosModules.home-manager
           sops-nix.nixosModules.sops
+          authentik-nix.nixosModules.default
         ] ++ lib.my.mapModulesRec' (toString ./modules/shared) import;
       };
 

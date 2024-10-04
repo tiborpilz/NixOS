@@ -41,6 +41,16 @@ with lib;
       group = config.users.groups.keys.name;
     };
 
+    sops.secrets.authentikEnv = {
+      sopsFile = ./secrets/secrets.yaml;
+      owner = "authentik";
+    };
+
+    sops.secrets.authentikToken = {
+      sopsFile = ./secrets/secrets.yaml;
+      owner = "authentik";
+    };
+
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
 
@@ -212,7 +222,7 @@ with lib;
         deluge = {
           enable = true;
           credentialsFile = config.sops.secrets.deluge.path;
-        }; # downloader
+        };
         sonarr.enable = true; # search & download tv shows
         radarr.enable = true; # search & download movies
         readarr.enable = true; # search & download books
@@ -227,6 +237,22 @@ with lib;
         };
         jellyfin.enable = true;
       };
+    };
+
+    services.authentik = {
+      enable = true;
+      environmentFile = config.sops.secrets.authentikEnv.path;
+      settings = {
+        disable_startup_analytics = true;
+        avatars = "initials";
+      };
+    };
+
+    modules.services.reverseProxy.proxies.authentik = {
+      publicPort = 9443;
+      targetHost = "127.0.0.1";
+      auth = false;
+      isHttps = true;
     };
 
     # sops.secrets.storagebox_nextcloud_smb_secrets = {

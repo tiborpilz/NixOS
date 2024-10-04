@@ -24,23 +24,40 @@ let
         example = "localhost";
         default = "localhost";
       };
+      isHttps = mkOption {
+        type = types.bool;
+        description = "Is the target host using HTTPS";
+        example = true;
+        default = false;
+      };
     };
   };
 
-  mkProxyConfig = { port, enableauth, username, password, host, targetHost, localDomain, ... }: {
-    serverAliases = [ "http://${host}" "http://${localDomain}" ];
-    extraConfig = let
-      reverseProxy = ''
-        reverse_proxy http://${targetHost}:${toString port} {
-            header_up X-Forwarded-Proto https
-        }
-      '';
-      basicAuth = if enableauth then ''
-        basicauth /* bcrypt {
-            ${username} ${password}
+  mkProxyConfig = { port, enableauth, username, password, host, targetHost, localDomain, isHttps, ... }:
+    let
+      protocol = if isHttps then "https" else "http";
+      additionalTransportConfig = if isHttps then ''
+        transport http {
+          tls_insecure_skip_verify
         }
       '' else "";
-      in reverseProxy + basicAuth;
+    in {
+      serverAliases = [ "http://${host}" "http://${localDomain}" ];
+      extraConfig =
+        let
+          reverseProxy = ''
+            reverse_proxy ${protocol}://${targetHost}:${toString port} {
+                header_up X-Forwarded-Proto https
+                ${additionalTransportConfig}
+            }
+          '';
+          basicAuth = if enableauth then ''
+            basicauth /* bcrypt {
+                ${username} ${password}
+            }
+          '' else "";
+        in
+          reverseProxy + basicAuth;
   };
 in
 {
@@ -124,6 +141,7 @@ in
             host = "${n}.${cfg.hostname}";
             localDomain = if cfg.localDomain != null then "${n}.${cfg.localDomain}" else "";
             targetHost = v.targetHost;
+            isHttps = v.isHttps;
           }))
           cfg.proxies // {
           health = {
