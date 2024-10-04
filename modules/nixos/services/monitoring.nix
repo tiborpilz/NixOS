@@ -21,11 +21,24 @@ in
   config = mkIf cfg.enable {
     services.grafana = {
       enable = true;
+      provision = {
+        datasources.settings.datasources = [{
+          name = "Prometheus";
+          type = "prometheus";
+          access = "proxy";
+          url = "http://localhost:${toString config.services.prometheus.port}";
+          editable = false;
+        }];
+        enable = true;
+      };
+
       settings = {
         server = {
-          http_addr = "0.0.0.0";
+          http_addr = "127.0.0.1";
           http_port = cfg.grafanaPort;
-          domain = "https://grafana.${config.modules.services.reverseProxy.hostname}";
+          domain = "grafana.${config.modules.services.reverseProxy.hostname}";
+          root_url = "https://${config.modules.services.reverseProxy.hostname}";
+          serve_from_sub_path = false;
         };
       };
     };
