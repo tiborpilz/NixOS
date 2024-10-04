@@ -24,7 +24,6 @@
     flake-utils.url = "github:numtide/flake-utils";
     flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
 
-    deno2nix.url = "github:SnO2WMaN/deno2nix";
     devshell.url = "github:numtide/devshell";
   };
 
@@ -82,7 +81,6 @@
           };
           my = self.packages."${prev.system}";
         })
-        inputs.deno2nix.overlays.default
         inputs.devshell.overlays.default
         inputs.emacs-overlay.overlays.default
       ];
