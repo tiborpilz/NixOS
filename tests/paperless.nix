@@ -1,7 +1,7 @@
 { inputs, lib, pkgs, ... }:
 
 let
-  paperlessPort = 8010;
+  paperlessPort = 8012;
   my = import ../lib { inherit inputs lib pkgs; };
 in
 {
@@ -27,6 +27,6 @@ in
     start_all()
     machine.wait_for_unit("podman-paperless-ngx-webserver.service")
     machine.wait_for_open_port(${toString paperlessPort})
-    machine.succeed("curl -sSf http://localhost:${toString paperlessPort}")
+    machine.succeed("curl -sL http://localhost:${toString paperlessPort}")
   '';
 }
