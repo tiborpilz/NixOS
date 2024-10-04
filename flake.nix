@@ -26,15 +26,6 @@
 
     deno2nix.url = "github:SnO2WMaN/deno2nix";
     devshell.url = "github:numtide/devshell";
-
-    deploy-rs.url = "github:serokell/deploy-rs";
-
-    copilot-el.url = "github:zerolfx/copilot.el";
-    copilot-el.flake = false;
-
-    lsp-mode.url = "github:emacs-lsp/lsp-mode";
-    lsp-mode.flake = false;
-
   };
 
   outputs =
@@ -45,7 +36,6 @@
     , sops-nix
     , flake-utils
     , flake-utils-plus
-    , deploy-rs
     , ...
     } @ inputs:
     let
