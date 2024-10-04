@@ -19,6 +19,8 @@ with mylib;
     };
 
     home.packages = with pkgs; [
+      nix
+
       # TODO: move fonts to own module
       (nerdfonts.override { fonts = [ "FiraCode" ]; })
       etBook
