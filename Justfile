@@ -1,5 +1,7 @@
 set dotenv-load
 
+is_nixos := shell('if [ -f /etc/os-release ] && grep -q "NixOS" /etc/os-release; then echo true; else echo false; fi')
+
 # Show this help
 help:
   just --list
@@ -14,3 +16,7 @@ deploy server mode="switch":
 # Switch the home-manager configuration
 homemanager:
   nh home switch
+
+# Automatically switch the local configuration based on the system type
+switch:
+  {{ if is_nixos == "true" { "nixos-rebuild switch --flake ." } else { "home-manager switch --flake ." } }}
