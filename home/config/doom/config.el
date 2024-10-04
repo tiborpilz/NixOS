@@ -243,6 +243,12 @@
   :after (typescript-mode js-mode typescript-tsx-mode)
   :hook (typescript-mode . jest-minor-mode))
 
+(setq find-sibling-rules
+      '(("src/\\(.*/\\)?\\([^/]+\\)\\.\\(ts\\|vue\\)\\'"
+         "test/.*\\2.test.ts")
+        ("test/\\(.*/\\)?\\([^/]+\\)\\.test.ts\\'"
+         "src/.*\\2.\\(ts\\|vue\\)")))
+
 ;; (advice-add 'lsp
 ;;             :before (lambda (&rest _args)
 ;;                       (setf (lsp-session-server-id->folders (lsp-session)) (ht))))
@@ -491,9 +497,13 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
       (:prefix ("o" . "open")
        :desc "Open GPTel" "g" #'gptel))
 
-(use-package! quarto-mode
-  :defer t
-  :mode (("\\.Rmd" . poly-quarto-mode)))
+(use-package! justl
+  :config
+
+  (map! :leader
+        (:prefix ("c" . "Code")
+         :desc "Make" "m" #'justl))
+  (map! :n "e" 'justl-exec-recipe))
 
 (use-package markdown-mode
   :mode ("\\.md\\'" . gfm-mode)

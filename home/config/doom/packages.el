@@ -39,7 +39,9 @@
 
 (package! gptel)
 
-(package! quarto-mode)
+(package! justl :recipe (:host github :repo "psibi/justl.el"))
+
+(package! just-mode)
 
 (package! mermaid-mode)
 

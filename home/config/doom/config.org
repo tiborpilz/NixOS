@@ -547,6 +547,18 @@ Add a package for Jest testing
   :hook (typescript-mode . jest-minor-mode))
 #+end_src
 
+Set up regexes for "sibling files" - so I'm able to jump from ~src/foo/bar.ts~ to ~test/foo/bar.test.ts.~
+
+#+begin_src elisp
+(setq find-sibling-rules
+      '(("src/\\(.*/\\)?\\([^/]+\\)\\.\\(ts\\|vue\\)\\'"
+         "test/.*\\2.test.ts")
+        ("test/\\(.*/\\)?\\([^/]+\\)\\.test.ts\\'"
+         "src/.*\\2.\\(ts\\|vue\\)")))
+#+end_src
+
+***** TODO This seems to only work for direct descendants of ~src~ and ~test~.
+
 **** TODO Eslint
 
 Eslint keeps track of all projects it has been run in, and - even if only one workspace is open,
@@ -1228,18 +1240,32 @@ Configure
        :desc "Open GPTel" "g" #'gptel))
 #+end_src
 
-*** Quarto
-Quarto (https://quarto.org/) is a package for writing literate programming,
-based on Pandoc.
+
+*** Task Runners
+
+I'm switching from Makefiles to Justfiles, using ~just~.
+There's ~just.el~ which allows you to call the recipe from within Emacs.
 
 #+begin_src elisp :tangle packages.el
-(package! quarto-mode)
+(package! justl :recipe (:host github :repo "psibi/justl.el"))
 #+end_src
 
+I want to bind ~just-exec-recipe~ to ~e~ in normal mode.
+
 #+begin_src elisp
-(use-package! quarto-mode
-  :defer t
-  :mode (("\\.Rmd" . poly-quarto-mode)))
+(use-package! justl
+  :config
+
+  (map! :leader
+        (:prefix ("c" . "Code")
+         :desc "Make" "m" #'justl))
+  (map! :n "e" 'justl-exec-recipe))
+#+end_src
+
+(I also want to have a major mode for editing Justfiles)
+
+#+begin_src elisp :tangle packages.el
+(package! just-mode)
 #+end_src
 
 *** Diagrams
@@ -1249,6 +1275,7 @@ based on Pandoc.
 #+begin_src elisp :tangle packages.el
 (package! mermaid-mode)
 #+end_src
+
 *** Markdown / Org Preview
 There are multiple packages out there for previewing markdown, some of them not
 maintained, some of them relying on the github API (via grip). Ideally, I'd like
@@ -1332,6 +1359,7 @@ And finally, a function to start previewing the markdown buffer.
        :desc "Preview" "p" #'markdown-html-preview
        :desc "Stop Preview" "s" #'markdown-html-preview-stop))
 #+end_src
+
 ** Theming
 *** Doom Themes
 
