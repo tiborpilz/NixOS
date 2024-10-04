@@ -98,6 +98,7 @@ in
         set-hook -g window-layout-changed 'if-shell "$is_many" "set-option -w pane-active-border-style fg=colour4" "set-option -w pane-active-border-style fg=colour0'
         set-hook -g session-window-changed 'if-shell "$is_many" "set-option -w pane-active-border-style fg=colour4" "set-option -w pane-active-border-style fg=colour0'
 
+        # TODO: these don't quite work yet
         set-hook -g session-window-changed 'run-shell refresh_tmux_starship'
         set-hook -g after-rename-window 'run-shell refresh_tmux_starship'
         set-hook -g after-select-pane 'run-shell refresh_tmux_starship'
