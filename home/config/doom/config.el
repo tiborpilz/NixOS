@@ -550,10 +550,19 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (setq doom-modeline-hud t)
 
-(setq doom-modeline-buffer-encoding nil)
-(setq doom-modeline-modal nil)
-(setq doom-modeline-column-format "")
-(setq size-indication-mode nil)
+(after! doom-modeline
+  (setq doom-modeline-buffer-encoding nil)
+  (setq doom-modeline-modal nil)
+  (setq doom-modeline-column-format "")
+  (setq size-indication-mode nil)
+  (setq doom-modeline-bar-width 0))
+
+(after! doom-modeline
+  (remove-hook 'doom-modeline-mode-hook #'size-indication-mode) ; filesize in modeline
+  (remove-hook 'doom-modeline-mode-hook #'column-number-mode)   ; cursor column in modeline
+  (line-number-mode -1))
+
+(add-hook 'treemacs-mode-hook (lambda () (hide-mode-line-mode)))
 
 (use-package! spacious-padding
   :config
