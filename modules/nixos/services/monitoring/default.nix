@@ -22,6 +22,8 @@ in
     services.grafana = {
       enable = true;
       provision = {
+        enable = true;
+
         datasources.settings.datasources = [{
           name = "Prometheus";
           type = "prometheus";
@@ -29,7 +31,21 @@ in
           url = "http://localhost:${toString config.services.prometheus.port}";
           editable = false;
         }];
-        enable = true;
+
+        dashboards.settings = {
+          apiVersion = 1;
+
+          providers = [{
+            name = "default";
+            type = "file";
+            disableDeletion = false;
+            updateIntervalSeconds = 10;
+            options = {
+              path = "/etc/grafana/dashboards";
+              foldersFromFileStructure = true;
+            };
+          }];
+        };
       };
 
       settings = {
@@ -40,6 +56,14 @@ in
           root_url = "https://${config.modules.services.reverseProxy.hostname}";
           serve_from_sub_path = false;
         };
+      };
+    };
+
+    environment.etc = {
+      "grafana/dashboards/overview.json" = {
+        source = ./dashboards/overview.json;
+        group = "grafana";
+        user = "grafana";
       };
     };
 
