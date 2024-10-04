@@ -77,8 +77,7 @@ in
         # Status Bar
         set -g status-position top
         set -g status-justify left
-        set -g status-bg colour8
-        set -g status-fg colour4
+        set -g status-style bg=default,fg=colour4
 
         set -g window-status-format '| ○ #W '
         set -g window-status-current-style 'bg=default,fg=colour7'
@@ -90,31 +89,39 @@ in
         set -g pane-border-lines single
         set -g pane-border-style 'fg=colour0'
 
-
         # Set active pane border to dark gay, same as pane-border
         set -g pane-active-border-style 'fg=colour0'
 
         # Only show active pane border when there's more than one pane
         is_many="if [ #{window_panes} -eq 1 ]; then exit 1; fi"
+
         set-hook -g window-layout-changed 'if-shell "$is_many" "set-option -w pane-active-border-style fg=colour4" "set-option -w pane-active-border-style fg=colour0'
         set-hook -g session-window-changed 'if-shell "$is_many" "set-option -w pane-active-border-style fg=colour4" "set-option -w pane-active-border-style fg=colour0'
+
+        set-hook -g session-window-changed 'run-shell refresh_tmux_starship'
+        set-hook -g after-rename-window 'run-shell refresh_tmux_starship'
+        set-hook -g after-select-pane 'run-shell refresh_tmux_starship'
+        set-hook -g after-select-window 'run-shell refresh_tmux_starship'
 
         set -g status-left-length 40
         set -g status-left '#[fg=colour4]  #S #[default]'
 
         set -g status-right-length 120
 
+        status_starship="#(${pkgs.starship}/bin/starship  prompt | head -n2 | tail -n1 | xargs ${pkgs.my.ansi2tmux}/bin/ansi2tmux)"
+        set -g status-right "$status_starship"
+
         # Normally, only show the current window name and the time
         # set -g status-right #[fg=colour4] #(date +"%H:%M") | #S '
 
-        show_git="false"
+        # show_git="false"
 
-        status_git="#(${pkgs.gitmux}/bin/gitmux -cfg $HOME/.config/gitmux/gitmux.conf #{pane_current_path}) #[fg=colour4] | #(date +%H:%M)"
-        status_no_git="#[fg=colour4] #(date +%H:%M)"
+        # status_git="#(${pkgs.gitmux}/bin/gitmux -cfg $HOME/.config/gitmux/gitmux.conf #{pane_current_path}) #[fg=colour4] | #(date +%H:%M)"
+        # status_no_git="#[fg=colour4] #(date +%H:%M)"
 
-        # TODO: get toggle working
-        # set -g status-right "#[if:#{==:#{@show_git],true}]$status_git#[else]$status_no_git#[endif]"
-        set -g status-right "$status_git "
+        # # TODO: get toggle working
+        # # set -g status-right "#[if:#{==:#{@show_git],true}]$status_git#[else]$status_no_git#[endif]"
+        # set -g status-right "$status_git "
       '';
     };
 
@@ -135,6 +142,63 @@ in
           insertions: '#[fg=colour4]'
           deletions: '#[fg=colour4]'
         layout: [branch, ' ', divergence, '- ', flags]
+    '';
+
+    # I'm only using starship as a panel for tmux, hence the config is here
+    programs.starship = {
+      enable = true;
+      settings = {
+        shell = {
+          disabled = true;
+        };
+        aws = {
+          disabled = true;
+        };
+        gcloud = {
+          disabled = true;
+        };
+        directory = {
+          disabled = true;
+        };
+        git_branch = {
+          format = "[$symbol$branch(:$remote_branch) ]($style)";
+          truncation_length = 12;
+        };
+        git_status = {
+          format = "[$modified$up_to_date ]($style)";
+          up_to_date = "✓";
+          modified = "✗";
+          stashed = "";
+        };
+        nix_shell = {
+          symbol = "❄️";
+          format = "[$symbol$name]($style)";
+        };
+      };
+    };
+
+    modules.shell.zsh.rcInit = ''
+        autoload -U add-zsh-hook
+
+        get_raw_starship_prompt() {
+          ${pkgs.starship}/bin/starship prompt | head -n2 | tail -n1
+        }
+
+        refresh_tmux_starship() {
+          # Early return if not TMUX
+          if [[ -z "$TMUX" ]]; then
+            return
+          fi
+
+          delay=''${1:-0}
+          sleep $delay
+          tmux set -g status-right "$(get_raw_starship_prompt | xargs ${pkgs.my.ansi2tmux}/bin/ansi2tmux))"
+        }
+
+        export PERIOD=1
+        add-zsh-hook chpwd refresh_tmux_starship
+        add-zsh-hook precmd refresh_tmux_starship
+        add-zsh-hook periodic refresh_tmux_starship
     '';
 
     home.sessionVariables = {
