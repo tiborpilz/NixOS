@@ -198,7 +198,7 @@ with lib;
       tandoor.enable = true;
       paperless.enable = true;
       firefly-iii.enable = true;
-      monitoring.enable = false;
+      monitoring.enable = true;
       linkding.enable = true;
 
       nextcloud = {
