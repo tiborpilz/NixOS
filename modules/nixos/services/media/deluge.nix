@@ -70,7 +70,7 @@ in
         "SOCKS_USER" = "admin";
         "SOCKS_PASS" = "socks";
         "LAN_NETWORK" = "192.168.2.0/24";
-        "NAME_SERVERS" = "84.200.69.80,37.235.1.174,1.1.1.1,37.235.1.177,84.200.70.40,1.0.0.1";
+        "NAME_SERVERS" = "1.1.1.1,1.0.0.1";
         "DELUGE_DAEMON_LOG_LEVEL" = "info";
         "DELUGE_WEB_LOG_LEVEL" = "info";
         "DELUGE_ENABLE_WEBUI_PASSWORD" = "yes";
