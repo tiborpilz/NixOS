@@ -42,6 +42,7 @@ in
 
         # Sometimes I wanna use the mouse, ok?
         set -g mouse on
+        set -g default-terminal "tmux"
 
         # Vim-ish key bindings
         bind P paste-buffer
@@ -99,30 +100,28 @@ in
         set-hook -g session-window-changed 'if-shell "$is_many" "set-option -w pane-active-border-style fg=colour4" "set-option -w pane-active-border-style fg=colour0'
 
         # TODO: these don't quite work yet
-        set-hook -g session-window-changed 'run-shell refresh_tmux_starship'
-        set-hook -g after-rename-window 'run-shell refresh_tmux_starship'
-        set-hook -g after-select-pane 'run-shell refresh_tmux_starship'
-        set-hook -g after-select-window 'run-shell refresh_tmux_starship'
+        # set-hook -g session-window-changed 'run-shell refresh_tmux_starship'
+        # set-hook -g after-rename-window 'run-shell refresh_tmux_starship'
+        # set-hook -g after-select-pane 'run-shell refresh_tmux_starship'
+        # set-hook -g after-select-window 'run-shell refresh_tmux_starship'
 
         set -g status-left-length 40
         set -g status-left '#[fg=colour4]  #S #[default]'
 
         set -g status-right-length 120
 
-        status_starship="#(${pkgs.starship}/bin/starship  prompt | head -n2 | tail -n1 | xargs ${pkgs.my.ansi2tmux}/bin/ansi2tmux)"
-        set -g status-right "$status_starship"
+        # status_starship="#(${pkgs.starship}/bin/starship  prompt | head -n2 | tail -n1 | xargs ${pkgs.my.ansi2tmux}/bin/ansi2tmux"
+        # set -g status-right "$status_starship"
+
+        # TODO: get toggle working
+        status_git="#(${pkgs.gitmux}/bin/gitmux -cfg $HOME/.config/gitmux/gitmux.conf #{pane_current_path}) #[fg=colour4] | #(date +%H:%M)"
+        status_no_git="#[fg=colour4] #(date +%H:%M)"
+
+        # set -g status-right "#[if:#{==:#{@show_git],true}]$status_git#[else]$status_no_git#[endif]"
+        set -g status-right "$status_git "
 
         # Normally, only show the current window name and the time
         # set -g status-right #[fg=colour4] #(date +"%H:%M") | #S '
-
-        # show_git="false"
-
-        # status_git="#(${pkgs.gitmux}/bin/gitmux -cfg $HOME/.config/gitmux/gitmux.conf #{pane_current_path}) #[fg=colour4] | #(date +%H:%M)"
-        # status_no_git="#[fg=colour4] #(date +%H:%M)"
-
-        # # TODO: get toggle working
-        # # set -g status-right "#[if:#{==:#{@show_git],true}]$status_git#[else]$status_no_git#[endif]"
-        # set -g status-right "$status_git "
       '';
     };
 
@@ -179,27 +178,27 @@ in
     };
 
     modules.shell.zsh.rcInit = ''
-        autoload -U add-zsh-hook
+        # autoload -U add-zsh-hook
 
-        get_raw_starship_prompt() {
-          ${pkgs.starship}/bin/starship prompt | head -n2 | tail -n1
-        }
+        # get_raw_starship_prompt() {
+        #   ${pkgs.starship}/bin/starship prompt | head -n2 | tail -n1
+        # }
 
-        refresh_tmux_starship() {
-          # Early return if not TMUX
-          if [[ -z "$TMUX" ]]; then
-            return
-          fi
+        # refresh_tmux_starship() {
+        #   # Early return if not TMUX
+        #   if [[ -z "$TMUX" ]]; then
+        #     return
+        #   fi
 
-          delay=''${1:-0}
-          sleep $delay
-          tmux set -g status-right "$(get_raw_starship_prompt | xargs ${pkgs.my.ansi2tmux}/bin/ansi2tmux))"
-        }
+        #   delay=''${1:-0}
+        #   sleep $delay
+        #   tmux set -g status-right "$(get_raw_starship_prompt | xargs ${pkgs.my.ansi2tmux}/bin/ansi2tmux))"
+        # }
 
-        export PERIOD=1
-        add-zsh-hook chpwd refresh_tmux_starship
-        add-zsh-hook precmd refresh_tmux_starship
-        add-zsh-hook periodic refresh_tmux_starship
+        # export PERIOD=1
+        # add-zsh-hook chpwd refresh_tmux_starship
+        # add-zsh-hook precmd refresh_tmux_starship
+        # add-zsh-hook periodic refresh_tmux_starship
     '';
 
     home.sessionVariables = {
