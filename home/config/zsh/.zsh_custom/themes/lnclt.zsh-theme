@@ -44,7 +44,7 @@ function venv_prompt() {
 }
 
 PROMPT='%{$fg_bold[white]%}$(get_pwd)%{$reset_color%} $ret_status '
-# RPS1='$(nix_shell_prompt)$(venv_prompt) $(git_prompt_info)'
+RPS1='$(nix_shell_prompt)$(venv_prompt) $(git_prompt_info)'
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[white]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
