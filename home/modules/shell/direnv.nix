@@ -11,15 +11,21 @@ in
   };
 
   config = mkIf cfg.enable {
-    home.packages = [ pkgs.direnv ];
+    programs.direnv = {
+      enable = true;
+
+      config = {
+        global = {
+          load_dotenv = false;
+        };
+      };
+
+      nix-direnv.enable = true;
+    };
+
     modules.shell.zsh.rcInit = ''
       export DIRENV_LOG_FORMAT=
       eval "$(direnv hook zsh)"
-    '';
-
-    xdg.configFile."direnv/direnv.toml".text = ''
-      [global]
-      load_dotenv = false
     '';
   };
 }
