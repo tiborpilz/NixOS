@@ -1,7 +1,7 @@
 { inputs, lib, pkgs, ... }:
 
 let
-  tandoorPort = 8185;
+  tandoorPort = 8285;
   my = import ../lib { inherit inputs lib pkgs; };
 in
 {
