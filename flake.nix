@@ -96,7 +96,8 @@
             pkgs = channels.nixpkgs;
           }))) // {
           testTandoor = pkgs.testers.runNixOSTest ./tests/tandoor.nix;
-          # testPaperless = pkgs.testers.runNixOSTest ./tests/paperless.nix;
+          testPaperless = pkgs.testers.runNixOSTest ./tests/paperless.nix;
+          # docs = pkgs.callPackage ./docs/mkDocs.nix { inherit inputs; };
         };
 
         apps = (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages) // {
