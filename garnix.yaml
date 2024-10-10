@@ -8,4 +8,5 @@ builds:
     - 'packages.aarch64-darwin.emacsXwWrapped'
     - 'packages.aarch64-darwin.emacsGitXw'
     - 'packages.aarch64-darwin.emacsGitXwWrapped'
+    - 'packages.*.testTandoor'
     - 'packages.*.testPaperless'
