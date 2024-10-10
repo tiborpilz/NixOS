@@ -1,7 +1,7 @@
 { inputs, lib, pkgs, ... }:
 
 let
-  tandoorPort = 8285; # This should match the port in your Tandoor module
+  tandoorPort = 8185;
   my = import ../lib { inherit inputs lib pkgs; };
 in
 {
