@@ -5,7 +5,7 @@
 
     settings = {
       experimental-features = [ "nix-command" "flakes" ];
-      system-features = [ "big-parallel" "kvm" "recursive-nix" ];
+      system-features = [ "big-parallel" "kvm" "recursive-nix" "nixos-test" ];
       trusted-users = [ "tibor" "root" ];
     };
     package = pkgs.nix;
