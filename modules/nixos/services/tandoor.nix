@@ -7,6 +7,7 @@ let
   db_password = "recipes";
   db_db = "recipes";
   cfg = config.modules.services.tandoor;
+  pg_data = "tandoor-pgdata";
 in
 {
   options.modules.services.tandoor = {
@@ -18,12 +19,19 @@ in
       mkdir -p /var/lib/tandoor/{staticfiles,mediafiles}
     '';
 
+    system.activationScripts.backupTandoor = stringAfter [ "var" ] ''
+      if podman volume exists tandoor-pgdata; then
+        mkdir -p /data/backups
+        podman volume export tandoor-pgdata -o /data/backups/tandoor-pgdata.tar
+      fi
+    '';
+
     modules.podgroups.pods.tandoor = {
       port = "${toString publicPort}:8080";
 
       containers.db = {
         image = "docker.io/postgres:13";
-        volumes = [ "tandoor-pgdata:/var/lib/postgresql/data" ];
+        volumes = [ "${pg_data}:/var/lib/postgresql/data" ];
         environment = {
           "POSTGRES_DB" = db_db;
           "POSTGRES_USER" = db_user;
