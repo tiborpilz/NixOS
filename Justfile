@@ -12,6 +12,8 @@ deploy server mode="switch":
     {{ if mode == "dry" { "dry-run"} else if mode == "switch" { "switch" } else { error("Unknown Mode") } }} \
     --flake .#{{server}} \
     --target-host root@{{env_var(uppercase(server))}} \
+    --build-host root@{{env_var(uppercase(server))}} \
+    --fast
 
 # Switch the home-manager configuration
 homemanager:
