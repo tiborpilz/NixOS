@@ -18,10 +18,10 @@ generate_node_packages: ## Generate nix node packages based on packages/node/nod
 packages/node/node-packages.nix: generate_node_packages
 
 deploy_klaus: ## Deploy the klaus nixos configuration to 192.168.2.134 (local adress)
-	nix run nixpkgs#nixos-rebuild -- switch --flake .#klaus --target-host root@192.168.2.134
+	nix run nixpkgs#nixos-rebuild -- switch --flake .#klaus --target-host root@192.168.2.134 --build-host root@192.168.2.134 --fast
 
 deploy_klaus_dry_run:
-	nix run nixpkgs#nixos-rebuild -- dry-run --flake .#klaus --target-host root@192.168.2.34
+	nix run nixpkgs#nixos-rebuild -- dry-run --flake .#klaus --target-host root@192.168.2.34 --build-host root@192.168.2.134 --fast
 
 deploy_edge: ## Deploy the edge nixos configuration to the hetzner vm
 	nix run nixpkgs#nixos-rebuild -- switch --flake .#edge --target-host root@159.69.194.44
