@@ -15,6 +15,7 @@ mkShell {
     nixos-rebuild
     cachix
     go-task
+    deploy-rs
     my.bw2pass
   ];
   shellHook = ''
