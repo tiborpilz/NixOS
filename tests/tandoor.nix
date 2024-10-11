@@ -12,8 +12,6 @@ in
 
     virtualisation.diskSize = 8192;
 
-    # nix.useSandbox = false;
-
     imports = [
       (import ../modules/nixos/podgroups.nix { inherit config pkgs; lib = lib // { inherit my; }; })
       (import ../modules/nixos/services/reverseProxy.nix { inherit config pkgs; lib = lib // { inherit my; }; })

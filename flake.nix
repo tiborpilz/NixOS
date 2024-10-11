@@ -25,6 +25,8 @@
     flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
 
     devshell.url = "github:numtide/devshell";
+
+    deploy-rs.url = "github:serokell/deploy-rs";
   };
 
   outputs =
@@ -35,6 +37,7 @@
     , sops-nix
     , flake-utils
     , flake-utils-plus
+    , deploy-rs
     , ...
     } @ inputs:
     let
@@ -53,10 +56,10 @@
         modules = lib.my.mapModulesRec' (toString ./modules/nixos) import;
       });
 
-      darwinHosts = mapModules ./hosts/darwin (hostPath: lib.my.mkHostAttrs hostPath {
-        system = "aarch64-darwin";
-        modules = lib.my.mapModulesRec' (toString ./modules/darwin) import;
-      });
+      # darwinHosts = mapModules ./hosts/darwin (hostPath: lib.my.mkHostAttrs hostPath {
+      #   system = "aarch64-darwin";
+      #   modules = lib.my.mapModulesRec' (toString ./modules/darwin) import;
+      # });
 
     in
     flake-utils-plus.lib.mkFlake rec {
@@ -108,6 +111,7 @@
         };
 
         formatter = pkgs.nixpkgs-fmt;
+
       };
 
       homeConfigurations = lib.my.mergeAttrs (lib.forEach supportedSystems (system:
@@ -141,5 +145,14 @@
       ));
 
       nixosModules = lib.my.mapModulesRec (toString ./modules) import;
+    } // {
+      deploy.nodes.klaus = {
+        hostname = "klaus";
+        profiles.system = {
+          user = "root";
+          path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.klaus;
+          remoteBuild = true;
+        };
+      };
     };
 }
