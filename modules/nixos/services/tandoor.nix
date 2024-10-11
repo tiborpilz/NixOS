@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 with lib;
 with lib.my;
 let
@@ -20,9 +20,9 @@ in
     '';
 
     system.activationScripts.backupTandoor = stringAfter [ "var" ] ''
-      if podman volume exists tandoor-pgdata; then
+      if ${pkgs.podman}/bin/podman volume exists tandoor-pgdata; then
         mkdir -p /data/backups
-        podman volume export tandoor-pgdata -o /data/backups/tandoor-pgdata.tar
+        ${pkgs.podman}/bin/podman volume export tandoor-pgdata -o /data/backups/tandoor-pgdata-$(date +%Y-%m-%d_%H%M%S).tar
       fi
     '';
 
@@ -40,7 +40,7 @@ in
       };
 
       containers.tandoor = {
-        image = "docker.io/vabene1111/recipes:1.5";
+        image = "docker.io/vabene1111/recipes:1.5.19";
         environment = {
           "SECRET_KEY" = "secretkey";
           "DB_ENGINE" = "django.db.backends.postgresql";
