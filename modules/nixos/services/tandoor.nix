@@ -30,7 +30,7 @@ in
       port = "${toString publicPort}:8080";
 
       containers.db = {
-        image = "docker.io/postgres:13";
+        image = "docker.io/postgres:17";
         volumes = [ "${pg_data}:/var/lib/postgresql/data" ];
         environment = {
           "POSTGRES_DB" = db_db;
