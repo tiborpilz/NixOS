@@ -22,7 +22,9 @@ in
     system.activationScripts.backupTandoor = stringAfter [ "var" ] ''
       if ${pkgs.podman}/bin/podman volume exists tandoor-pgdata; then
         mkdir -p /data/backups
-        ${pkgs.podman}/bin/podman volume export tandoor-pgdata -o /data/backups/tandoor-pgdata-$(date +%Y-%m-%d_%H%M%S).tar
+        version=$(echo "${config.modules.podgroups.pods.tandoor.containers.tandoor.image}" | rev | cut -d"/" -f1 | rev)
+        backup_name="tandoor-pgdata-$version-$(date +%Y-%m-%d_%H%M%S).tar"
+        ${pkgs.podman}/bin/podman volume export tandoor-pgdata -o /data/backups/$backup_name
       fi
     '';
 
