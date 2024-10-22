@@ -52,7 +52,7 @@ in
       ];
 
       db = {
-        image = "postgres:16-alpine";
+        image = "postgres:17-alpine";
         volumes = [ "${cfg.dataDir}/postgres:/var/lib/postgresql/data" ];
         environment = {
           POSTGRES_PASSWORD = "postgres";
