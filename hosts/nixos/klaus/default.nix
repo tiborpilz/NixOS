@@ -222,7 +222,7 @@ with lib;
         calibre.enable = false; # book reader
 
         immich = {
-          immich-version = "v1.117.0";
+          immich-version = "v1.118.2";
           enable = true;
         };
         jellyfin.enable = true;
