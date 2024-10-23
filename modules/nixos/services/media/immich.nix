@@ -36,7 +36,7 @@ in
     '';
 
     modules.podgroups.pods.immich = {
-      port = "${toString publicPort}:3001";
+      port = "${toString publicPort}:2283";
 
       containers.immich-server = {
         image = "ghcr.io/immich-app/immich-server:${cfg.immich-version}";
