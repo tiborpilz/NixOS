@@ -35,6 +35,9 @@ with mylib;
       # GNU Parallel my beloved
       parallel
 
+      # graphs in the terminal
+      youplot
+
       # C stuff
       gnumake
       gcc
