@@ -34,6 +34,9 @@ source $ZDOTDIR/.zsh_custom/theme.zsh
 # Util functions
 source $ZDOTDIR/.zsh_custom/utils.zsh
 
+# Extra config from Nix
+source $ZDOTDIR/extra.zshrc
+
 # Aliases
 if type gfind >/dev/null; then alias find=gfind; fi
 alias k=kubectl
@@ -63,3 +66,14 @@ heck() {
   fi
   heck
 }
+
+# Load Completions
+if [[ $TERM != dumb  ]]; then
+  autoload -Uz +X compinit
+  if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
+    compinit
+  else
+    compinit -C
+  fi
+  source <(kubectl completion zsh)
+fi
