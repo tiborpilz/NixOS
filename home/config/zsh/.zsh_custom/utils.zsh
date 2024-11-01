@@ -56,15 +56,30 @@ urlencode () {
         (*) printf '%%%02X' "'$c" ;;
       esac
   done
-  LC_COLLATE=$old_lc_collate
+      LC_COLLATE=$old_lc_collate
+}
+
+# Format branch name for MRs etc.
+format_branch_name() {
+  branch_name=$(git rev-parse --abbrev-ref HEAD)
+  ticket=$(echo "$branch_name" | cut -d'/' -f2 | sed -E 's/^([A-Z0-9]+-[0-9]+).*/\1/')
+  rest=$(echo "$branch_name" | cut -d'/' -f2 | sed -E "s/^$ticket-//" | sed 's/-/ /g')
+
+  echo "$ticket: $rest"
+}
+
+# Create MR with formatted branch name
+mr() {
+  title=$(format_branch_name)
+  glab mr create --web --title "$title" "$@"
 }
 
 # Show current pipeline state abbreviated
 # TODO: move this into its own package and use in tmux, prompt, nvim or emacs
 cistatus() {
-    local pipeline_output=$(glab ci status 2>/dev/null)
+  local pipeline_output=$(glab ci status 2>/dev/null)
 
-    echo "$pipeline_output" | awk '
+  echo "$pipeline_output" | awk '
     {
         if ($1 ~ /\(created\)/) state="<0001f7e1>"
         else if ($1 ~ /\(running\)/) state="<0001f7e2>"
