@@ -237,7 +237,7 @@ with lib;
         jackett.enable = true; # indexer for media
 
         komga.enable = true; # comic reader
-        calibre.enable = false; # book reader
+        calibre.enable = true; # book reader
 
         immich = {
           immich-version = "v1.118.2";
