@@ -204,6 +204,7 @@ with lib;
     };
 
     modules.services = {
+      linkwarden.enable = true;
       syncthing.enable = true;
       tandoor.enable = true;
       paperless.enable = true;
