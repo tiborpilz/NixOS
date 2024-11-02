@@ -43,12 +43,17 @@ with lib;
 
     sops.secrets.authentikEnv = {
       sopsFile = ./secrets/secrets.yaml;
-      owner = "authentik";
+      # owner = "authentik";
     };
 
     sops.secrets.authentikToken = {
       sopsFile = ./secrets/secrets.yaml;
-      owner = "authentik";
+      # owner = "authentik";
+    };
+
+    sops.secrets.forgejoAdminPassword = {
+      sopsFile = ./secrets/secrets.yaml;
+      owner = "forgejo";
     };
 
     boot.loader.systemd-boot.enable = true;
@@ -237,6 +242,11 @@ with lib;
         };
         jellyfin.enable = true;
       };
+    };
+
+    modules.services.forgejo = {
+      enable = true;
+      adminPasswordFile = config.sops.secrets.forgejoAdminPassword.path;
     };
 
     services.authentik = {
