@@ -60,7 +60,7 @@ with lib;
 
     boot.kernelParams = [ "cpufreq.default_governor=conservative" ];
 
-    boot.tmp.onTmpfs = true;
+    boot.tmp.useTmpfs = true;
 
 
     systemd.services.refresh-flake = {
