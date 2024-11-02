@@ -60,6 +60,8 @@ with lib;
 
     boot.kernelParams = [ "cpufreq.default_governor=conservative" ];
 
+    boot.tmp.onTmpfs = true;
+
 
     systemd.services.refresh-flake = {
       description = "Update the remote flake used for system configuration";
