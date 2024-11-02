@@ -51,6 +51,10 @@ with lib;
       owner = "authentik";
     };
 
+    sops.secrets.linkwardenEnv = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
 
@@ -213,7 +217,10 @@ with lib;
     };
 
     modules.services = {
-      linkwarden.enable = true;
+      linkwarden = {
+        enable = true;
+        envFile = config.sops.secrets.linkwardenEnv.path;
+      };
       syncthing.enable = true;
       tandoor.enable = true;
       paperless.enable = true;
