@@ -20,6 +20,9 @@ with mylib;
       type = types.str;
       default = "/var/lib/linkwarden";
     };
+    envFile = mkOption {
+      type = types.str;
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -35,6 +38,11 @@ with mylib;
         volumes = [
           "linkwarden-pgdata:/var/lib/postgresql/data"
         ];
+        environment = {
+          POSTGRES_USER = db_user;
+          POSTGRES_PASSWORD = db_password;
+          POSTGRES_DB = db_db;
+        };
       };
 
       containers.linkwarden = {
@@ -44,12 +52,19 @@ with mylib;
         ];
         environment = {
           "DATABASE_URL" = "postgresql://${db_user}:${db_password}@localhost:5432/${db_db}";
+          "NEXTAUTH_URL" = "http://localhost:${toString cfg.publicPort}";
+          "NEXTAUTH_SECRET" = "secret";
+          "NEXT_PUBLIC_DISABLE_REGISTRATION" = "true";
         };
+        environmentFiles = [
+          cfg.envFile
+        ];
       };
     };
 
     modules.services.reverseProxy.proxies.linkwarden = {
       publicPort = cfg.publicPort;
+      auth = false;
     };
   };
 }
