@@ -34,7 +34,7 @@ with mylib;
       port = "${toString cfg.publicPort}:3000";
 
       containers.db = {
-        image = "postgres:16-alpine";
+        image = "postgres:17-alpine";
         volumes = [
           "linkwarden-pgdata:/var/lib/postgresql/data"
         ];
