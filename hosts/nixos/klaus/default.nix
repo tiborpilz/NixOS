@@ -144,6 +144,13 @@ with lib;
 
     users.mutableUsers = true;
 
+    users.groups.authentik = {};
+    users.users.authentik = {
+      uid = 1005;
+      isSystemUser = true;
+      group = "authentik";
+    };
+
     users.users.tibor = {
       uid = 1000;
       extraGroups = [ "wheel" ];
