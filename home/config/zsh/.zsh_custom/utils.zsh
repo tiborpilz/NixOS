@@ -81,8 +81,8 @@ cistatus() {
 
   echo "$pipeline_output" | awk '
     {
-        if ($1 ~ /\(created\)/) state="<0001f7e1>"
-        else if ($1 ~ /\(running\)/) state="<0001f7e2>"
+        if ($1 ~ /\(created\)/) state="⏳"
+        else if ($1 ~ /\(running\)/) state="👟"
         else if ($1 ~ /\(success\)/) state="✅"
         else if ($1 ~ /\(failed\)/) state="❌"
         else state="❓"
