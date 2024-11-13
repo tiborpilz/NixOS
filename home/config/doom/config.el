@@ -464,7 +464,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (setq lsp-signature-render-documentation nil)
 
 (setq lsp-ui-doc-max-height 60
-      lsp-ui-doc-max-width 100)
+      lsp-ui-doc-max-width 250)
 
 (eval-after-load 'git-timemachine
   '(progn
