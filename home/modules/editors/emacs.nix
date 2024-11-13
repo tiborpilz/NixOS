@@ -57,7 +57,7 @@ in
       python3Packages.python-lsp-server
 
       # Python Language Server Dependencies
-      python3Packages.rope
+      # python3Packages.rope (broken?)
       python3Packages.pyflakes
       python3Packages.mccabe
       python3Packages.pycodestyle
