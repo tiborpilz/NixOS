@@ -1146,7 +1146,7 @@ Same with signature help, as well as help documentation
 Set lsp-ui-doc sizing
 #+begin_src elisp
 (setq lsp-ui-doc-max-height 60
-      lsp-ui-doc-max-width 100)
+      lsp-ui-doc-max-width 250)
 #+end_src
 
 *** Git
