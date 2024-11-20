@@ -55,6 +55,7 @@ in
           "PAPERLESS_REDIS" = "redis://localhost:6379";
           "PAPERLESS_DBHOST" = "localhost";
           "PAPERLESS_CONSUMPTION_DIR" = "/usr/src/paperless/consume";
+          "PAPERLESS_OCR_LANGUAGE" = "deu";
           "PAPERLESS_TIKA_ENABLED" = "1";
           "PAPERLESS_TIKA_GOTENBERG_ENDPOINT" = "http://localhost:3000";
           "PAPERLESS_TIKA_ENDPOINT" = "http://localhost:9998";
