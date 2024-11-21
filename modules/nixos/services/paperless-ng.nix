@@ -16,7 +16,7 @@ in
   config = mkIf cfg.enable {
     system.activationScripts.makePaperlessDir = stringAfter [ "var" ] ''
       mkdir -p /var/lib/paperless/data
-      mkdir -p /data/media/paperless/{consume,export}
+      mkdir -p /data/media/paperless/{consume,export,media}
     '';
 
     modules.podgroups.pods.paperless-ngx = {
@@ -46,7 +46,7 @@ in
         dependsOn = [ "db" "broker" ];
         volumes = [
           "/var/lib/paperless/data:/usr/src/paperless/data"
-          "media:/usr/src/paperless/media"
+          "/data/media/paperless/media:/usr/src/paperless/media"
           "/data/media/paperless/consume:/usr/src/paperless/consume"
           "/data/media/paperless/export:/usr/src/paperless/export"
         ];
