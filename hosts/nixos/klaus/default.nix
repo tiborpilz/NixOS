@@ -144,9 +144,10 @@ with lib;
       htop
     ];
 
-    nix.extraOptions = ''
-      !include ${config.sops.secrets.nixAccessTokens.path}
-    '';
+    # TODO: rotate github nix access token
+    # nix.extraOptions = ''
+    #   !include ${config.sops.secrets.nixAccessTokens.path}
+    # '';
 
     users.mutableUsers = true;
 
