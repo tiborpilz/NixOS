@@ -213,7 +213,7 @@ with lib;
 
     modules.services.reverseProxy.proxies.homeassistant = {
       publicPort = 8123;
-      targetHost = "192.168.2.138";
+      targetHost = "192.168.1.175";
       auth = false;
     };
 
