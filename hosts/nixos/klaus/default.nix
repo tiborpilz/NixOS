@@ -76,17 +76,17 @@ with lib;
       };
     };
 
-    systemd.services.nixos-upgrade.wants = [ "refresh-flake.service" ];
+    # systemd.services.nixos-upgrade.wants = [ "refresh-flake.service" ];
 
-    system.autoUpgrade = {
-      enable = true;
-      flake = "github:tiborpilz/nixos";
-      flags = [
-        "-L"
-      ];
-      dates = "02:00";
-      "randomizedDelaySec" = "45min";
-    };
+    # system.autoUpgrade = {
+    #   enable = true;
+    #   flake = "github:tiborpilz/nixos";
+    #   flags = [
+    #     "-L"
+    #   ];
+    #   dates = "02:00";
+    #   "randomizedDelaySec" = "45min";
+    # };
 
     powerManagement.cpuFreqGovernor = "conservative";
 
