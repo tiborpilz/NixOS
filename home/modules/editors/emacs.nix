@@ -48,7 +48,7 @@ in
       sqlite
 
       # :lang latex & :lang org (late previews)
-      texlive.combined.scheme-small
+      # texlive.combined.scheme-small
 
       # Haskell language server
       haskell-language-server
