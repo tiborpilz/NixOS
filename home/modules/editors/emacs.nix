@@ -48,7 +48,7 @@ in
       sqlite
 
       # :lang latex & :lang org (late previews)
-      # texlive.combined.scheme-small
+      texlive.combined.scheme-small
 
       # Haskell language server
       haskell-language-server
@@ -57,7 +57,7 @@ in
       python3Packages.python-lsp-server
 
       # Python Language Server Dependencies
-      # python3Packages.rope (broken?)
+      # python3Packages.rope
       python3Packages.pyflakes
       python3Packages.mccabe
       python3Packages.pycodestyle
@@ -68,7 +68,7 @@ in
       python3Packages.pylint
 
       # Python Language Server Plugins
-      # python3Packages.pylsp-mypy
+      python3Packages.pylsp-mypy
       python3Packages.pyls-isort
       python3Packages.python-lsp-black
 
