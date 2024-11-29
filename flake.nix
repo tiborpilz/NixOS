@@ -86,6 +86,8 @@
             config.allowUnfree = true;
           };
           my = self.packages."${prev.system}";
+          # Temporary fix as I can't switch to 24.11 yet
+          ghostscript = nixpkgs-unstable.legacyPackages.${prev.system}.ghostscript;
         })
         inputs.devshell.overlays.default
         inputs.emacs-overlay.overlays.default
