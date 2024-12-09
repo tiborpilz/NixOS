@@ -48,7 +48,11 @@ in
       sqlite
 
       # :lang latex & :lang org (late previews)
-      texlive.combined.scheme-small
+      (pkgs.texlive.combine {
+        inherit (pkgs.texlive) scheme-full
+          dvisvgm dvipng # preview and export as html
+          wrapfig amsmath ulem hyperref capt-of etoolbox titlesec;
+      })
 
       # Haskell language server
       haskell-language-server
