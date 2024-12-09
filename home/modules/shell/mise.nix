@@ -13,7 +13,7 @@ in {
   config = mkIf cfg.enable {
     home.packages = [ pkgs.unstable.mise ];
     modules.shell.zsh.rcInit = ''
-      eval "$(pkgs.unstable.mise)/bin/mise activate zsh)"
+      eval "$(${pkgs.unstable.mise}/bin/mise activate zsh)"
     '';
     modules.shell.zsh.fpathDirs = "${pkgs.unstable.mise}/share/zsh/site-functions";
   };

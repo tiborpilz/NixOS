@@ -15,12 +15,12 @@ antigen use oh-my-zsh
 
 antigen bundle vi-mode
 
-# antigen bundle git
+antigen bundle git
+antigen bundle zsh-users/zsh-syntax-highlighting
 # antigen bundle docker
 # antigen bundle docker-compose
 # antigen bundle kubectl
 
-# antigen bundle zsh-users/zsh-syntax-highlighting
 # antigen bundle lukechilds/zsh-nvm
 
 antigen apply

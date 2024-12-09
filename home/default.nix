@@ -130,7 +130,7 @@ with mylib;
     modules.tools.container.enable = true;
     modules.tools.aws.enable = true;
 
-    modules.terminal.kitty.enable = false;
+    modules.terminal.kitty.enable = true;
 
     modules.shell.manix.enable = true;
 
