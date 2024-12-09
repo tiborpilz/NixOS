@@ -12,7 +12,8 @@ with mylib;
   };
   config = lib.mkIf cfg.enable {
     home.packages = with pkgs; [
-      gleam
+      erlang_27
+      unstable.gleam
     ];
   };
 }

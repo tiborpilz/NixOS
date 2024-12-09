@@ -842,6 +842,31 @@ First, I'm setting the auto-mode for ~.mdx~ files to be ~markdown-mode~:
       (append '(("\\.mdx\\'" . markdown-mode))
               auto-mode-alist))
 #+end_src
+*** Gleam
+
+Gleam is a strictly typed functional language that runs on the Erlang VM (and can also be transpiled to Javascript).
+
+#+begin_src elisp :tangle packages.el
+(package! gleam-ts-mode)
+#+end_src
+
+#+begin_src elisp
+(use-package! gleam-ts-mode
+  :config
+  ;; setup formatter to be used by `SPC c f`
+  (after! apheleia
+    (setf (alist-get 'gleam-ts-mode apheleia-mode-alist) 'gleam)
+    (setf (alist-get 'gleam apheleia-formatters) '("gleam" "format" "--stdin"))))
+
+(after! treesit
+  (add-to-list 'auto-mode-alist '("\\.gleam$" . gleam-ts-mode)))
+
+(after! gleam-ts-mode
+  (unless (treesit-language-available-p 'gleam)
+    ;; compile the treesit grammar file the first time
+    (gleam-ts-install-grammar)))
+#+end_src
+
 ** Tools
 *** Code Completion
 

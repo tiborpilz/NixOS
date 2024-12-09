@@ -51,8 +51,10 @@ with mylib;
       # mob.sh - git-powered pair/mob programming tool
       mob
 
+      # htop and btop are system dashboards for the terminal
       htop
 
+      # Pandoc is a document converter
       pandoc
 
       # PHP & composer
@@ -97,6 +99,7 @@ with mylib;
 
     modules.shell.git.enable = true;
     modules.shell.direnv.enable = true;
+    modules.shell.mise.enable = true;
 
     modules.editors.neovim.enable = true;
     modules.editors.emacs.enable = true;
@@ -108,6 +111,7 @@ with mylib;
     modules.dev.dhall.enable = true;
     modules.dev.cloud.enable = true;
     modules.dev.nix.enable = true;
+    modules.dev.gleam.enable = true;
 
     modules.dev.colima.enable = pkgs.stdenv.isDarwin; # I only need a docker runtime on MacOs
 
@@ -132,7 +136,7 @@ with mylib;
 
     modules.gui.plasma.enable = config.graphical;
 
-    modules.firefox.enable = !pkgs.stdenv.isDarwin; # Firefox package doesn't work on Darwin :(
+    modules.firefox.enable = !pkgs.stdenv.isDarwin; # Firefox packdge doesn't work on Darwin :(
 
     modules.tools.aider = {
       enable = false; # TODO: enable once  python-wandb is fixed (https://github.com/NixOS/nixpkgs/issues/349691)
