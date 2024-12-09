@@ -21,7 +21,7 @@ antigen bundle vi-mode
 # antigen bundle kubectl
 
 # antigen bundle zsh-users/zsh-syntax-highlighting
-antigen bundle lukechilds/zsh-nvm
+# antigen bundle lukechilds/zsh-nvm
 
 antigen apply
 

@@ -60,6 +60,8 @@ in
       nodejs
       coreutils
 
+      thefuck
+
       #Markdown View
       glow
     ];

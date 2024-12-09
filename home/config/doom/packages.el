@@ -26,6 +26,8 @@
 
 (package! jsonnet-mode)
 
+(package! gleam-ts-mode)
+
 (package! copilot
   :recipe (:host github
            :repo "copilot-emacs/copilot.el"
