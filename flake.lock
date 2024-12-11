@@ -100,6 +100,22 @@
         "type": "github"
       }
     },
+    "dnspythonFix": {
+      "locked": {
+        "lastModified": 1732019682,
+        "narHash": "sha256-X/lWc/Cye4Q8USSs4j4Z+jgq5usBgX/+zW2To5UF+Kw=",
+        "owner": "gador",
+        "repo": "nixpkgs",
+        "rev": "2fe42ec2da6fc604dc3a47f6f7c921c9431f01ad",
+        "type": "github"
+      },
+      "original": {
+        "owner": "gador",
+        "ref": "dnspython-network-disable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "doomemacs": {
       "flake": false,
       "locked": {
@@ -116,9 +132,27 @@
         "type": "github"
       }
     },
+    "emacs-lsp-booster": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_4"
+      },
+      "locked": {
+        "lastModified": 1716274896,
+        "narHash": "sha256-WsyEkdt8ReGQ40+yV4Cb99A2MEmV0O/i6rmFQura5ww=",
+        "owner": "slotThe",
+        "repo": "emacs-lsp-booster-flake",
+        "rev": "7d110295988fc9bf7fd43bb0cabfbe58a4a5ecf8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "slotThe",
+        "repo": "emacs-lsp-booster-flake",
+        "type": "github"
+      }
+    },
     "emacs-overlay": {
       "inputs": {
-        "nixpkgs": "nixpkgs_4",
+        "nixpkgs": "nixpkgs_5",
         "nixpkgs-stable": "nixpkgs-stable"
       },
       "locked": {
@@ -334,7 +368,7 @@
       "inputs": {
         "doomemacs": "doomemacs",
         "emacs-overlay": "emacs-overlay_2",
-        "nixpkgs": "nixpkgs_5",
+        "nixpkgs": "nixpkgs_6",
         "systems": "systems_5"
       },
       "locked": {
@@ -466,6 +500,22 @@
     },
     "nixpkgs_4": {
       "locked": {
+        "lastModified": 1704194953,
+        "narHash": "sha256-RtDKd8Mynhe5CFnVT8s0/0yqtWFMM9LmCzXv/YKxnq4=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "bd645e8668ec6612439a9ee7e71f7eac4099d4f6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_5": {
+      "locked": {
         "lastModified": 1732837521,
         "narHash": "sha256-jNRNr49UiuIwaarqijgdTR2qLPifxsVhlJrKzQ8XUIE=",
         "owner": "NixOS",
@@ -480,7 +530,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_5": {
+    "nixpkgs_6": {
       "locked": {
         "lastModified": 1732780316,
         "narHash": "sha256-NskLIz0ue4Uqbza+1+8UGHuPVr8DrUiLfZu5VS4VQxw=",
@@ -494,7 +544,7 @@
         "type": "indirect"
       }
     },
-    "nixpkgs_6": {
+    "nixpkgs_7": {
       "locked": {
         "lastModified": 1733016324,
         "narHash": "sha256-8qwPSE2g1othR1u4uP86NXxm6i7E9nHPyJX3m3lx7Q4=",
@@ -569,12 +619,14 @@
         "darwin": "darwin",
         "deploy-rs": "deploy-rs",
         "devshell": "devshell",
+        "dnspythonFix": "dnspythonFix",
+        "emacs-lsp-booster": "emacs-lsp-booster",
         "emacs-overlay": "emacs-overlay",
         "flake-utils": "flake-utils_2",
         "flake-utils-plus": "flake-utils-plus",
         "home-manager": "home-manager",
         "nix-doom-emacs-unstraightened": "nix-doom-emacs-unstraightened",
-        "nixpkgs": "nixpkgs_6",
+        "nixpkgs": "nixpkgs_7",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "plasma-manager": "plasma-manager",
         "sops-nix": "sops-nix"
