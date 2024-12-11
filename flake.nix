@@ -28,6 +28,10 @@
 
     deploy-rs.url = "github:serokell/deploy-rs";
     authentik-nix.url = "github:nix-community/authentik-nix";
+
+    emacs-lsp-booster.url = "github:slotThe/emacs-lsp-booster-flake";
+
+    dnspythonFix.url = "github:gador/nixpkgs/dnspython-network-disable";
   };
 
   outputs =
@@ -40,6 +44,7 @@
     , flake-utils-plus
     , deploy-rs
     , authentik-nix
+    , emacs-lsp-booster
     , ...
     } @ inputs:
     let
@@ -88,9 +93,13 @@
           my = self.packages."${prev.system}";
           # Temporary fix as I can't switch to 24.11 yet
           ghostscript = nixpkgs-unstable.legacyPackages.${prev.system}.ghostscript;
+
+          # Temporarily fix DNS python as its build fails without network connectivity (https://github.com/NixOS/nixpkgs/issues/356803)
+          python311Packages.dns = inputs.dnspythonFix.python3111Packages.dns;
         })
         inputs.devshell.overlays.default
         inputs.emacs-overlay.overlays.default
+        emacs-lsp-booster.overlays.default
       ];
 
       hosts = nixosHosts;

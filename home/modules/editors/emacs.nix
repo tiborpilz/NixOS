@@ -90,6 +90,9 @@ in
 
       # doom emacs org :jupyter and :gnuplot
       gnuplot
+
+      # Speed up LSP
+      emacs-lsp-booster
     ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
