@@ -1171,7 +1171,7 @@ Same with signature help, as well as help documentation
 
 Set lsp-ui-doc sizing
 #+begin_src elisp
-(setq lsp-ui-doc-max-height 60
+(setq lsp-ui-doc-max-height 400
       lsp-ui-doc-max-width 250)
 #+end_src
 
@@ -1182,7 +1182,7 @@ to offload this computation from emacs.
 
 To correctly use it, I need to adjust the lsp command called from within emacs:
 
-#+begin_src elisp
+#+begin_src elisp :tangle no
 (defun lsp-booster--advice-json-parse (old-fn &rest args)
   "Try to parse bytecode instead of json."
   (or
