@@ -10,17 +10,17 @@ in
     enable = true;
     openFirewall = true;
     securityType = "user";
-    extraConfig = ''
-      workgroup = WORKGROUP
-      server string = smbnix
-      netbios name = smbnix
-      security = user
-      # use sendfile = yes
-      # max protocol = smb2
-      hosts allow = 0.0.0.0/0 192.168.2. 127.0.0.1 localhost
-      guest account = samba
-      map to guest = bad user
-    '';
+    settings = {
+      global = {
+        "workgroup" = "WORKGROUP";
+        "server string" = "smbnix";
+        "netbios name" = "smbnix";
+        "security" = "user";
+        "hosts allow" = "0.0.0.0/0 192.168.2. 127.0.0.1 localhost";
+        "guest account" = "samba";
+        "map to guest" = "bad user";
+      };
+    };
     shares = {
       "media" = {
         path = "/data/media";
