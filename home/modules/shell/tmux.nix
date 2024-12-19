@@ -35,10 +35,15 @@ in
       baseIndex = 1;
       escapeTime = 0;
       keyMode = "vi";
+      sensibleOnTop = false;
 
       extraConfig = ''
         # Add Nix PATH
         set-environment -g 'PATH' "$HOME/.nix-profile/bin:$PATH"
+
+        # Fix default shell
+        set -gu default-command
+        set -g default-shell "$SHELL"
 
         # Sometimes I wanna use the mouse, ok?
         set -g mouse on
