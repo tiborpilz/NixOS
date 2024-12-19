@@ -16,7 +16,6 @@ mkShell {
     cachix
     go-task
     deploy-rs
-    my.bw2pass
   ];
   shellHook = ''
     export FLAKE="$PWD"

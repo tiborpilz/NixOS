@@ -2,10 +2,11 @@
   description = "NixOS and Home-Manager configurations";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-24.05";
+    nixpkgs-24-05.url = "nixpkgs/nixos-24.05";
+    nixpkgs.url = "nixpkgs/nixos-24.11";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
-    home-manager.url = "github:nix-community/home-manager/release-24.05";
+    home-manager.url = "github:nix-community/home-manager/release-24.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     plasma-manager.url = "github:nix-community/plasma-manager";
@@ -30,8 +31,6 @@
     authentik-nix.url = "github:nix-community/authentik-nix";
 
     emacs-lsp-booster.url = "github:slotThe/emacs-lsp-booster-flake";
-
-    dnspythonFix.url = "github:gador/nixpkgs/dnspython-network-disable";
   };
 
   outputs =
@@ -91,11 +90,10 @@
             config.allowUnfree = true;
           };
           my = self.packages."${prev.system}";
+          # Keep 24.05 bitwarden-cli as there are some build issues with the new one
+          bitwarden-cli = inputs.nixpkgs-24-05.legacyPackages.${prev.system}.bitwarden-cli;
           # Temporary fix as I can't switch to 24.11 yet
-          ghostscript = nixpkgs-unstable.legacyPackages.${prev.system}.ghostscript;
-
-          # Temporarily fix DNS python as its build fails without network connectivity (https://github.com/NixOS/nixpkgs/issues/356803)
-          python311Packages.dns = inputs.dnspythonFix.python3111Packages.dns;
+          # ghostscript = nixpkgs-unstable.legacyPackages.${prev.system}.ghostscript;
         })
         inputs.devshell.overlays.default
         inputs.emacs-overlay.overlays.default

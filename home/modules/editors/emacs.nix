@@ -69,7 +69,7 @@ in
       python3Packages.autopep8
       python3Packages.yapf
       python3Packages.flake8
-      python3Packages.pylint
+      # python3Packages.pylint
 
       # Python Language Server Plugins
       python3Packages.pylsp-mypy
