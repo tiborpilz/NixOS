@@ -72,7 +72,7 @@ with lib;
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
         Type = "oneshot";
-        ExecStart = "${pkgs.nixFlakes}/bin/nix flake prefetch github:tiborpilz/nixos --refresh";
+        ExecStart = "${pkgs.nixVersions.stable}/bin/nix flake prefetch github:tiborpilz/nixos --refresh";
       };
     };
 
