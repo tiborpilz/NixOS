@@ -86,8 +86,8 @@
   };
   services.dnsmasq = {
     enable = true;
-    extraConfig = ''
-      interface=wg0
-    '';
+    settings = {
+      interface = "wg0";
+    };
   };
 }
