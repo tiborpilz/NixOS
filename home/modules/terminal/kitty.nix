@@ -17,7 +17,7 @@ with lib;
         size = 14;
         name = "Fira Code";
       };
-      themeFile = "Catppuccin-Macchiato";
+      themeFile = "Nord";
       settings = {
         enable_audio_bell = false;
       };
