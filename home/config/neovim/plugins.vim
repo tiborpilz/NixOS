@@ -64,6 +64,12 @@ Plug 'hashivim/vim-terraform'
 "" Nix
 Plug 'LnL7/vim-nix'
 
+"" Vleam (Vue + Gleam)
+Plug 'vleam/vleam.nvim'
+
+" Formatting
+Plug 'stevearc/conform.nvim'
+
 " LSP
 Plug 'williamboman/mason.nvim'
 Plug 'williamboman/mason-lspconfig.nvim'
@@ -136,6 +142,8 @@ let g:copilot_no_tab_map = v:true
 
 " LSP settings
 lua require('lsp-config')
+
+lua require('vleam-config')
 
 " Mason settings
 lua require('mason-setup')
