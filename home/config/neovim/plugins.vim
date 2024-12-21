@@ -7,12 +7,12 @@ Plug 'github/copilot.vim'
 Plug 'glepnir/dashboard-nvim'
 let g:dashboard_default_executive = 'telescope'
 
-" telescope
+" telescope - fuzzy finder of files, buffers, etc
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
-nnoremap <leader>ff <cmd>Telescope find_files<cr>
-nnoremap <leader>fg <cmd>Telescope live_grep<cr>
-nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>pf <cmd>Telescope find_files<cr>
+nnoremap <leader>sp <cmd>Telescope live_grep<cr>
+nnoremap <leader>bb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
 " Icons
@@ -21,7 +21,10 @@ Plug 'kyazdani42/nvim-web-devicons'
 
 " NERDtree
 Plug 'preservim/nerdtree'
-nnoremap <leader>n :NERDTreeToggle<CR>
+nnoremap <leader>op :NERDTreeToggle<CR>
+
+" Which-Key - shows keybindings
+Plug 'folke/which-key.nvim'
 
 " Fuzzy Finder
 Plug 'kien/ctrlp.vim'
@@ -63,9 +66,6 @@ Plug 'hashivim/vim-terraform'
 
 "" Nix
 Plug 'LnL7/vim-nix'
-
-"" Vleam (Vue + Gleam)
-Plug 'vleam/vleam.nvim'
 
 " Formatting
 Plug 'stevearc/conform.nvim'
@@ -142,8 +142,6 @@ let g:copilot_no_tab_map = v:true
 
 " LSP settings
 lua require('lsp-config')
-
-lua require('vleam-config')
 
 " Mason settings
 lua require('mason-setup')
