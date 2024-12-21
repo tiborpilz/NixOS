@@ -16,6 +16,8 @@ if not (mason_lspconfig_present) then
   return
 end
 
+lspconfig.gleam.setup({})
+
 mason.setup()
 mason_lspconfig.setup()
 
@@ -24,6 +26,15 @@ mason_lspconfig.setup_handlers {
     require("lspconfig")[server_name].setup {}
   end
 }
+
+-- Hide diagnostic float per default
+vim.diagnostic.config({ virtual_text = false })
+
+-- Bind lsp hover to <Leader> c g
+vim.api.nvim_set_keymap('n', '<Leader>cg', '<cmd>lua vim.lsp.buf.hover()<CR>', { noremap = true, silent = true })
+
+-- Bind code action to <Leader> c a
+vim.api.nvim_set_keymap('n', '<Leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', { noremap = true, silent = true })
 
 -- add snippet support
 local capabilities = vim.lsp.protocol.make_client_capabilities()
