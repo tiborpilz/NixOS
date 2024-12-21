@@ -1,13 +1,3 @@
-" call plug#begin('~/.config/nvim/plugged')
-" Plug 'nvim-lua/plenary.nvim'
-" Plug 'nvim-telescope/telescope.nvim'
-" 
-" Plug 'ryanoasis/vim-devicons'
-" Plug 'preservim/nerdtree'
-" 
-" Plug 'hoob3rt/lualine.nvim'
-" 
-" call plug#end()
 scriptencoding utf-8
 set encoding=utf-8
 " let base16colorpsace=256
@@ -21,6 +11,7 @@ set ignorecase smartcase shiftround smartindent
 set noerrorbells
 set autoread
 set relativenumber
+set number
 set modeline
 set modelines=5
 set nofoldenable
@@ -40,8 +31,6 @@ autocmd VimEnter *
 " Load plugins
 source $HOME/.config/nvim/plugins.vim
 
-" Look and Feel
-source $HOME/.config/nvim/look-and-feel.vim
 set signcolumn=yes:1
 highlight clear SignColumn
 set fillchars=eob:\ 
