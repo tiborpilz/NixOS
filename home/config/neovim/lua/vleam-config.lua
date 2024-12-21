@@ -1,5 +1,26 @@
+local lspconfig = require("lspconfig")
 local lspconfig_configs = require("lspconfig.configs")
 local lspconfig_util = require("lspconfig.util")
+
+lspconfig.vleam.setup({
+  cmd = { "npx", "vleam", "lsp" },
+  filetypes = { "vue" },
+  root_dir = function(fname)
+    local gleam_root = lspconfig_util.root_pattern("gleam.toml")(fname)
+    if not gleam_root then
+      return false
+    else
+      local javascript_root = lspconfig_util.root_pattern("package.json")(fname)
+
+      if not javascript_root then
+        return false
+      end
+
+      return javascript_root
+    end
+  end,
+  settings = {},
+})
 
 if not lspconfig_configs.vleam then
   lspconfig_configs.vleam = {
@@ -8,10 +29,19 @@ if not lspconfig_configs.vleam then
       filetypes = { "vue" },
       root_dir = function(fname)
         local gleam_root = lspconfig_util.root_pattern("gleam.toml")(fname)
+        print("Getting gleam root")
         if not gleam_root then
           return false
         else
-          return lspconfig_util.root_pattern("package.json")(fname)
+          print("gleam root", gleam_root)
+          local javascript_root = lspconfig_util.root_pattern("package.json")(fname)
+
+          if not javascript_root then
+            return false
+          end
+
+          print("javascript root", javascript_root)
+          return javascript_root
         end
       end,
       settings = {},
