@@ -129,6 +129,12 @@ with lib;
     services.openssh.enable = true;
     services.openssh.settings.PermitRootLogin = "yes";
 
+    services.wyoming.faster-whisper.servers.ha = {
+      enable = true;
+      language = "en";
+      uri = "tcp://0.0.0.0:10300";
+    };
+
     programs.zsh.enable = true;
 
     environment.systemPackages = with pkgs; [
