@@ -1,5 +1,3 @@
-zstyle ':omz:alpha:lib:git' async-prompt no
-
 # Zsh Async Library
 source $ZDOTDIR/.zsh_custom/async.zsh
 
@@ -28,11 +26,11 @@ antigen bundle zsh-users/zsh-syntax-highlighting
 
 antigen apply
 
-# Display red dots whilst waiting for completion.
-COMPLETION_WAITING_DOTS="true"
-
 # Custom theme
 source $ZDOTDIR/.zsh_custom/transient.zsh
+
+# Display red dots whilst waiting for completion.
+COMPLETION_WAITING_DOTS="true"
 
 # Util functions
 source $ZDOTDIR/.zsh_custom/utils.zsh

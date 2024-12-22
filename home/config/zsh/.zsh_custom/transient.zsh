@@ -74,7 +74,7 @@ function _transient_prompt_widget-zle-line-finish {
         sysopen -r -o cloexec -u _transient_prompt_fd /dev/null
         zle -F $_transient_prompt_fd _transient_prompt_restore_prompt
     }
-    zle && PROMPT=$(get_left_prompt) RPROMPT= zle reset-prompt && zle -R
+    zle && PROMPT=$(get_left_prompt) RPS1= zle reset-prompt && zle -R
 }
 
 function _transient_prompt_restore_prompt {
@@ -104,9 +104,9 @@ function prompt_setup () {
     emulate -L zsh
     autoload -Uz vcs_info
     autoload -Uz zsh/sched
+    autoload -Uz add-zsh-hook
 
     PS1=$(get_left_prompt)
-    RPS1=""
 
     # Use async git prompt, speed up the prompt in huge git repo
     async_start_worker vcs_updater_worker
@@ -126,9 +126,8 @@ function do_update() {
 }
 
 function prompt_precmd() {
-    # We set default upper prompt without vcs
-    # asynchronously update it in do_update
-    # ps1_upper=$ps1_stub
+    # We set just the left prompt without vcs and
+    # asynchronously update the right prompt in do_update
     # PS1="${ps1_upper}$prompt_newline${ps1_lower}"
     if [ -d .git ] || git rev-parse --git-dir > /dev/null 2> /dev/null; then
         async_job vcs_updater_worker

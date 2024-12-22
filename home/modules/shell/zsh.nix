@@ -93,7 +93,17 @@ in
       # ls = "eza";
     };
 
-    xdg.configFile."zsh" = { source = "${configDir}/zsh"; recursive = true; };
+    # xdg.configFile."zsh" = { source = "${configDir}/zsh"; recursive = true; };
+
+    xdg.configFile."zsh/.zshrc" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Code/nixos/home/config/zsh/.zshrc";
+      recursive = true;
+    };
+
+    xdg.configFile."zsh/.zsh_custom" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Code/nixos/home/config/zsh/.zsh_custom";
+      recursive = true;
+    };
 
     xdg.configFile."zsh/extra.zshrc".text =
       let aliasLines = mapAttrsToList (n: v: "alias ${n}=\"${v}\"") cfg.aliases;
