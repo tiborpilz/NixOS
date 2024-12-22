@@ -1,4 +1,4 @@
-### Simple transient prompt
+# ### Simple transient prompt
 
 [[ -c /dev/null ]]  ||  return
 zmodload zsh/system ||  return
@@ -54,12 +54,12 @@ function venv_prompt() {
   echo $venv_indicator
 }
 
+function get_left_prompt() {
+    echo '%{$fg_bold[white]%}$(get_pwd)%{$reset_color%} $ret_status '
+}
 
-TRANSIENT_PROMPT='%# '
-
-function set_prompt {
-    PROMPT='%{$fg_bold[white]%}$(get_pwd)%{$reset_color%} $ret_status '
-    RPS1='$(nix_shell_prompt)$(venv_prompt) $(git_prompt_info)'
+function get_right_prompt() {
+    echo '$(nix_shell_prompt)$(venv_prompt) $(git_prompt_info)'
 }
 
 zle -N send-break _transient_prompt_widget-send-break
@@ -74,7 +74,7 @@ function _transient_prompt_widget-zle-line-finish {
         sysopen -r -o cloexec -u _transient_prompt_fd /dev/null
         zle -F $_transient_prompt_fd _transient_prompt_restore_prompt
     }
-    zle && PROMPT='%{$fg_bold[white]%}$(get_pwd)%{$reset_color%} $ret_status ' RPROMPT= zle reset-prompt && zle -R
+    zle && PROMPT=$(get_left_prompt) RPROMPT= zle reset-prompt && zle -R
 }
 
 function _transient_prompt_restore_prompt {
@@ -85,6 +85,9 @@ function _transient_prompt_restore_prompt {
     zle reset-prompt
     zle -R
 }
+
+TRANSIENT_PROMPT=$(get_left_prompt)
+PROMPT=$(get_left_prompt)
 
 (( ${+precmd_functions} )) || typeset -ga precmd_functions
 (( ${#precmd_functions} )) || {
@@ -97,5 +100,50 @@ function _transient_prompt_precmd {
     TRAPINT() { zle && _transient_prompt_widget-zle-line-finish; return $(( 128 + $1 )) }
 }
 
+function prompt_setup () {
+    emulate -L zsh
+    autoload -Uz vcs_info
+    autoload -Uz zsh/sched
+
+    PS1=$(get_left_prompt)
+    RPS1=""
+
+    # Use async git prompt, speed up the prompt in huge git repo
+    async_start_worker vcs_updater_worker
+    async_register_callback vcs_updater_worker do_update
+
+    add-zsh-hook precmd prompt_precmd
+}
+
+function set_prompt() {
+    PS1=$(get_left_prompt)
+    RPS1=$(get_right_prompt)
+}
+
+function do_update() {
+    set_prompt
+    zle reset-prompt
+}
+
+function prompt_precmd() {
+    # We set default upper prompt without vcs
+    # asynchronously update it in do_update
+    # ps1_upper=$ps1_stub
+    # PS1="${ps1_upper}$prompt_newline${ps1_lower}"
+    if [ -d .git ] || git rev-parse --git-dir > /dev/null 2> /dev/null; then
+        async_job vcs_updater_worker
+    else
+        PS1=$(get_left_prompt)
+    fi
+}
+
+function prompt_help() {
+    echo "HELP"
+}
+
+# enable substitution and treat percent as special characters
+# http://zsh.sourceforge.net/Doc/Release/Options.html
+prompt_opts=(subst percent cr)
+prompt_setup "$@"
 
 # vim: sw=0 ts=4 sts=4 et
