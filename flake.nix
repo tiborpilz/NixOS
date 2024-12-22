@@ -68,96 +68,97 @@
       # });
 
     in
-    flake-utils-plus.lib.mkFlake rec {
-      inherit lib self inputs supportedSystems;
+    flake-utils-plus.lib.mkFlake
+      rec {
+        inherit lib self inputs supportedSystems;
 
-      channels.nixpkgs-unstable.config = { allowUnfree = true; };
-      channels.nixpkgs.config = { allowUnfree = true; };
+        channels.nixpkgs-unstable.config = { allowUnfree = true; };
+        channels.nixpkgs.config = { allowUnfree = true; };
 
-      hostDefaults = {
-        channelName = "nixpkgs";
-        modules = [
-          home-manager.nixosModules.home-manager
-          sops-nix.nixosModules.sops
-          authentik-nix.nixosModules.default
-        ] ++ lib.my.mapModulesRec' (toString ./modules/shared) import;
-      };
+        hostDefaults = {
+          channelName = "nixpkgs";
+          modules = [
+            home-manager.nixosModules.home-manager
+            sops-nix.nixosModules.sops
+            authentik-nix.nixosModules.default
+          ] ++ lib.my.mapModulesRec' (toString ./modules/shared) import;
+        };
 
-      sharedOverlays = [
-        (final: prev: {
-          unstable = import nixpkgs-unstable {
-            system = prev.system;
-            config.allowUnfree = true;
+        sharedOverlays = [
+          (final: prev: {
+            unstable = import nixpkgs-unstable {
+              system = prev.system;
+              config.allowUnfree = true;
+            };
+            my = self.packages."${prev.system}";
+            # Keep 24.05 bitwarden-cli as there are some build issues with the new one
+            bitwarden-cli = inputs.nixpkgs-24-05.legacyPackages.${prev.system}.bitwarden-cli;
+            # Temporary fix as I can't switch to 24.11 yet
+            # ghostscript = nixpkgs-unstable.legacyPackages.${prev.system}.ghostscript;
+          })
+          inputs.devshell.overlays.default
+          inputs.emacs-overlay.overlays.default
+          emacs-lsp-booster.overlays.default
+        ];
+
+        hosts = nixosHosts;
+
+        outputsBuilder = channels: rec {
+          inherit channels;
+
+          packages = lib.foldAttrs (item: acc: item) { }
+            (lib.attrValues (mapModules ./packages (p: import p {
+              inherit lib inputs;
+              pkgs = channels.nixpkgs;
+            }))) // {
+            testTandoor = pkgs.testers.runNixOSTest ./tests/tandoor.nix;
+            testPaperless = pkgs.testers.runNixOSTest ./tests/paperless.nix;
           };
-          my = self.packages."${prev.system}";
-          # Keep 24.05 bitwarden-cli as there are some build issues with the new one
-          bitwarden-cli = inputs.nixpkgs-24-05.legacyPackages.${prev.system}.bitwarden-cli;
-          # Temporary fix as I can't switch to 24.11 yet
-          # ghostscript = nixpkgs-unstable.legacyPackages.${prev.system}.ghostscript;
-        })
-        inputs.devshell.overlays.default
-        inputs.emacs-overlay.overlays.default
-        emacs-lsp-booster.overlays.default
-      ];
 
-      hosts = nixosHosts;
-
-      outputsBuilder = channels: rec {
-        inherit channels;
-
-        packages = lib.foldAttrs (item: acc: item) { }
-          (lib.attrValues (mapModules ./packages (p: import p {
-            inherit lib inputs;
-            pkgs = channels.nixpkgs;
-          }))) // {
-          testTandoor = pkgs.testers.runNixOSTest ./tests/tandoor.nix;
-          testPaperless = pkgs.testers.runNixOSTest ./tests/paperless.nix;
-        };
-
-        apps = (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages) // {
-          default = apps.flakeRepl;
-        };
-
-        devShells = {
-          default = import ./shell.nix { pkgs = channels.nixpkgs; };
-        };
-
-        formatter = pkgs.nixpkgs-fmt;
-
-      };
-
-      homeConfigurations = lib.my.mergeAttrs (lib.forEach supportedSystems (system:
-        let
-          isDarwin = (system == "x86_64-darwin" || system == "aarch64-darwin");
-          user = if (isDarwin) then "tibor.pilz" else "tibor";
-          homeDirectory = if (isDarwin) then "/Users/${user}" else "/home/${user}";
-          pkgs = self.channels.${system}.nixpkgs;
-          enableSyncthing = (system == "x86_64-linux");
-          hosts = lib.attrNames self.nixosConfigurations;
-          mkHostAliases = map (h: "${user}@${h}") hosts;
-          aliases = mkHostAliases;
-          homeConfiguration = home-manager.lib.homeManagerConfiguration {
-            inherit lib pkgs;
-
-            modules = [
-              ./home
-              inputs.nix-doom-emacs-unstraightened.hmModule
-              {
-                _module.args.inputs = inputs;
-                home.username = user;
-                home.homeDirectory = homeDirectory;
-                modules.syncthing.service = enableSyncthing;
-                nix.package = pkgs.nix;
-              }
-            ];
+          apps = (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages) // {
+            default = apps.flakeRepl;
           };
-          aliasConfigurations = lib.foldr (curr: prev: prev // { "${curr}" = homeConfiguration; }) { } aliases;
-        in
-        { "${user}" = homeConfiguration; } // aliasConfigurations
-      ));
 
-      nixosModules = lib.my.mapModulesRec (toString ./modules) import;
-    } // {
+          devShells = {
+            default = import ./shell.nix { pkgs = channels.nixpkgs; };
+          };
+
+          formatter = pkgs.nixpkgs-fmt;
+
+        };
+
+        homeConfigurations = lib.my.mergeAttrs (lib.forEach supportedSystems (system:
+          let
+            isDarwin = (system == "x86_64-darwin" || system == "aarch64-darwin");
+            user = if (isDarwin) then "tibor.pilz" else "tibor";
+            homeDirectory = if (isDarwin) then "/Users/${user}" else "/home/${user}";
+            pkgs = self.channels.${system}.nixpkgs;
+            enableSyncthing = (system == "x86_64-linux");
+            hosts = lib.attrNames self.nixosConfigurations;
+            mkHostAliases = map (h: "${user}@${h}") hosts;
+            aliases = mkHostAliases;
+            homeConfiguration = home-manager.lib.homeManagerConfiguration {
+              inherit lib pkgs;
+
+              modules = [
+                ./home
+                inputs.nix-doom-emacs-unstraightened.hmModule
+                {
+                  _module.args.inputs = inputs;
+                  home.username = user;
+                  home.homeDirectory = homeDirectory;
+                  modules.syncthing.service = enableSyncthing;
+                  nix.package = pkgs.nix;
+                }
+              ];
+            };
+            aliasConfigurations = lib.foldr (curr: prev: prev // { "${curr}" = homeConfiguration; }) { } aliases;
+          in
+          { "${user}" = homeConfiguration; } // aliasConfigurations
+        ));
+
+        nixosModules = lib.my.mapModulesRec (toString ./modules) import;
+      } // {
       deploy.nodes.klaus = {
         hostname = "klaus";
         profiles.system = {
