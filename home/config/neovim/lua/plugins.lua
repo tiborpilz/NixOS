@@ -200,9 +200,23 @@ require("lazy").setup({
 
   --- Nix
   {"LnL7/vim-nix"},
+
+  --- Markdown
+  {
+    "plasticboy/vim-markdown",
+    dependencies = {
+      {"godlygeek/tabular"},
+    },
+  },
 })
 
 -- Settings
+--- Various
+vim.g.markdown_fenced_languages = { "bash=sh", "json", "python", "ts=typescript", "vim", "vue", "yaml", "nix" }
+-- vim.g.vim_markdown_conceal = 0
+-- vim.g.vim_markdown_conceal_code_blocks = 0
+
+
 --- Airline
 vim.g.airlene_left_sep = ""
 vim.g.airlene_right_sep = ""
@@ -231,13 +245,6 @@ wk.add({
   { "<leader>oc", "<cmd>CopilotToggle<cr>", desc = "Toggle Copilot" },
   { "<leader>op", "<cmd>NERDTreeToggle<cr>", desc = "Toggle NERDTree" },
 })
-
--- Nerdtree
-vim.g.NERDTreeMinimalUI=1
-
--- Copilot
-vim.api.nvim_set_keymap('i', '<C-Space>', 'copilot#Accept("\\<CR>")', { silent = true, expr = true, script = true })
-vim.g.copilot_no_tab_map = 1
 
 -- Colorscheme
 vim.cmd("colorscheme nord")

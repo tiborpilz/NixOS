@@ -23,12 +23,36 @@ if not (mason_nvim_dap_present) then
 end
 
 mason.setup()
-mason_lspconfig.setup()
 mason_nvim_dap.setup()
+
+mason_lspconfig.setup({
+  ensure_installed = {
+    "lua_ls",
+  },
+})
 
 mason_lspconfig.setup_handlers {
   function(server_name)  -- default handler
     require("lspconfig")[server_name].setup {}
+  end,
+
+  ["lua_ls"] = function()
+    return require("lspconfig")["lua_ls"].setup({
+      settings = {
+        Lua = {
+          diagnostics = {
+            globals = { "vim" },
+          },
+
+          workspace = {
+            library = {
+              [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+              [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
+            },
+          },
+        },
+      }
+    })
   end
 }
 
@@ -76,47 +100,13 @@ lspconfig.ts_ls.setup {
 -- Hide diagnostic float per default
 vim.diagnostic.config({ virtual_text = false })
 
---- Describe LSP actions
-vim.api.nvim_create_autocmd('LspAttach', {
-  group = lsp_cmds,
-  desc = 'LSP actions',
-  callback = function()
-    vim.keymap.set('n', '<Leader>cg', '<cmd>lua vim.lsp.buf.hover()<cr>')
-    vim.keymap.set('n', '<Leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>')
-    vim.keymap.set('n', '<Leader>cr', '<cmd>lua vim.lsp.buf.rename()<cr>')
-    vim.keymap.set({ 'n', 'x' }, '<Leader>cf', '<cmd>lua vim.lsp.buf.format({async = true})<cr>')
-    vim.keymap.set('n', '<Leader>cd', '<cmd>lua vim.lsp.buf.definition()<cr>')
-    vim.keymap.set('n', '<Leader>cD', '<cmd>lua vim.lsp.buf.declaration()<cr>')
-    vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
-    vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>')
-
-    -- bufmap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>')
-    -- bufmap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
-    -- bufmap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>')
-    -- bufmap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>')
-    -- bufmap('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>')
-    -- bufmap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>')
-    -- bufmap('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>')
-    -- bufmap('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>')
-    -- bufmap({'n', 'x'}, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>')
-    -- bufmap('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<cr>')
-    -- bufmap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>')
-    -- bufmap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>')
-
-    -- bufmap('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>')
-    -- bufmap('x', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>')
-
-    -- if using Neovim v0.8 uncomment this
-    -- bufmap('x', '<F4>', '<cmd>lua vim.lsp.buf.range_code_action()<cr>')
-  end
-})
-
 -- add snippet support
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 -- suppress error messages from lang servers
-vim.notify = function(msg, log_level)
+---@diagnostic disable-next-line: duplicate-set-field
+vim.notify = function(msg, log_level, _)
   if msg:match "exit code" then
     return
   end
@@ -136,4 +126,3 @@ vim.keymap.set('n', '<Leader>cD', '<cmd>lua vim.lsp.buf.declaration()<cr>', { de
 vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', { desc = 'Go to definition' })
 vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', { desc = 'Go to declaration' })
 vim.keymap.set('n', '<Leader>cx', '<cmd>lua vim.diagnostic.open_float(nil, {focus=false})<CR>', { noremap = true, silent = true })
-
