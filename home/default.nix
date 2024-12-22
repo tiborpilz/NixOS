@@ -88,6 +88,8 @@ with mylib;
 
     programs.man.enable = true;
 
+    modules.shell.atuin.enable = true;
+
     modules.scripts.enable = true;
 
     modules.shell.zsh.enable = true;
