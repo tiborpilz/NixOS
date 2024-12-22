@@ -7,10 +7,9 @@ return {
         { "<leader>", mode = { "n", "v" } },
       },
       win = {
-        -- border = "none",
+        border = "shadow",
         height = { min = 1, max = 10 },
         padding = { 1, 8 },
-        title = "Henlo",
         title_pos = "center",
         col = 0.5,
       },
