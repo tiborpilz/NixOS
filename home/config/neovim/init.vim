@@ -10,11 +10,28 @@ set dir=$HOME/.vim/tmp backupdir=$HOME/.vim/tmp
 set ignorecase smartcase shiftround smartindent
 set noerrorbells
 set autoread
-set relativenumber
-set number
 set modeline
 set modelines=5
 set nofoldenable
+
+"" Set Hybrid Line Numbers (Current line number is absolute, rest are relative)
+set relativenumber
+set number
+"" Make sure to enable line numbers when entering a buffer
+autocmd BufEnter * setlocal relativenumber
+autocmd BufLeave * setlocal number
+
+"" Terminal Colors
+let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+" Enable syntax highlighting 
+syntax enable
+" Enable 256 colors palette 
+set t_Co=256
+" Important!! 
+if has('termguicolors') 
+    set termguicolors 
+endif
 
 "" Smoother update
 set updatetime=1000
