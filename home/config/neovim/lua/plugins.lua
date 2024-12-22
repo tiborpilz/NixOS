@@ -205,13 +205,6 @@ vim.g.airline_theme = "base16"
 -- Nerdtree
 vim.keymap.set("n", "<leader>op", ":NERDTreeToggle<CR>", { desc = "Toggle NERDTree" })
 
--- Vim Test
-vim.keymap.set("n", "<leader>tt", ":TestNearest<CR>", { desc = "Run Nearest Test" })
-vim.keymap.set("n", "<leader>tT", ":TestFile<CR>", { desc = "Run File Test" })
-vim.keymap.set("n", "<leader>ta", ":TestSuite<CR>", { desc = "Run Test Suite" })
-vim.keymap.set("n", "<leader>tl", ":TestLast<CR>", { desc = "Run Last Test" })
-vim.keymap.set("n", "<leader>tg", ":TestVisit<CR>", { desc = "Go to Test" })
-
 -- Copilot
 vim.api.nvim_set_keymap('i', '<C-Space>', 'copilot#Accept("\\<CR>")', { silent = true, expr = true, script = true })
 vim.g.copilot_no_tab_map = 1

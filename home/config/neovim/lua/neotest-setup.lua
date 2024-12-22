@@ -2,6 +2,24 @@ local neotest = require("neotest")
 local neotest_jest = require("neotest-jest")
 
 neotest.setup({
+  status = {
+    virtual_text = true,
+  },
+  output = {
+    open_on_run = true,
+  },
+  config = function(_, opts)
+    local neotest_ns = vim.api.nvim_create_namespace("neotest")
+    vim.diagnostic.config({
+      virtual_text = {
+        format = function(diagnostic)
+          -- Replace newline and tab characters with space for more compact diagnostics
+          local message = diagnostic.message:gsub("\n", " "):gsub("\t", " "):gsub("%s+", " "):gsub("^%s+", "")
+          return message
+        end,
+      },
+    }, neotest_ns)
+  end,
   adapters = {
     neotest_jest({}),
   },
@@ -16,9 +34,16 @@ vim.keymap.set(
 
 vim.keymap.set(
   'n',
-  '<leader>tT',
+  '<leader>tR',
   '<cmd>lua require("neotest").run.run(vim.fn.expand("%"))<cr>',
   { desc = 'Run all tests in file' }
+)
+
+vim.keymap.set(
+  'n',
+  '<leader>tl',
+  '<cmd>lua require("neotest").run.run_last()<cr>',
+  { desc = 'Run last test' }
 )
 
 vim.keymap.set(
@@ -61,4 +86,11 @@ vim.keymap.set(
   '<leader>to',
   '<cmd>lua require("neotest").output.open({ enter = true, auto_close = true })<cr>',
   { desc = 'Open test output' }
+)
+
+vim.keymap.set(
+  'n',
+  '<leader>tO',
+  '<cmd>lua require("neotest").output_panel.toggle()<cr>',
+  { desc = 'Toggle test output panel' }
 )
