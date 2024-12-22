@@ -29,7 +29,7 @@ antigen apply
 COMPLETION_WAITING_DOTS="true"
 
 # Custom theme
-source $ZDOTDIR/.zsh_custom/theme.zsh
+source $ZDOTDIR/.zsh_custom/transient.zsh
 
 # Util functions
 source $ZDOTDIR/.zsh_custom/utils.zsh
