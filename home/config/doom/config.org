@@ -258,6 +258,16 @@ I want to enable it per default in org-mode, but be able to toggle it with
 #+end_src
 
 ** Babel
+
+Org-Babel provides two things related to code blocks:
+
+1. a way to execute code blocks inside of org files. In a way, it's similar to Jupyter Notebooks,
+though it supports a lot more languages on the one hand, but does not (easily) pass around context between cells on
+the other.
+
+1. "Tangling", meaning it will strip the prose surrounding the code blocks and generate a program from the individual code
+      blocks in the document. In fact, that's how this config is generated.
+
 *** HTTP requests via babel
 
 ob-http is a package that allows for making HTTP requests from within org-mode
@@ -290,6 +300,8 @@ GET https://jsonplaceholder.typicode.com/posts/1
 #+end_example
 
 *** Babel header args
+
+Sensible defaults for the various header arguments of code blocks.
 
 See https://org-babel.readthedocs.io/en/latest/header-args/
 
@@ -337,11 +349,40 @@ To execute typescript code blocks, I'm using the ~ob-typescript~ package.
 #+end_src
 
 *** Latex fragments
+
 #+begin_src elisp
 (setq org-highlight-latex-and-related '(native script entities))
 #+end_src
 
+*** Mermaid Diagrams
+
+Using ob-mermaid, I can generate diagrams using the mermaid syntax.
+
+#+begin_src elisp :tangle packages.el
+(package! ob-mermaid)
+#+end_src
+
+Since mmdc is handled via nix, I'll need to get the binary's path during runtime via a shell call.
+
+#+begin_src elisp
+(setq ob-mermaid-cli-path (shell-command-to-string "printf %s \"$(readlink -f $(which mmdc))\""))
+#+end_src
+
+Then, I'll need to add mermaid to the list of babel languages.
+
+#+begin_src elisp
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((mermaid . t)))
+#+end_src
+
+**** TODO All mermaid diagrams have a white background
+
 ** Roam
+
+Org-Roam is a Zettelkasten implementation. In short, it allows for writing down multiple small notes and interlinking them,
+creating pretty graphs. See also Obsidian or Logseq
+
 *** Use the same directory as org
 
 All roam files should be under a subdirectory of my org directory - so I can sync them with the same mechanism.
@@ -380,31 +421,40 @@ The closest comparison to org-roam-ui is Obsidian.
 
 I want to be able to use ~org-capture~ to capture stuff in the current date's roam daily file.
 
+** Org-Node
+
+Org-Node is similar to Org-Roam - it allows for creating small notes and linking them, creating a knowledge graph.
+
+(In fact, it's so similar that an existing Org-Roam knowledge base should just work in org-node)
+
+#+begin_src elisp :tangle packages.el
+(package! org-node)
+#+end_src
+
+#+begin_src elisp
+(use-package! org-node
+  :after org
+  :config (org-node-cache-mode))
+#+end_src
+
+Additionally, org-node-fakeroam can speed up org-roam itself, as well as allow for the usage of org-node and org-roam in parallel.
+
+#+begin_src elisp :tangle packages.el
+(package! org-node-fakeroam)
+#+end_src
+
+#+begin_src elisp
+(use-package! org-node-fakeroam
+  :defer)
+#+end_src
+
 ** Fixes and miscellanious improvements
+
 *** Prevent org-block face for latex fragments, since they look weird
 
 #+begin_src elisp
 (require 'org-src)
 (add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t)))
-#+end_src
-
-*** Function to create an org buffer
-
-#+begin_src elisp
-(evil-define-command evil-buffer-org-new (count file)
-  "creates a new ORG buffer replacing the current window, optionally
-   editing a certain FILE"
-  :repeat nil
-  (interactive "P<f>")
-  (if file
-      (evil-edit file)
-    (let ((buffer (generate-new-buffer "*new org*")))
-      (set-window-buffer nil buffer)
-      (with-current-buffer buffer
-        (org-mode)))))
-(map! :leader
-      (:prefix "b"
-       :desc "new empty ORG buffer" "o" #'evil-buffer-org-new))
 #+end_src
 
 *** Nix-Doom-Emacs messes with dashboard
@@ -419,7 +469,8 @@ corresponding GH issue has a fix.
 
 *** Faster insertion of org structures (i.e. source blocks)
 
-For some reason, ~org-tempo~ does not start at launch, so I'm  loading it here.
+Org-Tempo provides shortcuts like ~"<s" - <TAB>~ for generating code blocks.
+For some reason, it does not start at launch, so I'm  loading it here.
 
 #+begin_src elisp
 (use-package! org-tempo)
@@ -441,11 +492,10 @@ newline, etc.
 #+end_src
 
 ** Capture
+
 *** Add / change capture templates
 
-Some other tools (like orgzly) work better with ~TODO~ instead of ~[ ]~ (and test another thing wow now it works yay
-something
-~DONE~ instead of ~[X]~).
+Some other tools (like orgzly) work better with ~TODO~ instead of ~[ ]~, so I'm adjusting my capture templates.
 
 #+begin_src elisp
 (after! org

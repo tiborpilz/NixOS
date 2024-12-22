@@ -100,14 +100,12 @@
        ; ein               ; tame Jupyter notebooks with emacs
        (eval +overlay)     ; run code, run (also, repls)
        (lookup +dictionary +docsets +offline)              ; navigate your code and its documentation
-       (lookup +docsets)
        (lsp +peek)
        (magit +forge)             ; a git porcelain for Emacs
        make              ; run make tasks from Emacs
        (pass +auth)              ; password manager for nerds
        pdf               ; pdf enhancements
        ;; prodigy           ; FIXME managing external services & code builders
-       ; taskrunner        ; taskrunner for all your projects
        terraform         ; infrastructure as code
        tmux              ; an API for interacting with tmux
        tree-sitter
@@ -121,9 +119,9 @@
        ;;agda              ; types of types of types of types...
        ;;beancount         ; mind the GAAP
        ;;cc                ; C > C++ == 1
-       clojure           ; java with a lisp
+       ;; clojure           ; java with a lisp
        ;;common-lisp       ; if you've seen one lisp, you've seen them all
-       coq               ; proofs-as-programs
+       ;; coq               ; proofs-as-programs
        ;;crystal           ; ruby at the speed of c
        ;;csharp            ; unity, .NET, and mono shenanigans
        data              ; config/data formats
@@ -135,19 +133,20 @@
        ;;erlang            ; an elegant language for a more civilized age
        ;; ess               ; emacs speaks statistics
        ;;factor
-       faust             ; dsp, but you get to keep your soul
+       ;; faust             ; dsp, but you get to keep your soul
        ;;fortran           ; in FORTRAN, GOD is REAL (unless declared INTEGER)
        ;;fsharp            ; ML stands for Microsoft's Language
        ;;fstar             ; (dependent) types and (monadic) effects and Z3
        ;;gdscript          ; the language you waited for
        (go +lsp)         ; the hipster dialect
+       (graphviz)
        (haskell +lsp)              ; a language that's lazier than I am
        (hy)                ; readability of scheme w/ speed of python
        ;;idris             ; a language you can depend on
        (json +lsp)              ; At least it ain't XML
        ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
        (javascript +lsp +tree-sitter)
-       (julia +lsp)
+       ;; (julia +lsp)
        ;;kotlin            ; a better, slicker Java(Script)
        (latex             ; writing papers in Emacs has never been so fun
         +cdlatex
@@ -155,14 +154,15 @@
         +latexmk
         +lsp)
        ;; (lean)              ; for folks with too much to prove
-       (ledger)            ; be audit you can be
+       ;; (ledger)            ; be audit you can be
        lua               ; one-based indices? one-based indices
        (markdown +grip)          ; writing docs for people to ignore
        ;;nim               ; python + lisp at the speed of c
-       (nix +lsp)              ; I hereby declare "nix geht mehr!"
+       (nix +lsp +tree-sitter)              ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
        (org
         ;; +brain
+        +crypt
         +dragndrop
         +gnuplot
         ;; +hugo
@@ -182,7 +182,7 @@
        ;; racket            ; a DSL for DSLs
        ;;raku              ; the artist formerly known as perl6
        (rest)              ; Emacs as a REST client
-       rst               ; ReST in peace
+       ;; rst               ; ReST in peace
        ;; (ruby
        ;;  +chruby
        ;;  +lsp
@@ -191,7 +191,7 @@
        (rust +lsp)       ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala             ; java, but good
        ;;(scheme +guile)   ; a fully conniving family of lisps
-       sh                  ; she sells {ba,z,fi}sh shells on the C xor
+       (sh +lsp +tree-sitter)                  ; she sells {ba,z,fi}sh shells on the C xor
        ;;sml
        ;;solidity          ; do you need a blockchain? No.
        ;; (swift +lsp)
