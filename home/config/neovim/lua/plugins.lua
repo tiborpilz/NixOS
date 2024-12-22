@@ -4,8 +4,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = "https://github.com/folke/lazy.nvim.git"
   local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
   if vim.v.shell_error ~= 0 then
-    vim.api.nvim_echo({
-      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+    vim.api.nvim_echo({ { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
       { out, "WarningMsg" },
       { "\nPress any key to exit..." },
     }, true, {})
@@ -59,7 +58,15 @@ require("lazy").setup({
   },
 
   -- Which Key
-  {"folke/which-key.nvim"},
+  {
+    "folke/which-key.nvim",
+    opts = {
+      loop = true,
+      win = {
+        border = "single",
+      },
+    },
+  },
   {"AckslD/nvim-whichkey-setup.lua"},
 
   -- Git
@@ -72,7 +79,17 @@ require("lazy").setup({
   },
 
   -- Floating Window Borders
-  {"mikesmithgh/borderline.nvim"},
+  {
+    "mikesmithgh/borderline.nvim",
+    enabled = true,
+    lazy = true,
+    event = 'VeryLazy',
+    config = function()
+      require('borderline').setup({
+        --  ...
+      })
+    end,
+  },
 
   -- Comments
   {"tpope/vim-commentary"},
@@ -121,6 +138,7 @@ require("lazy").setup({
   {"RRethy/nvim-base16"},
   {"mcchrish/zenbones.nvim"},
   {"rktjmp/lush.nvim"},
+  {"shaunsingh/nord.nvim"},
 
   -- Organization
   {"vimwiki/vimwiki"},
@@ -155,8 +173,8 @@ vim.api.nvim_set_keymap('i', '<C-Space>', 'copilot#Accept("\\<CR>")', { silent =
 vim.g.copilot_no_tab_map = 1
 
 -- Colorscheme
-vim.g.nightfox_style = "nordfox"
-vim.cmd("colorscheme nightfox")
+vim.cmd("colorscheme nord")
+vim.opt.termguicolors = true
 
 -- LSP / Mason setup
 require("lsp-config")
