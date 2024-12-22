@@ -1,5 +1,6 @@
 local neotest = require("neotest")
 local neotest_jest = require("neotest-jest")
+local dap = require("dap")
 
 neotest.setup({
   status = {
