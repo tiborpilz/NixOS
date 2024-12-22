@@ -22,7 +22,7 @@ return {
     end,
   },
 
-  -- Colorschemes
+  -- Colorschemes / Themes
   {"eddyekofo94/gruvbox-flat.nvim"},
   {"marko-cerovac/material.nvim"},
   {"kdheepak/monochrome.nvim"},
@@ -30,6 +30,7 @@ return {
   {"RRethy/nvim-base16"},
   {"mcchrish/zenbones.nvim"},
   {"rktjmp/lush.nvim"},
+  {"yorickpeterse/nvim-grey"},
   {
     "shaunsingh/nord.nvim",
     config = function()

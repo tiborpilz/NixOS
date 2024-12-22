@@ -45,6 +45,9 @@ with mylib;
       # Task runner
       just
 
+      # GPT Commit Message generator
+      opencommit
+
       # Terminal Markdown viewer/browser
       frogmouth
 

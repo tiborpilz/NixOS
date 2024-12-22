@@ -1,4 +1,5 @@
 vim.g.markdown_fenced_languages = { "bash=sh", "json", "python", "ts=typescript", "vim", "vue", "yaml", "nix" }
+vim.treesitter.language.register("markdown", { "vimwiki" })
 
 return {
   ---- Preview
@@ -11,7 +12,6 @@ return {
     end,
     ft = { "markdown" },
   },
-
   ---- Folding/Concealing
   {
     "plasticboy/vim-markdown",
