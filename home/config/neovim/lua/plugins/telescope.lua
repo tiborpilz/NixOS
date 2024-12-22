@@ -28,7 +28,7 @@ return {
         }
       })
       -- CONFIG
-      local blend = 90
+      local blend = 85
 
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "TelescopePrompt",
