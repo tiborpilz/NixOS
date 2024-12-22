@@ -1,6 +1,7 @@
 local lspconfig_present, lspconfig = pcall(require, 'lspconfig')
 local mason_present, mason = pcall(require, 'mason')
 local mason_lspconfig_present, mason_lspconfig = pcall(require, 'mason-lspconfig')
+local mason_nvim_dap_present, mason_nvim_dap = pcall(require, 'mason-nvim-dap')
 
 if not (lspconfig_present) then
   return
@@ -16,14 +17,22 @@ if not (mason_lspconfig_present) then
   return
 end
 
+if not (mason_nvim_dap_present) then
+  print('mason-nvim-dap not found')
+  return
+end
+
 mason.setup()
 mason_lspconfig.setup()
+mason_nvim_dap.setup()
 
 mason_lspconfig.setup_handlers {
   function(server_name)  -- default handler
     require("lspconfig")[server_name].setup {}
   end
 }
+
+lspconfig.nil_ls.setup({})
 
 -- Languages
 lspconfig.gleam.setup({})
@@ -33,7 +42,7 @@ lspconfig.volar.setup({
   cmd = { "vue-language-server", "--stdio" },
   init_options = {
     vue = {
-      hybridMode = true,
+      hybridMode = false,
     },
     typescript = {
       tsdk = vim.fn.stdpath("data") .. "/mason/packages/typescript/node_modules/typescript/lib",

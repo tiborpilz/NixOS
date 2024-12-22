@@ -14,6 +14,9 @@ with mylib;
     home.packages = with pkgs; [
       erlang_27
       unstable.gleam
+      # Dependencies for glacier (incremental test runner)
+      rebar3
+      inotify-tools
     ];
   };
 }

@@ -120,6 +120,12 @@ require("lazy").setup({
   -- LSP Signatures
   {"ray-x/lsp_signature.nvim"},
 
+  -- DAP - Debug Adapter Protocol
+  {"jay-babu/mason-nvim-dap.nvim"},
+  {"mfussenegger/nvim-dap"},
+  {"theHamsta/nvim-dap-virtual-text"},
+  {"nvim-telescope/telescope-dap.nvim"},
+
   -- Formatting
   {
     "stevearc/conform.nvim",
