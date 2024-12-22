@@ -1,5 +1,8 @@
 zstyle ':omz:alpha:lib:git' async-prompt no
 
+# Zsh Async Library
+source $ZDOTDIR/.zsh_custom/async.zsh
+
 # Antigen Plugin Manager
 if [[ ! -a $HOME/.antigen/antigen.zsh ]]; then
   git clone --branch master https://github.com/zsh-users/antigen.git ~/.antigen
