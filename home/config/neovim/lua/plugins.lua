@@ -55,6 +55,7 @@ require("lazy").setup({
   -- Icons
   {"ryanoasis/vim-devicons"},
   {"kyazdani42/nvim-web-devicons"},
+  {"ryanoasis/vim-devicons"},
 
   -- NERDtree
   {
@@ -202,8 +203,31 @@ vim.g.airlene_right_sep = ""
 vim.g.airline_theme = "base16"
 
 -- Keybindings
+local wk = require("which-key")
+
 -- Nerdtree
-vim.keymap.set("n", "<leader>op", ":NERDTreeToggle<CR>", { desc = "Toggle NERDTree" })
+vim.api.nvim_create_user_command(
+  'CopilotToggle',
+  function () vim.g.copilot_enabled = not vim.g.copilot_enabled
+    if vim.g.copilot_enabled then
+      vim.cmd('Copilot disable')
+      print("Copilot OFF")
+    else
+      vim.cmd('Copilot enable')
+      print("Copilot ON")
+    end
+  end,
+  {nargs = 0}
+)
+
+wk.add({
+  { "<leader>o", group = "open" },
+  { "<leader>oc", "<cmd>CopilotToggle<cr>", desc = "Toggle Copilot" },
+  { "<leader>op", "<cmd>NERDTreeToggle<cr>", desc = "Toggle NERDTree" },
+})
+
+-- Nerdtree
+vim.g.NERDTreeMinimalUI=1
 
 -- Copilot
 vim.api.nvim_set_keymap('i', '<C-Space>', 'copilot#Accept("\\<CR>")', { silent = true, expr = true, script = true })
