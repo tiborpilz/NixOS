@@ -156,6 +156,23 @@ require("lazy").setup({
   {"hrsh7th/nvim-cmp"},
   {"hrsh7th/cmp-nvim-lsp"},
 
+  -- Tree-like undo history
+  {
+    "mbbill/undotree",
+    keys = {
+      {
+        "<leader>su",
+        function()
+          vim.cmd(":UndotreeToggle")
+        end,
+        desc = "Toggle Undo Tree",
+      },
+    },
+    -- setup = function()
+    --   vim.keymap.set("n", "<leader>su", ":UndotreeToggle<CR>", { desc = "Toggle Undo Tree" })
+    -- end,
+  },
+
   -- Tests
   {"vim-test/vim-test"},
   {
@@ -193,6 +210,12 @@ require("lazy").setup({
 
   -- Organization
   {"vimwiki/vimwiki"},
+  {
+    "nvim-neorg/neorg",
+    lazy = false,
+    version = "*",
+    config = true,
+  },
 
   -- Languages
   --- Terraform
@@ -212,14 +235,13 @@ require("lazy").setup({
 
   ---- Preview
   {
-    -- Install markdown preview, use npx if available.
     "iamcco/markdown-preview.nvim",
     cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
     build = "cd app && yarn install",
     init = function()
       vim.g.mkdp_filetypes = { "markdown" }
     end,
-    ft = "markdown",
+    ft = { "markdown" },
   },
 })
 
@@ -264,6 +286,8 @@ wk.add({
 wk.add({
   { "<leader>op", "<cmd>NERDTreeToggle<cr>", desc = "Toggle NERDTree" },
 })
+
+vim.cmd("autocmd FileType nerdtree map <buffer> <Tab> o")
 
 -- Colorscheme
 vim.cmd("colorscheme nord")

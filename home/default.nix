@@ -45,6 +45,9 @@ with mylib;
       # Task runner
       just
 
+      # Terminal Markdown viewer/browser
+      frogmouth
+
       # bat is a better cat (as a program, at least)
       bat
 
