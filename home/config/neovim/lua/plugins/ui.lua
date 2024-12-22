@@ -37,5 +37,24 @@ return {
       vim.cmd("colorscheme nord")
     end,
   },
+
+  -- Screenkey
+  {
+    "NStefan002/screenkey.nvim",
+    lazy = false,
+    version = "*",
+    config = function()
+      require("screenkey").setup({
+        -- Center
+        win_opts = {
+          width = 20;
+          col = (vim.o.columns / 2) + 10,
+          row = 1,
+          border = "none",
+          height = 1,
+        },
+      })
+    end,
+  },
 }
 
