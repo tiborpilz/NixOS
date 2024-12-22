@@ -20,6 +20,8 @@ set number
 " Enable syntax highlighting 
 syntax enable
 
+let g:vim_markdown_conceal_code_blocks = 0
+
 "" Smoother update
 set updatetime=1000
 
