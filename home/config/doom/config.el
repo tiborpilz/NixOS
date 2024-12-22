@@ -350,20 +350,46 @@
     ;; compile the treesit grammar file the first time
     (gleam-ts-install-grammar)))
 
-(setq company-idle-delay 0.1 ;; How long to wait before popping up
-      company-minimum-prefix-length 1 ;; Show the menu after one key press
-      company-tooltip-limit 10 ;; Limit on how many options to display
-      company-tooltip-align-annotations t ;; Align annotations to the right
-      company-require-match nil           ;; Allow free typing
-      company-selection-wrap-around t ;; Wrap around to beginning when you hit bottom of suggestions
-      )
+(setq  corfu-auto-delay 0.1
+       corfu-auto-prefix 2
+       corfu-left-margin-width 2
+       corfu-right-margin-width 2
+       corfu-bar-width 1)
 
-(after! lsp-mode
-  (setq company-backends '(company-capf)))
+(setq global-corfu-minibuffer nil)
 
-(setq company-ispell-available nil)
+(defvar after-load-theme-hook nil
+  "Hook run after a color theme is loaded using `load-theme'.")
+(defadvice load-theme (after run-after-load-theme-hook activate)
+  "Run `after-load-theme-hook'."
+  (run-hooks 'after-load-theme-hook))
 
-(setq company-format-margin-function #'company-vscode-dark-icons-margin)
+(defun adjust-corfu-colors ()
+  "Adjust corfu colors to match the current theme"
+  (set-face-background 'corfu-border (doom-darken 'bg 0.25))
+  (set-face-background 'corfu-current (doom-lighten 'bg 0.25)))
+
+(eval-after-load 'corfu '(adjust-corfu-colors))
+
+(setq corfu--frame-parameters '((internal-border-width . 5)
+                                (min-width . 80)
+                                (max-width . 100)))
+
+(setq corfu--buffer-parameters '((mode-line-format . nil)
+                                 (header-line-format . nil)
+                                 (left-margin-width . 2)
+                                 (right-margin-width . 2)
+                                 (fringes-outside-margins . 0)))
+
+(setq corfu-popupinfo-delay '(0.1 . 0.05)
+      corfu-popupinfo-hide nil
+      corfu-popupinfo-max-width 160
+      corfu-popupinfo-min-width 160
+      corfu-popupinfo-max-height 30
+      corfu-popupinfo--buffer-parameters '((truncate-lines . nil)
+                                           (left-margin-width . 2)
+                                           (right-margin-width . 2)
+                                           (word-wrap . t)))
 
 (use-package! copilot
   :defer t

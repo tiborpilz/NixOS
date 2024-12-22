@@ -25,7 +25,8 @@
                                         ; layout            ; auie,ctsrnm is the superior home row
 
        :completion
-       (company +childframe)           ; the ultimate code completion backend
+       ;; (company +childframe)           ; the ultimate code completion backend
+       (corfu +icons)
        ;;ido               ; the other *other* search engine...
        ;; (ivy +fuzzy +icons)               ; a search engine for love and lifoe
        ;; (helm +fuzzy +icons)      ; the *other* search engine for love and life
@@ -193,7 +194,7 @@
        sh                  ; she sells {ba,z,fi}sh shells on the C xor
        ;;sml
        ;;solidity          ; do you need a blockchain? No.
-       (swift +lsp)
+       ;; (swift +lsp)
        ;;terra             ; Earth and Moon in alignment for performance.
        (web +lsp +tree-sitter)               ; the tubes
        (yaml +lsp)              ; JSON, but readable
