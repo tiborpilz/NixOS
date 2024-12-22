@@ -143,6 +143,12 @@
 
 (setq org-highlight-latex-and-related '(native script entities))
 
+(setq ob-mermaid-cli-path (shell-command-to-string "printf %s \"$(readlink -f $(which mmdc))\""))
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((mermaid . t)))
+
 (setq org-roam-directory (concat org-directory "roam"))
 
 (use-package! websocket
@@ -157,23 +163,15 @@
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
 
+(use-package! org-node
+  :after org
+  :config (org-node-cache-mode))
+
+(use-package! org-node-fakeroam
+  :defer)
+
 (require 'org-src)
 (add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t)))
-
-(evil-define-command evil-buffer-org-new (count file)
-  "creates a new ORG buffer replacing the current window, optionally
-   editing a certain FILE"
-  :repeat nil
-  (interactive "P<f>")
-  (if file
-      (evil-edit file)
-    (let ((buffer (generate-new-buffer "*new org*")))
-      (set-window-buffer nil buffer)
-      (with-current-buffer buffer
-        (org-mode)))))
-(map! :leader
-      (:prefix "b"
-       :desc "new empty ORG buffer" "o" #'evil-buffer-org-new))
 
 (add-hook! 'emacs-startup-hook #'doom-init-ui-h)
 

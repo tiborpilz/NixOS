@@ -6,8 +6,14 @@
 
 (package! ob-typescript)
 
+(package! ob-mermaid)
+
 (package! org-roam-ui)
 (package! websocket)
+
+(package! org-node)
+
+(package! org-node-fakeroam)
 
 (package! org-autolist)
 
