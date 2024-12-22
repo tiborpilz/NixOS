@@ -6,8 +6,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({ { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
       { out, "WarningMsg" },
-      { "\nPress any key to exit..." },
-    }, true, {})
+      { "\nPress any key to exit..." }, }, true, {})
     vim.fn.getchar()
     os.exit(1)
   end
@@ -44,6 +43,11 @@ require("lazy").setup({
         "<leader>fh",
         function() require("telescope.builtin").help_tags() end,
         desc = "Find Help",
+      },
+      {
+        "<leader>cX",
+        function() require("telescope.builtin").diagnostics() end,
+        desc = "Show Diagnostics",
       },
     },
   },
@@ -98,7 +102,14 @@ require("lazy").setup({
   {"nvim-treesitter/nvim-treesitter"},
 
   -- LSP
-  {"williamboman/mason.nvim"},
+  {
+    "williamboman/mason.nvim",
+    opts = {
+      ui = {
+        border = "single",
+      },
+    },
+  },
   {"williamboman/mason-lspconfig.nvim"},
   {"neovim/nvim-lspconfig"},
 
@@ -109,14 +120,46 @@ require("lazy").setup({
   {"ray-x/lsp_signature.nvim"},
 
   -- Formatting
-  {"stevearc/conform.nvim"},
-  
+  {
+    "stevearc/conform.nvim",
+    dependencies = {
+      {"williamboman/mason.nvim"},
+      {"zapling/mason-conform.nvim"},
+    },
+    config = function()
+      require("conform").setup({})
+      -- Create a command for formatting the entire buffer
+      vim.api.nvim_create_user_command("Format", function(args)
+        local range = nil
+        if args.count ~= -1 then
+          local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
+          range = {
+            start = { args.line1, 0 },
+            ["end"] = { args.line2, end_line:len() },
+          }
+        end
+        require("conform").format({ async = true, lsp_format = "fallback", range = range })
+      end, { range = true })
+
+      -- Call that formatting command with `<leader>cf`
+    end,
+  },
+
   -- Autocompletion
   {"hrsh7th/nvim-cmp"},
   {"hrsh7th/cmp-nvim-lsp"},
 
   -- Tests
   {"vim-test/vim-test"},
+  {
+    "nvim-neotest/neotest",
+    dependencies = {
+      "nvim-neotest/nvim-nio",
+      "nvim-lua/plenary.nvim",
+      "antoinemadec/FixCursorHold.nvim",
+      "nvim-treesitter/nvim-treesitter",
+    },
+  },
 
   -- Run Snippets
   -- TODO: set up correctly
@@ -162,11 +205,11 @@ vim.g.airline_theme = "base16"
 vim.keymap.set("n", "<leader>op", ":NERDTreeToggle<CR>", { desc = "Toggle NERDTree" })
 
 -- Vim Test
-vim.keymap.set("n", "<leader>tt", ":TestNearest<CR>")
-vim.keymap.set("n", "<leader>tT", ":TestFile<CR>")
-vim.keymap.set("n", "<leader>ta", ":TestSuite<CR>")
-vim.keymap.set("n", "<leader>tl", ":TestLast<CR>")
-vim.keymap.set("n", "<leader>tg", ":TestVisit<CR>")
+vim.keymap.set("n", "<leader>tt", ":TestNearest<CR>", { desc = "Run Nearest Test" })
+vim.keymap.set("n", "<leader>tT", ":TestFile<CR>", { desc = "Run File Test" })
+vim.keymap.set("n", "<leader>ta", ":TestSuite<CR>", { desc = "Run Test Suite" })
+vim.keymap.set("n", "<leader>tl", ":TestLast<CR>", { desc = "Run Last Test" })
+vim.keymap.set("n", "<leader>tg", ":TestVisit<CR>", { desc = "Go to Test" })
 
 -- Copilot
 vim.api.nvim_set_keymap('i', '<C-Space>', 'copilot#Accept("\\<CR>")', { silent = true, expr = true, script = true })
@@ -180,6 +223,8 @@ vim.opt.termguicolors = true
 require("lsp-config")
 require("mason-setup")
 
+-- Formatting
+vim.keymap.set("n", "<leader>cf", ":Format<CR>", { desc = "Format Buffer" })
 -- Completion setup
 require('cmp-config')
 
