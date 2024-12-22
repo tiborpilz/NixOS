@@ -158,6 +158,7 @@ require("lazy").setup({
       "nvim-lua/plenary.nvim",
       "antoinemadec/FixCursorHold.nvim",
       "nvim-treesitter/nvim-treesitter",
+      "nvim-neotest/neotest-jest",
     },
   },
 
@@ -222,6 +223,9 @@ vim.opt.termguicolors = true
 -- LSP / Mason setup
 require("lsp-config")
 require("mason-setup")
+
+-- Neotest
+require("neotest-setup")
 
 -- Formatting
 vim.keymap.set("n", "<leader>cf", ":Format<CR>", { desc = "Format Buffer" })

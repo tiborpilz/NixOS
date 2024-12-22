@@ -15,6 +15,7 @@
   "material.nvim": { "branch": "main", "commit": "31429eef4b7233ebdae3ddb57b7165ee4f1bd653" },
   "monochrome.nvim": { "branch": "main", "commit": "2de78d9688ea4a177bcd9be554ab9192337d35ff" },
   "neotest": { "branch": "master", "commit": "6d3d22cdad49999ef774ebe1bc250a4994038964" },
+  "neotest-jest": { "branch": "main", "commit": "514fd4eae7da15fd409133086bb8e029b65ac43f" },
   "nerdtree": { "branch": "master", "commit": "9b465acb2745beb988eff3c1e4aa75f349738230" },
   "nightfox.nvim": { "branch": "main", "commit": "7557f26defd093c4e9bc17f28b08403f706f5a44" },
   "nord.nvim": { "branch": "master", "commit": "80c1e5321505aeb22b7a9f23eb82f1e193c12470" },
