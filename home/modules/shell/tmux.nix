@@ -47,7 +47,10 @@ in
 
         # Sometimes I wanna use the mouse, ok?
         set -g mouse on
-        set -g default-terminal "tmux"
+
+        # Fix Colors in Tmux
+        set -g default-terminal "tmux-256color"
+        set -sa terminal-overrides ",xterm-256color:RGB"
 
         # Vim-ish key bindings
         bind P paste-buffer

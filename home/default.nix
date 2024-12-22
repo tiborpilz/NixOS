@@ -112,6 +112,7 @@ with mylib;
     modules.dev.cloud.enable = true;
     modules.dev.nix.enable = true;
     modules.dev.gleam.enable = true;
+    modules.dev.lua.enable = true;
 
     modules.dev.colima.enable = pkgs.stdenv.isDarwin; # I only need a docker runtime on MacOs
 
