@@ -25,6 +25,9 @@ mason_lspconfig.setup_handlers {
   end
 }
 
+-- Languages
+lspconfig.gleam.setup({})
+
 -- Hide diagnostic float per default
 vim.diagnostic.config({ virtual_text = false })
 

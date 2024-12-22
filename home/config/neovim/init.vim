@@ -22,14 +22,8 @@ set updatetime=1000
 " Space as Leader
 let mapleader = "\<Space>"
 
-" Install Plugins automatically if they're missing.
-autocmd VimEnter *
-  \ if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
-  \|  PlugInstall --sync | q
-  \| endif
-
 " Load plugins
-source $HOME/.config/nvim/plugins.vim
+lua require('plugins')
 
 set signcolumn=yes:1
 highlight clear SignColumn
