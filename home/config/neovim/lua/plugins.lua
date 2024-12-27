@@ -6,7 +6,6 @@
 
 --- Airline
 -- Copilot
--- vim.api.nvim_set_keymap('i', '<C-Space>', 'copilot#Accept("\\<CR>")', { silent = true, expr = true, script = true })
 
 -- Colorscheme
 -- vim.cmd("colorscheme nord")

@@ -12,7 +12,7 @@ vim.api.nvim_create_user_command(
   {nargs = 0}
 )
 
-vim.api.nvim_set_keymap('i', '<C-Space>', 'copilot#Accept("\\<CR>")', { silent = true, expr = true, script = true })
+vim.keymap.set('i', '<C-Space>', 'copilot#Accept("\\<CR>")', { silent = true, expr = true, script = true })
 
 return {
   {

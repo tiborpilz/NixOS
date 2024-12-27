@@ -1,10 +1,3 @@
--- Hide diagnostic float per default
-vim.diagnostic.config({ virtual_text = false })
-
--- Bind diagnostic to <Leader> c d
-vim.api.nvim_set_keymap('n', '<Leader>cd', '<cmd>lua vim.diagnostic.open_float(nil, {focus=false})<CR>',
-  { noremap = true, silent = true })
-
 return {
   -- Mason for installing LSP servers
   {
@@ -115,6 +108,12 @@ return {
       vim.keymap.set('n', '<Leader>cr', '<cmd>lua vim.lsp.buf.rename()<cr>', { desc = 'Rename symbol' })
       vim.keymap.set({ 'n', 'x' }, '<Leader>cf', '<cmd>lua vim.lsp.buf.format({async = true})<cr>',
         { desc = 'Format code' })
+      -- Hide diagnostic float per default
+      vim.diagnostic.config({ virtual_text = false })
+      -- Bind diagnostic to <Leader> c e
+      vim.keymap.set('n', '<Leader>ce', '<cmd>lua vim.diagnostic.open_float(nil, {focus=false})<CR>',
+  { noremap = true, silent = true })
+
       vim.keymap.set('n', '<Leader>cd', '<cmd>lua vim.lsp.buf.definition()<cr>', { desc = 'Go to definition' })
       vim.keymap.set('n', '<Leader>cD', '<cmd>lua vim.lsp.buf.declaration()<cr>', { desc = 'Go to declaration' })
       vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', { desc = 'Go to definition' })
