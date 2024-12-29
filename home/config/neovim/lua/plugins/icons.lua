@@ -1,5 +1,5 @@
 return {
-  {"ryanoasis/vim-devicons"},
-  {"kyazdani42/nvim-web-devicons"},
-  {"ryanoasis/vim-devicons"},
+  -- {"ryanoasis/vim-devicons"},
+  -- {"kyazdani42/nvim-web-devicons"},
+  -- {"ryanoasis/vim-devicons"},
 }

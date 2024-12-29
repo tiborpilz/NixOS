@@ -4,7 +4,7 @@ return {
     "williamboman/mason.nvim",
     opts = {
       ui = {
-        border = "single",
+        border = "rounded",
       },
     },
     config = function()
@@ -34,13 +34,6 @@ return {
               Lua = {
                 diagnostics = {
                   globals = { "vim" },
-                },
-
-                workspace = {
-                  library = {
-                    [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-                    [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
-                  },
                 },
               },
             }
@@ -102,6 +95,12 @@ return {
         end
       end
 
+      -- Set border for LSP Hover
+      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'single' })
+
+      -- Set diagnostic sign
+      -- Change diagnostic signs.
+
       -- LSP Keymaps
       vim.keymap.set('n', '<Leader>cg', '<cmd>lua vim.lsp.buf.hover()<cr>', { desc = 'Show hover information' })
       vim.keymap.set('n', '<Leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', { desc = 'Show code actions' })
@@ -123,9 +122,6 @@ return {
     end,
   },
 
-  -- LSP Lightbulb (Code Actions)
-  { "kosayoda/nvim-lightbulb" },
-
   -- LSP Signatures
   {
     "ray-x/lsp_signature.nvim",
@@ -138,9 +134,9 @@ return {
         padding = ' ',
         shadow_blend = 36,
         shadow_guibg = "green",
-        floating_window_above_cur_line = false,
+        floating_window_above_cur_line = true,
         handler_opts = {
-          border = "single"
+          border = "rounded"
         }
       })
 
@@ -221,116 +217,6 @@ return {
 
   --- Nix
   { "LnL7/vim-nix" },
-
-  -- Tests
-  {
-    "nvim-neotest/neotest",
-    dependencies = {
-      "nvim-neotest/nvim-nio",
-      "nvim-lua/plenary.nvim",
-      "antoinemadec/FixCursorHold.nvim",
-      "nvim-treesitter/nvim-treesitter",
-      "nvim-neotest/neotest-jest",
-    },
-    config = function()
-      local neotest = require("neotest")
-      local neotest_jest = require("neotest-jest")
-
-      neotest.setup({
-        status = {
-          virtual_text = true,
-        },
-        output = {
-          open_on_run = true,
-        },
-        config = function(_, opts)
-          local neotest_ns = vim.api.nvim_create_namespace("neotest")
-          vim.diagnostic.config({
-            virtual_text = {
-              format = function(diagnostic)
-                -- Replace newline and tab characters with space for more compact diagnostics
-                local message = diagnostic.message:gsub("\n", " "):gsub("\t", " "):gsub("%s+", " "):gsub("^%s+", "")
-                return message
-              end,
-            },
-          }, neotest_ns)
-        end,
-        adapters = {
-          neotest_jest({}),
-        },
-      })
-
-      vim.keymap.set(
-        'n',
-        '<leader>tr',
-        '<cmd>lua require("neotest").run.run()<cr>',
-        { desc = 'Run nearest test' }
-      )
-
-      vim.keymap.set(
-        'n',
-        '<leader>tR',
-        '<cmd>lua require("neotest").run.run(vim.fn.expand("%"))<cr>',
-        { desc = 'Run all tests in file' }
-      )
-
-      vim.keymap.set(
-        'n',
-        '<leader>tl',
-        '<cmd>lua require("neotest").run.run_last()<cr>',
-        { desc = 'Run last test' }
-      )
-
-      vim.keymap.set(
-        'n',
-        '<leader>tw',
-        '<cmd>lua require("neotest").watch.toggle()<cr>',
-        { desc = 'Watch nearest test' }
-      )
-
-      vim.keymap.set(
-        'n',
-        '<leader>tW',
-        '<cmd>lua require("neotest").watch.toggle(vim.fn.expand("%"))<cr>',
-        { desc = 'Watch all tests in file' }
-      )
-
-      vim.keymap.set(
-        'n',
-        '<leader>tS',
-        '<cmd>lua require("neotest").run.stop()<cr>',
-        { desc = 'Stop running tests' }
-      )
-
-      vim.keymap.set(
-        'n',
-        '<leader>ta',
-        '<cmd>lua require("neotest").run.attach()<cr>',
-        { desc = 'Attach to test runner' }
-      )
-
-      vim.keymap.set(
-        'n',
-        '<leader>ts',
-        '<cmd>lua require("neotest").summary.toggle()<cr>',
-        { desc = 'Toggle test summary' }
-      )
-
-      vim.keymap.set(
-        'n',
-        '<leader>to',
-        '<cmd>lua require("neotest").output.open({ enter = true, auto_close = true })<cr>',
-        { desc = 'Open test output' }
-      )
-
-      vim.keymap.set(
-        'n',
-        '<leader>tO',
-        '<cmd>lua require("neotest").output_panel.toggle()<cr>',
-        { desc = 'Toggle test output panel' }
-      )
-    end,
-  },
 
   -- Run Snippets
   -- TODO: set up correctly
