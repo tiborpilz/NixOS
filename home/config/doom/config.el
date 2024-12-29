@@ -163,13 +163,6 @@
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
 
-(use-package! org-node
-  :after org
-  :config (org-node-cache-mode))
-
-(use-package! org-node-fakeroam
-  :defer)
-
 (require 'org-src)
 (add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t)))
 
