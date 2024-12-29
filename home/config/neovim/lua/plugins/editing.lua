@@ -31,6 +31,7 @@ return {
     },
     config = function()
       require("conform").setup({})
+
       -- Create a command for formatting the entire buffer
       vim.api.nvim_create_user_command("Format", function(args)
         local range = nil
@@ -56,7 +57,12 @@ return {
 
       cmp.setup({
         sources = {
-          {name = 'nvim_lsp'},
+          {name = 'nvim_lsp' },
+          {name = 'buffer' },
+        },
+        window = {
+          completion = cmp.config.window.bordered(),
+          documentation = cmp.config.window.bordered(),
         },
         mapping = cmp.mapping.preset.insert({
           ['<Enter>'] = cmp.mapping.confirm({select = true}),
@@ -66,7 +72,7 @@ return {
       })
     end,
   },
-  {"hrsh7th/cmp-nvim-lsp"},
+  { "hrsh7th/cmp-nvim-lsp" },
 
   -- Run Snippets
   -- TODO: set up correctly
