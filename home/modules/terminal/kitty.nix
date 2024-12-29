@@ -22,7 +22,8 @@ with lib;
         enable_audio_bell = false;
       };
       extraConfig = ''
-        window_margin_width 16
+        window_margin_width 32
+        macos_titlebar_color background
       '';
     };
   };
