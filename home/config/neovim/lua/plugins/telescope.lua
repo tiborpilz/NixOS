@@ -13,10 +13,15 @@ return {
           prompt_prefix =" ",
           entry_prefix = " ",
           selection_caret = " ",
+          borderchars = {
+            prompt = { " ", " ", " ", " ", " ", " ", " ", " " },
+            results = { " ", " ", " ", " ", " ", " ", " ", " " },
+            preview = { " ", " ", " ", " ", " ", " ", " ", " " },
+          },
           border = {
-            prompt = { 0, 0, 0, 0 },
-            results = { 0, 0, 0, 0 },
-            preview = { 0, 0, 0, 0 },
+            prompt = { 1, 0, 0, 0 },
+            results = { 1, 0, 0, 0 },
+            preview = { 1, 0, 0, 0 },
           },
           layout_strategy = "vertical",
           layout_config = {

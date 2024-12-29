@@ -5,6 +5,19 @@ vim.keymap.set("n", "<leader>cf", ":Format<CR>", { desc = "Format Buffer" })
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 
+local function border(hl_name)
+  return {
+    { "┌", hl_name },
+    { "─", hl_name },
+    { "┐", hl_name },
+    { "│", hl_name },
+    { "┘", hl_name },
+    { "─", hl_name },
+    { "└", hl_name },
+    { "│", hl_name },
+  }
+end
+
 return {
   -- Comments
   {"tpope/vim-commentary"},
@@ -50,13 +63,8 @@ return {
           ['<C-u>'] = cmp.mapping.scroll_docs(-4),
           ['<C-d>'] = cmp.mapping.scroll_docs(4),
         }),
-        snippet = {
-          -- expand = function(args)
-            --   luasnip.lsp_expand(args.body)
-            -- end
-          },
-        })
-      end,
+      })
+    end,
   },
   {"hrsh7th/cmp-nvim-lsp"},
 
@@ -82,9 +90,9 @@ return {
         desc = "Toggle Undo Tree",
       },
     },
-    -- setup = function()
-    --   vim.keymap.set("n", "<leader>su", ":UndotreeToggle<CR>", { desc = "Toggle Undo Tree" })
-    -- end,
+    setup = function()
+      vim.keymap.set("n", "<leader>su", ":UndotreeToggle<CR>", { desc = "Toggle Undo Tree" })
+    end,
   },
 
 }
