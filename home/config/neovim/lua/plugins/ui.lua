@@ -41,9 +41,9 @@ return {
           globalstatus = false,
         },
         sections = {
-          lualine_a = {'mode'},
-          lualine_b = {'branch'},
-          lualine_c = {'filename'},
+          lualine_a = { 'mode' },
+          lualine_b = { 'branch' },
+          lualine_c = { 'filename' },
           lualine_x = {
             'filetype',
             'location',
@@ -66,8 +66,8 @@ return {
                 info  = 'DiagnosticInfo',  -- Changes diagnostics' info color.
                 hint  = 'DiagnosticHint',  -- Changes diagnostics' hint color.
               },
-              symbols = {error = '', warn = '', info = '', hint = ''},
-              colored = true,           -- Displays diagnostics status in color if set to true.
+              symbols = { error = '', warn = '', info = '', hint = '' },
+              colored = true,          -- Displays diagnostics status in color if set to true.
               update_in_insert = true, -- Update diagnostics in insert mode.
               always_visible = true,   -- Show diagnostics even if there are none.
             },
@@ -78,7 +78,7 @@ return {
         inactive_sections = {
           lualine_a = {},
           lualine_b = {},
-          lualine_c = {'filename'},
+          lualine_c = { 'filename' },
           lualine_x = {},
           lualine_y = {},
           lualine_z = {},
@@ -109,15 +109,33 @@ return {
   --   end,
   -- },
 
+  -- Status Column
+  --
+  {
+    "lewis6991/gitsigns.nvim",
+    config = function()
+      require("gitsigns").setup({
+        signs = {
+          add          = { text = '┃' },
+          change       = { text = '┃' },
+          delete       = { text = '_' },
+          topdelete    = { text = '‾' },
+          changedelete = { text = '~' },
+          untracked    = { text = '┆' },
+        },
+      })
+    end,
+  },
+
   -- Colorschemes / Themes
-  {"eddyekofo94/gruvbox-flat.nvim"},
-  {"marko-cerovac/material.nvim"},
-  {"kdheepak/monochrome.nvim"},
-  {"EdenEast/nightfox.nvim"},
-  {"RRethy/nvim-base16"},
-  {"mcchrish/zenbones.nvim"},
-  {"rktjmp/lush.nvim"},
-  {"yorickpeterse/nvim-grey"},
+  { "eddyekofo94/gruvbox-flat.nvim" },
+  { "marko-cerovac/material.nvim" },
+  { "kdheepak/monochrome.nvim" },
+  { "EdenEast/nightfox.nvim" },
+  { "RRethy/nvim-base16" },
+  { "mcchrish/zenbones.nvim" },
+  { "rktjmp/lush.nvim" },
+  { "yorickpeterse/nvim-grey" },
   {
     "shaunsingh/nord.nvim",
     config = function()
@@ -145,7 +163,7 @@ return {
       require("screenkey").setup({
         -- Center
         win_opts = {
-          width = 20;
+          width = 20,
           col = (vim.o.columns / 2) + 10,
           row = 1,
           border = "none",
@@ -155,4 +173,3 @@ return {
     end,
   },
 }
-

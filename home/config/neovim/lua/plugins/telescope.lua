@@ -36,14 +36,15 @@ return {
       local blend = 85
 
       vim.api.nvim_create_autocmd("FileType", {
-        pattern = "TelescopePrompt",
+        -- Telescope, Mason
+        pattern = "TelescopePrompt,Mason,LspInfo",
         callback = function(ctx)
           local backdropName = "TelescopeBackdrop"
           local telescopeBufnr = ctx.buf
 
           -- `Telescope` does not set a zindex, so it uses the default value
           -- of `nvim_open_win`, which is 50: https://neovim.io/doc/user/api.html#nvim_open_win()
-          local telescopeZindex = 50
+          local telescopeZindex = 2
 
           local backdropBufnr = vim.api.nvim_create_buf(false, true)
           local winnr = vim.api.nvim_open_win(backdropBufnr, false, {
@@ -79,7 +80,7 @@ return {
     keys = {
       {
         "<leader>pf",
-        function() require("telescope.builtin").find_files() end,
+        "<cmd>Telescope frecency workspace=CWD<cr>",
         desc = "Find Files",
       },
       {
@@ -133,6 +134,14 @@ return {
         desc = "Show Diagnostics",
       },
     },
+  },
+  {
+    "nvim-telescope/telescope-frecency.nvim",
+    -- install the latest stable version
+    version = "*",
+    config = function()
+      require("telescope").load_extension "frecency"
+    end,
   },
   -- {
   --   'stevearc/dressing.nvim',
