@@ -12,7 +12,14 @@ vim.api.nvim_create_user_command(
   {nargs = 0}
 )
 
-vim.keymap.set('i', '<C-Space>', 'copilot#Accept("\\<CR>")', { silent = true, expr = true, script = true })
+-- Accept copilot suggestion with <C-Space>
+-- `replace_keycodes` is important to not insert the key code in the buffer
+vim.keymap.set(
+  'i',
+  '<C-Space>', 'copilot#Accept("<CR>")',
+  { noremap = true, silent = true, expr = true, replace_keycodes = false, desc = "Copilot accept" }
+)
+
 
 return {
   {
