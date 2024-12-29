@@ -10,17 +10,17 @@ return {
   },
 
   -- Floating Window Borders
-  -- {
-  --   "mikesmithgh/borderline.nvim",
-  --   enabled = true,
-  --   lazy = true,
-  --   event = 'VeryLazy',
-  --   config = function()
-  --     require('borderline').setup({
-  --       --  ...
-  --     })
-  --   end,
-  -- },
+  {
+    "mikesmithgh/borderline.nvim",
+    enabled = true,
+    lazy = true,
+    event = 'VeryLazy',
+    config = function()
+      require('borderline').setup({
+        --  ...
+      })
+    end,
+  },
 
   -- Colorschemes / Themes
   {"eddyekofo94/gruvbox-flat.nvim"},
@@ -37,6 +37,9 @@ return {
       vim.cmd("colorscheme nord")
     end,
   },
+
+  -- Messages, Cmdline & Popupmenu replacement
+  { "folke/noice.nvim" },
 
   -- Screenkey
   {
