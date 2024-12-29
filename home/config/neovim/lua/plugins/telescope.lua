@@ -19,9 +19,9 @@ return {
             preview = { " ", " ", " ", " ", " ", " ", " ", " " },
           },
           border = {
-            prompt = { 1, 0, 0, 0 },
-            results = { 1, 0, 0, 0 },
-            preview = { 1, 0, 0, 0 },
+            prompt = { 1, 1, 1, 1 },
+            results = { 1, 1, 1, 1 },
+            preview = { 1, 1, 1, 1 },
           },
           layout_strategy = "vertical",
           layout_config = {
@@ -91,6 +91,36 @@ return {
         "<leader>bb",
         function() require("telescope.builtin").buffers() end,
         desc = "List Buffers",
+      },
+      {
+        "<leader>bp",
+        desc = "Go to Previous Buffer",
+        function()
+          local last_buffer = vim.fn.bufnr("#")
+          if last_buffer > 0 then
+            vim.cmd("buffer " .. last_buffer)
+          end
+        end,
+      },
+      {
+        "<leader>bn",
+        desc = "Go to Next Buffer",
+        function()
+          local last_buffer = vim.fn.bufnr("#")
+          if last_buffer > 0 then
+            vim.cmd("buffer " .. last_buffer)
+          end
+        end,
+      },
+      {
+        "<leader>bk",
+        desc = "Close Buffer",
+        function()
+          local current_buffer = vim.fn.bufnr("%")
+          if current_buffer > 1 then
+            vim.cmd("bdelete " .. current_buffer)
+          end
+        end,
       },
       {
         "<leader>fh",

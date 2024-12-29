@@ -22,6 +22,12 @@ vim.o.modeline = true
 vim.o.modelines = 5
 vim.o.foldenable = false
 
+--- Use System Clipboard
+vim.o.clipboard = "unnamedplus"
+
+--- Persistent undo
+vim.o.undofile = true
+
 --- Set Hybrid Line Numbers
 vim.wo.relativenumber = true
 vim.wo.number = true

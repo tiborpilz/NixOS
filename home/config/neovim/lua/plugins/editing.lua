@@ -91,7 +91,8 @@ return {
       },
     },
     setup = function()
-      vim.keymap.set("n", "<leader>su", ":UndotreeToggle<CR>", { desc = "Toggle Undo Tree" })
+      vim.g.undotree_WindowLayout = 3 -- Right hand side
+      vim.g.undotree_SetFocusWhenToggle = 1
     end,
   },
 
