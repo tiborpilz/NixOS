@@ -103,7 +103,7 @@ return {
 
       -- LSP Keymaps
       vim.keymap.set('n', '<Leader>cg', '<cmd>lua vim.lsp.buf.hover()<cr>', { desc = 'Show hover information' })
-      vim.keymap.set('n', '<Leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', { desc = 'Show code actions' })
+      -- vim.keymap.set('n', '<Leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', { desc = 'Show code actions' })
       vim.keymap.set('n', '<Leader>cr', '<cmd>lua vim.lsp.buf.rename()<cr>', { desc = 'Rename symbol' })
       vim.keymap.set({ 'n', 'x' }, '<Leader>cf', '<cmd>lua vim.lsp.buf.format({async = true})<cr>',
         { desc = 'Format code' })
@@ -111,7 +111,7 @@ return {
       vim.diagnostic.config({ virtual_text = false })
       -- Bind diagnostic to <Leader> c e
       vim.keymap.set('n', '<Leader>ce', '<cmd>lua vim.diagnostic.open_float(nil, {focus=false})<CR>',
-  { noremap = true, silent = true })
+        { noremap = true, silent = true })
 
       vim.keymap.set('n', '<Leader>cd', '<cmd>lua vim.lsp.buf.definition()<cr>', { desc = 'Go to definition' })
       vim.keymap.set('n', '<Leader>cD', '<cmd>lua vim.lsp.buf.declaration()<cr>', { desc = 'Go to declaration' })
@@ -119,6 +119,32 @@ return {
       vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', { desc = 'Go to declaration' })
       vim.keymap.set('n', '<Leader>cx', '<cmd>lua vim.diagnostic.open_float(nil, {focus=false})<CR>',
         { noremap = true, silent = true })
+    end,
+  },
+
+  -- LSP Actions Preview
+  {
+    "aznhe21/actions-preview.nvim",
+    config = function()
+      vim.keymap.set({ "v", "n" }, "<Leader>ca", require("actions-preview").code_actions, { desc = "Code Actions" })
+    end,
+    setup = function()
+      require("actions-preview").setup({
+        telescope = {
+          defaults = {
+            border = {
+              prompt = { 0, 0, 0, 0 },
+              results = { 0, 0, 0, 0 },
+              preview = { 0, 0, 0, 0 },
+            },
+            layout_config = {
+              prompt_position = "top",
+              width = 0.5,
+              height = 0.5,
+            },
+          },
+        },
+      })
     end,
   },
 
@@ -157,7 +183,7 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     config = function()
-      require'nvim-treesitter.configs'.setup {
+      require 'nvim-treesitter.configs'.setup {
 
         ensure_installed = {
           "typescript",
