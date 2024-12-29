@@ -422,6 +422,9 @@ The closest comparison to org-roam-ui is Obsidian.
 I want to be able to use ~org-capture~ to capture stuff in the current date's roam daily file.
 
 ** Org-Node
+:PROPERTIES:
+:HEADER-ARGS: :tangle no
+:END:
 
 Org-Node is similar to Org-Roam - it allows for creating small notes and linking them, creating a knowledge graph.
 
