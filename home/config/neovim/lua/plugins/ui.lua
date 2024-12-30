@@ -10,6 +10,8 @@ vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSig
 
 vim.diagnostic.config { float = { border = "rounded" } }
 
+vim.g.tpipeline_autoembed = 0
+
 return {
   -- Icons
   {
@@ -45,6 +47,7 @@ return {
           lualine_b = { 'branch' },
           lualine_c = { 'filename' },
           lualine_x = {
+            'overseer',
             'filetype',
             'location',
             {
@@ -91,23 +94,12 @@ return {
       })
     end,
   },
-  -- {
-  --   "vim-airline/vim-airline",
-  --   dependencies = {"vim-airline/vim-airline-themes"},
-  -- },
 
-  -- Floating Window Borders
-  -- {
-  --   "mikesmithgh/borderline.nvim",
-  --   enabled = true,
-  --   lazy = true,
-  --   event = 'VeryLazy',
-  --   config = function()
-  --     require('borderline').setup({
-  --       --  ...
-  --     })
-  --   end,
-  -- },
+  -- Status line in Tmux
+  {
+    "vimpostor/vim-tpipeline",
+    event = "VeryLazy",
+  },
 
   -- Status Column
   --

@@ -84,7 +84,7 @@ in
         set -g renumber-windows on
 
         # Status Bar
-        set -g status-position top
+        set -g status-position bottom
         set -g status-justify left
         set -g status-style bg=default,fg=colour4
 
@@ -94,7 +94,7 @@ in
 
 
         set -g pane-border-format ""
-        set -g pane-border-status top
+        set -g pane-border-status bottom
         set -g pane-border-lines single
         set -g pane-border-style 'fg=colour0'
 
@@ -114,7 +114,9 @@ in
         # set-hook -g after-select-window 'run-shell refresh_tmux_starship'
 
         set -g status-left-length 40
-        set -g status-left '#[fg=colour4]  #S #[default]'
+        set -g status-left '#(cat #{socket_path}-\#{session_id}-vimbridge) #[fg=colour4]  #S #[default]'
+
+        set -g status-c
 
         set -g status-right-length 120
 
@@ -126,7 +128,7 @@ in
         status_no_git="#[fg=colour4] #(date +%H:%M)"
 
         # set -g status-right "#[if:#{==:#{@show_git],true}]$status_git#[else]$status_no_git#[endif]"
-        set -g status-right "$status_git "
+        set -g status-right '#(cat #{socket_path}-\#{session_id}-vimbridge-R)'
 
         # Normally, only show the current window name and the time
         # set -g status-right #[fg=colour4] #(date +"%H:%M") | #S '

@@ -143,8 +143,8 @@ return {
       require("telescope").load_extension "frecency"
     end,
   },
-  -- {
-  --   'stevearc/dressing.nvim',
-  --   opts = {},
-  -- }
+  {
+    'stevearc/dressing.nvim',
+    opts = {},
+  }
 }
