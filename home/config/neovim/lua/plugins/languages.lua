@@ -1,123 +1,232 @@
 return {
   -- Mason for installing LSP servers
-  {
-    "williamboman/mason.nvim",
-    opts = {
-      ui = {
-        border = "none",
-      },
-    },
-    config = function()
-      require("mason").setup()
-    end,
-  },
+  -- {
+  --   "williamboman/mason.nvim",
+  --   opts = {
+  --     ui = {
+  --       border = "none",
+  --     },
+  --   },
+  --   config = function()
+  --     require("mason").setup()
+  --   end,
+  -- },
 
   -- LSP config
   {
-    "williamboman/mason-lspconfig.nvim",
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim",
+      "neovim/nvim-lspconfig",
+      "jay-babu/mason-null-ls.nvim",
+      "jay-babu/mason-nvim-dap.nvim",
+      "rcarriga/nvim-dap-ui",
+      "mfussenegger/nvim-dap",
+      "nvim-neotest/nvim-nio",
+      "nvimtools/none-ls.nvim",
+      "nvimtools/none-ls-extras.nvim",
+      "zapling/mason-lock.nvim",
+      "folke/lazydev.nvim",
+    },
     config = function()
-      local mason_lspconfig = require("mason-lspconfig")
+      require("mason").setup({})
 
-      mason_lspconfig.setup({
-        ensure_installed = { "lua_ls" },
+      require("mason-tool-installer").setup({
+        -- a list of all tools you want to ensure are installed upon start
+        ensure_installed = {
+          "ts_ls",
+          "volar",
+        },
+        auto_update = true, -- Default: false
+        run_on_start = true, -- Default: true
+        start_delay = 1000, -- 1 second delay ( Default: 0 )
+        debounce_hours = 1, -- at least 1 hour between attempts to install/update
       })
 
-      mason_lspconfig.setup_handlers {
-        -- function(server_name) -- default handler
-        --   require("lspconfig")[server_name].setup {}
-        -- end,
+      require("mason-lock").setup({
+        lockfile_path = vim.fn.stdpath("config") .. "/mason-lock.json", -- (default)
+      })
 
-        -- need to set up lua_ls so it stops whining about global vim
-        ["lua_ls"] = function()
-          return require("lspconfig")["lua_ls"].setup({
-            settings = {
-              Lua = {
-                diagnostics = {
-                  globals = { "vim" },
+      require("mason-null-ls").setup({
+        ensure_installed = {},
+        automatic_installation = { exclude = { "stylua", "gitsigns" } },
+        handlers = {},
+      })
+
+      require("null-ls").setup({
+        sources = {
+          -- Anything not supported by mason.
+          require("null-ls").builtins.formatting.stylua,
+          require("null-ls").builtins.code_actions.gitsigns,
+          require("null-ls").builtins.diagnostics.zsh,
+          require("null-ls").builtins.diagnostics.selene,
+          -- Anythng not supported by none-ls.
+          require("none-ls.diagnostics.eslint_d"),
+          require("none-ls.formatting.eslint_d").with({ timeout = 5000 }),
+          require("none-ls.code_actions.eslint_d"),
+        },
+        -- Format on save using null-ls instead of lsp server.
+        on_attach = function(current_client, bufnr)
+          if current_client.supports_method("textDocument/formatting") then
+            vim.api.nvim_create_autocmd("BufWritePre", {
+              group = augroup,
+              buffer = bufnr,
+              callback = function()
+                vim.lsp.buf.format({
+                  filter = function(client)
+                    return client.name == "null-ls"
+                  end,
+                  bufnr = bufnr,
+                })
+              end,
+            })
+          end
+        end,
+      })
+
+      require("lazydev").setup({
+        library = vim.api.nvim_get_runtime_file("", true),
+      })
+
+      require("mason-lspconfig").setup({
+        automatic_installation = true,
+
+        handlers = {
+          function(server_name) -- default handler
+            require("lspconfig")[server_name].setup({})
+          end,
+
+          ["volar"] = function()
+            require("lspconfig").volar.setup({
+              -- NOTE: Uncomment to enable volar in file types other than vue.
+              -- (Similar to Takeover Mode)
+
+              -- filetypes = { "vue", "javascript", "typescript", "javascriptreact", "typescriptreact", "json" },
+
+              -- NOTE: Uncomment to restrict Volar to only Vue/Nuxt projects. This will enable Volar to work alongside other language servers (tsserver).
+
+              -- root_dir = require("lspconfig").util.root_pattern(
+              --   "vue.config.js",
+              --   "vue.config.ts",
+              --   "nuxt.config.js",
+              --   "nuxt.config.ts"
+              -- ),
+              init_options = {
+                vue = {
+                  hybridMode = false,
+                },
+                -- NOTE: This might not be needed. Uncomment if you encounter issues.
+
+                -- typescript = {
+                --   tsdk = vim.fn.getcwd() .. "/node_modules/typescript/lib",
+                -- },
+              },
+              settings = {
+                typescript = {
+                  inlayHints = {
+                    enumMemberValues = {
+                      enabled = true,
+                    },
+                    functionLikeReturnTypes = {
+                      enabled = true,
+                    },
+                    propertyDeclarationTypes = {
+                      enabled = true,
+                    },
+                    parameterTypes = {
+                      enabled = true,
+                      suppressWhenArgumentMatchesName = true,
+                    },
+                    variableTypes = {
+                      enabled = true,
+                    },
+                  },
                 },
               },
-            }
-          })
-        end
-      }
-    end,
-  },
-  {
-    "neovim/nvim-lspconfig",
-    config = function()
-      local lspconfig = require("lspconfig")
+            })
+          end,
 
-      lspconfig.nil_ls.setup({})
-      lspconfig.gleam.setup({})
+          ["ts_ls"] = function()
+            local mason_packages = vim.fn.stdpath("data") .. "/mason/packages"
+            local volar_path = mason_packages .. "/vue-language-server/node_modules/@vue/language-server"
 
-      lspconfig.volar.setup({
-        filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
-        init_options = {
-          vue = {
-            hybridMode = false,
-          },
+            require("lspconfig").ts_ls.setup({
+              -- NOTE: To enable hybridMode, change HybrideMode to true above and uncomment the following filetypes block.
+
+              -- filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
+              init_options = {
+                plugins = {
+                  {
+                    name = "@vue/typescript-plugin",
+                    location = volar_path,
+                    languages = { "vue" },
+                  },
+                },
+              },
+              settings = {
+                typescript = {
+                  inlayHints = {
+                    includeInlayParameterNameHints = "all",
+                    includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                    includeInlayFunctionParameterTypeHints = true,
+                    includeInlayVariableTypeHints = true,
+                    includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+                    includeInlayPropertyDeclarationTypeHints = true,
+                    includeInlayFunctionLikeReturnTypeHints = true,
+                    includeInlayEnumMemberValueHints = true,
+                  },
+                },
+              },
+            })
+          end,
+
+          ["lua_ls"] = function()
+            require("lspconfig").lua_ls.setup({
+              on_init = function(client)
+                local path = client.workspace_folders[1].name
+                if vim.loop.fs_stat(path .. "/.luarc.json") or vim.loop.fs_stat(path .. "/.luarc.jsonc") then
+                  return
+                end
+
+                client.config.settings.Lua = vim.tbl_deep_extend("force", client.config.settings.Lua, {
+                  runtime = {
+                    -- Tell the language server which version of Lua you're using
+                    -- (most likely LuaJIT in the case of Neovim)
+                    version = "LuaJIT",
+                  },
+                  -- Make the server aware of Neovim runtime files
+                  workspace = {
+                    checkThirdParty = false,
+                    library = {
+                      -- vim.env.VIMRUNTIME,
+                      -- Depending on the usage, you might want to add additional paths here.
+                      -- "${3rd}/luv/library",
+                      -- "${3rd}/busted/library",
+                      -- "~/.local/share/nvim/lazy",
+                    },
+                  },
+                  hint = {
+                    enable = true,
+                    arrayIndex = "Auto",
+                    await = true,
+                    paramName = "All",
+                    paramType = true,
+                    semicolon = "SameLine",
+                    setType = true,
+                  },
+                })
+              end,
+              settings = {
+                Lua = {},
+              },
+            })
+          end,
         },
-          -- on_new_config = function(new_config, new_root_dir)
-          --   local lib_path = vim.fs.find('node_modules/typescript/lib', { path = new_root_dir, upward = true})[1]
-          --   if lib_path then
-          --     new_config.typescript.tsdk = lib_path
-          --   end
-          -- end,
-        -- },
-        -- cmd = { "vue-language-server", "--stdio" },
-        -- init_options = {
-        --   vue = {
-        --     hybridMode = false,
-        --   },
-        --   typescript = {
-        --     tsdk = vim.fn.stdpath("data") .. "/mason/packages/vue-language-server/node_modules/typescript/lib",
-        --   },
-        -- },
       })
-
-      lspconfig.ts_ls.setup {}
-
-      -- suppress error messages from lang servers
-      ---@diagnostic disable-next-line: duplicate-set-field
-      vim.notify = function(msg, log_level, _)
-        if msg:match "exit code" then
-          return
-        end
-        if log_level == vim.log.levels.ERROR then
-          vim.api.nvim_err_writeln(msg)
-        else
-          vim.api.nvim_echo({ { msg } }, true, {})
-        end
-      end
-
-      -- Set border for LSP Hover
-      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
-        vim.lsp.handlers.hover,
-        { border = { " ", " ", " ", " ", " ", " ", " ", " " } }
-      )
-
-      -- Set diagnostic sign
-      -- Change diagnostic signs.
-
-      -- LSP Keymaps
-      vim.keymap.set('n', '<Leader>cg', '<cmd>lua vim.lsp.buf.hover()<cr>', { desc = 'Show hover information' })
-      -- vim.keymap.set('n', '<Leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', { desc = 'Show code actions' })
-      vim.keymap.set('n', '<Leader>cr', '<cmd>lua vim.lsp.buf.rename()<cr>', { desc = 'Rename symbol' })
-      vim.keymap.set({ 'n', 'x' }, '<Leader>cf', '<cmd>lua vim.lsp.buf.format({async = true})<cr>',
-        { desc = 'Format code' })
-      -- Hide diagnostic float per default
-      vim.diagnostic.config({ virtual_text = false })
-      -- Bind diagnostic to <Leader> c e
-      vim.keymap.set('n', '<Leader>ce', '<cmd>lua vim.diagnostic.open_float(nil, {focus=false})<CR>',
-        { desc = 'Open Diagnostic Float', noremap = true, silent = true })
-
-      vim.keymap.set('n', '<Leader>cd', '<cmd>lua vim.lsp.buf.definition()<cr>', { desc = 'Go to definition' })
-      vim.keymap.set('n', '<Leader>cD', '<cmd>lua vim.lsp.buf.declaration()<cr>', { desc = 'Go to declaration' })
-      vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', { desc = 'Go to definition' })
-      vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', { desc = 'Go to declaration' })
     end,
   },
-
   -- LSP Actions Preview
   {
     "aznhe21/actions-preview.nvim",
