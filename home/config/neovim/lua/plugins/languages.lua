@@ -4,7 +4,7 @@ return {
     "williamboman/mason.nvim",
     opts = {
       ui = {
-        border = "rounded",
+        border = "none",
       },
     },
     config = function()
@@ -96,7 +96,7 @@ return {
       end
 
       -- Set border for LSP Hover
-      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'single' })
+      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'none' })
 
       -- Set diagnostic sign
       -- Change diagnostic signs.
@@ -157,10 +157,9 @@ return {
         use_lspsaga = true,
         padding = ' ',
         shadow_blend = 36,
-        shadow_guibg = "green",
         floating_window_above_cur_line = true,
         handler_opts = {
-          border = "rounded"
+          border = "none"
         }
       })
 

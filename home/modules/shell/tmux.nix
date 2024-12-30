@@ -3,11 +3,6 @@
 with lib;
 let
   cfg = config.modules.shell.tmux;
-  # Monkey-Patch tmux to use XDG_CONFIG_HOME
-  tmux = (pkgs.writeScriptBin "tmux" ''
-    #!${pkgs.stdenv.shell}
-    exec ${pkgs.tmux}/bin/tmux -f "$TMUX_HOME/tmux.conf" "$@"
-  '');
   mylib = import ../../../lib { inherit inputs lib pkgs; };
 in
 {
@@ -108,26 +103,12 @@ in
         set-hook -g window-layout-changed 'if-shell "$is_many" "set-option -w pane-active-border-style fg=colour4" "set-option -w pane-active-border-style fg=colour0'
         set-hook -g session-window-changed 'if-shell "$is_many" "set-option -w pane-active-border-style fg=colour4" "set-option -w pane-active-border-style fg=colour0'
 
-        # TODO: these don't quite work yet
-        # set-hook -g session-window-changed 'run-shell refresh_tmux_starship'
-        # set-hook -g after-rename-window 'run-shell refresh_tmux_starship'
-        # set-hook -g after-select-pane 'run-shell refresh_tmux_starship'
-        # set-hook -g after-select-window 'run-shell refresh_tmux_starship'
-
         set -g status-left-length 40
-        set -g status-left '#(cat #{socket_path}-\#{session_id}-vimbridge) #[fg=colour4]  #S #[default]'
+        set -g status-left '#[fg=colour4]  #S #[default]'
 
-        set -g status-right-length 120
+        set -g status-right-length 512
 
-        # TODO: get toggle working
-        status_git="#(${pkgs.gitmux}/bin/gitmux -cfg $HOME/.config/gitmux/gitmux.conf #{pane_current_path}) #[fg=colour4] | #(date +%H:%M)"
-        status_no_git="#[fg=colour4] #(date +%H:%M)"
-
-        # set -g status-right "#[if:#{==:#{@show_git],true}]$status_git#[else]$status_no_git#[endif]"
         set -g status-right '#(cat #{socket_path}-\#{session_id}-vimbridge-R)'
-
-        # Normally, only show the current window name and the time
-        # set -g status-right #[fg=colour4] #(date +"%H:%M") | #S '
       '';
     };
 

@@ -20,7 +20,7 @@ end
 
 return {
   -- Comments
-  {"tpope/vim-commentary"},
+  { "tpope/vim-commentary" },
 
   -- Formatting
   {
@@ -57,12 +57,11 @@ return {
 
       cmp.setup({
         sources = {
-          {name = 'nvim_lsp' },
-          {name = 'buffer' },
+          { name = 'nvim_lsp' },
         },
         window = {
-          completion = cmp.config.window.bordered(),
-          documentation = cmp.config.window.bordered(),
+          -- completion = cmp.config.window.bordered(),
+          -- documentation = cmp.config.window.bordered(),
         },
         mapping = cmp.mapping.preset.insert({
           ['<Enter>'] = cmp.mapping.confirm({select = false}),

@@ -8,7 +8,7 @@ vim.fn.sign_define("DiagnosticSignWarn", { text = "", texthl = "DiagnosticSig
 vim.fn.sign_define("DiagnosticSignInfo", { text = "", texthl = "DiagnosticSignInfo" })
 vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSignHint" })
 
-vim.diagnostic.config { float = { border = "rounded" } }
+-- vim.diagnostic.config { float = { border = "" } }
 
 vim.g.tpipeline_autoembed = 0
 
@@ -32,6 +32,7 @@ return {
 
       local nord_theme_custom = require('lualine.themes.nord')
       nord_theme_custom.normal.c.bg = 'none'
+      -- nord_theme_custom.normal.c.fg = 'darker_white'
       nord_theme_custom.inactive.c.bg = 'none'
 
       local mode_map = {
@@ -59,27 +60,14 @@ return {
           theme = nord_theme_custom,
           section_separators = { left = ' ', right = ' ' },
           component_separators = { left = ' ', right = ' ' },
-          globalstatus = false,
+          globalstatus = true,
         },
         sections = {
-          lualine_a = { },
-          lualine_b = { },
-          lualine_c = { },
+          lualine_a = {},
+          lualine_b = {},
+          lualine_c = {},
           lualine_x = {
             'overseer',
-            {
-              'filename',
-              path = 4,
-              symbols = {
-                modified = '',
-                readonly = '',
-                unnamed = '',
-                newfile = '',
-              },
-            },
-          },
-          lualine_y = {
-            'branch',
             {
               'diagnostics',
 
@@ -91,11 +79,31 @@ return {
                 info  = 'DiagnosticInfo',  -- Changes diagnostics' info color.
                 hint  = 'DiagnosticHint',  -- Changes diagnostics' hint color.
               },
-              symbols = { error = '', warn = '', info = '', hint = '' },
+              -- symbols = { error = '', warn = '', info = '', hint = '' },
+              symbols = { error = ' ', warn = ' ', info = ' ' },
               colored = true,          -- Displays diagnostics status in color if set to true.
               update_in_insert = true, -- Update diagnostics in insert mode.
-              always_visible = false,   -- Show diagnostics even if there are none.
+              always_visible = false,  -- Show diagnostics even if there are none.
             },
+            {
+              'filename',
+              path = 4,
+              symbols = {
+                modified = '',
+                readonly = '',
+                unnamed = '',
+                newfile = '',
+              },
+            },
+            {
+              'filetype',
+              colored = true,
+              icon_only = true,
+            },
+          },
+          lualine_y = {
+            { 'b:gitsigns_head', icon = '' },
+            -- { 'branch', icon = '' },
           },
           lualine_z = {
             {
@@ -159,7 +167,9 @@ return {
   {
     "shaunsingh/nord.nvim",
     config = function()
-      vim.cmd("colorscheme nord")
+      vim.g.nord_contrast = true
+
+      require("nord").set()
     end,
   },
   {
@@ -172,7 +182,7 @@ return {
   },
 
   -- Messages, Cmdline & Popupmenu replacement
-  { "folke/noice.nvim" },
+  -- { "folke/noice.nvim" },
 
   -- Screenkey
   {

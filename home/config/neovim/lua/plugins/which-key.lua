@@ -5,7 +5,7 @@ return {
       delay = 300,
       loop = true,
       win = {
-        border = "single",
+        border = "none",
         height = { min = 1, max = 10 },
         padding = { 1, 8 },
         title_pos = "center",
@@ -44,6 +44,7 @@ return {
       wk.setup(opts)
 
       wk.add({
+        --- Groups
         { "<leader>b", group = "Buffer" },
         { "<leader>s", group = "Search" },
         { "<leader>c", group = "Code" },
@@ -51,6 +52,10 @@ return {
         { "<leader>t", group = "Test", icon = "" },
         { "<leader>p", group = "Project" },
         { "<leader>w", group = "Window" },
+
+        --- Unsorted key commands
+        { "<leader>wv", "<cmd>vsplit<cr>", desc = "Split Vertical" },
+        { "<leader>wh", "<cmd>split<cr>", desc = "Split Horizontal" },
       })
     end,
   },

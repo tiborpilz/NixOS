@@ -13,15 +13,15 @@ return {
           prompt_prefix = "> ",
           entry_prefix = " ",
           selection_caret = " ",
-          -- borderchars = {
-          --   prompt = { " ", " ", " ", " ", " ", " ", " ", " " },
-          --   results = { " ", " ", " ", " ", " ", " ", " ", " " },
-          --   preview = { " ", " ", " ", " ", " ", " ", " ", " " },
-          -- },
+          borderchars = {
+            prompt = { " ", " ", " ", " ", " ", " ", " ", " " },
+            results = { " ", " ", " ", " ", " ", " ", " ", " " },
+            preview = { " ", " ", " ", " ", " ", " ", " ", " " },
+          },
           border = {
             prompt = { 1, 1, 1, 1 },
-            results = { 1, 1, 1, 1 },
-            preview = { 1, 1, 1, 1 },
+            results = { 1, 1, 0, 1 },
+            preview = { 1, 1, 0, 1 },
           },
           layout_strategy = "vertical",
           layout_config = {
@@ -42,8 +42,6 @@ return {
           local backdropName = "TelescopeBackdrop"
           local telescopeBufnr = ctx.buf
 
-          -- `Telescope` does not set a zindex, so it uses the default value
-          -- of `nvim_open_win`, which is 50: https://neovim.io/doc/user/api.html#nvim_open_win()
           local telescopeZindex = 2
 
           local backdropBufnr = vim.api.nvim_create_buf(false, true)
