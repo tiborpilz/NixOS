@@ -20,7 +20,10 @@ vim.o.errorbells = false
 vim.o.autoread = true
 vim.o.modeline = true
 vim.o.modelines = 5
+
+--- Don't initially fold, though we set a high fold value so that not everything collapses on the first `zc`
 vim.o.foldenable = false
+-- vim.o.foldlevel = 99
 
 --- Use System Clipboard
 vim.o.clipboard = "unnamedplus"
