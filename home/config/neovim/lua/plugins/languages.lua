@@ -96,7 +96,10 @@ return {
       end
 
       -- Set border for LSP Hover
-      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'none' })
+      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
+        vim.lsp.handlers.hover,
+        { border = { " ", " ", " ", " ", " ", " ", " ", " " } }
+      )
 
       -- Set diagnostic sign
       -- Change diagnostic signs.
