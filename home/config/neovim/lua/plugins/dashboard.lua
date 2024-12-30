@@ -101,19 +101,15 @@ return {
 
       dashboard.section.buttons.val = {
         -- Browser projects
-        dashboard.button("SPC p p", "  Projects", ":NeovimProjectDiscover<CR>"),
-        dashboard.button("SPC f h", "  Help", ":Telescope help_tags<CR>"),
+        dashboard.button("SPC p p", "  Projects", ":NeovimProjectDiscover<CR>"),
+        dashboard.button("SPC f h", "  Help", ":Telescope help_tags<CR>"),
+        dashboard.button("SPC n a", "󰃭  Agenda", "<Cmd>lua require("orgmode").action("agenda.prompt")<CR>"),
       }
 
 
       dashboard.section.header.val = neovim_logo
       dashboard.section.subheader = {
         type = "text",
-        -- val = {
-        --   [[ ___       ___       ___                        _ _   ]],
-        --   [[ |   )     |___)     |   )      \  )     |      | | ) ]],
-        --   [[ |  /      |__       |__/        \/      |      |  /  ]],
-        -- },
         val = "n  e  o  v  i  m",
         opts = {
           position = "center",

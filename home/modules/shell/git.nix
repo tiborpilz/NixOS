@@ -21,6 +21,7 @@ in
       gitAndTools.git-crypt
       difftastic
       act
+      lazygit
     ];
 
     xdg.configFile = {
