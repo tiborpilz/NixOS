@@ -7,9 +7,10 @@ return {
       win = {
         border = "none",
         height = { min = 1, max = 10 },
-        padding = { 1, 8 },
+        padding = { 4, 4 },
         title_pos = "center",
-        col = 0.5,
+        col = 1,
+        title = false,
       },
       plugins = {
         marks = true,
@@ -36,6 +37,7 @@ return {
       preset = "modern",
       layout = {
         align = "center",
+        spacing = 3,
       },
     },
     config = function(_, opts)

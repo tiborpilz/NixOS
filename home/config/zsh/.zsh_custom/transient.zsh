@@ -136,9 +136,8 @@ function prompt_precmd() {
     fi
 }
 
-function prompt_help() {
-    echo "HELP"
-}
+# Insert new line
+precmd() { print "" }
 
 # enable substitution and treat percent as special characters
 # http://zsh.sourceforge.net/Doc/Release/Options.html

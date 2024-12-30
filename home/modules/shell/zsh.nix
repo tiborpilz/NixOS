@@ -100,6 +100,12 @@ in
       recursive = true;
     };
 
+    # Use powerlevel10k package
+    xdg.configFile."zsh/powerlevel10k" = {
+      source = "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k";
+      recursive = true;
+    };
+
     xdg.configFile."zsh/.zsh_custom" = {
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Code/nixos/home/config/zsh/.zsh_custom";
       recursive = true;
