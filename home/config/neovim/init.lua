@@ -21,9 +21,10 @@ vim.o.autoread = true
 vim.o.modeline = true
 vim.o.modelines = 5
 
---- Don't initially fold, though we set a high fold value so that not everything collapses on the first `zc`
-vim.o.foldenable = false
--- vim.o.foldlevel = 99
+--- To not fold everything on the first `zc`, `foldenable` needs to be enabled.
+--- But we don't want actual folding so `foldlevelstart` is set to a high number.
+vim.o.foldenable = true
+vim.o.foldlevelstart = 99
 
 --- Use System Clipboard
 vim.o.clipboard = "unnamedplus"
@@ -38,6 +39,7 @@ vim.wo.number = true
 --- Enable syntax highlighting
 vim.cmd("syntax enable")
 
+vim.opt.signcolumn = "yes"
 --- Smoother update
 vim.o.updatetime = 1000
 
