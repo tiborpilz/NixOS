@@ -1,0 +1,9 @@
+{
+  "eslint-lsp": "4.10.0",
+  "eslint_d": "14.3.0",
+  "firefox-debug-adapter": "2.12.0",
+  "lua-language-server": "3.13.5",
+  "node-debug2-adapter": "v1.43.0",
+  "typescript-language-server": "4.3.3",
+  "vue-language-server": "2.2.0"
+}
