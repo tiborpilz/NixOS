@@ -45,6 +45,7 @@ return {
     dependencies = {
       { "hrsh7th/cmp-nvim-lsp" },
       { "onsails/lspkind-nvim" },
+      { "sudo-burger/cmp-org-roam", dependencies = { 'chipsenkbeil/org-roam.nvim' } },
     },
     config = function()
       local cmp = require("cmp")
@@ -79,6 +80,12 @@ return {
             mode = "symbol_text",
             preset = "codicons",
           }),
+        },
+      })
+
+      cmp.setup.filetype("org", {
+        sources = {
+          { name = "org-roam" },
         },
       })
     end,
