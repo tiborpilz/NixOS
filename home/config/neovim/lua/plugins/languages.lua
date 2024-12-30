@@ -61,6 +61,8 @@ return {
         ensure_installed = {
           "ts_ls",
           "volar",
+          "eslint",
+          "eslint_d",
         },
         auto_update = true, -- Default: false
         run_on_start = true, -- Default: true
@@ -72,49 +74,40 @@ return {
         lockfile_path = vim.fn.stdpath("config") .. "/mason-lock.json", -- (default)
       })
 
-      -- require("mason-null-ls").setup({
-      --   ensure_installed = {},
-      --   automatic_installation = { exclude = { "stylua", "gitsigns" } },
-      --   handlers = {},
-      -- })
+      require("mason-null-ls").setup({
+        ensure_installed = {},
+        automatic_installation = { exclude = { "stylua", "gitsigns" } },
+        handlers = {},
+      })
 
-      -- require("null-ls").setup({
-      --   sources = {
-      --     -- Anything not supported by mason.
-      --     require("null-ls").builtins.formatting.stylua,
-      --     require("null-ls").builtins.code_actions.gitsigns,
-      --     require("null-ls").builtins.diagnostics.zsh,
-      --     require("null-ls").builtins.diagnostics.selene,
-      --     -- Anythng not supported by none-ls.
-      --     require("none-ls.diagnostics.eslint_d"),
-      --     require("none-ls.formatting.eslint_d").with({ timeout = 5000 }),
-      --     require("none-ls.code_actions.eslint_d"),
-      --   },
-      --   -- Format on save using null-ls instead of lsp server.
-      --   on_attach = function(current_client, bufnr)
-      --     if current_client.supports_method("textDocument/formatting") then
-      --       vim.api.nvim_create_autocmd("BufWritePre", {
-      --         group = augroup,
-      --         buffer = bufnr,
-      --         callback = function()
-      --           vim.lsp.buf.format({
-      --             filter = function(client)
-      --               return client.name == "null-ls"
-      --             end,
-      --             bufnr = bufnr,
-      --           })
-      --         end,
-      --       })
-      --     end
-      --   end,
-      -- })
+      require("null-ls").setup({
+        sources = {
+          -- Anything not supported by mason.
+          require("null-ls").builtins.formatting.stylua,
+          require("null-ls").builtins.code_actions.gitsigns,
+          require("null-ls").builtins.diagnostics.zsh,
+          -- Anythng not supported by none-ls.
+          require("none-ls.diagnostics.eslint_d"),
+          require("none-ls.formatting.eslint_d").with({ timeout = 5000 }),
+          require("none-ls.code_actions.eslint_d"),
+        },
+      })
 
       require("lazydev").setup({
+        enabled = true,
+        runtime = vim.env.RUNTIME,
         library = vim.api.nvim_get_runtime_file("", true),
+        integrations = {
+          lspconfig = true,
+          cmp = true,
+          coq = false,
+        },
+        debug = false,
       })
 
       require("mason-lspconfig").setup({
         automatic_installation = true,
+        ensure_installed = {},
 
         handlers = {
           function(server_name) -- default handler
@@ -126,7 +119,7 @@ return {
               -- NOTE: Uncomment to enable volar in file types other than vue.
               -- (Similar to Takeover Mode)
 
-              -- filetypes = { "vue", "javascript", "typescript", "javascriptreact", "typescriptreact", "json" },
+              filetypes = { "vue", "javascript", "typescript", "javascriptreact", "typescriptreact", "json" },
 
               -- NOTE: Uncomment to restrict Volar to only Vue/Nuxt projects. This will enable Volar to work alongside other language servers (tsserver).
 
@@ -205,6 +198,7 @@ return {
             })
           end,
 
+
           ["lua_ls"] = function()
             require("lspconfig").lua_ls.setup({
               on_init = function(client)
@@ -248,6 +242,9 @@ return {
           end,
         },
       })
+
+
+      require("lspconfig").gleam.setup({})
     end,
   },
   -- LSP Actions Preview
@@ -311,6 +308,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     config = function()
       require('nvim-treesitter.configs').setup({
+        modules = {},
         ignore_install = {},
 
         ensure_installed = {
@@ -358,11 +356,9 @@ return {
   { "mfussenegger/nvim-dap" },
   {
     "theHamsta/nvim-dap-virtual-text",
-    config = function()
-      require("nvim-dap-virtual-text").setup({
-        commented = true,
-      })
-    end,
+    opts = {
+      commented = true,
+    },
   },
   { "nvim-telescope/telescope-dap.nvim" },
 
