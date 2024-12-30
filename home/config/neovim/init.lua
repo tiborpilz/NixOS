@@ -25,6 +25,7 @@ vim.o.modelines = 5
 --- But we don't want actual folding so `foldlevelstart` is set to a high number.
 vim.o.foldenable = true
 vim.o.foldlevelstart = 99
+vim.o.foldlevel = 99
 
 --- Use System Clipboard
 vim.o.clipboard = "unnamedplus"

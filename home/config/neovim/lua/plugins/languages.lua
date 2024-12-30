@@ -23,9 +23,9 @@ return {
       })
 
       mason_lspconfig.setup_handlers {
-        function(server_name) -- default handler
-          require("lspconfig")[server_name].setup {}
-        end,
+        -- function(server_name) -- default handler
+        --   require("lspconfig")[server_name].setup {}
+        -- end,
 
         -- need to set up lua_ls so it stops whining about global vim
         ["lua_ls"] = function()
@@ -49,38 +49,33 @@ return {
 
       lspconfig.nil_ls.setup({})
       lspconfig.gleam.setup({})
+
       lspconfig.volar.setup({
-        cmd = { "vue-language-server", "--stdio" },
+        filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
         init_options = {
           vue = {
             hybridMode = false,
           },
-          typescript = {
-            tsdk = vim.fn.stdpath("data") .. "/mason/packages/typescript/node_modules/typescript/lib",
-          },
         },
+          -- on_new_config = function(new_config, new_root_dir)
+          --   local lib_path = vim.fs.find('node_modules/typescript/lib', { path = new_root_dir, upward = true})[1]
+          --   if lib_path then
+          --     new_config.typescript.tsdk = lib_path
+          --   end
+          -- end,
+        -- },
+        -- cmd = { "vue-language-server", "--stdio" },
+        -- init_options = {
+        --   vue = {
+        --     hybridMode = false,
+        --   },
+        --   typescript = {
+        --     tsdk = vim.fn.stdpath("data") .. "/mason/packages/vue-language-server/node_modules/typescript/lib",
+        --   },
+        -- },
       })
 
-      lspconfig.ts_ls.setup {
-        init_options = {
-          plugins = {
-            {
-              name = "@vue/typescript-plugin",
-              configNamespace = "typescript",
-              enableForWorkspaceTypeScriptVersions = true,
-              location = require("mason-registry").get_package("vue-language-server"):get_install_path() .. "/node_modules/@vue/language-server/node_modules/@vue/typescript-plugin/",
-              languages = { "javascript", "typescript", "vue" },
-            },
-          },
-        },
-        filetypes = {
-          "javascript",
-          "javascriptreact",
-          "typescript",
-          "typescriptreact",
-          "vue",
-        },
-      }
+      lspconfig.ts_ls.setup {}
 
       -- suppress error messages from lang servers
       ---@diagnostic disable-next-line: duplicate-set-field
