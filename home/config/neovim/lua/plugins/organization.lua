@@ -27,12 +27,6 @@ return {
       })
       -- TODO: Adjust this https://github.com/nvim-orgmode/orgmode/blob/master/DOCS.md#global-mappings with the current state in Emacs
 
-      -- NOTE If you are using nvim-treesitter with ~ensure_installed = "all"~ option
-      -- add ~org~ to ignore_install
-      -- require('nvim-treesitter.configs').setup({
-      --   ensure_installed = 'all',
-      --   ignore_install = { 'org' },
-      -- })
     end,
   },
   {
@@ -68,6 +62,7 @@ return {
       })
     end
   },
+  -- Telescope integration for finding headlines etc.
   {
     "nvim-orgmode/telescope-orgmode.nvim",
     event = "VeryLazy",

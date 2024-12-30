@@ -17,6 +17,8 @@
 
 (package! org-autolist)
 
+(package! khalel)
+
 (package! jest)
 
 (package! svelte-mode)

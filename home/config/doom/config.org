@@ -565,6 +565,38 @@ no modeline.
         (org-capture)))
 #+END_SRC
 
+** Agenda and Time Management
+
+*** Khal / Khalel
+Khal is a  CLI tool for managing calendars and events. It can be synced with
+various services, like Google Calendar, through vdirsyncer.
+
+Khalel is an Emacs package that sits between the CLI and Org mode, allowing for
+easy integration of Khal with Org.
+
+#+begin_src elisp :tangle packages.el
+(package! khalel)
+#+end_src
+
+#+begin_src elisp
+(use-package! khalel
+  :after org
+  :config
+  (khalel-add-capture-template))
+
+(setq khalel-khal-command (shell-command-to-string "printf %s \"$(readlink -f $(which khal))\""))
+(setq khalel-vdirsyncer-command "vdirsyncer")
+
+(setq khalel-capture-key "e")
+(setq khalel-import-org-file (concat org-directory "/" "calendar.org"))
+
+(setq khalel-import-org-file-confirm-overwrite nil)
+
+(setq khalel-import-end-date "+30d")
+
+(khalel-add-capture-template)
+#+end_src
+
 * Workspaces & Projects
 ** Projectile Project Search Path
 
