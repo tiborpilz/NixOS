@@ -138,7 +138,6 @@ return {
   },
 
   -- Status Column
-  --
   {
     "lewis6991/gitsigns.nvim",
     config = function()
@@ -151,7 +150,21 @@ return {
           changedelete = { text = '~' },
           untracked    = { text = '┆' },
         },
+        signs_staged = {
+          add          = { text = '┃' },
+          change       = { text = '┃' },
+          delete       = { text = '_' },
+          topdelete    = { text = '‾' },
+          changedelete = { text = '~' },
+          untracked    = { text = '┆' },
+        },
+        signs_staged_enabled = true,
+        preview_config = {
+          border = { " ", " ", " ", " ", " ", " ", " ", " " },
+        },
       })
+
+      vim.keymap.set("n", "<leader>gB", "<cmd>Gitsigns blame_line<cr>", { desc = "Blame Line" })
     end,
   },
 
