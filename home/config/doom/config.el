@@ -226,6 +226,23 @@
         (set-window-parameter nil 'mode-line-format 'none)
         (org-capture)))
 
+(use-package! khalel
+  :after org
+  :config
+  (khalel-add-capture-template))
+
+(setq khalel-khal-command (shell-command-to-string "printf %s \"$(readlink -f $(which khal))\""))
+(setq khalel-vdirsyncer-command "vdirsyncer")
+
+(setq khalel-capture-key "e")
+(setq khalel-import-org-file (concat org-directory "/" "calendar.org"))
+
+(setq khalel-import-org-file-confirm-overwrite nil)
+
+(setq khalel-import-end-date "+30d")
+
+(khalel-add-capture-template)
+
 (setq projectile-project-search-path '(("~/Code/" . 1)))
 
 (setq +workspaces-on-switch-project-behavior nil)

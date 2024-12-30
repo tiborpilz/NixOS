@@ -84,6 +84,11 @@ with mylib;
 
       # Git Repo information
       onefetch
+
+      # CLI Calendar
+      khal
+      khard
+      vdirsyncer
     ];
 
     modules.shell.zsh.fpathDirs = ''
