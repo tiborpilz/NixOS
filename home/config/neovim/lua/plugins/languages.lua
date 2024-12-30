@@ -43,7 +43,6 @@ return {
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
       "neovim/nvim-lspconfig",
-      "jay-babu/mason-null-ls.nvim",
       "jay-babu/mason-nvim-dap.nvim",
       "rcarriga/nvim-dap-ui",
       "mfussenegger/nvim-dap",
@@ -72,25 +71,6 @@ return {
 
       require("mason-lock").setup({
         lockfile_path = vim.fn.stdpath("config") .. "/mason-lock.json", -- (default)
-      })
-
-      require("mason-null-ls").setup({
-        ensure_installed = {},
-        automatic_installation = { exclude = { "stylua", "gitsigns" } },
-        handlers = {},
-      })
-
-      require("null-ls").setup({
-        sources = {
-          -- Anything not supported by mason.
-          require("null-ls").builtins.formatting.stylua,
-          require("null-ls").builtins.code_actions.gitsigns,
-          require("null-ls").builtins.diagnostics.zsh,
-          -- Anythng not supported by none-ls.
-          require("none-ls.diagnostics.eslint_d"),
-          require("none-ls.formatting.eslint_d").with({ timeout = 5000 }),
-          require("none-ls.code_actions.eslint_d"),
-        },
       })
 
       require("lazydev").setup({
@@ -276,31 +256,9 @@ return {
   -- LSP Signatures
   {
     "ray-x/lsp_signature.nvim",
-    setup = function()
-      require('lsp_signature').setup({
-        bind = true,
-        floating_window = false,
-        doc_lines = 2,
-        use_lspsaga = true,
-        padding = ' ',
-        shadow_blend = 36,
-        floating_window_above_cur_line = true,
-        handler_opts = {
-          border = "none"
-        }
-      })
-
-      vim.api.nvim_create_autocmd("LspAttach", {
-        callback = function(args)
-          local bufnr = args.buf
-          local client = vim.lsp.get_client_by_id(args.data.client_id)
-          if vim.tbl_contains({ 'null-ls' }, client.name) then -- blacklist lsp
-            return
-          end
-          require("lsp_signature").on_attach({}, bufnr)
-        end,
-      })
-    end,
+    event = "VeryLazy",
+    opts = { },
+    config = function(_, opts) require'lsp_signature'.setup(opts) end
   },
 
   -- Treesitter
@@ -318,7 +276,8 @@ return {
           "tsx",
           "rust",
           "lua",
-          "vim"
+          "vim",
+          "gleam"
         },
 
         -- Install parsers asynchronously...

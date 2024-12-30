@@ -5,6 +5,10 @@ vim.keymap.set("n", "<leader>cf", ":Format<CR>", { desc = "Format Buffer" })
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 
+-- Limit height of floating windows
+
+vim.opt.pumheight = 10
+
 return {
   -- Comments
   { "tpope/vim-commentary" },
@@ -36,13 +40,6 @@ return {
     end,
   },
 
-  -- {
-  --   "onsails/lspkind-nvim",
-  --   config = function()
-  --     require("lspkind").init()
-  --   end,
-  -- },
-  -- Autocompletion
   {
     "hrsh7th/nvim-cmp",
     dependencies = {
@@ -56,7 +53,7 @@ return {
       cmp.setup({
         window = {
           completion = cmp.config.window.bordered({
-            border = { " ", " ", " ", " ", " ", " ", " ", " " },
+            border = "none",
             winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
           }),
           documentation = cmp.config.window.bordered({
@@ -76,7 +73,7 @@ return {
           { name = 'nvim_lsp' },
         },
         formatting = {
-          fields = { "abbr", "kind" },
+          fields = { "abbr", "kind", "menu" },
           expandable_indicator = false,
           format = lspkind.cmp_format({
             mode = "symbol_text",
@@ -86,7 +83,6 @@ return {
       })
     end,
   },
-  -- { "hrsh7th/cmp-nvim-lsp" },
 
   -- Tree-like undo history
   {
@@ -100,8 +96,8 @@ return {
         desc = "Toggle Undo Tree",
       },
     },
-    setup = function()
-      vim.g.undotree_WindowLayout = 3 -- Right hand side
+    config = function()
+      vim.g.undotree_WindowLayout = 1 -- Left hand side
       vim.g.undotree_SetFocusWhenToggle = 1
     end,
   },
