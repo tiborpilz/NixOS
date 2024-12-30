@@ -74,22 +74,12 @@ return {
   },
   { "hrsh7th/cmp-nvim-lsp" },
 
-  -- Run Snippets
-  -- TODO: set up correctly
-  {
-    "michaelb/sniprun",
-    build = "sh install.sh",
-    config = function()
-      require("sniprun").setup({})
-    end,
-  },
-
   -- Tree-like undo history
   {
     "mbbill/undotree",
     keys = {
       {
-        "<leader>su",
+        "<leader>ou",
         function()
           vim.cmd(":UndotreeToggle")
         end,
