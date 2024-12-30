@@ -10,14 +10,14 @@ return {
       local telescope = require("telescope")
       telescope.setup({
         defaults = {
-          prompt_prefix =" ",
+          prompt_prefix = "> ",
           entry_prefix = " ",
           selection_caret = " ",
-          borderchars = {
-            prompt = { " ", " ", " ", " ", " ", " ", " ", " " },
-            results = { " ", " ", " ", " ", " ", " ", " ", " " },
-            preview = { " ", " ", " ", " ", " ", " ", " ", " " },
-          },
+          -- borderchars = {
+          --   prompt = { " ", " ", " ", " ", " ", " ", " ", " " },
+          --   results = { " ", " ", " ", " ", " ", " ", " ", " " },
+          --   preview = { " ", " ", " ", " ", " ", " ", " ", " " },
+          -- },
           border = {
             prompt = { 1, 1, 1, 1 },
             results = { 1, 1, 1, 1 },
