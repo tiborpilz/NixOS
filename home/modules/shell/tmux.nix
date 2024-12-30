@@ -84,7 +84,7 @@ in
         set -g renumber-windows on
 
         # Status Bar
-        set -g status-position bottom
+        set -g status-position top
         set -g status-justify left
         set -g status-style bg=default,fg=colour4
 
@@ -94,7 +94,7 @@ in
 
 
         set -g pane-border-format ""
-        set -g pane-border-status bottom
+        set -g pane-border-status top
         set -g pane-border-lines single
         set -g pane-border-style 'fg=colour0'
 
@@ -116,9 +116,7 @@ in
         set -g status-left-length 40
         set -g status-left '#(cat #{socket_path}-\#{session_id}-vimbridge) #[fg=colour4]  #S #[default]'
 
-        set -g status-c
-
-        set -g status-right-length 120
+        set -g status-right-length u20
 
         # status_starship="#(${pkgs.starship}/bin/starship  prompt | head -n2 | tail -n1 | xargs ${pkgs.my.ansi2tmux}/bin/ansi2tmux"
         # set -g status-right "$status_starship"

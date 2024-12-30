@@ -34,56 +34,84 @@ return {
       nord_theme_custom.normal.c.bg = 'none'
       nord_theme_custom.inactive.c.bg = 'none'
 
+      local mode_map = {
+        ['NORMAL'] = 'N',
+        ['O-PENDING'] = 'N?',
+        ['INSERT'] = 'I',
+        ['VISUAL'] = 'V',
+        ['V-BLOCK'] = 'VB',
+        ['V-LINE'] = 'VL',
+        ['V-REPLACE'] = 'VR',
+        ['REPLACE'] = 'R',
+        ['COMMAND'] = '!',
+        ['SHELL'] = 'SH',
+        ['TERMINAL'] = 'T',
+        ['EX'] = 'X',
+        ['S-BLOCK'] = 'SB',
+        ['S-LINE'] = 'SL',
+        ['SELECT'] = 'S',
+        ['CONFIRM'] = 'Y?',
+        ['MORE'] = 'M',
+      }
 
       require('lualine').setup({
         options = {
           theme = nord_theme_custom,
-          section_separators = { left = '', right = '' },
-          component_separators = { left = '', right = '' },
+          section_separators = { left = ' ', right = ' ' },
+          component_separators = { left = ' ', right = ' ' },
           globalstatus = false,
         },
         sections = {
-          lualine_a = { 'mode' },
-          lualine_b = { 'branch' },
-          lualine_c = { 'filename' },
+          lualine_a = { },
+          lualine_b = { },
+          lualine_c = { },
           lualine_x = {
             'overseer',
-            'filetype',
-            'location',
+            {
+              'filename',
+              path = 4,
+              symbols = {
+                modified = '',
+                readonly = '',
+                unnamed = '',
+                newfile = '',
+              },
+            },
+          },
+          lualine_y = {
+            'branch',
             {
               'diagnostics',
 
-              -- Table of diagnostic sources, available sources are:
-              --   'nvim_lsp', 'nvim_diagnostic', 'nvim_workspace_diagnostic', 'coc', 'ale', 'vim_lsp'.
-              -- or a function that returns a table as such:
-              --   { error=error_cnt, warn=warn_cnt, info=info_cnt, hint=hint_cnt }
               sources = { 'nvim_lsp', 'nvim_diagnostic' },
-
-              -- Displays diagnostics for the defined severity types
               sections = { 'error', 'warn', 'info', 'hint' },
 
               diagnostics_color = {
-                -- Same values as the general color option can be used here.
                 error = 'DiagnosticError', -- Changes diagnostics' error color.
-
                 info  = 'DiagnosticInfo',  -- Changes diagnostics' info color.
                 hint  = 'DiagnosticHint',  -- Changes diagnostics' hint color.
               },
               symbols = { error = '', warn = '', info = '', hint = '' },
               colored = true,          -- Displays diagnostics status in color if set to true.
               update_in_insert = true, -- Update diagnostics in insert mode.
-              always_visible = true,   -- Show diagnostics even if there are none.
+              always_visible = false,   -- Show diagnostics even if there are none.
             },
           },
-          lualine_y = {},
-          lualine_z = {},
+          lualine_z = {
+            {
+              'mode',
+              fmt = function(mode)
+                return mode_map[mode] or mode
+              end,
+            },
+          },
         },
         inactive_sections = {
           lualine_a = {},
           lualine_b = {},
-          lualine_c = { 'filename' },
+          lualine_c = {},
           lualine_x = {},
-          lualine_y = {},
+          lualine_y = { 'filename' },
           lualine_z = {},
         },
         extensions = {
