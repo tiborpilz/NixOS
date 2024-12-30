@@ -1,3 +1,26 @@
+-- LSP Keymaps
+vim.keymap.set('n', '<Leader>cg', '<cmd>lua vim.lsp.buf.hover()<cr>', { desc = 'Show hover information' })
+-- vim.keymap.set('n', '<Leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', { desc = 'Show code actions' })
+vim.keymap.set('n', '<Leader>cr', '<cmd>lua vim.lsp.buf.rename()<cr>', { desc = 'Rename symbol' })
+vim.keymap.set({ 'n', 'x' }, '<Leader>cf', '<cmd>lua vim.lsp.buf.format({async = true})<cr>',
+{ desc = 'Format code' })
+-- Hide diagnostic float per default
+vim.diagnostic.config({ virtual_text = false })
+-- Bind diagnostic to <Leader> c e
+vim.keymap.set('n', '<Leader>ce', '<cmd>lua vim.diagnostic.open_float(nil, {focus=false})<CR>',
+{ desc = 'Open Diagnostic Float', noremap = true, silent = true })
+
+vim.keymap.set('n', '<Leader>cd', '<cmd>lua vim.lsp.buf.definition()<cr>', { desc = 'Go to definition' })
+vim.keymap.set('n', '<Leader>cD', '<cmd>lua vim.lsp.buf.declaration()<cr>', { desc = 'Go to declaration' })
+vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', { desc = 'Go to definition' })
+vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', { desc = 'Go to declaration' })
+
+-- Set border for LSP Hover
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
+  vim.lsp.handlers.hover,
+  { border = { " ", " ", " ", " ", " ", " ", " ", " " } }
+)
+
 return {
   -- Mason for installing LSP servers
   -- {
@@ -49,42 +72,42 @@ return {
         lockfile_path = vim.fn.stdpath("config") .. "/mason-lock.json", -- (default)
       })
 
-      require("mason-null-ls").setup({
-        ensure_installed = {},
-        automatic_installation = { exclude = { "stylua", "gitsigns" } },
-        handlers = {},
-      })
+      -- require("mason-null-ls").setup({
+      --   ensure_installed = {},
+      --   automatic_installation = { exclude = { "stylua", "gitsigns" } },
+      --   handlers = {},
+      -- })
 
-      require("null-ls").setup({
-        sources = {
-          -- Anything not supported by mason.
-          require("null-ls").builtins.formatting.stylua,
-          require("null-ls").builtins.code_actions.gitsigns,
-          require("null-ls").builtins.diagnostics.zsh,
-          require("null-ls").builtins.diagnostics.selene,
-          -- Anythng not supported by none-ls.
-          require("none-ls.diagnostics.eslint_d"),
-          require("none-ls.formatting.eslint_d").with({ timeout = 5000 }),
-          require("none-ls.code_actions.eslint_d"),
-        },
-        -- Format on save using null-ls instead of lsp server.
-        on_attach = function(current_client, bufnr)
-          if current_client.supports_method("textDocument/formatting") then
-            vim.api.nvim_create_autocmd("BufWritePre", {
-              group = augroup,
-              buffer = bufnr,
-              callback = function()
-                vim.lsp.buf.format({
-                  filter = function(client)
-                    return client.name == "null-ls"
-                  end,
-                  bufnr = bufnr,
-                })
-              end,
-            })
-          end
-        end,
-      })
+      -- require("null-ls").setup({
+      --   sources = {
+      --     -- Anything not supported by mason.
+      --     require("null-ls").builtins.formatting.stylua,
+      --     require("null-ls").builtins.code_actions.gitsigns,
+      --     require("null-ls").builtins.diagnostics.zsh,
+      --     require("null-ls").builtins.diagnostics.selene,
+      --     -- Anythng not supported by none-ls.
+      --     require("none-ls.diagnostics.eslint_d"),
+      --     require("none-ls.formatting.eslint_d").with({ timeout = 5000 }),
+      --     require("none-ls.code_actions.eslint_d"),
+      --   },
+      --   -- Format on save using null-ls instead of lsp server.
+      --   on_attach = function(current_client, bufnr)
+      --     if current_client.supports_method("textDocument/formatting") then
+      --       vim.api.nvim_create_autocmd("BufWritePre", {
+      --         group = augroup,
+      --         buffer = bufnr,
+      --         callback = function()
+      --           vim.lsp.buf.format({
+      --             filter = function(client)
+      --               return client.name == "null-ls"
+      --             end,
+      --             bufnr = bufnr,
+      --           })
+      --         end,
+      --       })
+      --     end
+      --   end,
+      -- })
 
       require("lazydev").setup({
         library = vim.api.nvim_get_runtime_file("", true),
