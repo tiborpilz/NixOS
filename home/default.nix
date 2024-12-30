@@ -35,6 +35,9 @@ with mylib;
       # GNU Parallel my beloved
       parallel
 
+      # Download stuff boi
+      wget
+
       # graphs in the terminal
       youplot
 
@@ -72,6 +75,15 @@ with mylib;
       # Haskell
       cabal-install
       ghc
+
+      # Image to Ascii
+      ascii-image-converter
+
+      # Text to 3D Ascii Text
+      figlet
+
+      # Git Repo information
+      onefetch
     ];
 
     modules.shell.zsh.fpathDirs = ''
