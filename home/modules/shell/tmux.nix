@@ -63,6 +63,7 @@ in
 
         # Attach current directory to session
         bind a attach -c "#{pane_current_path}"
+        # bind a run-shell "SESSION_NAME=\$(basename '#{pane_current_path}'); tmux rename-session \"\$SESSION_NAME\" ; tmux attach -c '#{pane_current_path}' >/dev/null"
 
         # Use tmux-fzf to switch sessions
         bind-key S run-shell -b "${pkgs.tmuxPlugins.tmux-fzf}/share/tmux-plugins/tmux-fzf/scripts/session.sh switch"
@@ -116,10 +117,7 @@ in
         set -g status-left-length 40
         set -g status-left '#(cat #{socket_path}-\#{session_id}-vimbridge) #[fg=colour4]  #S #[default]'
 
-        set -g status-right-length u20
-
-        # status_starship="#(${pkgs.starship}/bin/starship  prompt | head -n2 | tail -n1 | xargs ${pkgs.my.ansi2tmux}/bin/ansi2tmux"
-        # set -g status-right "$status_starship"
+        set -g status-right-length 120
 
         # TODO: get toggle working
         status_git="#(${pkgs.gitmux}/bin/gitmux -cfg $HOME/.config/gitmux/gitmux.conf #{pane_current_path}) #[fg=colour4] | #(date +%H:%M)"
