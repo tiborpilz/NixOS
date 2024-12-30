@@ -181,9 +181,6 @@ return {
     end
   },
 
-  -- Messages, Cmdline & Popupmenu replacement
-  -- { "folke/noice.nvim" },
-
   -- Screenkey
   {
     "NStefan002/screenkey.nvim",
