@@ -61,26 +61,26 @@ return {
         },
       })
 
-      -- lspconfig.ts_ls.setup {
-      --   init_options = {
-      --     plugins = {
-      --       {
-      --         name = "@vue/typescript-plugin",
-      --         configNamespace = "typescript",
-      --         enableForWorkspaceTypeScriptVersions = true,
-      --         location = require("mason-registry").get_package("vue-language-server"):get_install_path() .. "/node_modules/@vue/language-server/node_modules/@vue/typescript-plugin/",
-      --         languages = { "javascript", "typescript", "vue" },
-      --       },
-      --     },
-      --   },
-      --   filetypes = {
-      --     "javascript",
-      --     "javascriptreact",
-      --     "typescript",
-      --     "typescriptreact",
-      --     "vue",
-      --   },
-      -- }
+      lspconfig.ts_ls.setup {
+        init_options = {
+          plugins = {
+            {
+              name = "@vue/typescript-plugin",
+              configNamespace = "typescript",
+              enableForWorkspaceTypeScriptVersions = true,
+              location = require("mason-registry").get_package("vue-language-server"):get_install_path() .. "/node_modules/@vue/language-server/node_modules/@vue/typescript-plugin/",
+              languages = { "javascript", "typescript", "vue" },
+            },
+          },
+        },
+        filetypes = {
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact",
+          "vue",
+        },
+      }
 
       -- suppress error messages from lang servers
       ---@diagnostic disable-next-line: duplicate-set-field
@@ -111,14 +111,12 @@ return {
       vim.diagnostic.config({ virtual_text = false })
       -- Bind diagnostic to <Leader> c e
       vim.keymap.set('n', '<Leader>ce', '<cmd>lua vim.diagnostic.open_float(nil, {focus=false})<CR>',
-        { noremap = true, silent = true })
+        { desc = 'Open Diagnostic Float', noremap = true, silent = true })
 
       vim.keymap.set('n', '<Leader>cd', '<cmd>lua vim.lsp.buf.definition()<cr>', { desc = 'Go to definition' })
       vim.keymap.set('n', '<Leader>cD', '<cmd>lua vim.lsp.buf.declaration()<cr>', { desc = 'Go to declaration' })
       vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', { desc = 'Go to definition' })
       vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', { desc = 'Go to declaration' })
-      vim.keymap.set('n', '<Leader>cx', '<cmd>lua vim.diagnostic.open_float(nil, {focus=false})<CR>',
-        { noremap = true, silent = true })
     end,
   },
 
@@ -243,18 +241,4 @@ return {
 
   --- Nix
   { "LnL7/vim-nix" },
-
-  -- Run Snippets
-  -- TODO: set up correctly
-  {
-    "michaelb/sniprun",
-    build = "sh install.sh",
-    config = function()
-      require("sniprun").setup({})
-
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities.textDocument.completion.completionItem.snippetSupport = true
-    end,
-  },
-
 }

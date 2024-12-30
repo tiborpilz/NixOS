@@ -1,5 +1,5 @@
 return {
-  {"vimwiki/vimwiki"},
+  -- {"vimwiki/vimwiki"},
   -- {
   --   "nvim-neorg/neorg",
   --   lazy = false,
