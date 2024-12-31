@@ -1,4 +1,7 @@
-# ### Simple transient prompt
+# My current, transient zsh prompt.
+# In the left prompt, it shows only a prompt symbol with the return status.
+# Everything else is shown in the right prompt and is updated asynchronously (as well
+# as removed from the left prompt) when the prompt is redrawn.
 
 [[ -c /dev/null ]]  ||  return
 zmodload zsh/system ||  return
@@ -55,11 +58,11 @@ function venv_prompt() {
 }
 
 function get_left_prompt() {
-    echo '%{$fg_bold[white]%}$(get_pwd)%{$reset_color%} $ret_status '
+    echo '$ret_status '
 }
 
 function get_right_prompt() {
-    echo '$(nix_shell_prompt)$(venv_prompt) $(git_prompt_info)'
+    echo '%{$fg_bold[white]%}$(get_pwd)%{$reset_color%} $(nix_shell_prompt)$(venv_prompt) $(git_prompt_info)'
 }
 
 zle -N send-break _transient_prompt_widget-send-break
