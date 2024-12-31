@@ -322,6 +322,10 @@ return {
     end
   },
 
+  --  Increase TS error messages
+  { 'dmmulroy/ts-error-translator.nvim' },
+
+
   --- Terraform
   { "hashivim/vim-terraform" },
 
