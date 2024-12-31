@@ -14,6 +14,8 @@ in
   config = mkIf cfg.enable {
     home.packages = [
       pkgs.gitmux
+      pkgs.sesh
+      pkgs.smug
     ];
     programs.tmux = {
       enable = true;
@@ -61,6 +63,7 @@ in
         # bind a run-shell "SESSION_NAME=\$(basename '#{pane_current_path}'); tmux rename-session \"\$SESSION_NAME\" ; tmux attach -c '#{pane_current_path}' >/dev/null"
 
         # Use tmux-fzf to switch sessions
+        r
         bind-key S run-shell -b "${pkgs.tmuxPlugins.tmux-fzf}/share/tmux-plugins/tmux-fzf/scripts/session.sh switch"
 
         # Use tmux-fzf to switch windows
