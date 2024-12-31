@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+# Get the list of smug projects
+smug_projects=$(smug list | tr . _)
+
+PROJECTS_DIR=${PROJECTS_DIR:-~/Code}
+
+
+# Get te list of projects
+project_dirs() {
+  find "$PROJECTS_DIR" -mindepth 1 -maxdepth 2 -name .git -type d -prune -exec dirname {} \; | sort | xargs -L 1 basename
+}
+
+# export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --color=always -E .git --ignore-file ~/.gitignoreiu'
+# export FZF_DEFAULT_OPTS="--height=80% --margin=2 --padding=4"
+# export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+#     --color=fg:#e5e9f0,bg:#3b4252,hl:#81a1c1
+#     --color=fg+:#e5e9f0,bg+:#3b4252,hl+:#81a1c1
+#     --color=info:#eacb8a,prompt:#bf6069,pointer:#b48dac
+#     --color=marker:#a3be8b,spinner:#b48dac,header:#a3be8b'
+# export TMUX_FZF_ORDER="session|window|keybinding|clipboard"
+
+export FZF_DEFAULT_OPTS='--color=bg+:#D9D9D9,bg:#E1E1E1,border:#C8C8C8,spinner:#719899,hl:#719872,fg:#616161,header:#719872,info:#727100,pointer:#E12672,marker:#E17899,fg+:#616161,preview-bg:#D9D9D9,prompt:#0099BD,hl+:#719899'
+# export TMUX_FZF_PREVIEW=0
+# export TMUX_FZF_PREVIEW_FOLLOW=0
+
+
+if [[ $# -eq 1 ]]; then
+    selected=$1
+else
+
+  query=${1:-''}
+
+  query=${query%/} # Remove trailing slash
+
+  selected=$PROJECTS_DIR/$(project_dirs | fzf --tmux 70%,70% --highlight-line --no-scrollbar --inline-info --pointer="" --border "horizontal" --ansi --query "$query" --preview "if [ -f \"${PROJECTS_DIR}\"/{}/README.md ]; then CLICOLOR_FORCE=0 COLORTERM=truecolor glow \"${PROJECTS_DIR}\"/{}/README.md --style=light; else ls \"${PROJECTS_DIR}\"/{}; fi")
+fi
+
+# if [[ -z $selected ]]; then
+#     exit 0
+# fi
+
+# selected_name=$(basename "$selected" | tr . _)
+
+# # Check if the selected project is in the smug list
+# if echo "$smug_projects" | grep -q "^$selected_name$"; then
+#     # If it's a smug project, start it with smug
+#     smug start "$selected_name" --attach
+# else
+#     # If it's not a smug project, use the original tmux logic
+#     tmux_running=$(pgrep tmux)
+
+#     if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
+#         tmux new-session -s "$selected_name" -c $selected
+#         exit 0
+#     fi
+
+#     if ! tmux has-session -t="$selected_name" 2>/dev/null; then
+#         tmux new-session -ds "$selected_name" -c "$selected"
+#     fi
+
+#     tmux switch-client -t "$selected_name"
+# fikjjkBBBB
