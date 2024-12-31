@@ -28,5 +28,6 @@ in
     '';
 
     modules.shell.zsh.aliases.ccd = ". $(which codedirs)";
+    modules.shell.zsh.aliases.gw = ". $(which gotoworkspace)";
   };
 }
