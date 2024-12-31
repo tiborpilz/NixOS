@@ -157,6 +157,10 @@ with mylib;
     # without having to create a new module for every one
     modules.editors.lsp.enable = true;
 
+    # TODO: Create idiomatic NixOS module for Neovim
+    home.sessionVariables.EDITOR = "nvim";
+
+
     modules.tools.vagrant.enable = false;
     modules.tools.podman.enable = true;
 

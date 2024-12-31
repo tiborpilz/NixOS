@@ -27,8 +27,6 @@ in
 
     services.emacs.enable = lib.mkIf (pkgs.stdenv.hostPlatform.isLinux) true;
 
-    home.sessionVariables.EDITOR = "${pkgs.my.emacsWrapped}/bin/emacsclient";
-
     home.packages = with pkgs; [
       # emacsWithNativeComp
 

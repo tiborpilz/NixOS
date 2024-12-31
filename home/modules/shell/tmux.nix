@@ -63,7 +63,6 @@ in
         # bind a run-shell "SESSION_NAME=\$(basename '#{pane_current_path}'); tmux rename-session \"\$SESSION_NAME\" ; tmux attach -c '#{pane_current_path}' >/dev/null"
 
         # Use tmux-fzf to switch sessions
-        r
         bind-key S run-shell -b "${pkgs.tmuxPlugins.tmux-fzf}/share/tmux-plugins/tmux-fzf/scripts/session.sh switch"
 
         # Use tmux-fzf to switch windows
@@ -167,35 +166,39 @@ in
       };
     };
 
-    modules.shell.zsh.rcInit = ''
-        # autoload -U add-zsh-hook
-
-        # get_raw_starship_prompt() {
-        #   ${pkgs.starship}/bin/starship prompt | head -n2 | tail -n1
-        # }
-
-        # refresh_tmux_starship() {
-        #   # Early return if not TMUX
-        #   if [[ -z "$TMUX" ]]; then
-        #     return
-        #   fi
-
-        #   delay=''${1:-0}
-        #   sleep $delay
-        #   tmux set -g status-right "$(get_raw_starship_prompt | xargs ${pkgs.my.ansi2tmux}/bin/ansi2tmux))"
-        # }
-
-        # export PERIOD=1
-        # add-zsh-hook chpwd refresh_tmux_starship
-        # add-zsh-hook precmd refresh_tmux_starship
-        # add-zsh-hook periodic refresh_tmux_starship
-    '';
-
     home.sessionVariables = {
       TMUX_HOME = "${config.home.sessionVariables.XDG_CONFIG_HOME}/tmux";
       TMUXIFIER = "${config.home.sessionVariables.XDG_CONFIG_HOME}/tmuxifier";
       TMUXIFIER_LAYOUT_PATH = "${config.home.sessionVariables.XDG_CONFIG_HOME}/tmuxifier";
       TMUX_FZF_OPTIONS = "-p -w 75% -h 66% -m";
     };
+
+
+    # Template for Smug (inofficial tmuxifier successor)
+
+    xdg.configFile."smug/nixos_template.yml.bak" = {
+      text = ''
+        sendkeys_timeout: 0
+        session: "0"
+        tmux_options:
+          socket_name: ""
+          socket_path: ""
+          config_file: ""
+        env: {}
+        root: ""
+        before_start: []
+        stop: []
+        windows:
+        - name: Editor
+          root: ~/Code/NixOS // Make sure to adjust this path
+          before_start: []
+          commands: [$EDITOR]
+        - name: Shell
+          root: ~/{home.username}/Code/NixOS
+          commands: []
+      '';
+
+    };
+
   };
 }
