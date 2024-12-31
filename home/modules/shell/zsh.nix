@@ -47,7 +47,6 @@ in
       zsh-completions
       zsh-syntax-highlighting
       nix-zsh-completions
-      eza # drop-in replacement for ls
       fd
       fzf
       jq
