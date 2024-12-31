@@ -78,3 +78,7 @@ if [[ $TERM != dumb  ]]; then
   fi
   source <(kubectl completion zsh)
 fi
+
+# Initialize zoxide
+# TODO: Once we get rid of the non-home-assistant zshrc, stuff like this should be also taken care of.
+source <(zoxide init zsh)
