@@ -58,6 +58,9 @@ in
         # Actually copy to clipboard (on Linux)
         bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
 
+        # Switch to (another) workspace
+        bind g gotoworkspace
+
         # Attach current directory to session
         bind a attach -c "#{pane_current_path}"
         # bind a run-shell "SESSION_NAME=\$(basename '#{pane_current_path}'); tmux rename-session \"\$SESSION_NAME\" ; tmux attach -c '#{pane_current_path}' >/dev/null"
