@@ -20,15 +20,7 @@ vim.o.errorbells = false
 vim.o.autoread = true
 vim.o.modeline = true
 vim.o.modelines = 5
-
---- To not fold everything on the first `zc`, `foldenable` needs to be enabled.
---- But we don't want actual folding so `foldlevelstart` is set to a high number.
-vim.o.foldenable = true
-vim.o.foldlevelstart = 99
-vim.o.foldlevel = 99
-
---- Use System Clipboard
-vim.o.clipboard = "unnamedplus"
+vim.o.foldenable = false
 
 --- Persistent undo
 vim.o.undofile = true
@@ -40,7 +32,6 @@ vim.wo.number = true
 --- Enable syntax highlighting
 vim.cmd("syntax enable")
 
-vim.opt.signcolumn = "yes"
 --- Smoother update
 vim.o.updatetime = 1000
 
@@ -72,11 +63,4 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({
-  {
-    import = "plugins",
-    change_detection = {
-      notify = false,
-    },
-  },
-})
+require("lazy").setup("plugins")
