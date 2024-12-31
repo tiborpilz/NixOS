@@ -5,12 +5,12 @@ return {
       delay = 300,
       loop = true,
       win = {
-        border = "none",
-        height = { min = 1, max = 10 },
+        border = { " ", " ", " ", " ", " ", " ", " ", " " },
+        height = { min = 3, max = 10 },
         padding = { 4, 4 },
         title_pos = "center",
-        col = 1,
-        title = false,
+        col = 0.5,
+        title = true,
       },
       plugins = {
         marks = true,
@@ -37,7 +37,8 @@ return {
       preset = "modern",
       layout = {
         align = "center",
-        spacing = 3,
+        spacing = 2,
+        height = { min = 1 },
       },
     },
     config = function(_, opts)

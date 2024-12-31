@@ -3,12 +3,12 @@ vim.keymap.set('n', '<Leader>cg', '<cmd>lua vim.lsp.buf.hover()<cr>', { desc = '
 -- vim.keymap.set('n', '<Leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', { desc = 'Show code actions' })
 vim.keymap.set('n', '<Leader>cr', '<cmd>lua vim.lsp.buf.rename()<cr>', { desc = 'Rename symbol' })
 vim.keymap.set({ 'n', 'x' }, '<Leader>cf', '<cmd>lua vim.lsp.buf.format({async = true})<cr>',
-{ desc = 'Format code' })
+  { desc = 'Format code' })
 -- Hide diagnostic float per default
 vim.diagnostic.config({ virtual_text = false })
 -- Bind diagnostic to <Leader> c e
 vim.keymap.set('n', '<Leader>ce', '<cmd>lua vim.diagnostic.open_float(nil, {focus=false})<CR>',
-{ desc = 'Open Diagnostic Float', noremap = true, silent = true })
+  { desc = 'Open Diagnostic Float', noremap = true, silent = true })
 
 vim.keymap.set('n', '<Leader>cd', '<cmd>lua vim.lsp.buf.definition()<cr>', { desc = 'Go to definition' })
 vim.keymap.set('n', '<Leader>cD', '<cmd>lua vim.lsp.buf.declaration()<cr>', { desc = 'Go to declaration' })
@@ -63,10 +63,10 @@ return {
           "eslint",
           "eslint_d",
         },
-        auto_update = true, -- Default: false
+        auto_update = true,  -- Default: false
         run_on_start = true, -- Default: true
-        start_delay = 1000, -- 1 second delay ( Default: 0 )
-        debounce_hours = 1, -- at least 1 hour between attempts to install/update
+        start_delay = 1000,  -- 1 second delay ( Default: 0 )
+        debounce_hours = 1,  -- at least 1 hour between attempts to install/update
       })
 
       require("mason-lock").setup({
@@ -253,14 +253,6 @@ return {
     end,
   },
 
-  -- LSP Signatures
-  {
-    "ray-x/lsp_signature.nvim",
-    event = "VeryLazy",
-    opts = { },
-    config = function(_, opts) require'lsp_signature'.setup(opts) end
-  },
-
   -- Treesitter
   {
     "nvim-treesitter/nvim-treesitter",
@@ -320,6 +312,15 @@ return {
     },
   },
   { "nvim-telescope/telescope-dap.nvim" },
+
+  -- Web dev stuff
+  {
+    "roobert/tailwindcss-colorizer-cmp.nvim",
+    -- optionally, override the default options:
+    config = function()
+      require("tailwindcss-colorizer-cmp").setup()
+    end
+  },
 
   --- Terraform
   { "hashivim/vim-terraform" },

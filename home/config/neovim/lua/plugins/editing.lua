@@ -46,10 +46,14 @@ return {
       { "hrsh7th/cmp-nvim-lsp" },
       { "onsails/lspkind-nvim" },
       { "sudo-burger/cmp-org-roam", dependencies = { 'chipsenkbeil/org-roam.nvim' } },
+      { "brenoprata10/nvim-highlight-colors" },
     },
     config = function()
       local cmp = require("cmp")
       local lspkind = require("lspkind")
+      local highlight_colors = require("nvim-highlight-colors")
+
+      highlight_colors.setup({})
 
       cmp.setup({
         window = {
@@ -76,10 +80,22 @@ return {
         formatting = {
           fields = { "abbr", "kind", "menu" },
           expandable_indicator = false,
-          format = lspkind.cmp_format({
-            mode = "symbol_text",
-            preset = "codicons",
-          }),
+          format = function(entry, item)
+            -- Check Tailwind first
+            local tw_item = require("tailwindcss-colorizer-cmp").formatter(entry, item)
+            if tw_item.kind == "XX" then
+              return tw_item
+            end
+
+            local color_item = highlight_colors.format(entry, { kind = item.kind })
+
+            item = lspkind.cmp_format({ mode = "symbol_text", preset = "codicons"})(entry, item)
+            if color_item.abbr1_hl_group then
+              item.kind_hl_group = color_item.abbr_hl_group
+              item.kind = color_item.abbr
+            end
+            return item
+          end
         },
       })
 

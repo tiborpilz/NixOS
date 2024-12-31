@@ -10,6 +10,11 @@ vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSig
 
 -- vim.diagnostic.config { float = { border = "" } }
 
+
+test_function = function(a, b, long_one, c)
+  return a
+end
+
 vim.g.tpipeline_autoembed = 0
 
 return {
@@ -103,7 +108,6 @@ return {
           },
           lualine_y = {
             { 'b:gitsigns_head', icon = '' },
-            -- { 'branch', icon = '' },
           },
           lualine_z = {
             {
@@ -184,7 +188,13 @@ return {
       require('nordic').load()
     end
   },
-
+  --- Icons
+  {
+    'echasnovski/mini.icons',
+    config = function()
+      require('mini.icons').setup()
+    end,
+  },
   -- Screenkey
   {
     "NStefan002/screenkey.nvim",
@@ -203,4 +213,5 @@ return {
       })
     end,
   },
+
 }

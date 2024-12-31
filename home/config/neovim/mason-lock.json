@@ -9,6 +9,7 @@
   "node-debug2-adapter": "v1.43.0",
   "rnix-lsp": "0.2.5",
   "shellcheck": "v0.10.0",
+  "tailwindcss-language-server": "0.0.27",
   "typescript-language-server": "4.3.3",
   "vue-language-server": "2.2.0"
 }
