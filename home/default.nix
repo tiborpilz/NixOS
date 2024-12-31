@@ -54,6 +54,15 @@ with mylib;
       # bat is a better cat (as a program, at least)
       bat
 
+      # Dust is a better version of du
+      dust
+
+      # Eza is a better version of ls
+      eza
+
+      # fd is a better version of find
+      fd
+
       # mob.sh - git-powered pair/mob programming tool
       mob
 
@@ -89,6 +98,10 @@ with mylib;
       khal
       khard
       vdirsyncer
+
+      # better man page replacements
+      tldr # tldr pages
+      cheat # cheat sheets
     ];
 
     modules.shell.zsh.fpathDirs = ''
@@ -111,6 +124,8 @@ with mylib;
 
     modules.shell.zsh.enable = true;
     modules.shell.zsh.aliases.ungron = "gron --ungron";
+
+    modules.shell.zoxide.enable = true;
 
     modules.shell.tmux.enable = true;
     modules.shell.gnupg = {
