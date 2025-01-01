@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# TODO: Maybe Integrate sesh instead of smug? https://github.com/joshmedeski/sesh
+# TODO Either clean up fzf or use something else entirely (like gum).
+# Also look into tmux `display-popup` 
+
 # Get the list of smug projects
 smug_projects=$(smug list | tr . _)
 
