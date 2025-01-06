@@ -7,6 +7,8 @@
   "lua-language-server": "3.13.5",
   "nixpkgs-fmt": "1.3.0",
   "node-debug2-adapter": "v1.43.0",
+  "php-debug-adapter": "v1.35.0",
+  "phpactor": "2024.11.28.1",
   "rnix-lsp": "0.2.5",
   "shellcheck": "v0.10.0",
   "tailwindcss-language-server": "0.0.27",
