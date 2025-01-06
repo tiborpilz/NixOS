@@ -10,6 +10,7 @@ in
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
       awscli2
+      ssm-session-manager-plugin
     ];
   };
 }
