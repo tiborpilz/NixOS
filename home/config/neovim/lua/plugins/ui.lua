@@ -92,7 +92,7 @@ return {
             },
             {
               'filename',
-              path = 4,
+              path = 1,
               symbols = {
                 modified = '',
                 readonly = '',
