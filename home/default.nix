@@ -29,6 +29,9 @@ with mylib;
       # Need later version of bash for nix-shell to work correctly on macos
       bash
 
+      # TODO create python dev module
+      python3
+
       # Setuptools is missing from python
       python3Packages.setuptools
 
