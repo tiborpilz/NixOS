@@ -34,6 +34,9 @@
   rebase = true
 [init]
   defaultBranch = main
+[diff "lockb"]
+  textconv = bun
+  binary = true
 
 [alias]
   difft = "-c diff.external=difft diff"
