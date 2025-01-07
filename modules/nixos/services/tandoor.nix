@@ -2,7 +2,7 @@
 with lib;
 with lib.my;
 let
-  publicPort = 8285;
+  publicPort = 8286;
   db_user = "recipes";
   db_password = "recipes";
   db_db = "recipes";
