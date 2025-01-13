@@ -46,7 +46,7 @@ with mylib;
       };
 
       containers.linkwarden = {
-        image = "ghcr.io/linkwarden/linkwarden:v2.7.1";
+        image = "ghcr.io/linkwarden/linkwarden:v2.9.3";
         volumes = [
           "${cfg.dataDir}/data:/data/data"
         ];
