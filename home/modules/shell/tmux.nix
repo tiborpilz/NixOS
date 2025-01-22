@@ -38,6 +38,9 @@ in
         # Add Nix PATH
         set-environment -g 'PATH' "$HOME/.nix-profile/bin:$PATH"
 
+        # Add custom script path
+        set-environment -g 'PATH' "$HOME/bin:$PATH"
+
         # Fix default shell
         set -gu default-command
         set -g default-shell "$SHELL"
