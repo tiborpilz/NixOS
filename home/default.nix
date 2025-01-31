@@ -188,6 +188,11 @@ with mylib;
       passApiKey = "bitwarden/openai-api-key";
     };
 
+    # Use clang++ instead of g++
+    modules.shell.zsh.envInit = ''
+      export CXX=clang++
+    '';
+
     nix = {
       registry.nixpkgs.flake = inputs.nixpkgs;
       settings = {
