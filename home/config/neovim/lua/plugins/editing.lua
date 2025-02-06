@@ -11,7 +11,12 @@ vim.opt.pumheight = 10
 
 return {
   -- Comments
-  { "tpope/vim-commentary" },
+  {
+    'numToStr/Comment.nvim',
+    opts = {
+        -- add any options here
+    }
+  },
 
   -- Formatting
   {
