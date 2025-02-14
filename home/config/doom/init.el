@@ -24,6 +24,7 @@
        ;;japanese
                                         ; layout            ; auie,ctsrnm is the superior home row
 
+       :completion
        (company)           ; the ultimate code completion backend
        ;; (corfu +icons)
        ;;ido               ; the other *other* search engine...
