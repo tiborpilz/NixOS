@@ -61,8 +61,9 @@ in
         # Actually copy to clipboard (on Linux)
         bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
 
-        # Switch to (another) workspace
-        bind g gotoworkspace
+        # Switch to (another) workspace, broken for now
+        # TODO: fix
+        # bind g gotoworkspace
 
         # Attach current directory to session
         bind a attach -c "#{pane_current_path}"
