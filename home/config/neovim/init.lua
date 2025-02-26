@@ -22,6 +22,9 @@ vim.o.modeline = true
 vim.o.modelines = 5
 vim.o.foldenable = false
 
+-- Use system clipboard
+vim.o.clipboard = "unnamedplus"
+
 --- Persistent undo
 vim.o.undofile = true
 
