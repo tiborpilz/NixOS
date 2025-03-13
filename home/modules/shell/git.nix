@@ -31,5 +31,9 @@ in
       "git/gitk".source = ../../config/git/gitk;
       "git/ignore_global".source = ../../config/git/ignore_global;
     };
+
+    modules.shell.zsh.rcInit = ''
+      fpath=(${pkgs.gitAndTools.glab}/share/zsh/site-functions $fpath)
+    '';
   };
 }
