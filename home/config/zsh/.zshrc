@@ -27,7 +27,7 @@ antigen bundle zsh-users/zsh-syntax-highlighting
 antigen apply
 
 # Custom theme
-source $ZDOTDIR/.zsh_custom/transient.zsh
+source $ZDOTDIR/.zsh_custom/theme.zsh
 
 # Display red dots whilst waiting for completion.
 COMPLETION_WAITING_DOTS="true"

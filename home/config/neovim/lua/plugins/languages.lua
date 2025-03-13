@@ -225,6 +225,8 @@ return {
 
 
       require("lspconfig").gleam.setup({})
+
+      require("lspconfig").sourcekit.setup({})
     end,
   },
   -- LSP Actions Preview
