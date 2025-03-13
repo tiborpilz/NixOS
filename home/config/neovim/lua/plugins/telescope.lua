@@ -5,7 +5,10 @@ return {
   -- },
   {
     "nvim-telescope/telescope.nvim",
-    dependencies = {"nvim-lua/plenary.nvim"},
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+    },
     config = function()
       local telescope = require("telescope")
       telescope.setup({
@@ -30,8 +33,15 @@ return {
             height = 0.8,
           }
         },
+        extensions = {
+          fzf = {
+            fuzzy = true,
+            override_generic_sorter = true,
+            override_file_sorter = true,
+            case_mode = "smart_case",
+          },
+        },
       })
-
       -- CONFIG
       local blend = 85
 
@@ -78,7 +88,7 @@ return {
     keys = {
       {
         "<leader>pf",
-        "<cmd>Telescope frecency workspace=CWD<cr>",
+        function() require("telescope.builtin").find_files() end,
         desc = "Find Files",
       },
       {
@@ -134,11 +144,10 @@ return {
     },
   },
   {
-    "nvim-telescope/telescope-frecency.nvim",
-    -- install the latest stable version
-    version = "*",
+    "nvim-telescope/telescope-fzf-native.nvim",
+    build = "make",
     config = function()
-      require("telescope").load_extension "frecency"
+      require("telescope").load_extension "fzf"
     end,
   },
   {
