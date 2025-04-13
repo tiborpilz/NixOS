@@ -48,7 +48,7 @@ in
       # :lang latex & :lang org (late previews)
       (pkgs.texlive.combine {
         inherit (pkgs.texlive) scheme-full
-          dvisvgm dvipng # preview and export as html
+          dvisvgm dvipng# preview and export as html
           wrapfig amsmath ulem hyperref capt-of etoolbox titlesec;
       })
 
@@ -86,11 +86,14 @@ in
       # Mermaid diagramming
       nodePackages.mermaid-cli
 
+      # Copilot
+      github-copilot-cli
+
       # doom emacs org :jupyter and :gnuplot
       gnuplot
 
       # Speed up LSP
-      emacs-lsp-booster
+      my.emacs-lsp-booster
     ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
