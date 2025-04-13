@@ -12,11 +12,6 @@ in
 {
   options.modules.tools.aider = {
     enable = mylib.mkBoolOpt false;
-    passApiKey = lib.mkOption {
-      type = lib.types.str;
-      default = "bitwarden/openai-api-key";
-      description = "The key to use to retrieve the OpenAI API key from `pass`.";
-    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -24,8 +19,14 @@ in
       pkgs.unstable.aider-chat
     ];
 
-    modules.shell.zsh.aliases = {
-      aider = "eval 'OPENAI_API_KEY=\\$(pass ${cfg.passApiKey}) aider'";
-    };
+    modules.shell.zsh.rcInit = ''
+      function aider() {
+        if [ -z "$OPENAI_API_KEY" ]; then
+          # TODO: add key to home config somewhere
+          export OPENAI_API_KEY=$(pass bitwarden/openai-api-key)
+        fi
+        ${pkgs.unstable.aider-chat}/bin/aider "$@"
+      }
+    '';
   };
 }
