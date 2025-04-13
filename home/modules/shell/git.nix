@@ -22,6 +22,7 @@ in
       difftastic
       act
       lazygit
+      unstable.opencommit
     ];
 
     xdg.configFile = {
@@ -34,6 +35,16 @@ in
 
     modules.shell.zsh.rcInit = ''
       fpath=(${pkgs.gitAndTools.glab}/share/zsh/site-functions $fpath)
+      function opencommit() {
+        if [ -z "$OPENAI_API_KEY" ]; then
+          # TODO: add key to home config somewhere
+          export OCO_API_KEY=$(pass bitwarden/openai-api-key)
+        else
+          export OCO_API_KEY=$OPENAI_API_KEY
+        fi
+        ${pkgs.unstable.opencommit}/bin/opencommit "$@"
+        alias oco="opencommit"
+      }
     '';
   };
 }
