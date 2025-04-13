@@ -185,10 +185,7 @@ with mylib;
 
     modules.firefox.enable = !pkgs.stdenv.isDarwin; # Firefox packdge doesn't work on Darwin :(
 
-    modules.tools.aider = {
-      enable = false; # TODO: enable once  python-wandb is fixed (https://github.com/NixOS/nixpkgs/issues/349691)
-      passApiKey = "bitwarden/openai-api-key";
-    };
+    modules.tools.aider.enable = true;
 
     # Use clang++ instead of g++
     modules.shell.zsh.envInit = ''
