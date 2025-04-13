@@ -37,7 +37,7 @@ in
       fpath=(${pkgs.gitAndTools.glab}/share/zsh/site-functions $fpath)
       function opencommit() {
         if [ -z "$OPENAI_API_KEY" ]; then
-          # TODO: add key to home config somewhere
+          # TODO: make key configurable in global config
           export OCO_API_KEY=$(pass bitwarden/openai-api-key)
         else
           export OCO_API_KEY=$OPENAI_API_KEY

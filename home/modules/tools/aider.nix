@@ -22,8 +22,12 @@ in
     modules.shell.zsh.rcInit = ''
       function aider() {
         if [ -z "$OPENAI_API_KEY" ]; then
-          # TODO: add key to home config somewhere
+          # TODO: make key(s) configurable in global config
           export OPENAI_API_KEY=$(pass bitwarden/openai-api-key)
+        fi
+        if [ -z "$ANTHROPIC_API_KEY" ]; then
+          # TODO: make key(s) configurable in global config
+          export ANTHROPIC_API_KEY=$(pass bitwarden/anthropic-api-key)
         fi
         ${pkgs.unstable.aider-chat}/bin/aider "$@"
       }

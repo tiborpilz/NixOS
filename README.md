@@ -29,3 +29,4 @@ To check whether the configuration is correct and evaluates during build, this p
 ### Cachix
 
 This project uses Github Actions to automatically build the configurations (on linux_x86 and darwin_aarch64) and uses [Cachix](https://www.cachix.org/) to store them in a [binary cache](https://app.cachix.org/cache/tiborpilz#pins). This means once my configuration is pushed, I don't have to re-build packages on systems that use it.
+henlo
