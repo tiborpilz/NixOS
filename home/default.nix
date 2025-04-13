@@ -47,6 +47,8 @@ with mylib;
       # C stuff
       gnumake
       gcc
+      cmake
+      glibtool
 
       # Task runner
       just
