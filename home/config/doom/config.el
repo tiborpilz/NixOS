@@ -419,6 +419,13 @@
       (:prefix ("t" . "toggle")
        :desc "Toggle Copilot" "p" #'copilot-mode))
 
+(use-package! aidermacs
+  :defer t
+  :hook (aidermacs-minor-mode . (lambda () (setenv "OPENAI_API_KEY" (password-store-get "bitwarden/openai-gpt-key"))))
+  :custom
+  (aidermacs-use-architect-mode t)
+  (aidermacs-default-model "4o"))
+
 (setq dap-python-debugger 'debugpy)
 
 ;;;###autoload

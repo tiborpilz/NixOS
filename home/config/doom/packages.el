@@ -41,6 +41,8 @@
            :repo "copilot-emacs/copilot.el"
            :files ("*.el" "dist")))
 
+(package! aidermacs)
+
 (package! lab)
 
 (package! diff-ansi)

@@ -1067,6 +1067,24 @@ to insert the suggestion for use in normal mode, and ~t p~ to toggle Copilot.
        :desc "Toggle Copilot" "p" #'copilot-mode))
 #+end_src
 
+
+*** Aider
+
+Aider is a CLI tool for modifying codebases using LLMs. Aidermacs is a package that integrates Aider with Emacs.
+
+#+begin_src elisp :tangle packages.el
+(package! aidermacs)
+#+end_src
+
+#+begin_src elisp
+(use-package! aidermacs
+  :defer t
+  :hook (aidermacs-minor-mode . (lambda () (setenv "OPENAI_API_KEY" (password-store-get "bitwarden/openai-gpt-key"))))
+  :custom
+  (aidermacs-use-architect-mode t)
+  (aidermacs-default-model "4o"))
+#+end_src
+
 *** Debugging
 Doom Emacs has a debugger module which uses ~dap-mode~ under the hood.
 
