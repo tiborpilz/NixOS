@@ -2,10 +2,12 @@
   description = "NixOS and Home-Manager configurations";
 
   inputs = {
+    # Base Nix Inputs
     nixpkgs-24-05.url = "nixpkgs/nixos-24.05";
     nixpkgs.url = "nixpkgs/nixos-24.11";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
+    # External tools and moduless
     home-manager.url = "github:nix-community/home-manager/release-24.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -14,7 +16,7 @@
     plasma-manager.inputs.home-manager.follows = "home-manager";
 
     emacs-overlay.url = "github:nix-community/emacs-overlay";
-    nix-doom-emacs-unstraightened.url = "github:marienz/nix-doom-emacs-unstraightened";
+    nix-doom-emacs.url = "github:marienz/nix-doom-emacs-unstraightened";
 
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
@@ -22,19 +24,19 @@
     darwin.url = "github:LnL7/nix-darwin";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
 
-    flake-utils.url = "github:numtide/flake-utils";
-    flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
-
-    devshell.url = "github:numtide/devshell";
-
     deploy-rs.url = "github:serokell/deploy-rs";
     authentik-nix.url = "github:nix-community/authentik-nix";
 
-    emacs-lsp-booster.url = "github:slotThe/emacs-lsp-booster-flake";
+    # Development tools
+    devshell.url = "github:numtide/devshell";
+
+    # Local Sub-Flakes
+    lib-tools.url = "path:./lib";
+    lib-tools.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs =
-    { self
+  outputs = inputs @ {
+    self
     , nixpkgs
     , nixpkgs-unstable
     , home-manager
@@ -44,16 +46,24 @@
     , deploy-rs
     , authentik-nix
     , emacs-lsp-booster
+    , lib-tools
     , ...
-    } @ inputs:
+  }:
     let
       supportedSystems = [ "x86_64-linux" "aarch64-darwin" ];
-      lib = nixpkgs.lib.extend
-        (self: super: {
-          my = import ./lib { inherit inputs; lib = self; pkgs = nixpkgs; };
-          hm = home-manager.lib;
-        });
-      inherit (lib.my) mapModules;
+
+      # Import the library functions
+      lib = nixpkgs.lib.extend (self: super: {
+        my = lib-tools.lib;
+        hm = home-manager.lib;
+      })
+
+      # lib = nixpkgs.lib.extend
+      #   (self: super: {
+      #     my = import ./lib { inherit inputs; lib = self; pkgs = nixpkgs; };
+      #     hm = home-manager.lib;
+      #   });
+      # inherit (lib.my) mapModules;
 
       pkgs = self.pkgs.x86_64-linux.nixpkgs;
 

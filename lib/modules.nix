@@ -53,4 +53,16 @@ rec {
       paths = files ++ concatLists (map (d: mapModulesRec' d id) dirs);
     in
     map fn paths;
+
+  importDir = dir:
+    let
+      files = lib.filterAttrs
+        (name: type: type == "regular" && lib.hasSuffix ".nix" name && name != "default.nix")
+        (builtins.readDir dir);
+
+      imports = lib.mapAttrsToList
+        (name: _: import (dir + "/${name}"))
+        files;
+    in
+      imports;
 }
