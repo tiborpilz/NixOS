@@ -67,7 +67,7 @@ in
       };
 
       containers.gotenberg = {
-        image = "docker.io/thecodingmachine/gotenberg:8.11.1";
+        image = "docker.io/thecodingmachine/gotenberg:8.20.1";
         environment = {
           "DISABLE_GOOGLE_CHROME" = "1";
         };
