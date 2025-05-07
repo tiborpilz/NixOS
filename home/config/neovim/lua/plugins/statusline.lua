@@ -44,11 +44,60 @@ return {
           globalstatus = true,
         },
         sections = {
-          lualine_a = {},
-          lualine_b = {},
-          lualine_c = {},
+          lualine_a = {
+            {
+              'mode',
+              fmt = function(mode)
+                return mode_map[mode] or mode
+              end,
+            },
+          },
+          lualine_b = {
+            'branch',
+            {
+              'diff',
+              colored = true, -- Displays a colored diff status if set to true
+              -- diff_color = {
+              --   -- Same color values as the general color option can be used here.
+              --   added    = 'LuaLineDiffAdd',                  -- Changes the diff's added color
+              --   modified = 'LuaLineDiffChange',               -- Changes the diff's modified color
+              --   removed  = 'LuaLineDiffDelete',               -- Changes the diff's removed color you
+              -- },
+              symbols = { added = '+', modified = '~', removed = '-' }, -- Changes the symbols used by the diff.
+              -- source = nil,                                   -- A function that works as a data source for diff.
+              -- It must return a table as such:
+              --   { added = add_count, modified = modified_count, removed = removed_count }
+              -- or nil on failure. count <= 0 won't be displayed.
+            }
+          },
+          lualine_c = {
+            {
+              'filetype',
+              colored = true,
+              icon_only = true,
+              icon = { align = 'right' },
+            },
+            {
+              'filename',
+              file_status = true,
+              newfile_status = true,
+              path = 1,
+              shorting_target = 40,
+
+              buffers_color = {
+                active = 'lualine_{section}_normal',
+                inactive = 'lualine_{section}_inactive',
+              },
+              symbols = {
+                modified = ' ●',
+                readonly = ' ',
+                alternate_file = ' ',
+                directory = ' ',
+              },
+            },
+          },
+
           lualine_x = {
-            'overseer',
             {
               'diagnostics',
 
@@ -60,40 +109,36 @@ return {
                 info  = 'DiagnosticInfo',  -- Changes diagnostics' info color.
                 hint  = 'DiagnosticHint',  -- Changes diagnostics' hint color.
               },
-              -- symbols = { error = '', warn = '', info = '', hint = '' },
-              symbols = { error = ' ', warn = ' ', info = ' ' },
+              symbols = { error = ' ', warn = ' ', info = ' ', hint = '' },
               colored = true,          -- Displays diagnostics status in color if set to true.
               update_in_insert = true, -- Update diagnostics in insert mode.
               always_visible = false,  -- Show diagnostics even if there are none.
             },
-            {
-              'filename',
-              path = 1,
-              symbols = {
-                modified = '',
-                readonly = '',
-                unnamed = '',
-                newfile = '',
-              },
-            },
-            {
-              'filetype',
-              colored = true,
-              icon_only = true,
-            },
           },
           lualine_y = {
-            { 'b:gitsigns_head', icon = '' },
-          },
-          lualine_z = {
-            {
-              'mode',
-              fmt = function(mode)
-                return mode_map[mode] or mode
-              end,
+            'overseer',
+            lualine_z = {
+              {
+                'progress',
+              },
+              {
+                'location',
+                padding = 0,
+              },
             },
+            -- lualine_y = {},
+            -- lualine_z = {},
           },
         },
+        tabline = {
+          lualine_a = {},
+          lualine_b = {},
+          lualine_c = {},
+          lualine_x = {},
+          lualine_y = {},
+          lualine_z = {},
+        },
+        winbar = {},
         inactive_sections = {
           lualine_a = {},
           lualine_b = {},
@@ -106,6 +151,9 @@ return {
           'nvim-tree',
           'mason',
           'lazy',
+          'quickfix',
+          'symbols-outline',
+          'ctrlspace',
         },
       })
     end,

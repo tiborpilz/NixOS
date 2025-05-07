@@ -6,8 +6,8 @@ return {
       loop = true,
       win = {
         border = { " ", " ", " ", " ", " ", " ", " ", " " },
-        height = { min = 3, max = 10 },
-        padding = { 4, 4 },
+        height = { min = 3, max = 24 },
+        padding = { 3, 3 },
         title_pos = "center",
         col = 0.5,
         title = true,
@@ -37,8 +37,8 @@ return {
       preset = "modern",
       layout = {
         align = "center",
-        spacing = 2,
-        height = { min = 1 },
+        spacing = 1,
+        height = { min = 4 },
       },
     },
     config = function(_, opts)
