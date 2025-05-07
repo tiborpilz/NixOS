@@ -40,6 +40,46 @@ return {
     end,
   },
 
+  -- Zen Mode
+  {
+    "folke/zen-mode.nvim",
+    cmd = "ZenMode",
+    keys = {
+      { "<leader>zz", "<cmd>ZenMode<cr>", desc = "Toggle Zen Mode" },
+    },
+    opts = {
+      window = {
+        width = 0.85, -- width will be 85% of the editor width
+        options = {
+          number = false,
+          relativenumber = false,
+          signcolumn = "no",
+          cursorline = false,
+          cursorcolumn = false,
+          foldcolumn = "0",
+          list = false,
+        },
+      },
+      plugins = {
+        gitsigns = { enabled = false },
+        tmux = { enabled = false },
+        diagnostics = { enabled = false }, -- disable diagnostics
+        kitty = {
+          enabled = false,
+          font = "+2", -- font size increment
+        },
+      },
+      on_open = function()
+        -- Disable status line in zen mode
+        vim.opt.laststatus = 0
+      end,
+      on_close = function()
+        -- Re-enable status line when exiting zen mode
+        vim.opt.laststatus = 2
+      end,
+    },
+  },
+
   -- Colorschemes / Themes
   { "eddyekofo94/gruvbox-flat.nvim" },
   { "marko-cerovac/material.nvim" },

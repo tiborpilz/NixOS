@@ -1,0 +1,63 @@
+# NixOS Configuration Project
+
+## Project Context
+This is a comprehensive NixOS configuration repository that manages multiple machines and user environments through Nix Flakes. It contains:
+- Host-specific NixOS configurations
+- Shared modules for system configuration
+- Home-manager user environment setup
+- Custom packages and overlays
+
+## Directory Structure
+- `/hosts/` - Machine-specific configurations (nixos and darwin)
+- `/modules/` - Reusable configuration modules (nixos, darwin, shared)
+- `/home/` - Home-manager user configuration
+- `/packages/` - Custom package definitions
+- `/overlays/` - Package overrides
+- `/lib/` - Reusable Nix functions
+- `/tests/` - System tests
+
+## Nix Language Rules
+
+### Formatting Rules
+- Follow nixpkgs formatting conventions
+- Use 2-space indentation for all Nix files
+- Group related configurations together
+
+### Module Structure
+- Each module should have distinct options and config sections
+- Use mkOption for declaring configuration options
+- Provide default values and descriptions for options
+- Ensure backward compatibility when modifying modules
+
+### Flake Structure
+- Keep flake.nix clean and use lib functions for complex operations
+- Maintain explicit dependencies in inputs
+- Organize outputs logically
+
+## AI Code Generation Guidelines
+
+### General
+- Generate Nix code that follows the functional and declarative style
+- Respect existing project patterns and module structure
+- Try to keep your changes minimal and only touch the necessary files
+
+### Host Configurations
+- When creating host configurations, include hardware-configuration.nix
+- Separate specialized services into their own files
+
+### Home-Manager
+- Follow modular approach with toggleable features
+- Maintain consistent structure for all user configurations
+- Use conditional logic for platform-specific adjustments
+
+### Testing
+- Generate test configurations that are compatible with NixOS test framework
+- Include assertions to validate configurations
+
+### Documentation
+- Keep documentation up to date with the latest configurations
+- Use nixos-generators to generate documentation for new configurations
+- Include examples and usage instructions for all configurations
+
+### MCP usage
+- Query MCP for nixos packages, modules and options

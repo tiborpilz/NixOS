@@ -87,6 +87,11 @@
   org-modern-star 'nil ;; Use old org-modern star icons
 )
 
+;; customize org-modern face
+(custom-set-faces!
+  '(org-modern-label :height 1.0))
+
+
 (global-org-modern-mode)
 
 (setq prettify-symbols-alist
@@ -162,6 +167,8 @@
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
+
+;; (load (expand-file-name "org-roam-logseq.el" doom-user-dir))
 
 (require 'org-src)
 (add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t)))

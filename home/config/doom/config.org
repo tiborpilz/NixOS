@@ -191,6 +191,11 @@ Set up org-modern
   org-modern-star 'nil ;; Use old org-modern star icons
 )
 
+;; customize org-modern face
+(custom-set-faces!
+  '(org-modern-label :height 1.0))
+
+
 (global-org-modern-mode)
 #+end_src
 
@@ -420,6 +425,22 @@ The closest comparison to org-roam-ui is Obsidian.
 *** TODO Capture to Org Roam Dailies
 
 I want to be able to use ~org-capture~ to capture stuff in the current date's roam daily file.
+
+*** TODO Logseq compatibility
+
+Org-Roam is so similar to Logseq that they can /almost/ be used together. I'm mostly following [[https://coredumped.dev/2021/05/26/taking-org-roam-everywhere-with-logseq/][Core Dumped's Guide on how to integrate both]]
+
+
+**** Turn Logseq Nodes into Org-Roam Nodes
+
+One of the incompatibilities between Logseq and Org-Roam is the way links between nodes are handled. Logseq inserts a file link, Org-Roam an Id link.
+But nodes inserted via Logseq aren't properly recognized in Org-Roam.
+
+There's an Elisp Snippet from Bill Burdick that turns Logseq notes into Org-Roam nodes (https://gist.github.com/zot/ddf1a89a567fea73bc3c8a209d48f527)
+
+#+begin_src elisp
+;; (load (expand-file-name "org-roam-logseq.el" doom-user-dir))
+#+end_src
 
 ** Org-Node
 :PROPERTIES:
