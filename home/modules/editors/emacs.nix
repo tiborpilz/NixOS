@@ -55,6 +55,7 @@ in
       # Haskell language server
       haskell-language-server
 
+      # TODO: move python stuff into dev/python.nix or conditionally enable here
       # Python Language Server
       python3Packages.python-lsp-server
 

@@ -55,10 +55,12 @@ return {
         { "<leader>t", group = "Test", icon = "" },
         { "<leader>p", group = "Project" },
         { "<leader>w", group = "Window" },
+        { "<leader>z", group = "Zen" },
 
         --- Unsorted key commands
         { "<leader>wv", "<cmd>vsplit<cr>", desc = "Split Vertical" },
         { "<leader>wh", "<cmd>split<cr>", desc = "Split Horizontal" },
+        { "<leader>zz", "<cmd>ZenMode<cr>", desc = "Toggle Zen Mode" },
       })
     end,
   },

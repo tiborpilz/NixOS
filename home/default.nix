@@ -29,11 +29,6 @@ with mylib;
       # Need later version of bash for nix-shell to work correctly on macos
       bash
 
-      # TODO create python dev module
-      python3
-
-      # Setuptools is missing from python
-      python3Packages.setuptools
 
       # GNU Parallel my beloved
       parallel
@@ -155,6 +150,7 @@ with mylib;
     modules.dev.nix.enable = true;
     modules.dev.gleam.enable = true;
     modules.dev.lua.enable = true;
+    modules.dev.python.enable = true;
 
     modules.dev.colima.enable = pkgs.stdenv.isDarwin; # I only need a docker runtime on MacOs
 

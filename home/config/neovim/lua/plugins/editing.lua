@@ -94,7 +94,7 @@ return {
 
             local color_item = highlight_colors.format(entry, { kind = item.kind })
 
-            item = lspkind.cmp_format({ mode = "symbol_text", preset = "codicons"})(entry, item)
+            item = lspkind.cmp_format({ mode = "symbol", preset = "codicons"})(entry, item)
             if color_item.abbr1_hl_group then
               item.kind_hl_group = color_item.abbr_hl_group
               item.kind = color_item.abbr

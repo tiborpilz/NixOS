@@ -271,6 +271,16 @@ with lib;
       };
     };
 
+    services.limesurvey = {
+      enable = true;
+      virtualHost = {
+        hostName = "survey.tiborpilz.xyz";
+        adminAddr = "goaway@tiborpilz.xyz";
+        forceSSL = false;
+        enableACME = false;
+      };
+    };
+
     modules.services.reverseProxy.proxies.authentik = {
       publicPort = 9443;
       targetHost = "127.0.0.1";
