@@ -117,18 +117,18 @@ return {
           },
           lualine_y = {
             'overseer',
-            lualine_z = {
-              {
-                'progress',
-              },
-              {
-                'location',
-                padding = 0,
-              },
+          },
+          lualine_z = {
+            {
+              'progress',
             },
+            {
+              'location',
+              padding = 0,
+            },
+          },
             -- lualine_y = {},
             -- lualine_z = {},
-          },
         },
         tabline = {
           lualine_a = {},
@@ -159,3 +159,4 @@ return {
     end,
   },
 }
+
