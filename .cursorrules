@@ -60,4 +60,4 @@ This is a comprehensive NixOS configuration repository that manages multiple mac
 - Include examples and usage instructions for all configurations
 
 ### MCP usage
-- Query MCP for nixos packages, modules and options
+- Query MCP for nixos packages, modules and

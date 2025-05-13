@@ -1,0 +1,38 @@
+FROM ubuntu:22.04
+
+# Avoid prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install required packages
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    neovim \
+    xvfb \
+    x11-apps \
+    imagemagick \
+    scrot \
+    python3-pip \
+    nodejs \
+    npm \
+    ripgrep \
+    fd-find \
+    unzip \
+    wget \
+    sudo \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install pynvim for Neovim Python support
+RUN pip3 install pynvim
+
+# Create a non-root user
+
+COPY home/config/neovim /root/.config/nvim/
+
+# Add screenshot script
+COPY ./screenshot.sh /root/screenshot.sh
+RUN chmod +x /root/screenshot.sh
+
+# Set default command
+ENTRYPOINT ["/root/screenshot.sh"] 

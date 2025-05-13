@@ -1,0 +1,49 @@
+name: Generate Neovim Screenshots
+
+on:
+  workflow_dispatch:  # Allow manual triggering
+  push:
+    paths:
+      - 'home/config/neovim/**'  # Run when Neovim config changes
+    branches:
+      - main  # Adjust to your main branch name if different
+
+jobs:
+  generate-screenshots:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Build and run screenshot Docker image
+        run: |
+          # Create output directory for screenshots
+          mkdir -p ./screenshots
+          
+          # Build the Docker image
+          docker build -t neovim-screenshot -f Dockerfile.screenshot .
+          
+          # Run the container to generate screenshots
+          docker run --rm \
+            -v $(pwd)/screenshots:/output \
+            neovim-screenshot
+      
+      - name: Upload screenshots as artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: neovim-screenshots
+          path: ./screenshots/*.png
+      
+      # Optional: If you want to commit the screenshots back to the repository
+      - name: Commit screenshots to repository
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add ./screenshots/*.png
+          git commit -m "Update Neovim screenshots" || echo "No changes to commit"
+          git push 
