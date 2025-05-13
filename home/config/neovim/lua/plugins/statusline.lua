@@ -53,30 +53,6 @@ return {
             },
           },
           lualine_b = {
-            'branch',
-            {
-              'diff',
-              colored = true, -- Displays a colored diff status if set to true
-              -- diff_color = {
-              --   -- Same color values as the general color option can be used here.
-              --   added    = 'LuaLineDiffAdd',                  -- Changes the diff's added color
-              --   modified = 'LuaLineDiffChange',               -- Changes the diff's modified color
-              --   removed  = 'LuaLineDiffDelete',               -- Changes the diff's removed color you
-              -- },
-              symbols = { added = '+', modified = '~', removed = '-' }, -- Changes the symbols used by the diff.
-              -- source = nil,                                   -- A function that works as a data source for diff.
-              -- It must return a table as such:
-              --   { added = add_count, modified = modified_count, removed = removed_count }
-              -- or nil on failure. count <= 0 won't be displayed.
-            }
-          },
-          lualine_c = {
-            {
-              'filetype',
-              colored = true,
-              icon_only = true,
-              icon = { align = 'right' },
-            },
             {
               'filename',
               file_status = true,
@@ -95,12 +71,18 @@ return {
                 directory = ' ',
               },
             },
+            {
+              'filetype',
+              colored = true,
+              icon_only = true,
+              icon = { align = 'right' },
+            },
           },
+          lualine_c = {},
 
           lualine_x = {
             {
               'diagnostics',
-
               sources = { 'nvim_lsp', 'nvim_diagnostic' },
               sections = { 'error', 'warn', 'info', 'hint' },
 
@@ -116,18 +98,36 @@ return {
             },
           },
           lualine_y = {
-            'overseer',
-            lualine_z = {
+            {
+              'branch',
               {
-                'progress',
-              },
-              {
-                'location',
-                padding = 0,
+                'diff',
+                colored = true, -- Displays a colored diff status if set to true
+                -- diff_color = {
+                --   -- Same color values as the general color option can be used here.
+                --   added    = 'LuaLineDiffAdd',                  -- Changes the diff's added color
+                --   modified = 'LuaLineDiffChange',               -- Changes the diff's modified color
+                --   removed  = 'LuaLineDiffDelete',               -- Changes the diff's removed color you
+                -- },
+                symbols = { added = '+', modified = '~', removed = '-' }, -- Changes the symbols used by the diff.
+                -- source = nil,                                   -- A function that works as a data source for diff.
+                -- It must return a table as such:
+                --   { added = add_count, modified = modified_count, removed = removed_count }
+                -- or nil on failure. count <= 0 won't be displayed.
+              }
+            },
+            {
+              'overseer',
+              lualine_z = {
+                {
+                  'progress',
+                },
+                {
+                  'location',
+                  padding = 0,
+                },
               },
             },
-            -- lualine_y = {},
-            -- lualine_z = {},
           },
         },
         tabline = {
