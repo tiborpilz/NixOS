@@ -235,7 +235,7 @@ with lib;
       linkding.enable = true;
 
       nextcloud = {
-        enable = true;
+        enable = false;
         adminpassFile = config.sops.secrets.nextcloud_admin_pass.path;
         dataDir = "/data/nextcloud";
         # home = "/nextcloud";
@@ -255,7 +255,7 @@ with lib;
         calibre.enable = true; # book reader
 
         immich = {
-          immich-version = "v1.118.2";
+          immich-version = "v1.132.3";
           enable = true;
         };
         jellyfin.enable = true;
