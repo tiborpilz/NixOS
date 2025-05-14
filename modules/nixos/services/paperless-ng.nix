@@ -34,7 +34,7 @@ in
           };
 
           paperless-ngx-db.containerConfig = {
-            image = "docker.io/postgres:15";
+            image = "docker.io/postgres:17";
             volumes = [
               "paperless-pgdata:/var/lib/postgresql/data"
             ];
