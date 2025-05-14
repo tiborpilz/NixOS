@@ -50,40 +50,20 @@ let
       portFlags = concatMapStringsSep " " (port: "-p ${port}") ports;
     in
     {
-      serviceConfig.Type = "oneshot";
       wantedBy = map (containerName: "podman-${containerName}.service")
         (podContainerNames name pod);
-      script = ''
-        # TODO: Add support for changing ports (running ports prevent `podman pod rm`)
-        # if ${pkgs.podman}/bin/podman pod exists ${name}-pod; then
-        #   ports=( ${ concatMapStringsSep " " (port: port) ports } )
-        #   has_changed=false
-
-        #   for port_map in "''${ports[@]}"; do
-        #     new_host_port=$(echo $port_map | cut -d':' -f1)
-        #     new_target_port=$(echo $port_map | cut -d':' -f2)
-
-        #     old_host_port=$(${pkgs.podman}/bin/podman pod inspect ${name}-pod | grep --after-context=1 $new_target_port | grep HostPort | cut -d':' -f2 | tr -d '," ')
-
-        #     if [ "$old_target_port" != "$new_host_port" ]; then
-        #       has_changed=true
-        #       break
-        #     fi
-        #   done
-
-        #   if [ "$has_changed" = true ]; then
-        #     ${pkgs.podman}/bin/podman pod stop ${name}-pod
-        #     ${pkgs.podman}/bin/podman pod rm ${name}-pod
-        #     ${pkgs.podman}/bin/podman pod create -n ${name}-pod ${portFlags}
-        #   fi
-        # else
-        #   ${pkgs.podman}/bin/podman pod create -n ${name}-pod ${portFlags}
-        # fi
-
-        ${pkgs.podman}/bin/podman pod exists ${name}-pod || \
-          ${pkgs.podman}/bin/podman pod create -n ${name}-pod ${portFlags}
-      '';
-    };
+      after = [ "network.target" ];
+      serviceConfig = {
+        ExecStartPre = [
+          # Create the pod only if it doesn't exist
+          "/bin/sh -c '${pkgs.podman}/bin/podman pod exists ${name}-pod || ${pkgs.podman}/bin/podman pod create -n ${name}-pod ${portFlags}'"
+          ];
+          ExecStart = "${pkgs.podman}/bin/podman pod start ${name}-pod";
+          ExecStop = "${pkgs.podman}/bin/podman pod stop ${name}-pod";
+          RemainAfterExit = true;
+          TimeoutSec = 30;
+        };
+      };
 
   mkContainers = pods:
     recursiveMergeAttrs (concatMap
