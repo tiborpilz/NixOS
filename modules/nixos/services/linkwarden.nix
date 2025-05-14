@@ -30,37 +30,45 @@ with mylib;
       mkdir -p ${cfg.dataDir}/data
     '';
 
-    modules.podgroups.pods.linkwarden = {
-      port = "${toString cfg.publicPort}:3000";
+    virtualisation.quadlet =
+      let inherit (config.virtualisation.quadlet) network pods; in
+      {
+        containers.linkwarden-db.containerConfig = {
+          image = "postgres:16-alpine";
+          volumes = [
+            "linkwarden-pgdata:/var/lib/postgresql/data"
+          ];
+          environments = {
+            POSTGRES_USER = db_user;
+            POSTGRES_PASSWORD = db_password;
+            POSTGRES_DB = db_db;
+          };
+          pod = pods.linkwarden-pod.ref;
+        };
 
-      containers.db = {
-        image = "postgres:16-alpine";
-        volumes = [
-          "linkwarden-pgdata:/var/lib/postgresql/data"
-        ];
-        environment = {
-          POSTGRES_USER = db_user;
-          POSTGRES_PASSWORD = db_password;
-          POSTGRES_DB = db_db;
+        containers.linkwarden.containerConfig = {
+          image = "ghcr.io/linkwarden/linkwarden:v2.7.1";
+          volumes = [
+            "${cfg.dataDir}/data:/data/data"
+          ];
+          environments = {
+            "DATABASE_URL" = "postgresql://${db_user}:${db_password}@localhost:5432/${db_db}";
+            "NEXTAUTH_URL" = "http://localhost:${toString cfg.publicPort}";
+            "NEXTAUTH_SECRET" = "secret";
+            "NEXT_PUBLIC_DISABLE_REGISTRATION" = "true";
+          };
+          environmentFiles = [
+            cfg.envFile
+          ];
+          pod = pods.linkwarden-pod.ref;
+        };
+
+        pods.linkwarden-pod.podConfig = {
+          publishPorts = [
+            "${toString cfg.publicPort}:3000"
+          ];
         };
       };
-
-      containers.linkwarden = {
-        image = "ghcr.io/linkwarden/linkwarden:v2.7.1";
-        volumes = [
-          "${cfg.dataDir}/data:/data/data"
-        ];
-        environment = {
-          "DATABASE_URL" = "postgresql://${db_user}:${db_password}@localhost:5432/${db_db}";
-          "NEXTAUTH_URL" = "http://localhost:${toString cfg.publicPort}";
-          "NEXTAUTH_SECRET" = "secret";
-          "NEXT_PUBLIC_DISABLE_REGISTRATION" = "true";
-        };
-        environmentFiles = [
-          cfg.envFile
-        ];
-      };
-    };
 
     modules.services.reverseProxy.proxies.linkwarden = {
       publicPort = cfg.publicPort;

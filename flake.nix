@@ -31,6 +31,9 @@
     authentik-nix.url = "github:nix-community/authentik-nix";
 
     emacs-lsp-booster.url = "github:slotThe/emacs-lsp-booster-flake";
+
+    quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
+    quadlet-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -44,6 +47,7 @@
     , deploy-rs
     , authentik-nix
     , emacs-lsp-booster
+    , quadlet-nix
     , ...
     } @ inputs:
     let
@@ -59,7 +63,8 @@
 
       nixosHosts = mapModules ./hosts/nixos (hostPath: lib.my.mkHostAttrs hostPath {
         system = "x86_64-linux";
-        modules = lib.my.mapModulesRec' (toString ./modules/nixos) import;
+        modules = lib.my.mapModulesRec' (toString ./modules/nixos) import
+                  ++ [quadlet-nix.nixosModules.quadlet];
       });
 
       # darwinHosts = mapModules ./hosts/darwin (hostPath: lib.my.mkHostAttrs hostPath {
