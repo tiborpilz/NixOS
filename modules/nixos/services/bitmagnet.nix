@@ -44,35 +44,54 @@ in
       mkdir -p ${cfg.dataDir}
     '';
 
-    modules.podgroups.pods.bitmagnet = {
-      ports = [
-        "${toString cfg.publicApiPort}:3333"
-        "${toString cfg.publicTorrentPort}:3334/tcp"
-        "${toString cfg.publicTorrentPort}:3334/udp"
-      ];
+    virtualisation.quadlet =
+      let
+        inherit (config.virtualisation.quadlet) network pods;
+      in
+      {
+        containers = {
+          bitmagnet-db.containerConfig = {
+            image = "postgres:16-alpine";
+            volumes = [
+              "${cfg.dataDir}/postgres:/var/lib/postgresql/data"
+            ];
+            environments = {
+              POSTGRES_PASSWORD = "postgres";
+              POSTGRES_DB = "bitmagnet";
+              PGUSER = "postgres";
+            };
+            extraOptions = [ "--shm-size=1g" ]; # translate shm_size to extraOptions
+            pod = pods.bitmagnet-pod.ref;
+          };
 
-      db = {
-        image = "postgres:16-alpine";
-        volumes = [ "${cfg.dataDir}/postgres:/var/lib/postgresql/data" ];
-        environment = {
-          POSTGRES_PASSWORD = "postgres";
-          POSTGRES_DB = "bitmagnet";
-          PGUSER = "postgres";
+          bitmagnet.containerConfig = {
+            image = "ghcr.io/bitmagnet-io/bitmagnet:latest";
+            restartPolicy = "unless-stopped";
+            volumes = [
+              "${cfg.dataDir}/data:/data"
+            ];
+            environments = {
+              POSTGRES_HOST = "postgres";
+              POSTGRES_PASSWORD = "postgres";
+              TMDB_API_KEY = cfg.tmdbApiKey or "";
+            };
+            command = [ "worker" "run" "--keys=http_server" "--keys=queue_server" ]
+              ++ lib.optional cfg.runDhtCrawler "--keys=dht_crawler";
+            pod = pods.bitmagnet-pod.ref;
+          };
         };
-        extraOptions = [ "--shm-size=1g" ]; # translate shm_size to extraOptions
+        pods.bitmagnet-pod.podConfig = {
+          publishPorts = [
+            "${toString cfg.publicApiPort}:3333"
+            "${toString cfg.publicTorrentPort}:3334/tcp"
+            "${toString cfg.publicTorrentPort}:3334/udp"
+          ];
+        };
       };
 
-      bitmagnet = {
-        image = "ghcr.io/bitmagnet-io/bitmagnet:latest";
-        restartPolicy = "unless-stopped";
-        environment = {
-          POSTGRES_HOST = "postgres";
-          POSTGRES_PASSWORD = "postgres";
-          TMDB_API_KEY = cfg.tmdbApiKey or "";
-        };
-        command = [ "worker" "run" "--keys=http_server" "--keys=queue_server" ]
-          ++ lib.optional cfg.runDhtCrawler "--keys=dht_crawler";
-      };
+    modules.services.reverseProxy.proxies.bitmagnet = {
+      publicPort = cfg.publicApiPort;
+      auth = true;
     };
   };
 }
