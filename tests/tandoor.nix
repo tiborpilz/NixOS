@@ -13,7 +13,6 @@ in
     virtualisation.diskSize = 8192;
 
     imports = [
-      (import ../modules/nixos/podgroups.nix { inherit config pkgs; lib = lib // { inherit my; }; })
       (import ../modules/nixos/services/reverseProxy.nix { inherit config pkgs; lib = lib // { inherit my; }; })
       (import ../modules/nixos/services/tandoor.nix { inherit config pkgs; lib = lib // { inherit my; }; })
     ];
