@@ -35,54 +35,63 @@ in
       mkdir -p ${photoDir}
     '';
 
-    modules.podgroups.pods.immich = {
-      port = "${toString publicPort}:2283";
+    virtualisation.quadlet =
+      let
+        inherit (config.virtualisation.quadlet) network pods;
+      in
+      {
+        containers = {
+          immich-server.containerConfig = {
+            image = "ghcr.io/immich-app/immich-server:${cfg.immich-version}";
+            volumes = [
+              "${dataDir}/upload:/usr/src/app/upload"
+              "${photoDir}:/data/media/photos"
+              "/etc/localtime:/etc/localtime:ro"
+            ];
+            environments = {
+              UPLOAD_LOCATION = "./library";
+              DB_PASSWORD = cfg.db_password;
+              DB_USERNAME = cfg.db_user;
+              DB_DATABASE_NAME = cfg.db_name;
+              IMMICH_VERSION = cfg.immich-version;
+              DB_HOSTNAME = "localhost";
+              REDIS_HOSTNAME = "localhost";
+            };
+            pod = pods.immich-pod.ref;
+          };
 
-      containers.immich-server = {
-        image = "ghcr.io/immich-app/immich-server:${cfg.immich-version}";
-        volumes = [
-          "${dataDir}/upload:/usr/src/app/upload"
-          "${photoDir}:/data/media/photos"
-          "/etc/localtime:/etc/localtime:ro"
-        ];
-        environment = {
-          "UPLOAD_LOCATION" = "./library";
-          "DB_PASSWORD" = cfg.db_password;
-          "DB_USERNAME" = cfg.db_user;
-          "DB_DATABASE_NAME" = cfg.db_name;
-          "IMMICH_VERSION" = cfg.immich-version;
-          "DB_HOSTNAME" = "localhost";
-          "REDIS_HOSTNAME" = "localhost";
+          immich-machine-learning.containerConfig = {
+            image = "ghcr.io/immich-app/immich-machine-learning:${cfg.immich-version}";
+            volumes = [
+              "immich-model-cache:/cache"
+            ];
+            pod = pods.immich-pod.ref;
+          };
+
+          immich-redis.containerConfig = {
+            image = "redis:7.4";
+            pod = pods.immich-pod.ref;
+          };
+
+          immich-db.containerConfig = {
+            image = "tensorchord/pgvecto-rs:pg14-v0.2.0";
+            environments = {
+              POSTGRES_USER = cfg.db_user;
+              POSTGRES_PASSWORD = cfg.db_password;
+              POSTGRES_DB = cfg.db_name;
+            };
+            volumes = [
+              "immich-pgdata:/var/lib/postgresql/data"
+            ];
+            pod = pods.immich-pod.ref;
+          };
+        };
+        pods.immich-pod.podConfig = {
+          publishPorts = [
+            "${toString publicPort}:2283"
+          ];
         };
       };
-
-      containers.immich-machine-learning = {
-        image = "ghcr.io/immich-app/immich-machine-learning:${cfg.immich-version}";
-        volumes = [
-          "immich-model-cache:/cache"
-        ];
-        environment = {
-          # TODO
-        };
-      };
-
-      containers.redis = {
-        image = "redis:7.4";
-      };
-
-      containers.db = {
-        image = "tensorchord/pgvecto-rs:pg14-v0.2.0";
-        environment = {
-          POSTGRES_USER = cfg.db_user;
-          POSTGRES_PASSWORD = cfg.db_password;
-          POSTGRES_DB = cfg.db_name;
-          # TODO
-        };
-        volumes = [
-          "immich-pgdata:/var/lib/postgresql/data"
-        ];
-      };
-    };
 
     modules.services.reverseProxy.proxies.immich = {
       publicPort = publicPort;
