@@ -5,7 +5,7 @@ with lib.my;
 let
   dataDir = "/data/media/immich";
   photoDir = "/data/media/photos";
-  publicPort = 2283;
+  publicPort = 2284;
   cfg = config.modules.services.media.immich;
 in
 {
