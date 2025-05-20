@@ -81,14 +81,6 @@ return {
   },
 
   -- Colorschemes / Themes
-  { "eddyekofo94/gruvbox-flat.nvim" },
-  { "marko-cerovac/material.nvim" },
-  { "kdheepak/monochrome.nvim" },
-  { "EdenEast/nightfox.nvim" },
-  { "RRethy/nvim-base16" },
-  { "mcchrish/zenbones.nvim" },
-  { "rktjmp/lush.nvim" },
-  { "yorickpeterse/nvim-grey" },
   {
     "shaunsingh/nord.nvim",
     config = function()
@@ -96,14 +88,6 @@ return {
 
       require("nord").set()
     end,
-  },
-  {
-    'AlexvZyl/nordic.nvim',
-    lazy = false,
-    priority = 1000,
-    config = function()
-      require('nordic').load()
-    end
   },
   --- Icons
   {
@@ -130,5 +114,4 @@ return {
       })
     end,
   },
-
 }
