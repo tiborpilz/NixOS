@@ -1,10 +1,13 @@
 return {
+  -- TODO: add project management/switching
   -- {
   --   "coffebar/neovim-project",
+  --   lazy = true,
   --   opts = {
   --     projects = {
   --       "~/Code/*",
   --     },
+  --     dashboard_mode = true,
   --     picker = {
   --       type = "telescope",
   --       preview = {
@@ -14,7 +17,6 @@ return {
   --         show_hidden = true, -- show hidden files/folders
   --       },
   --     },
-  --     dashboard_mode = true,
   --   },
   --   init = function()
   --     -- enable saving the state of plugins in the session
@@ -26,7 +28,6 @@ return {
   --     { "nvim-telescope/telescope.nvim" },
   --     { "Shatur/neovim-session-manager" },
   --   },
-  --   lazy = false,
   --   priority = 100,
   -- },
   {
@@ -37,14 +38,4 @@ return {
       vim.keymap.set("n", "<leader>pr", "<cmd>OverseerRun<CR>", { desc = "Run Project Tasks" })
     end,
   },
-  {
-    "ahmedkhalf/project.nvim",
-    config = function()
-      require("project_nvim").setup({
-        manual_mode = false,
-      })
-      require("telescope").load_extension("projects")
-      vim.keymap.set("n", "<leader>pp", "<cmd>Telescope projects<CR>", { desc = "Switch Project" })
-    end
-  }
 }
