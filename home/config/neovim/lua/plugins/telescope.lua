@@ -1,8 +1,4 @@
 return {
-  -- {
-  --   {"AstroNvim/astrocommunity"},
-  --   { import = "astrocommunity.recipes.telescope-nvchad-theme" },
-  -- },
   {
     "nvim-telescope/telescope.nvim",
     dependencies = {
@@ -39,6 +35,10 @@ return {
             override_generic_sorter = true,
             override_file_sorter = true,
             case_mode = "smart_case",
+          },
+          frecency = {
+            db_safe_mode = true,
+            matcher = "fuzzy",
           },
         },
       })
@@ -88,9 +88,16 @@ return {
     keys = {
       {
         "<leader>pf",
-        function() require("telescope.builtin").find_files() end,
+        function()
+          vim.cmd("Telescope frecency workspace=CWD")
+        end,
         desc = "Find Files",
       },
+      -- {
+      --   "<leader>pa",
+      --   find_alternate_files,
+      --   desc = "Find Alternate Files",
+      -- },
       {
         "<leader>sp",
         function() require("telescope.builtin").live_grep() end,
@@ -148,6 +155,12 @@ return {
     build = "make",
     config = function()
       require("telescope").load_extension "fzf"
+    end,
+  },
+  {
+    "nvim-telescope/telescope-frecency.nvim",
+    config = function()
+      require("telescope").load_extension "frecency"
     end,
   },
   {

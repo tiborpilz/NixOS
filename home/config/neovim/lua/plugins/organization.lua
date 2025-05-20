@@ -43,26 +43,26 @@ return {
     dependencies = "nvim-treesitter/nvim-treesitter",
     opts = {}
   },
-  -- Org *roam* in vim
-  {
-    "chipsenkbeil/org-roam.nvim",
-    tag = "0.1.1",
-    dependencies = {
-      {
-        "nvim-orgmode/orgmode",
-        tag = "0.3.7",
-      },
-    },
-    config = function()
-      require("org-roam").setup({
-        directory = "~/org/roam",
-        -- optional
-        org_files = {
-          "~/org",
-        }
-      })
-    end
-  },
+  -- Org roam in vim
+  -- TODO: this slows down startup, investigate
+  -- {
+  --   "chipsenkbeil/org-roam.nvim",
+  --   dependencies = {
+  --     {
+  --       "nvim-orgmode/orgmode",
+  --     },
+  --   },
+  --   lazy = true,
+  --   config = function()
+  --     require("org-roam").setup({
+  --       directory = "~/org/roam",
+  --       -- optional
+  --       org_files = {
+  --         "~/org",
+  --       }
+  --     })
+  --   end
+  -- },
   -- Telescope integration for finding headlines etc.
   {
     "nvim-orgmode/telescope-orgmode.nvim",
