@@ -38,6 +38,7 @@ return {
           },
           frecency = {
             db_safe_mode = true,
+            db_version = "v2",
             matcher = "fuzzy",
           },
         },
@@ -82,6 +83,20 @@ return {
               end
             end,
           })
+
+          -- show line numbers and highlight the current line in preview
+          vim.api.nvim_create_autocmd('User', {
+            pattern = 'TelescopePreviewerLoaded',
+            callback = function(args)
+              vim.wo.number     = true
+              vim.wo.cursorline = true
+
+              local ok, picker = pcall(
+                require('telescope.actions.state').get_current_picker,
+                args.data.prompt_bufnr
+              )
+            end,
+          })
         end,
       })
     end,
@@ -93,15 +108,12 @@ return {
         end,
         desc = "Find Files",
       },
-      -- {
-      --   "<leader>pa",
-      --   find_alternate_files,
-      --   desc = "Find Alternate Files",
-      -- },
       {
         "<leader>sp",
-        function() require("telescope.builtin").live_grep() end,
-        desc = "Search Project",
+        function()
+          require("telescope.builtin").live_grep()
+        end,
+        desc = "Search in Project",
       },
       {
         "<leader>bb",

@@ -29,9 +29,9 @@ return {
 
     vim.keymap.set(
       "n",
-      "<leader>pa",
+      "<leader>tf",
       "<cmd>A<CR>",
-      { desc = "Open Alternate File" }
+      { desc = "Switch Test File" }
     )
   end,
 }
