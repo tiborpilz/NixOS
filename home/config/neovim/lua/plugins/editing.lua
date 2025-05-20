@@ -3,7 +3,7 @@ vim.keymap.set("n", "<leader>cf", ":Format<CR>", { desc = "Format Buffer" })
 
 -- Treesitter
 vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+-- vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 
 -- Limit height of floating windows
 
@@ -45,72 +45,74 @@ return {
     end,
   },
 
-  {
-    "hrsh7th/nvim-cmp",
-    dependencies = {
-      { "hrsh7th/cmp-nvim-lsp" },
-      { "onsails/lspkind-nvim" },
-      { "sudo-burger/cmp-org-roam", dependencies = { 'chipsenkbeil/org-roam.nvim' } },
-      { "brenoprata10/nvim-highlight-colors" },
-    },
-    config = function()
-      local cmp = require("cmp")
-      local lspkind = require("lspkind")
-      local highlight_colors = require("nvim-highlight-colors")
-
-      highlight_colors.setup({})
-
-      cmp.setup({
-        window = {
-          completion = cmp.config.window.bordered({
-            border = "none",
-            winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
-          }),
-          documentation = cmp.config.window.bordered({
-            border = { " ", " ", " ", " ", " ", " ", " ", " " },
-            winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
-          }),
-        },
-        mapping = {
-          ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-          ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-          ["<C-d>"] = cmp.mapping.scroll_docs(-4),
-          ["<C-f>"] = cmp.mapping.scroll_docs(4),
-          ["<C-e>"] = cmp.mapping.close(),
-          ["<CR>"] = cmp.mapping.confirm({ select = false }),
-        },
-        sources = {
-          { name = 'nvim_lsp' },
-        },
-        formatting = {
-          fields = { "abbr", "kind", "menu" },
-          expandable_indicator = false,
-          format = function(entry, item)
-            -- Check Tailwind first
-            local tw_item = require("tailwindcss-colorizer-cmp").formatter(entry, item)
-            if tw_item.kind == "XX" then
-              return tw_item
-            end
-
-            local color_item = highlight_colors.format(entry, { kind = item.kind })
-
-            item = lspkind.cmp_format({ mode = "symbol", preset = "codicons"})(entry, item)
-            if color_item.abbr1_hl_group then
-              item.kind_hl_group = color_item.abbr_hl_group
-              item.kind = color_item.abbr
-            end
-            return item
-          end
-        },
-      })
-
-      cmp.setup.filetype("org", {
-        sources = {
-          { name = "org-roam" },
-        },
-      })
-    end,
-  },
+  -- Completions
+  -- TODO: is this necessary?
+  -- {
+  --   "hrsh7th/nvim-cmp",
+  --   dependencies = {
+  --     { "hrsh7th/cmp-nvim-lsp" },
+  --     { "onsails/lspkind-nvim" },
+  --     { "sudo-burger/cmp-org-roam", dependencies = { 'chipsenkbeil/org-roam.nvim' } },
+  --     { "brenoprata10/nvim-highlight-colors" },
+  --   },
+  --   config = function()
+  --     local cmp = require("cmp")
+  --     local lspkind = require("lspkind")
+  --     local highlight_colors = require("nvim-highlight-colors")
+  --
+  --     highlight_colors.setup({})
+  --
+  --     cmp.setup({
+  --       window = {
+  --         completion = cmp.config.window.bordered({
+  --           border = "none",
+  --           winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
+  --         }),
+  --         documentation = cmp.config.window.bordered({
+  --           border = { " ", " ", " ", " ", " ", " ", " ", " " },
+  --           winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
+  --         }),
+  --       },
+  --       mapping = {
+  --         ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+  --         ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+  --         ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+  --         ["<C-f>"] = cmp.mapping.scroll_docs(4),
+  --         ["<C-e>"] = cmp.mapping.close(),
+  --         ["<CR>"] = cmp.mapping.confirm({ select = false }),
+  --       },
+  --       sources = {
+  --         { name = 'nvim_lsp' },
+  --       },
+  --       formatting = {
+  --         fields = { "abbr", "kind", "menu" },
+  --         expandable_indicator = false,
+  --         format = function(entry, item)
+  --           -- Check Tailwind first
+  --           local tw_item = require("tailwindcss-colorizer-cmp").formatter(entry, item)
+  --           if tw_item.kind == "XX" then
+  --             return tw_item
+  --           end
+  --
+  --           local color_item = highlight_colors.format(entry, { kind = item.kind })
+  --
+  --           item = lspkind.cmp_format({ mode = "symbol", preset = "codicons"})(entry, item)
+  --           if color_item.abbr1_hl_group then
+  --             item.kind_hl_group = color_item.abbr_hl_group
+  --             item.kind = color_item.abbr
+  --           end
+  --           return item
+  --         end
+  --       },
+  --     })
+  --
+  --     cmp.setup.filetype("org", {
+  --       sources = {
+  --         { name = "org-roam" },
+  --       },
+  --     })
+  --   end,
+  -- },
 
   -- Tree-like undo history
   {

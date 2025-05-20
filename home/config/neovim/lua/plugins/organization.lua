@@ -38,11 +38,12 @@ return {
       }
     end,
   },
-  {
-    "lukas-reineke/headlines.nvim",
-    dependencies = "nvim-treesitter/nvim-treesitter",
-    opts = {}
-  },
+  -- {
+  --   "lukas-reineke/headlines.nvim",
+  --   dependencies = "nvim-treesitter/nvim-treesitter",
+  --   event = "VeryLazy",
+  --   opts = {}
+  -- },
   -- Org roam in vim
   -- TODO: this slows down startup, investigate
   -- {
