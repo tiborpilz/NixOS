@@ -82,21 +82,8 @@ return {
       { "MarcHamamji/ascii-text.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
     },
     config = function()
-
-      ---@diagnostic disable-next-line: missing-fields
-      local git_dashboard = require("git-dashboard-nvim").setup({
-        days = { 'S', 'M', 'D', 'M', 'D', 'F', 'S' },
-        show_contributions_count = true,
-        show_only_weeks_with_commits = false,
-        title = "owner_with_repo_name",
-        filled_squares = { '', '', '', '', '', '' },
-        empty_square = '',
-      })
-
       local dashboard = require("alpha.themes.dashboard")
 
-      local neovim_slanted = load_neovim_text()
-      local generated_text = generate_random_neovim_text()
       local neovim_logo = load_neovim_logo()
 
       dashboard.section.buttons.val = {
@@ -116,7 +103,6 @@ return {
           hl = "Type",
         },
       }
-      dashboard.section.footer.val = git_dashboard
 
       dashboard.config.opts.margin = 0
       dashboard.config.layout = {
@@ -126,7 +112,6 @@ return {
         dashboard.section.subheader,
         { type = "padding", val = 8 },
         dashboard.section.buttons,
-        dashboard.section.footer,
       }
 
       require("alpha").setup(
