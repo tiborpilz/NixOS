@@ -41,6 +41,11 @@ return {
             db_version = "v2",
             matcher = "fuzzy",
           },
+          cmdline = {
+            overseer = {
+              enabled = true,
+            },
+          },
         },
       })
       -- CONFIG
@@ -176,5 +181,25 @@ return {
     config = function()
       require("telescope").load_extension "frecency"
     end,
+  },
+  {
+    "jonarrien/telescope-cmdline.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("telescope").load_extension "cmdline"
+    end,
+    keys = {
+      {
+        "<leader><leader>",
+        function()
+          require("telescope").extensions.cmdline.cmdline {
+            cmd = "command",
+            prompt_title = "Command History",
+            previewer = false,
+          }
+        end,
+        desc = "Command",
+      },
+    },
   },
 }
