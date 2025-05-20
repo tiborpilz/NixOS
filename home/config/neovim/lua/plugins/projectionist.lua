@@ -13,6 +13,20 @@ return {
             "test/**/{}.test.ts",
           },
         },
+        ["src/*.tsx"] = {
+          type      = "source",
+          alternate = {
+            "test/{}.test.ts",
+            "test/**/{}.test.ts",
+          },
+        },
+        ["src/*.vue"] = {
+          type      = "source",
+          alternate = {
+            "test/{}.test.ts",
+            "test/**/{}.test.ts",
+          },
+        },
         ["test/*.test.ts"] = {
           type      = "test",
           alternate = {

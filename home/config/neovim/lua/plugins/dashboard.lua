@@ -101,7 +101,6 @@ return {
 
       dashboard.section.buttons.val = {
         -- Browser projects
-        dashboard.button("SPC p p", "  Projects", ":Telescope projects<CR>", { desc = "Switch Project" }),
         dashboard.button("SPC p f", "  Files", ":Telescope frecency workspace=CWD<CR>", { desc = "Find Files" }),
         dashboard.button("SPC f h", "  Help", ":Telescope help_tags<CR>", { desc = "Help" }),
         dashboard.button("SPC n a", "󰃭  Agenda", "<Cmd>lua require('orgmode').action('agenda.prompt')<CR>", { desc = "Agenda" }),
