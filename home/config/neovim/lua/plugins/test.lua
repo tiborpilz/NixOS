@@ -7,15 +7,21 @@ return {
     "nvim-treesitter/nvim-treesitter",
     "nvim-neotest/neotest-jest",
   },
+  event = "VeryLazy",
+  lazy = true,
   config = function()
     local neotest = require("neotest")
     local neotest_jest = require("neotest-jest")
 
+---@diagnostic disable-next-line: missing-fields
     neotest.setup({
       status = {
+        enabled = true,
         virtual_text = true,
+        signs = true,
       },
       output = {
+        enabled = true,
         open_on_run = true,
       },
       config = function(_, opts)
