@@ -12,7 +12,7 @@ in
 
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
-      neovim
+      unstable.neovim
     ];
 
     modules.shell.zsh.aliases = {

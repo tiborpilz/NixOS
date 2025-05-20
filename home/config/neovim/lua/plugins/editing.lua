@@ -1,10 +1,6 @@
 -- Formatting
 vim.keymap.set("n", "<leader>cf", ":Format<CR>", { desc = "Format Buffer" })
 
--- Treesitter
-vim.opt.foldmethod = "expr"
--- vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
-
 -- Limit height of floating windows
 
 vim.opt.pumheight = 10
@@ -14,7 +10,7 @@ return {
   {
     'numToStr/Comment.nvim',
     opts = {
-        -- add any options here
+      -- add any options here
     }
   },
 
@@ -26,7 +22,11 @@ return {
       { "zapling/mason-conform.nvim" },
     },
     config = function()
-      require("conform").setup({})
+      require("conform").setup({
+        formatters_by_ft = {
+          typescript = { lsp_format = "last" },
+        },
+      })
 
       -- Create a command for formatting the entire buffer
       vim.api.nvim_create_user_command("Format", function(args)
