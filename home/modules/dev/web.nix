@@ -36,6 +36,9 @@ with mylib;
 
       # Load Testing
       k6
+
+      # Debugger for DAP (neovim, emacs)
+      vscode-js-debug
     ];
   };
 }

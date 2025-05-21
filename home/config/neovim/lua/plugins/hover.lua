@@ -10,9 +10,9 @@ return {
           require("hover.providers.diagnostic")
         end,
         preview_opts = {
-          border = "single",
+          border = "none",
         },
-        title = true,
+        title = false,
       }
 
       vim.keymap.set("n", "<leader>cg", function()
