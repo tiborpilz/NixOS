@@ -41,3 +41,4 @@
 [alias]
   difft = "-c diff.external=difft diff"
   dlog = "-c diff.external=difft log -p --ext-diff"
+  conflicts = "diff --name-only --diff-filter=U --relative"

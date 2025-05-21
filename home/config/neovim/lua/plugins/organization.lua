@@ -3,11 +3,14 @@ return {
     "folke/todo-comments.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
-      signs = false,
+      signs = true,
       -- your configuration comes here
       -- or leave it empty to use the default settings
       -- refer to the configuration section below
-    }
+    },
+    keys = {
+      { "<leader>pT", "<cmd>TodoTelescope<cr>", desc = "Find TODOs in current project" },
+    },
   },
   -- Orgmode in Vim
   {
@@ -34,6 +37,7 @@ return {
     "akinsho/org-bullets.nvim",
     config = function()
       require("org-bullets").setup {
+        concealcursor = true,
         symbols = { "◉", "○", "✸", "✿" },
       }
     end,

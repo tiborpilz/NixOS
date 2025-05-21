@@ -22,19 +22,35 @@ vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
 )
 
 return {
-  -- Mason for installing LSP servers
-  -- {
-  --   "williamboman/mason.nvim",
-  --   opts = {
-  --     ui = {
-  --       border = "none",
-  --     },
-  --   },
-  --   config = function()
-  --     require("mason").setup()
-  --   end,
-  -- },
+  -- -- Single languages
+  -- Rust
+  {
+    'mrcjkb/rustaceanvim',
+    version = '^6', -- Recommended
+    lazy = false,   -- This plugin is already lazy
+    config = function()
+      vim.g.rustaceanvim = {
+        server = {
+          cmd = function()
+            local mason_registry = require('mason-registry')
+            if mason_registry.is_installed('rust-analyzer') then
+              -- This may need to be tweaked depending on the operating system.
+              local ra = mason_registry.get_package('rust-analyzer')
+              local ra_filename = ra:get_receipt():get().links.bin['rust-analyzer']
+              return { ('%s/%s'):format(ra:get_install_path(), ra_filename or 'rust-analyzer') }
+            else
+              -- global installation
+              return { 'rust-analyzer' }
+            end
+          end,
 
+          cargo = {
+            allFeatures = true,
+          },
+        },
+      }
+    end
+  },
   -- LSP config
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
@@ -268,6 +284,24 @@ return {
     config = function()
       require("lsp-file-operations").setup()
     end,
+  },
+  -- LSP Symbol view
+  {
+    "stevearc/aerial.nvim",
+    config = function()
+      require("aerial").setup({
+        attach_mode = "global",
+        backends = { "lsp", "treesitter", "markdown" },
+        filter_kind = false,
+        show_guides = true,
+        lsp = {
+          diagnostics_trigger_update = true,
+        }
+      })
+    end,
+    keys = {
+      { "<leader>cS", "<cmd>AerialToggle!<cr>", desc = "Show LSP Symbols" },
+    },
   },
 
   -- Treesitter
