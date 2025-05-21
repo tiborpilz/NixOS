@@ -13,12 +13,19 @@ return {
     require("neotest").setup({
       status = {
         enabled = true,
-        virtual_text = true,
+        virtual_text = false,
         signs = true,
       },
       output = {
         enabled = true,
         open_on_run = true,
+      },
+      running = {
+        concurrent = true,
+      },
+      discovery = {
+        enabled = false,
+        concurrent = 16,
       },
       config = function(_, opts)
         local neotest_ns = vim.api.nvim_create_namespace("neotest")
@@ -62,6 +69,13 @@ return {
       '<leader>tr',
       '<cmd>lua require("neotest").run.run()<cr>',
       { desc = 'Run nearest test' }
+    )
+
+    vim.keymap.set(
+      'n',
+      '<leader>td',
+      '<cmd>lua require("neotest").run.run({ strategy = "dap" })<cr>',
+      { desc = 'Debug nearest test' }
     )
 
     vim.keymap.set(
