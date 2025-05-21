@@ -8,13 +8,9 @@ return {
     "nvim-neotest/neotest-jest",
   },
   event = "VeryLazy",
-  lazy = true,
   config = function()
-    local neotest = require("neotest")
-    local neotest_jest = require("neotest-jest")
-
----@diagnostic disable-next-line: missing-fields
-    neotest.setup({
+    --- @diagnostic disable-next-line: missing-fields
+    require("neotest").setup({
       status = {
         enabled = true,
         virtual_text = true,
@@ -37,14 +33,27 @@ return {
         }, neotest_ns)
       end,
       adapters = {
-        require('neotest-jest')({
+        require("neotest-jest")({
           jestCommand = "npm test --",
           jestConfigFile = "jest.config.ts",
           env = { CI = true },
-          cwd = function(path)
+          cwd = function()
             return vim.fn.getcwd()
           end,
         }),
+      },
+      consumers = {
+        overseer = require("neotest.consumers.overseer"),
+      },
+      overseer = {
+        enabled = true,
+        force_default = true,
+        task_list = {
+          name = "Tests",
+          filter = function(task)
+            return task:has_tags("test")
+          end,
+        },
       },
     })
 

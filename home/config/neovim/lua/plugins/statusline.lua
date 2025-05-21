@@ -6,7 +6,10 @@ return {
   -- Status line
   {
     'nvim-lualine/lualine.nvim',
-    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
+      'arkav/lualine-lsp-progress',
+    },
     config = function()
       -- TODO: This doesn't work, setting the background via nord theme override
       vim.cmd [[ hi lualine_c_normal guibg=NONE ]]
@@ -81,6 +84,11 @@ return {
           lualine_c = {},
 
           lualine_x = {
+            'lsp_status',
+            {
+              'lsp_progress',
+              display_components = { 'lsp_client_name', 'spinner', { 'title', 'percentage', 'message' }},
+            },
             {
               'diagnostics',
               sources = { 'nvim_lsp', 'nvim_diagnostic' },
