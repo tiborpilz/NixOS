@@ -1,3 +1,38 @@
+-- use "git jump" to list all merge conflicts and feed them into telescope
+-- TODO: Find out why this doesn't work
+-- TODO: restructure lua files so these functions have a better home
+--
+-- local git_conflicts = function()
+--   require("telescope.pickers")
+--     .new({
+--       finder = require("telescope.finders").new_oneshot_job({ "git", "jump", "--stdout", "merge" }, {
+--         entry_maker = function(line)
+--           local filename, lnum_string = line:match("([^:]+):(%d+).*")
+--
+--           -- if filename is /dev/null, skip it (it was deleted)
+--           if filename.match("^/dev/null") then
+--             return nil
+--           end
+--
+--           return {
+--             value = filename,
+--             display = line,
+--             ordinal = line,
+--             filename = filename,
+--             lnum = tonumber(lnum_string),
+--           }
+--         end,
+--       }),
+--       sorter = require("telescope.sorters").get_generic_fuzzy_sorter(),
+--       previewer = require("telescope.config").values.grep_previewer({}),
+--       results_title = "Git Merge Conflicts",
+--       prompt_title = "Git Merge Conflicts",
+--     }, {})
+--     :find()
+--   end
+--
+-- vim.keymap.set("n", "<leader>gc", git_conflicts, { desc = "List Git Conflicts" })
+
 return {
   {
     "sindrets/diffview.nvim",
