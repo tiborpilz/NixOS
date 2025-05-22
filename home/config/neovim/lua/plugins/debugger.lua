@@ -11,13 +11,10 @@ return {
       dap.adapters["pwa-node"] = {
         type = "server",
         host = "localhost",
-        port = "${port}", --let both ports be the same for now...
+        port = "${port}",
         executable = {
-          command = "node",
-          -- -- 💀 Make sure to update this path to point to your installation
-          args = { vim.fn.stdpath('data') .. "/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js", "${port}" },
-          -- command = "js-debug-adapter",
-          -- args = { "${port}" },
+          command = "js-debug-adapter",
+          args = { "${port}" },
         },
       }
 
@@ -84,12 +81,19 @@ return {
 
       require("dapui").setup()
 
-      local dap, dapui = require("dap"), require("dapui")
-      dap.listeners.after.event_initialized["dapui_config"] = function()
-        dapui.open({ reset = true })
+      local dapui = require("dapui")
+      dap.listeners.before.attach["dapui_config"] = function()
+        dapui.open()
       end
-      dap.listeners.before.event_terminated["dapui_config"] = dapui.close
-      dap.listeners.before.event_exited["dapui_config"] = dapui.close
+      dap.listeners.before.launch["dap-view-config"] = function()
+        dapui.open()
+      end
+      dap.listeners.before.event_terminated["dapui_config"] = function()
+        dapui.close()
+      end
+      dap.listeners.before.event_exited["dapui_config"] = function()
+        dapui.close()
+      end
 
     end,
 
