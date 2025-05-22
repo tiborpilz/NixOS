@@ -1,10 +1,12 @@
 return {
   {
-    -- TODO: Add keybindings
     "mfussenegger/nvim-dap",
+    lazy = true,
+    dependencies = {
+      "rcarriga/nvim-dap-ui",
+    },
     config = function()
       local dap = require("dap")
-      -- require("dap").setup()
 
       dap.adapters["pwa-node"] = {
         type = "server",
@@ -16,6 +18,16 @@ return {
           args = { vim.fn.stdpath('data') .. "/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js", "${port}" },
           -- command = "js-debug-adapter",
           -- args = { "${port}" },
+        },
+      }
+
+      dap.adapters["pwa-firefox"] = {
+        type = "server",
+        host = "localhost",
+        port = "${port}",
+        executable = {
+          command = "node",
+          args = { vim.fn.stdpath('data') .. "/mason/packages/js-debug-adapter/dist/src/firefoxDebug.js", "${port}" },
         },
       }
 
@@ -48,8 +60,37 @@ return {
               "!**/node_modules/**",
             },
           },
+          {
+            type = 'pwa-node',
+            request = 'launch',
+            name = 'Debug NestJS Application',
+            cwd = "${workspaceFolder}",
+            runtimeExecutable = 'npm',
+            runtimeArgs = { 'run', 'start:dev', '--', '--debug', '--watch', '--inspect-brk' },
+            autoAttachChildProcesses = true,
+            restart = true,
+            sourceMaps = true,
+            stopOnEntry = false,
+            console = 'integratedTerminal',
+          },
+          {
+            type = 'pwa-firefox',
+            request = 'launch',
+            name = 'Launch Firefox',
+          }
         }
       end
+
+
+      require("dapui").setup()
+
+      local dap, dapui = require("dap"), require("dapui")
+      dap.listeners.after.event_initialized["dapui_config"] = function()
+        dapui.open({ reset = true })
+      end
+      dap.listeners.before.event_terminated["dapui_config"] = dapui.close
+      dap.listeners.before.event_exited["dapui_config"] = dapui.close
+
     end,
 
     keys = {
@@ -87,6 +128,13 @@ return {
           require("dap").repl.open()
         end,
         desc = "Open REPL",
+      },
+      {
+        -- toggle the UI
+        "<leader>dt",
+        function()
+          require("dapui").toggle()
+        end,
       },
     },
   }
