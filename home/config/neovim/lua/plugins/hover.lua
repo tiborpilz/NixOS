@@ -10,7 +10,7 @@ return {
           require("hover.providers.diagnostic")
         end,
         preview_opts = {
-          border = "none",
+          border = "solid",
         },
         title = false,
       }
@@ -20,10 +20,8 @@ return {
       end, { desc = "Glance at LSP" })
 
       vim.keymap.set("n", "<leader>ce", function()
-        require("hover").hover({ providers = { "Diagnostic" }})
+        require("hover").hover({ providers = { "Diagnostics" }})
       end, { desc = "Diagnostic Hover" })
-
-
     end,
   },
 }
