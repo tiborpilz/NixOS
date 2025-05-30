@@ -1,7 +1,7 @@
 (setq user-full-name "Tibor Pilz"
       user-mail-address "tibor@pilz.berlin")
 
-(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
+(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'normal)
       doom-big-font (font-spec :family "FiraCode Nerd Font" :size 28 :weight 'light)
       doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
       doom-variable-pitch-font (font-spec :family "DejaVu Serif" :size 16 :weight 'light))
@@ -156,6 +156,11 @@
 
 (setq org-roam-directory (concat org-directory "roam"))
 
+;; (setq org-roam-capture-templates
+(add-to-list 'org-roam-capture-templates
+             '("j" "Journal" entry "* %T %?" :target (file+datetree "journal.org" day))
+             '("t" "Todo" entry "* TODO %?" :target (file+head "todo.org" "Inbox")))
+
 (use-package! websocket
   :after org-roam
   :defer t)
@@ -222,7 +227,7 @@
         (org-mks org-capture-templates
                 "Select a capture template\n━━━━━━━━━━━━━━━━━━━━━━━━━"
                 "Template key: "
-                `(("q" ,(concat (all-the-icons-octicon "stop" :face 'all-the-icons-red :v-adjust 0.01) "\tAbort")))))))
+                `(("q" ,(concat (nerd-icons-octicon "nf-oct-stop" :face 'all-the-icons-red :v-adjust 0.01) "\tAbort")))))))
     (advice-add 'org-capture-select-template :override #'org-capture-select-template-prettier))
 
 (setf (alist-get 'height +org-capture-frame-parameters) 15)

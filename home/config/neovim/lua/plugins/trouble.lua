@@ -1,9 +1,7 @@
 return {
   {
     "folke/trouble.nvim",
-    opts = {
-      focus = true,
-    },
+    opts = {}, -- for default options, refer to the configuration section for custom setup.
     cmd = "Trouble",
     keys = {
       {
@@ -15,11 +13,6 @@ return {
         "<leader>xX",
         "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
         desc = "Buffer Diagnostics (Trouble)",
-      },
-      {
-        "<leader>cs",
-        "<cmd>Trouble symbols toggle focus=false<cr>",
-        desc = "Symbols (Trouble)",
       },
       {
         "<leader>cl",

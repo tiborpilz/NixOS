@@ -20,7 +20,7 @@
   "terraform-ls": "v0.36.4",
   "tflint": "v0.55.1",
   "trivy": "v0.62.1",
-  "typescript-language-server": "4.3.3",
+  "typescript-language-server": "4.3.4",
   "vue-language-server": "2.2.0",
   "yaml-language-server": "1.15.0",
   "yamlfmt": "v0.14.0",
