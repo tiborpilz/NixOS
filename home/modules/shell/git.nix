@@ -33,8 +33,10 @@ in
       "git/ignore_global".source = ../../config/git/ignore_global;
     };
 
+    modules.shell.zsh.fpathDirs = "${pkgs.gitAndTools.gh}/share/zsh/site-functions";
+
     modules.shell.zsh.rcInit = ''
-      fpath=(${pkgs.gitAndTools.glab}/share/zsh/site-functions $fpath)
+      # fpath=(${pkgs.gitAndTools.glab}/share/zsh/site-functions $fpath)
       function opencommit() {
         if [ -z "$OPENAI_API_KEY" ]; then
           # TODO: make key configurable in global config

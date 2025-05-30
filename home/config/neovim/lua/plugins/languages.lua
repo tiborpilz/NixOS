@@ -41,6 +41,9 @@ return {
           default_settings = {
             -- rust-analyzer language server configuration
             ['rust-analyzer'] = {
+              cargo = {
+                allFeatures = true,
+              },
             },
           },
         },
@@ -130,9 +133,9 @@ return {
                 },
                 -- NOTE: This might not be needed. Uncomment if you encounter issues.
 
-                -- typescript = {
-                --   tsdk = vim.fn.getcwd() .. "/node_modules/typescript/lib",
-                -- },
+                typescript = {
+                  tsdk = vim.fn.getcwd() .. "/node_modules/typescript/lib",
+                },
               },
               settings = {
                 typescript = {
@@ -166,7 +169,7 @@ return {
             require("lspconfig").ts_ls.setup({
               -- NOTE: To enable hybridMode, change HybrideMode to true above and uncomment the following filetypes block.
 
-              -- filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
+              filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
               init_options = {
                 plugins = {
                   {
@@ -290,16 +293,23 @@ return {
     config = function()
       require("aerial").setup({
         attach_mode = "global",
-        backends = { "lsp", "treesitter", "markdown" },
+        backends = { "lsp", "markdown" },
         filter_kind = false,
         show_guides = true,
+        layout = {
+          -- margin
+          win_opts = {
+            winblend = 10,
+            winhighlight = "Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
+          },
+        },
         lsp = {
           diagnostics_trigger_update = true,
         }
       })
     end,
     keys = {
-      { "<leader>cS", "<cmd>AerialToggle!<cr>", desc = "Show LSP Symbols" },
+      { "<leader>cs", "<cmd>AerialToggle!<cr>", desc = "Show LSP Symbols" },
     },
   },
 

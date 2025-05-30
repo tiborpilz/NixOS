@@ -55,6 +55,7 @@ return {
       { "sudo-burger/cmp-org-roam", dependencies = { 'chipsenkbeil/org-roam.nvim' } },
       { "brenoprata10/nvim-highlight-colors" },
     },
+    event = "VeryLazy",
     config = function()
       local cmp = require("cmp")
       local lspkind = require("lspkind")

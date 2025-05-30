@@ -13,7 +13,7 @@ Set Name and mail adress
 ** Font settings
 
 #+begin_src elisp
-(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
+(setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'normal)
       doom-big-font (font-spec :family "FiraCode Nerd Font" :size 28 :weight 'light)
       doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
       doom-variable-pitch-font (font-spec :family "DejaVu Serif" :size 16 :weight 'light))
@@ -396,6 +396,17 @@ All roam files should be under a subdirectory of my org directory - so I can syn
 (setq org-roam-directory (concat org-directory "roam"))
 #+end_src
 
+*** Capture Templates
+
+I'm adding some capture tempates for todos and journal entries.
+
+#+begin_src elisp
+;; (setq org-roam-capture-templates
+(add-to-list 'org-roam-capture-templates
+             '("j" "Journal" entry "* %T %?" :target (file+datetree "journal.org" day))
+             '("t" "Todo" entry "* TODO %?" :target (file+head "todo.org" "Inbox")))
+#+end_src
+
 *** Add Org-Roam UI
 
 Org-Roam UI is a web-based interface for Org-roam. It is a separate package -
@@ -549,7 +560,7 @@ Some other tools (like orgzly) work better with ~TODO~ instead of ~[ ]~, so I'm 
           "* %U %?\n %i\n %a" :heading "Changelog" :prepend t))))
 #+end_src
 
-*** Improve org-capture dialog
+*** TODO Improve org-capture dialog
 
 #+BEGIN_SRC elisp
 (after! org-capture
@@ -568,9 +579,8 @@ Some other tools (like orgzly) work better with ~TODO~ instead of ~[ ]~, so I'm 
         (org-mks org-capture-templates
                 "Select a capture template\n━━━━━━━━━━━━━━━━━━━━━━━━━"
                 "Template key: "
-                `(("q" ,(concat (all-the-icons-octicon "stop" :face 'all-the-icons-red :v-adjust 0.01) "\tAbort")))))))
+                `(("q" ,(concat (nerd-icons-octicon "nf-oct-stop" :face 'all-the-icons-red :v-adjust 0.01) "\tAbort")))))))
     (advice-add 'org-capture-select-template :override #'org-capture-select-template-prettier))
-
 #+END_SRC
 
 The [[file:~/.emacs.d/bin/org-capture][org-capture bin]] is rather nice, but It would be even nicer with a smaller frame, and

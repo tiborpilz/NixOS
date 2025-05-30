@@ -50,24 +50,27 @@ return {
   -- },
   -- Org roam in vim
   -- TODO: this slows down startup, investigate
-  -- {
-  --   "chipsenkbeil/org-roam.nvim",
-  --   dependencies = {
-  --     {
-  --       "nvim-orgmode/orgmode",
-  --     },
-  --   },
-  --   lazy = true,
-  --   config = function()
-  --     require("org-roam").setup({
-  --       directory = "~/org/roam",
-  --       -- optional
-  --       org_files = {
-  --         "~/org",
-  --       }
-  --     })
-  --   end
-  -- },
+  {
+    "chipsenkbeil/org-roam.nvim",
+    dependencies = {
+      {
+        "nvim-orgmode/orgmode",
+      },
+    },
+    lazy = true,
+    config = function()
+      local org_directory = "~/org"
+      local org_roam_directory = org_directory .. "/roam"
+
+      require("org-roam").setup({
+        directory = org_roam_directory, 
+        -- optional
+        org_files = { org_directory },
+        org_agenda_files = org_directory .. "/**/*",
+        org_default_notes_file = org_roam_directory .. "/refile.org",
+      })
+    end
+  },
   -- Telescope integration for finding headlines etc.
   {
     "nvim-orgmode/telescope-orgmode.nvim",
