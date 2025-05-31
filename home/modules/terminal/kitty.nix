@@ -12,12 +12,6 @@ with lib;
   config = mkIf cfg.enable {
     programs.kitty = {
       enable = true;
-      font = {
-        package = pkgs.fira-code;
-        size = 14;
-        name = "Fira Code";
-      };
-      themeFile = "Nord";
       settings = {
         enable_audio_bell = false;
       };
