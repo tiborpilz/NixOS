@@ -122,10 +122,6 @@ with lib;
 
     services.nfs.server.enable = true;
 
-    fileSystems = {
-      "/".label = "nixos-root";
-    };
-
     services.openssh.enable = true;
     services.openssh.settings.PermitRootLogin = "yes";
 
