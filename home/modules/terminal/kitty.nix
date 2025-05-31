@@ -18,7 +18,7 @@ with lib;
       extraConfig = ''
         window_margin_width 32
         macos_titlebar_color background
-        remote_control_password "" *-colors
+        allow_remote_control yes
       '';
     };
   };

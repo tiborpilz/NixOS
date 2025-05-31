@@ -26,7 +26,7 @@ in
     # home-manager.extraSpecialArgs = { inherit lib; };
     home-manager.users.tibor = mkMerge [
       inputs.nix-doom-emacs-unstraightened.hmModule
-      inputs.stylix.homeModule.stylix
+      inputs.stylix.homeModules.stylix
       {
         _module.args.inputs = inputs;
         _module.args.lib = lib;
