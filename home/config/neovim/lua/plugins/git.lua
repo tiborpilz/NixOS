@@ -56,6 +56,14 @@ return {
       auto_refresh = true,
       disable_insert_on_commit = false,
       graph_style = "kitty",
+      process_spinner = true,
+      git_services = {
+        ["github.com"] = "https://github.com/${owner}/${repository}/compare/${branch_name}?expand=1",
+        ["gitlab.com"] = "https://gitlab.com/${owner}/${repository}/merge_requests/new?merge_request[source_branch]=${branch_name}",
+      },
+
+      use_per_project_settings = true,
+
       commit_popup = {
         kind = "split",
       },
@@ -75,6 +83,12 @@ return {
       { "<leader>gg", function() require("neogit").open() end, desc = "Open Neogit" },
       { "<leader>gl", function() require("neogit").open({ "log" }) end, desc = "Git Log" },
       { "<leader>gb", function() require("neogit").open({ "branch" }) end, desc = "Git branch" },
+    },
+
+    kind = "float",
+    floating = {
+      border = "rounded",
+      winblend = 0,
     },
   },
   --- Show Pipeline information for Github and Gitlab
