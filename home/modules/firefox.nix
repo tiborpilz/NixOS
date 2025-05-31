@@ -13,6 +13,12 @@ in
   config = mkIf cfg.enable {
     programs.firefox = {
       enable = true;
+      profiles = {
+        nixboi = {
+
+        };
+      };
+
       nativeMessagingHosts = [
         pkgs.tridactyl-native
       ];
@@ -22,4 +28,18 @@ in
       colourscheme --url https://raw.githubusercontent.com/bezmi/base16-tridactyl/master/base16-grayscale-dark.css grayscale-dark
     '';
   };
+
+
+  # config = mkIf cfg.enable {
+  #   programs.firefox = {
+  #     enable = true;
+  #     package = pkgs.firefox-unwrapped;
+  #     nativeMessagingHosts = [
+  #       pkgs.tridactyl-native
+  #     ];
+  #   };
+
+    # xdg.configFile."tridactyl/tridactylrc".text = ''
+    #   colourscheme --url https://raw.githubusercontent.com/bezmi/base16-tridactyl/master/base16-grayscale-dark.css grayscale-dark
+    # '';
 }

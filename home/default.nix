@@ -19,6 +19,8 @@ with mylib;
     };
 
     home.packages = with pkgs; [
+      firefox-unwrapped
+
       nix
 
       # TODO: move fonts to own module
@@ -118,6 +120,9 @@ with mylib;
 
     programs.man.enable = true;
 
+    programs.alacritty.enable = true;
+    stylix.targets.alacritty.enable = true;
+
     modules.shell.atuin.enable = true;
 
     modules.scripts.enable = true;
@@ -187,6 +192,7 @@ with mylib;
     modules.shell.zsh.envInit = ''
       export CXX=clang++
     '';
+
 
     nix = {
       registry.nixpkgs.flake = inputs.nixpkgs;
