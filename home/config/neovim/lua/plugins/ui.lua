@@ -54,23 +54,23 @@ return {
     dependencies = {
       "fussenegger/nvim-dap",
     },
-      opts = function()
-        local builtin = require('statuscol.builtin')
-        return {
-          setopt = true,
-          -- override the default list of segments with:
-          -- number-less fold indicator, then signs, then line number & separator
-          segments = {
-            { text = { builtin.foldfunc }, click = 'v:lua.ScFa' },
-            { text = { '%s' }, click = 'v:lua.ScSa' },
-            {
-              text = { builtin.lnumfunc, ' ' },
-              condition = { true, builtin.not_empty },
-              click = 'v:lua.ScLa',
-            },
+    opts = function()
+      local builtin = require('statuscol.builtin')
+      return {
+        setopt = true,
+        -- override the default list of segments with:
+        -- number-less fold indicator, then signs, then line number & separator
+        segments = {
+          { text = { builtin.foldfunc }, click = 'v:lua.ScFa' },
+          { text = { '%s' },             click = 'v:lua.ScSa' },
+          {
+            text = { builtin.lnumfunc, ' ' },
+            condition = { true, builtin.not_empty },
+            click = 'v:lua.ScLa',
           },
-        }
-      end,
+        },
+      }
+    end,
   },
 
   -- Zen Mode
@@ -133,8 +133,8 @@ return {
     "shaunsingh/nord.nvim",
     config = function()
       vim.g.nord_contrast = true
-      vim.g.nord_borders = true
-      vim.g.nord_disable_background = false
+      vim.g.nord_borders = false
+      vim.g.nord_disable_background = true
       vim.g.nord_italic = false
       vim.g.nord_uniform_diff_background = false
       vim.g.nord_bold = true
@@ -145,6 +145,14 @@ return {
   "rktjmp/lush.nvim",
   "kdheepak/monochrome.nvim",
   "Yazeed1s/minimal.nvim",
+  "neanias/everforest-nvim",
+  {
+    "rose-pine/neovim",
+    name = "rose-pine",
+    config = function()
+      vim.cmd("colorscheme rose-pine")
+    end
+  },
   {
     "zenbones-theme/zenbones.nvim",
     -- Optionally install Lush. Allows for more configuration or extending the colorscheme
@@ -185,4 +193,11 @@ return {
       })
     end,
   },
+  -- Send new BG Color to Kitty
+  {
+    "shaun-mathew/Chameleon.nvim",
+    config = function()
+      require("chameleon").setup()
+    end,
+  }
 }

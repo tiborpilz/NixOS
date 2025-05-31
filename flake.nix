@@ -3,10 +3,10 @@
 
   inputs = {
     nixpkgs-24-05.url = "nixpkgs/nixos-24.05";
-    nixpkgs.url = "nixpkgs/nixos-24.11";
+    nixpkgs.url = "nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
-    home-manager.url = "github:nix-community/home-manager/release-24.11";
+    home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     plasma-manager.url = "github:nix-community/plasma-manager";
@@ -34,6 +34,9 @@
 
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
     quadlet-nix.inputs.nixpkgs.follows = "nixpkgs";
+
+    stylix.url = "github:danth/stylix/release-25.05";
+    stylix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -48,6 +51,7 @@
     , authentik-nix
     , emacs-lsp-booster
     , quadlet-nix
+    , stylix
     , ...
     } @ inputs:
     let
@@ -148,11 +152,13 @@
               modules = [
                 ./home
                 inputs.nix-doom-emacs-unstraightened.hmModule
+                stylix.homeModules.stylix
                 {
                   _module.args.inputs = inputs;
                   home.username = user;
                   home.homeDirectory = homeDirectory;
                   modules.syncthing.service = enableSyncthing;
+
                   nix.package = pkgs.nix;
                 }
               ];

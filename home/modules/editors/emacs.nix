@@ -94,7 +94,7 @@ in
       gnuplot
 
       # Speed up LSP
-      my.emacs-lsp-booster
+      emacs-lsp-booster
     ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];

@@ -122,10 +122,6 @@ with lib;
 
     services.nfs.server.enable = true;
 
-    fileSystems = {
-      "/".label = "nixos-root";
-    };
-
     services.openssh.enable = true;
     services.openssh.settings.PermitRootLogin = "yes";
 
@@ -142,7 +138,7 @@ with lib;
       tmux
       vim
       wireguard-tools
-      partition-manager
+      kdePackages.partitionmanager
       gparted
       hdparm
       python3
