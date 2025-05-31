@@ -138,7 +138,7 @@ with lib;
       tmux
       vim
       wireguard-tools
-      partition-manager
+      kdePackages.partitionmanager
       gparted
       hdparm
       python3
