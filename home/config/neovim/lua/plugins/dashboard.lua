@@ -106,7 +106,7 @@ return {
 
       dashboard.config.opts.margin = 0
       dashboard.config.layout = {
-        { type = "padding", val = 2 },
+        { type = "padding", val = 0 },
         dashboard.section.header,
         { type = "padding", val = 3 },
         dashboard.section.subheader,

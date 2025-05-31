@@ -46,7 +46,6 @@ return {
   },
 
   -- Completions
-  -- TODO: is this necessary?
   {
     "hrsh7th/nvim-cmp",
     dependencies = {
@@ -133,4 +132,32 @@ return {
     end,
   },
 
+  -- Zen Mode
+  {
+    "folke/zen-mode.nvim",
+    keys = {
+      {
+        "<leader>Tz",
+        function()
+          require("zen-mode").toggle()
+        end,
+        desc = "Toggle Zen Mode",
+      },
+    },
+    opts = {
+      window = {
+        backdrop = 0.95, -- Darken the background
+        width = 120, -- Width of the zen window
+      },
+      plugins = {
+        gitsigns = { enabled = false }, -- Disable gitsigns in zen mode
+        twilight = { enabled = true }, -- Enable twilight for dimming inactive code
+        tmux = { enabled = false }, -- Disable TMUX Status mode
+        kitty = {
+          enabled = true,
+          font = "+4",
+        }, -- Enable Kitty mode
+      },
+    },
+  }
 }
