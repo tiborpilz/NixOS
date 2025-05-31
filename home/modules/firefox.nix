@@ -15,7 +15,7 @@ in
       enable = true;
       profiles = {
         nixboi = {
-
+          force = true;
         };
       };
 
