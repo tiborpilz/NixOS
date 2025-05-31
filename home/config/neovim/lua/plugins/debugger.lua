@@ -1,4 +1,36 @@
 return {
+  -- {
+  --   "folke/edgy.nvim",
+  --   event = "VeryLazy",
+  --   init = function()
+  --     vim.opt.laststatus = 3
+  --     vim.opt.splitkeep = "screen"
+  --   end,
+  --   opts = {
+  --     bottom = {
+  --       -- toggleterm / lazyterm at the bottom with a height of 40% of the screen
+  --       {
+  --         ft = "scopes",
+  --         title = "Scopes",
+  --         size = { height = 0.25 },
+  --       },
+  --       {
+  --         ft = "stacks",
+  --         title = "Stacks",
+  --         size = { height = 0.25 },
+  --       },
+  --       {
+  --         ft = "watch",
+  --         title = "Watchpoints",
+  --         size = { height = 0.25 },
+  --       },
+  --       {
+  --         ft = "breakpoint",
+  --         title = "Breakpoints",
+  --         size = { height = 0.25 },
+  --       },
+  --
+  -- },
   {
     "mfussenegger/nvim-dap",
     lazy = true,
@@ -78,8 +110,26 @@ return {
         }
       end
 
+      local sign = vim.fn.sign_define
+      sign("DapBreakpoint", { text = "●", texthl = "DapBreakpoint", linehl = "", numhl = "" })
+      sign("DapBreakpointCondition", { text = "●", texthl = "DapBreakpointCondition", linehl = "", numhl = "" })
+      sign("DapLogPoint", { text = "◆", texthl = "DapLogPoint", linehl = "", numhl = "" })
+      sign('DapStopped', { text = '', texthl = 'DapStopped', linehl = 'DapStopped', numhl = 'DapStopped' })
 
-      require("dapui").setup()
+      require("dapui").setup({
+        layouts = {
+          {
+            elements = {
+              { title = "Scopes",      id = "scopes",     size = 0.25 },
+              { title = "Stacks",      id = "stacks",     size = 0.25 },
+              { title = "Watchpoints", id = "watch",      size = 0.25 },
+              { title = "Breakpoints", id = "Breakpoint", size = 0.25 },
+            },
+            position = "right",
+            size = 0.25,
+          }
+        }
+      })
 
       local dapui = require("dapui")
       dap.listeners.before.attach["dapui_config"] = function()
@@ -94,7 +144,6 @@ return {
       dap.listeners.before.event_exited["dapui_config"] = function()
         dapui.close()
       end
-
     end,
 
     keys = {
@@ -140,6 +189,20 @@ return {
           require("dapui").toggle()
         end,
       },
+      {
+        -- glance at value
+        "<leader>dg",
+        function()
+          require("dapui").eval()
+        end,
+      },
+      {
+        -- Overlay STack Trace
+        "<leader>ds",
+        function()
+          require("dapui").float_element("stacks", { title = "Stack Trace", enter = true, max_height = 0.5 })
+        end,
+      }
     },
   }
 }
