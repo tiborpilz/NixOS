@@ -13,11 +13,7 @@ in
   config = mkIf cfg.enable {
     programs.firefox = {
       enable = true;
-      profiles = {
-        nixboi = {
-          force = true;
-        };
-      };
+      profiles.nixboi.extensions.force = true;
 
       nativeMessagingHosts = [
         pkgs.tridactyl-native
