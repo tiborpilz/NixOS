@@ -1,36 +1,5 @@
+---@diagnostic disable: missing-fields
 return {
-  -- {
-  --   "folke/edgy.nvim",
-  --   event = "VeryLazy",
-  --   init = function()
-  --     vim.opt.laststatus = 3
-  --     vim.opt.splitkeep = "screen"
-  --   end,
-  --   opts = {
-  --     bottom = {
-  --       -- toggleterm / lazyterm at the bottom with a height of 40% of the screen
-  --       {
-  --         ft = "scopes",
-  --         title = "Scopes",
-  --         size = { height = 0.25 },
-  --       },
-  --       {
-  --         ft = "stacks",
-  --         title = "Stacks",
-  --         size = { height = 0.25 },
-  --       },
-  --       {
-  --         ft = "watch",
-  --         title = "Watchpoints",
-  --         size = { height = 0.25 },
-  --       },
-  --       {
-  --         ft = "breakpoint",
-  --         title = "Breakpoints",
-  --         size = { height = 0.25 },
-  --       },
-  --
-  -- },
   {
     "mfussenegger/nvim-dap",
     lazy = true,
@@ -110,25 +79,62 @@ return {
         }
       end
 
-      local sign = vim.fn.sign_define
-      sign("DapBreakpoint", { text = "●", texthl = "DapBreakpoint", linehl = "", numhl = "" })
-      sign("DapBreakpointCondition", { text = "●", texthl = "DapBreakpointCondition", linehl = "", numhl = "" })
-      sign("DapLogPoint", { text = "◆", texthl = "DapLogPoint", linehl = "", numhl = "" })
-      sign('DapStopped', { text = '', texthl = 'DapStopped', linehl = 'DapStopped', numhl = 'DapStopped' })
-
       require("dapui").setup({
+        controls = {
+          element = "repl",
+          enabled = true,
+          icons = {
+            disconnect = "",
+            pause = "",
+            play = "",
+            run_last = "",
+            step_back = "",
+            step_into = "",
+            step_out = "",
+            step_over = "",
+            terminate = ""
+          }
+        },
+        expand_lines = true,
+        floating = {
+          border = "single",
+          mappings = {
+            close = { "q", "<Esc>" }
+          }
+        },
         layouts = {
           {
             elements = {
-              { title = "Scopes",      id = "scopes",     size = 0.25 },
-              { title = "Stacks",      id = "stacks",     size = 0.25 },
-              { title = "Watchpoints", id = "watch",      size = 0.25 },
-              { title = "Breakpoints", id = "Breakpoint", size = 0.25 },
+              { title = "Stacks",      id = "stacks", size = 0.25 },
+              { title = "Watches",     id = "watches",    size = 0.25 },
+              { title = "Breakpoints", id = "Breakpoints", size = 0.25 },
             },
             position = "right",
             size = 0.25,
+          },
+          {
+            elements = {
+              { title = "repl",   id = "repl",  size = 0.4 },
+              { title = "Scopes", id = "scopes", size = 0.4},
+            },
+            position = "bottom",
+            size = 0.25,
           }
-        }
+        },
+        mappings = {
+          expand = { "<CR>", "<2-LeftMouse>" },
+          open = "o",
+          remove = "d",
+          edit = "e",
+          repl = "r",
+          toggle = "t",
+        },
+        render = {
+          max_value_lines = 100,
+          max_string_length = 100,
+          max_num_lines = 10,
+          indent = 2,
+        },
       })
 
       local dapui = require("dapui")
@@ -194,6 +200,13 @@ return {
         "<leader>dg",
         function()
           require("dapui").eval()
+        end,
+      },
+      {
+        -- Watch a variable
+        "<leader>dw",
+        function()
+          require('dapui').elements.watches.add(vim.fn.expand('<cword>'))
         end,
       },
       {
