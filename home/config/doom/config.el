@@ -23,7 +23,7 @@
     (add-hook hook function)))
 
 (setq org-directory "~/org/")
-(setq org-agenda-files (list org-directory))
+(setq org-agenda-files (append (list org-directory) '("~/org/roam/journal.org" "~/org/roam/inbox.org" "~/org/roam/todo.org")))
 
 (setq org-use-property-inheritance t)
 (setq org-log-done 'time) ; Log time when task completes
@@ -157,9 +157,43 @@
 (setq org-roam-directory (concat org-directory "roam"))
 
 ;; (setq org-roam-capture-templates
-(add-to-list 'org-roam-capture-templates
-             '("j" "Journal" entry "* %T %?" :target (file+datetree "journal.org" day))
-             '("t" "Todo" entry "* TODO %?" :target (file+head "todo.org" "Inbox")))
+;;       '(("o" "moc" plain
+;;          "\n*Link*:  %?\n\n"
+;;          :if-new (file+head "1-main/${slug}.org" "#+title: ${title}\n#+filetags: :moc:\n#+hugo_section: braindump\n#+date: %u\n#+hugo_lastmod: %u\n#+hugo_tags: noexport\n")
+;;          :immediate-finish t
+;;          :unnarrowed t
+;;          :empty-lines-after 1)))
+;; (setq org-roam-capture-templates
+;; (add-to-list 'org-roam-capture-templates
+;;              '("j" "Journal" entry "* %T %?" :target (file+datetree "journal.org" day))
+;;              '("t" "Todo" entry "* TODO %?" :target (file+head "todo.org" "Inbox")))
+
+;; (defun my/org-roam-capture-inbox()
+;;   (interactive)
+;;   (org-roam-capture- :node (org-roam-node-create)
+;;                      :templates '(("i" "inbox" plain "* %?"
+;;                                   :if-new (file+head "Inbox.org" "#+title: Inbox\n")))))
+
+;; (defun my/org-roam-capture-todo()
+;;   (interactive)
+;;   (org-roam-capture- :node (org-roam-node-create)
+;;                      :templates '(("t" "todo" plain "* TODO %?"
+;;                                   :if-new (file+head "todo.org" "#+title: Inbox\n")))))
+
+;; (defun my/org-roam-capture-journal()
+;;   (interactive)
+;;   (org-roam-capture- :node (org-roam-node-create)
+;;                      :templates '(("j" "journal" entry "* %T %?"
+;;                                   :if-new (file+datetree "journal.org" day)))))
+
+;; (map! :leader
+;;       :desc "inbox" "n r c i" #'my/org-roam-capture-inbox)
+
+;; (map! :leader
+;;       :desc "todo" "n r c t" #'my/org-roam-capture-todo)
+
+;; (map! :leader
+;;       :desc "journal" "n r c j" #'my/org-roam-capture-journal)
 
 (use-package! websocket
   :after org-roam
@@ -172,6 +206,13 @@
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
+
+(after! org
+  (setq time-stamp-active t
+        time-stamp-start "#\\+hugo_lastmod:[ \t]*"
+        time-stamp-end "$"
+        time-stamp-format "\[%Y-%m-%d\]")
+  (add-hook 'before-save-hook 'time-stamp))
 
 ;; (load (expand-file-name "org-roam-logseq.el" doom-user-dir))
 

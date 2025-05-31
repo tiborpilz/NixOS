@@ -63,9 +63,9 @@ return {
       local org_roam_directory = org_directory .. "/roam"
 
       require("org-roam").setup({
-        directory = org_roam_directory, 
+        directory = org_roam_directory,
         -- optional
-        org_files = { org_directory },
+        org_files = { org_roam_directory },
         org_agenda_files = org_directory .. "/**/*",
         org_default_notes_file = org_roam_directory .. "/refile.org",
       })

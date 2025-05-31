@@ -13,85 +13,64 @@ return {
   --   },
   -- },
   {
-    'nvim-tree/nvim-tree.lua',
-    version = '*',
-    event = 'VeryLazy',
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
     dependencies = {
-      'nvim-tree/nvim-web-devicons',
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+      "MunifTanjim/nui.nvim",
+      -- {"3rd/image.nvim", opts = {}}, -- Optional image support in preview window: See `# Preview Mode` for more information
     },
+    lazy = false, -- neo-tree will lazily load itself
+    ---@module "neo-tree"
+    ---@type neotree.Config?
+    config = function()
+      require("neo-tree").setup({
+        default_component_configs = {
+          container = {
+            enable_character_fade = true,
+          },
+        },
+        padding = 2,
+        sources = {
+          "filesystem",
+          "buffers",
+          "git_status",
+          "document_symbols",
+        },
+        window = {
+          mapping_options = {
+            noremap = true,
+            nowait = true,
+          },
+          mappings = {
+            ["<Tab>"] = "open_with_window_picker",
+            ["<space>"] = {
+              "none", -- disable space key in the tree
+            },
+            ["<cr>"] = "open",
+            ["ov"] = "open_vsplit",
+            ["oh"] = "open_split",
+            ["ot"] = "open_tabnew",
+          },
+        },
+      })
+    end,
     keys = {
       {
-        '<leader>op',
-        '<cmd>NvimTreeToggle<cr>',
-        desc = 'Toggle NvimTree',
+        "<leader>op",
+        function()
+          require("neo-tree.command").execute({ toggle = true, dir = vim.loop.cwd() })
+        end,
+        desc = "Toggle NeoTree",
+      },
+      {
+        "<leader>oP",
+        function()
+          require("neo-tree.command").execute({ toggle = true, dir = vim.loop.cwd(), source = "filesystem" })
+        end,
+        desc = "Toggle NeoTree Filesystem",
       },
     },
-    config = function()
-      require('nvim-tree').setup {
-        sync_root_with_cwd = true,
-        respect_buf_cwd = true,
-        update_focused_file = {
-          enable = true,
-          update_root = true,
-        },
-        on_attach = function(bufnr)
-          local api = require 'nvim-tree.api'
-
-          -- Default Keybindings
-          -- api.config.mappings.default_on_attach(bufnr)
-
-          -- Custom keybindings similar to NERDTree
-          local function opts(desc)
-            return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
-          end
-
-          -- Basic operations
-          vim.keymap.set('n', 'o', api.node.open.edit, opts('Open'))
-          vim.keymap.set('n', '<CR>', api.node.open.edit, opts('Open'))
-          vim.keymap.set('n', '<Tab>', api.node.open.edit, opts('Open'))
-          vim.keymap.set('n', 'O', api.node.open.no_window_picker, opts('Open: No Window Picker'))
-          vim.keymap.set('n', 'i', api.node.open.vertical, opts('Open: Vertical Split'))
-          vim.keymap.set('n', 's', api.node.open.horizontal, opts('Open: Horizontal Split'))
-          vim.keymap.set('n', 't', api.node.open.tab, opts('Open: New Tab'))
-
-          -- File operations
-          vim.keymap.set('n', 'm', api.fs.create, opts('Create'))
-          vim.keymap.set('n', 'd', api.fs.remove, opts('Delete'))
-          vim.keymap.set('n', 'r', api.fs.rename, opts('Rename'))
-          vim.keymap.set('n', 'c', api.fs.copy.node, opts('Copy'))
-          vim.keymap.set('n', 'p', api.fs.paste, opts('Paste'))
-          vim.keymap.set('n', 'x', api.fs.cut, opts('Cut'))
-
-          -- Navigation
-          vim.keymap.set('n', 'P', api.node.navigate.parent, opts('Parent Directory'))
-          vim.keymap.set('n', 'K', api.node.navigate.sibling.first, opts('First Sibling'))
-          vim.keymap.set('n', 'J', api.node.navigate.sibling.last, opts('Last Sibling'))
-          vim.keymap.set('n', 'C', api.tree.change_root_to_node, opts('CD'))
-          vim.keymap.set('n', 'u', api.tree.change_root_to_parent, opts('Up'))
-
-          -- Tree manipulation
-          vim.keymap.set('n', 'R', api.tree.reload, opts('Refresh'))
-          vim.keymap.set('n', 'a', api.tree.toggle_hidden_filter, opts('Toggle Dotfiles'))
-          vim.keymap.set('n', 'I', api.tree.toggle_gitignore_filter, opts('Toggle Git Ignore'))
-          vim.keymap.set('n', 'H', api.tree.toggle_hidden_filter, opts('Toggle Hidden Files'))
-          vim.keymap.set('n', '?', api.tree.toggle_help, opts('Help'))
-
-          -- Filesystem operations
-          vim.keymap.set('n', 'q', api.tree.close, opts('Close'))
-          vim.keymap.set('n', 'g?', api.tree.toggle_help, opts('Help'))
-        end,
-
-        -- Other configuration options
-        view = {
-          adaptive_size = true,
-        },
-        renderer = {
-          group_empty = true,
-        },
-        filters = {
-          dotfiles = false,
-        },
-      }
-    end,
   }
 }

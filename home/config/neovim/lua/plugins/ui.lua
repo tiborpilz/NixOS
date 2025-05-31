@@ -6,9 +6,19 @@ vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSig
 
 -- vim.diagnostic.config { float = { border = "" } }
 
+
+-- Disable white border next to file tree
+vim.opt.fillchars = vim.opt.fillchars + 'vert: '
+
 vim.g.tpipeline_autoembed = 0
 
 return {
+  -- Layout
+  {
+    "folke/edgy.nvim",
+    event = "VeryLazy",
+    opts = {}
+  },
   -- Icons
   {
     'nvim-tree/nvim-web-devicons',
@@ -39,6 +49,29 @@ return {
       vim.keymap.set("n", "<leader>gB", "<cmd>Gitsigns blame_line<cr>", { desc = "Blame Line" })
     end,
   },
+  {
+    "luukvbaal/statuscol.nvim",
+    config = function()
+      -- local builtin = require("statuscol.builtin")
+      require("statuscol").setup({
+        -- configuration goes here, for example:
+        -- relculright = true,
+        -- segments = {
+        --   { text = { builtin.foldfunc }, click = "v:lua.ScFa" },
+        --   {
+        --     sign = { namespace = { "diagnostic/signs" }, maxwidth = 2, auto = true },
+        --     click = "v:lua.ScSa"
+        --   },
+        --   { text = { builtin.lnumfunc }, click = "v:lua.ScLa", },
+        --   {
+        --     sign = { name = { ".*" }, maxwidth = 2, colwidth = 1, auto = true, wrap = true },
+        --     click = "v:lua.ScSa"
+        --   },
+        -- }
+      })
+    end,
+  },
+
 
   -- Zen Mode
   {
@@ -80,15 +113,53 @@ return {
     },
   },
 
+  -- Switching Colorschemes
+  {
+    "vague2k/huez.nvim",
+    -- if you want registry related features, uncomment this
+    -- import = "huez-manager.import"
+    branch = "stable",
+    event = "UIEnter",
+    config = function()
+      require("huez").setup({})
+    end,
+  },
+
+  -- Color Buddy <3 --
+  "tjdevries/colorbuddy.nvim",
+
   -- Colorschemes / Themes
   {
     "shaunsingh/nord.nvim",
     config = function()
       vim.g.nord_contrast = true
+      vim.g.nord_borders = true
+      vim.g.nord_disable_background = false
+      vim.g.nord_italic = false
+      vim.g.nord_uniform_diff_background = false
+      vim.g.nord_bold = true
 
-      require("nord").set()
+      require('nord').set()
     end,
   },
+  "rktjmp/lush.nvim",
+  "kdheepak/monochrome.nvim",
+  "Yazeed1s/minimal.nvim",
+  {
+    "zenbones-theme/zenbones.nvim",
+    -- Optionally install Lush. Allows for more configuration or extending the colorscheme
+    -- If you don't want to install lush, make sure to set g:zenbones_compat = 1
+    -- In Vim, compat mode is turned on as Lush only works in Neovim.
+    dependencies = "rktjmp/lush.nvim",
+    lazy = false,
+    priority = 1000,
+    -- you can set set configuration options here
+    config = function()
+      vim.g.zenbones_darken_comments = 45
+      vim.cmd.colorscheme('zenbones')
+    end
+  },
+
   --- Icons
   {
     'echasnovski/mini.icons',

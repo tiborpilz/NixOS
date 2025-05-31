@@ -33,7 +33,7 @@
        (vertico +icons)           ; the search engine of the future
 
        :ui
-       deft              ; notational velocity for Emacs
+       ;; deft              ; notational velocity for Emacs
        doom              ; what makes DOOM look the way it does
        doom-dashboard    ; a nifty splash screen for Emacs
        ;; doom-quit         ; DOOM quit-message prompts when you quit Emacs
@@ -146,7 +146,7 @@
        (json +lsp)              ; At least it ain't XML
        ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
        (javascript +lsp +tree-sitter)
-       ;; (julia +lsp)
+       (julia +lsp)
        ;;kotlin            ; a better, slicker Java(Script)
        (latex             ; writing papers in Emacs has never been so fun
         +cdlatex
@@ -163,16 +163,17 @@
        (org
         ;; +brain
         +crypt
-        +dragndrop
+        ;; +dragndrop
         +gnuplot
-        ;; +hugo
-        +ipython
+        +hugo
+        ;; +ipython
         +journal
         ; +jupyter
         ;; +noter
         +pandoc
         +pomodoro
-        +present
+        ;; +present
+        +pretty
         +roam2)
        php               ; perl's insecure younger brother
        plantuml          ; diagrams for confusing people more
@@ -198,7 +199,7 @@
        ;;terra             ; Earth and Moon in alignment for performance.
        (web +lsp +tree-sitter)               ; the tubes
        (yaml +lsp)              ; JSON, but readable
-       ;;zig               ; C, but simpler
+       zig               ; C, but simpler
 
        :email
        (mu4e +org +gmail)
