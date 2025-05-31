@@ -30,13 +30,9 @@
     deploy-rs.url = "github:serokell/deploy-rs";
     authentik-nix.url = "github:nix-community/authentik-nix";
 
-    emacs-lsp-booster.url = "github:slotThe/emacs-lsp-booster-flake";
-
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
     quadlet-nix.inputs.nixpkgs.follows = "nixpkgs";
 
-    # stylix.url = "github:danth/stylix/release-25.05";
-    # stylix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -49,9 +45,7 @@
     , flake-utils-plus
     , deploy-rs
     , authentik-nix
-    , emacs-lsp-booster
     , quadlet-nix
-    # , stylix
     , ...
     } @ inputs:
     let
@@ -107,7 +101,6 @@
           })
           inputs.devshell.overlays.default
           inputs.emacs-overlay.overlays.default
-          emacs-lsp-booster.overlays.default
         ];
 
         hosts = nixosHosts;
@@ -152,7 +145,6 @@
               modules = [
                 ./home
                 inputs.nix-doom-emacs-unstraightened.hmModule
-                # stylix.homeManagerModules.stylix
                 {
                   _module.args.inputs = inputs;
                   home.username = user;

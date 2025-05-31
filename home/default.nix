@@ -22,7 +22,7 @@ with mylib;
       nix
 
       # TODO: move fonts to own module
-      (nerdfonts.override { fonts = [ "FiraCode" ]; })
+      nerd-fonts.fira-code
       etBook
       dejavu_fonts
 
