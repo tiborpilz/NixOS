@@ -277,6 +277,7 @@ with lib;
       auth = false;
       isHttps = true;
     };
+    
 
     # sops.secrets.storagebox_nextcloud_smb_secrets = {
     #   sopsFile = ./secrets/secrets.yaml;
