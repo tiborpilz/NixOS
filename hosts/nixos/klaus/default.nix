@@ -277,6 +277,11 @@ with lib;
       auth = false;
       isHttps = true;
     };
+
+    modules.services.penpot = {
+      enable = true;
+      dataDir = "/data/penpot";
+    };
     
 
     # sops.secrets.storagebox_nextcloud_smb_secrets = {

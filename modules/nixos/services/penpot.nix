@@ -14,12 +14,16 @@ let
   dbPort = 5432;
   redisPort = 6379;
   penpotEnv = {
-    PENPOT_FLAGS = "enable-registration enable-login enable-prepl-server";
-    PENPOT_PUBLIC_URI = "http://localhost:${toString penpotPort}";
-    PENPOT_DATABASE_URI = "postgresql://${db_user}:${db_password}@localhost:${toString dbPort}/${db_db}";
+    PENPOT_FLAGS = "enable-log-emails enable-registration enable-login enable-prepl-server";
+    PENPOT_PUBLIC_URI = "https://penpot.tiborpilz.xyz";
+    PENPOT_DATABASE_URI = "postgresql://localhost/${db_db}";
+    PENPOT_DATABASE_USERNAME = db_user;
+    PENPOT_DB_PASSWORD = db_password;
+    PENPOT_INITIAL_SECRET= "huddle-hypnotize-agenda-refract";
     PENPOT_REDIS_URI = "redis://localhost:${toString redisPort}/0";
     PENPOT_ASSETS_STORAGE_BACKEND = "fs";
     PENPOT_STORAGE_FS_DIRECTORY = "/assets";
+    PENPOT_REGISTRATION_DOMAIN_WHITELIST = "pilz.berlin,olynet.de"
   };
   dbEnv = {
     POSTGRES_USER = db_user;
@@ -40,6 +44,11 @@ in
       default = 9001;
       description = "Port to expose Penpot web UI on.";
     };
+    publicAdminPort = mkOption {
+      type = types.int;
+      default = 9002;
+      description = "Port to expose Penpot web UI on.";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -47,35 +56,39 @@ in
       mkdir -p ${penpotDbDir}
       mkdir -p ${penpotAssetsDir}
     '';
-    virtualisation.quadlet = {
+    virtualisation.quadlet = 
+    let
+      inherit (config.virtualisation.quadlet) network pods;
+    in {
       containers = {
-        "penpot-backend".containerConfig = {
-          image = "penpot-backend:latest";
+        penpot-backend.containerConfig = {
+          image = "penpotapp/backend:2.7.1";
           environments = penpotEnv;
           volumes = [
             "${penpotAssetsDir}:/assets"
           ];
           pod = pods.${podName}.ref;
-          dependsOn = [ "penpot-db" "penpot-redis" ];
         };
-        "penpot-frontend".containerConfig = {
-          image = "penpot-frontend:latest";
+
+        penpot-frontend.containerConfig = {
+          image = "penpotapp/frontend:2.7.1";
           environments = penpotEnv;
           pod = pods.${podName}.ref;
-          dependsOn = [ "penpot-backend" "penpot-exporter" ];
         };
-        "penpot-exporter".containerConfig = {
-          image = "penpot-exporter:latest";
+
+        penpot-exporter.containerConfig = {
+          image = "penpotapp/exporter:2.7.1";
           environments = penpotEnv;
           pod = pods.${podName}.ref;
-          dependsOn = [ "penpot-backend" ];
         };
-        "penpot-redis".containerConfig = {
-          image = "redis:7-alpine";
+
+        penpot-redis.containerConfig = {
+          image = "redis:7";
           pod = pods.${podName}.ref;
         };
-        "penpot-db".containerConfig = {
-          image = "postgres:15-alpine";
+
+        penpot-db.containerConfig = {
+          image = "postgres:15";
           environments = dbEnv;
           volumes = [
             "${penpotDbDir}:/var/lib/postgresql/data"
@@ -86,7 +99,7 @@ in
       pods = {
         "${podName}".podConfig = {
           publishPorts = [
-            "${toString penpotPort}:9001"
+            "${toString penpotPort}:8080"
           ];
         };
       };
