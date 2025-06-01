@@ -69,7 +69,7 @@ in
           };
 
           immich-redis.containerConfig = {
-            image = "redis:7.4";
+            image = "redis:8.0";
             pod = pods.immich-pod.ref;
           };
 
