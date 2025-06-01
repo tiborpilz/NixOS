@@ -105,8 +105,8 @@ return {
         layouts = {
           {
             elements = {
-              { title = "Stacks",      id = "stacks", size = 0.25 },
-              { title = "Watches",     id = "watches",    size = 0.25 },
+              { title = "Stacks",      id = "stacks",      size = 0.25 },
+              { title = "Watches",     id = "watches",     size = 0.25 },
               { title = "Breakpoints", id = "Breakpoints", size = 0.25 },
             },
             position = "right",
@@ -114,8 +114,8 @@ return {
           },
           {
             elements = {
-              { title = "repl",   id = "repl",  size = 0.4 },
-              { title = "Scopes", id = "scopes", size = 0.4},
+              { title = "repl",   id = "repl",   size = 0.4 },
+              { title = "Scopes", id = "scopes", size = 0.4 },
             },
             position = "bottom",
             size = 0.25,
@@ -217,5 +217,48 @@ return {
         end,
       }
     },
-  }
+  },
+  -- TODO: Decide between this and dap ui
+  {
+    "igorlfs/nvim-dap-view",
+    ---@module 'dap-view'
+    ---@type dapview.Config
+    opts = {},
+    keys = {
+      {
+        "<leader>dv",
+        function()
+          require("dap-view").toggle()
+        end,
+        desc = "Toggle DAP View",
+      },
+    },
+  },
+
+  -- Performance Analysis (TODO: Do these tools work with JS, etc.?)
+  {
+    "t-troebst/perfanno.nvim",
+    event = "VeryLazy",
+    config = function()
+      local keymap = vim.api.nvim_set_keymap
+      local opts = { noremap = true, silent = true }
+
+      keymap("n", "<LEADER>dplf", ":PerfLoadFlat<CR>", opts)
+      keymap("n", "<LEADER>dplg", ":PerfLoadCallGraph<CR>", opts)
+      keymap("n", "<LEADER>dplo", ":PerfLoadFlameGraph<CR>", opts)
+
+      keymap("n", "<LEADER>dpe", ":PerfPickEvent<CR>", opts)
+
+      keymap("n", "<LEADER>dpa", ":PerfAnnotate<CR>", opts)
+      keymap("n", "<LEADER>dpf", ":PerfAnnotateFunction<CR>", opts)
+      keymap("v", "<LEADER>dpa", ":PerfAnnotateSelection<CR>", opts)
+
+      keymap("n", "<LEADER>dpt", ":PerfToggleAnnotations<CR>", opts)
+
+      keymap("n", "<LEADER>dph", ":PerfHottestLines<CR>", opts)
+      keymap("n", "<LEADER>dps", ":PerfHottestSymbols<CR>", opts)
+      keymap("n", "<LEADER>dpc", ":PerfHottestCallersFunction<CR>", opts)
+      keymap("v", "<LEADER>dpc", ":PerfHottestCallersSelection<CR>", opts)
+    end
+  },
 }
