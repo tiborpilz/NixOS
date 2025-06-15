@@ -18,7 +18,7 @@ in
     '';
 
     virtualisation.oci-containers.containers.readarr = {
-      image = "docker.io/linuxserver/readarr:0.4.8-nightly";
+      image = "docker.io/linuxserver/readarr:0.4.19-nightly";
       ports = [ "${toString publicPort}:8787" ];
       volumes = [
         "${readarrConfigDir}:/config"
