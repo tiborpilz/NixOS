@@ -12,19 +12,18 @@ with lib;
   config = mkIf cfg.enable {
     programs.kitty = {
       enable = true;
+      font = {
+        package = pkgs.fira-code;
+        size = 14;
+        name = "Fira Code";
+      };
+      themeFile = "Nord";
       settings = {
         enable_audio_bell = false;
       };
       extraConfig = ''
         window_margin_width 32
         macos_titlebar_color background
-        wayland_titlebar_color background
-        macos_traditional_fullscreen yes
-
-        background_opacity 0.7
-        background_blur 0.5
-
-        forward_stdio no
       '';
     };
   };

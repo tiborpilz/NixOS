@@ -34,9 +34,6 @@
 
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
     quadlet-nix.inputs.nixpkgs.follows = "nixpkgs";
-
-    stylix.url = "github:danth/stylix/release-24.11";
-    stylix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -51,7 +48,6 @@
     , authentik-nix
     , emacs-lsp-booster
     , quadlet-nix
-    , stylix
     , ...
     } @ inputs:
     let
@@ -152,7 +148,6 @@
               modules = [
                 ./home
                 inputs.nix-doom-emacs-unstraightened.hmModule
-                stylix.homeManagerModules.stylix
                 {
                   _module.args.inputs = inputs;
                   home.username = user;
