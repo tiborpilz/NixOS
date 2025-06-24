@@ -23,7 +23,7 @@ let
     PENPOT_REDIS_URI = "redis://localhost:${toString redisPort}/0";
     PENPOT_ASSETS_STORAGE_BACKEND = "fs";
     PENPOT_STORAGE_FS_DIRECTORY = "/assets";
-    PENPOT_REGISTRATION_DOMAIN_WHITELIST = "pilz.berlin,olynet.de"
+    PENPOT_REGISTRATION_DOMAIN_WHITELIST = "pilz.berlin,olynet.de";
   };
   dbEnv = {
     POSTGRES_USER = db_user;
