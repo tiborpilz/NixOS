@@ -28,27 +28,6 @@ return {
       })
     end,
   },
-  -- Status Column
-  -- {
-  --   "lewis6991/gitsigns.nvim",
-  --   config = function()
-  --     require("gitsigns").setup({
-  --       signs = {
-  --         add          = { text = '┃' },
-  --         change       = { text = '┃' },
-  --         delete       = { text = '_' },
-  --         topdelete    = { text = '‾' },
-  --         changedelete = { text = '~' },
-  --         untracked    = { text = '┆' },
-  --       },
-  --       preview_config = {
-  --         border = { " ", " ", " ", " ", " ", " ", " ", " " },
-  --       },
-  --     })
-  --
-  --     vim.keymap.set("n", "<leader>gB", "<cmd>Gitsigns blame_line<cr>", { desc = "Blame Line" })
-  --   end,
-  -- },
   {
     "luukvbaal/statuscol.nvim",
     dependencies = {
