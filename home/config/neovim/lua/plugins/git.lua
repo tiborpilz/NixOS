@@ -77,6 +77,18 @@ return {
       { "<leader>gb", function() require("neogit").open({ "branch" }) end, desc = "Git branch" },
     },
   },
+  --- Git Signs
+  {
+    'lewis6991/gitsigns.nvim',
+    event = 'VeryLazy',
+    keys = {
+      { "<leader>gB", function () require('gitsigns').blame_line() end, desc = 'Git Blame Line' },
+      { "<leader>gtB", function () require('gitsigns').toggle_current_line_blame() end, desc = 'Toggle Blame' },
+    },
+    config = function(_, opts)
+      require('gitsigns').setup()
+    end,
+  },
   --- Show Pipeline information for Github and Gitlab
   {
     'topaxi/pipeline.nvim',
