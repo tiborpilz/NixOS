@@ -1,6 +1,8 @@
 set dotenv-load
+set dotenv-filename := "servers.env"
 
 is_nixos := shell('if [ -f /etc/os-release ] && grep -q "NixOS" /etc/os-release; then echo true; else echo false; fi')
+
 # Show this help
 help:
   just --list
