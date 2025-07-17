@@ -21,15 +21,15 @@ in
 
     modules.shell.zsh.rcInit = ''
       function aider() {
+        # TODO: make key(s) and API base configurable in global config
         if [ -z "$OPENAI_API_KEY" ]; then
-          # TODO: make key(s) configurable in global config
-          export OPENAI_API_KEY=$(pass bitwarden/openai-api-key)
+          export OPENAI_API_KEY=$(pass bitwarden/IU_OPENAI_API_KEY)
         fi
-        if [ -z "$ANTHROPIC_API_KEY" ]; then
-          # TODO: make key(s) configurable in global config
-          export ANTHROPIC_API_KEY=$(pass bitwarden/anthropic-api-key)
+
+        if [ -z "$OPENAI_API_BASE" ]; then
+          export OPENAI_API_BASE=$(pass bitwarden/IU_OPENAI_API_BASE)
         fi
-        ${pkgs.unstable.aider-chat}/bin/aider "$@"
+        ${pkgs.unstable.aider-chat}/bin/aider --no-auto-commits "$@"
       }
     '';
   };
