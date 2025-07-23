@@ -52,6 +52,8 @@ return {
             ["ov"] = "open_vsplit",
             ["oh"] = "open_split",
             ["ot"] = "open_tabnew",
+            -- use vim-native search in neotree buffer
+            ["/"] = "noop",
           },
         },
       })
