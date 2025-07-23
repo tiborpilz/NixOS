@@ -21,7 +21,7 @@ with mylib;
       bun
 
       # Linting
-      nodePackages.prettier
+      # nodePackages.prettier
 
       # Typescript
       nodePackages.typescript
