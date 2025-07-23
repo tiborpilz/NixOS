@@ -171,6 +171,8 @@ with lib;
     };
 
     virtualisation.oci-containers.backend = "podman";
+    virtualisation.quadlet.autoEscape = true;
+
     system.stateVersion = "23.11";
 
     services.avahi = {
