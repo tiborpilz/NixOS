@@ -33,7 +33,6 @@
     emacs-lsp-booster.url = "github:slotThe/emacs-lsp-booster-flake";
 
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
-    quadlet-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
