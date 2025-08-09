@@ -151,6 +151,7 @@ with mylib;
     modules.dev.gleam.enable = true;
     modules.dev.lua.enable = true;
     modules.dev.python.enable = true;
+    # modules.dev.lean.enable = true;
 
     modules.dev.colima.enable = pkgs.stdenv.isDarwin; # I only need a docker runtime on MacOs
 
@@ -182,6 +183,8 @@ with mylib;
     modules.firefox.enable = !pkgs.stdenv.isDarwin; # Firefox packdge doesn't work on Darwin :(
 
     modules.tools.aider.enable = true;
+
+    modules.shell.jujutsu.enable = true;
 
     # Use clang++ instead of g++
     modules.shell.zsh.envInit = ''
