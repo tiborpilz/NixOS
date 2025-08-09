@@ -19,6 +19,7 @@ mkShell {
   ];
   shellHook = ''
     export FLAKE="$PWD"
+    export NH_FLAKE="$PWD"
     export PATH="$FLAKE/bin:${nixBin}/bin:$PATH"
     export XDG_DATA_DIRS=$XDG_DATA_DIRS:/usr/local/share:/usr/share
   '';

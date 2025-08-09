@@ -3,8 +3,7 @@
 vim.o.encoding = "utf-8"
 vim.scriptencoding = "utf-8"
 
----- Basic Settings
-vim.o.compatible = false
+---- Basic Settings vim.o.compatible = false
 vim.o.shiftwidth = 2
 vim.o.tabstop = 2
 vim.o.expandtab = true
@@ -38,8 +37,9 @@ vim.cmd("syntax enable")
 --- Smoother update
 vim.o.updatetime = 1000
 
---- Space as Leader
+--- Space as Leader, Space-M as local leader
 vim.g.mapleader = " "
+vim.g.maplocalleader = "m"
 
 --- Sign column settings
 vim.wo.signcolumn = "yes:1"
