@@ -113,9 +113,16 @@ return {
       },
       initial_revisions = 128,
     },
+    keymap = {
+      ["next"] = '<C-n>',             -- next entry in log (older)
+      ["prev"] = '<C-p>',             -- previous entry in log (newer)
+      ["quit"] = 'q',                 -- quit all
+      ["revision_message"] = '<C-m>', -- show revision message for current revision
+      ["commit"] = '<C-g>',           -- replace contents of origin buffer with contents of tardis buffer
+    },
     config = function(_, opts)
       require("tardis-nvim").setup(opts)
-      vim.keymap.set("n", "<leader>gt", "<cmd>Tardis<cr>", { noremap = true, silent = true, desc = "Open Time Machine" })
+      vim.keymap.set("n", "<leader>gT", "<cmd>Tardis<cr>", { noremap = true, silent = true, desc = "Open Time Machine" })
     end,
   },
 }

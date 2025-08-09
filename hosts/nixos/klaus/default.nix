@@ -281,7 +281,7 @@ with lib;
     };
 
     modules.services.penpot = {
-      enable = true;
+      enable = false;
       dataDir = "/data/penpot";
     };
     

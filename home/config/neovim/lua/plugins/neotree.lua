@@ -1,17 +1,5 @@
 vim.cmd("autocmd FileType nerdtree map <buffer> <Tab> o")
 return {
-  -- {
-  --   "preservim/nerdtree",
-  --   keys = {
-  --     {
-  --       "<leader>op",
-  --       function()
-  --         vim.cmd(":NERDTreeToggle")
-  --       end,
-  --       desc = "Toggle NERDTree",
-  --     },
-  --   },
-  -- },
   {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v3.x",
@@ -31,7 +19,7 @@ return {
             enable_character_fade = true,
           },
         },
-        padding = 2,
+        padding = 1,
         sources = {
           "filesystem",
           "buffers",
