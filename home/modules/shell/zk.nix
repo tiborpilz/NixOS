@@ -5,18 +5,20 @@ let
   cfg = config.modules.shell.zk;
   mylib = import ../../../lib { inherit inputs lib pkgs; };
 in
-  {
-    options.modules.shell.zk = with types; {
-      enable = mylib.mkBoolOpt false;
-      zkDataPath = mylib.mkOpt str "$HOME/.local/share/zk";
-    };
+{
+  options.modules.shell.zk = with types; {
+    enable = mylib.mkBoolOpt false;
+    zkDataPath = mylib.mkOpt str "${config.home.homeDirectory}/zk";
+    zkConfigPath = mylib.mkOpt str "${config.xdg.configHome}/zk";
+  };
 
-    config = mkIf cfg.enable {
-      programs.zk.enable = true;
-      programs.zk.settings = { };
-
-      modules.shell.zsh.envInit = ''
-        export ZK_NOTEBOOK_DIR=${cfg.zkDataPath}
+  config = mkIf cfg.enable {
+    # write file to $XDG_CONFIG_HOME/zk/template/daily.md
+    home.file."${cfg.zkConfigPath}/templates/daily.md" = {
+      text = ''
+        # {{format-date now}} :daily:
+        
+        - [ ] 
       '';
     };
 

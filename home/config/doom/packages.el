@@ -19,6 +19,8 @@
 
 (package! khalel)
 
+(package! org-ql)
+
 (package! jest)
 
 (package! svelte-mode)
@@ -35,6 +37,16 @@
 (package! jsonnet-mode)
 
 (package! gleam-ts-mode)
+
+(package! lean4-mode
+  :recipe (:host github
+           :repo "leanprover-community/lean4-mode"
+           :files ("*.el" "data")))
+
+(package! ob-lean4
+  :recipe (:host github
+           :repo "Maverobot/ob-lean4"
+           :files ("*.el")))
 
 (package! copilot
   :recipe (:host github

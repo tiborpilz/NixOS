@@ -48,6 +48,10 @@ vim.cmd("highlight clear SignColumn")
 --- Fill characters
 vim.o.fillchars = "eob: "
 
+--- Help Edgy
+vim.opt.laststatus = 3
+vim.opt.splitkeep = "screen"
+
 --- Load plugins
 require('plugins')
 
