@@ -19,6 +19,7 @@ with mylib;
       nodePackages.pnpm
       nodePackages.yarn
       bun
+      deno
 
       # Linting
       # nodePackages.prettier
