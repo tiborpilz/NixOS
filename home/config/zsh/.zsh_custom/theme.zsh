@@ -70,7 +70,11 @@ zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:*:*' formats " %{$fg[blue]%}(%s %{$fg[red]%}%m%u%{$fg[white]%}%{$fg[blue]%} %b%{$fg[blue]%})%{$reset_color%}"
 
 PROMPT='%{$fg_bold[white]%}$(get_pwd)%{$reset_color%} $ret_status '
+<<<<<<< Updated upstream
 RPS1="$(nix_shell_prompt)$(venv_prompt) \$vcs_info_msg_0_"
+=======
+RPS1='$(gitlab_ci_status)$(nix_shell_prompt)$(venv_prompt) $(git_prompt_info)'
+>>>>>>> Stashed changes
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[white]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
