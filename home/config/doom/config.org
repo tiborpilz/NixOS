@@ -185,16 +185,27 @@ Set up org-modern
   "⭠ now ─────────────────────────────────────────────────"
 
   org-modern-block-name
-  '(("src" . ""))
+  '(("src" . "")
+    ("src" . "󰌠")
+    ("result" . " result ")
+    ("quote" . " quote")
+    ("verse" . " verse")
+    ("example" . "󰇥 example")
+    ("comment" . " comment")
+    ("center" . " center"))
 
-  ;; Org-Modern settings
-  org-modern-star 'nil ;; Use old org-modern star icons
-)
+  org-modern-keyword
+  '(("results" . " Results")
+    ("logbook" . " Logbook")
+    ("clock" . " Clock")
+    ("name" . " Name")
+    ("title" . "󰗴")
+    ("property" . "󱌣"))
 
-;; customize org-modern face
+  org-modern-star 'nil) ;; Use old org-modern star icons
+
 (custom-set-faces!
-  '(org-modern-label :height 1.0))
-
+  '(org-modern-label :height 1.1))
 
 (global-org-modern-mode)
 #+end_src
@@ -254,12 +265,12 @@ I want to enable it per default in org-mode, but be able to toggle it with
 ~<localleader>-z~
 
 #+begin_src elisp
-(use-package! org-tidy
-  :defer t
-  :hook (org-mode . org-tidy-mode)
-  :config (map! :map org-mode-map
-                :localleader
-                :desc "Toggle org-tidy" "z" #'org-tidy-mode))
+;; (use-package! org-tidy
+;;   :defer t
+;;   :hook (org-mode . org-tidy-mode)
+;;   :config (map! :map org-mode-map
+;;                 :localleader
+;;                 :desc "Toggle org-tidy" "z" #'org-tidy-mode))
 #+end_src
 
 ** Export
@@ -1107,6 +1118,56 @@ I'll need to set the path of the lean executable.
   (add-to-list 'org-babel-load-languages '(lean4 . t)))
 #+end_src
 
+*** SageMath
+
+**** Install and Package Set-Up
+
+SageMath is a mathematics software system that integrates many existing open-source packages into a common interface for mathematical computation.
+Through the ~ob-sagemath~ package, I can execute SageMath code blocks in org files.
+
+#+begin_src elisp :tangle packages.el
+(package! sage-shell-mode)
+(package! ob-sagemath)
+#+end_src
+
+I'll use the default settings for now.
+
+#+begin_src elisp
+;; Ob-sagemath supports only evaluating with a session.
+(setq org-babel-default-header-args:sage '((:session . t)
+                                           (:results . "output")))
+
+;; C-c c for asynchronous evaluating (only for SageMath code blocks).
+(with-eval-after-load "org"
+  (define-key org-mode-map (kbd "C-c c") 'ob-sagemath-execute-async))
+
+;; Do not confirm before evaluation
+(setq org-confirm-babel-evaluate nil)
+
+;; Do not evaluate code blocks when exporting.
+(setq org-export-babel-evaluate nil)
+
+;; Show images when opening a file.
+(setq org-startup-with-inline-images t)
+
+;; Show images after evaluating code blocks.
+(add-hook 'org-babel-after-execute-hook 'org-display-inline-images)
+#+end_src
+
+**** TODO Some Org-Babel Settings
+
+Additionally, I want to set up the parameters a bit, no default latex output for instance.
+
+#+begin_src elisp
+;; (setq org-babel-default-header-args:sage
+;;       '((:session . "none")
+;;         (:cache . "no")
+;;         (:noeval . "no")
+;;         (:hlines . "no")
+;;         (:tangle . "no")
+;;         (:comments . "link")))
+#+end_src
+
 ** Tools
 *** Code Completion
 
@@ -1620,6 +1681,16 @@ I want to bind ~just-exec-recipe~ to ~e~ in normal mode.
 
 #+begin_src elisp :tangle packages.el
 (package! mermaid-mode)
+#+end_src
+
+I want to set a few default values for mermaid blocks so that they are prettier.
+
+#+begin_src elisp
+(setq org-babel-default-header-args:mermaid
+      '((:background-color. "transparent")
+        (:theme . "dark")
+        (:results . "file")
+        (:file . (lambda () (make-temp-file "mermaid" nil ".svg")))))
 #+end_src
 
 *** Markdown / Org Preview
