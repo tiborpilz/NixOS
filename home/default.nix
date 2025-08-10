@@ -137,6 +137,7 @@ with mylib;
     modules.shell.git.enable = true;
     modules.shell.direnv.enable = true;
     modules.shell.mise.enable = true;
+    modules.shell.zk.enable = true;
 
     modules.editors.neovim.enable = true;
     modules.editors.emacs.enable = true;
