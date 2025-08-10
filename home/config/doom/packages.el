@@ -2,6 +2,8 @@
 
 (package! org-tidy)
 
+(package! ox-hugo)
+
 (package! ob-http)
 
 (package! ob-typescript)
@@ -20,6 +22,8 @@
 (package! khalel)
 
 (package! org-ql)
+
+(package! org-roam-ql)
 
 (package! jest)
 

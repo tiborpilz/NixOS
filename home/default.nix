@@ -39,6 +39,9 @@ with mylib;
       # graphs in the terminal
       youplot
 
+      # graphs in svg
+      graphviz
+
       # C stuff
       gnumake
       gcc
