@@ -14,6 +14,7 @@ in
     home.packages = with pkgs; [
       unstable.jujutsu
       unstable.jjui
+      unstable.jujuutils
     ];
 
     modules.shell.zsh.fpathDirs = "${pkgs.unstable.jujutsu}/share/zsh/site-functions";

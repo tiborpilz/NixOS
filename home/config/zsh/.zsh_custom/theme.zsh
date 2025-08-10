@@ -1,6 +1,10 @@
 #!/usr/bin/env
 
+fpath+="${0:A:h}/functions"
+
 local ret_status="%(?:%{$fg_bold[green]%}▸:%{$fg_bold[red]%}▸%s)"
+
+zstyle ':vcs_info:*' enable jj git
 
 function git_prompt_info() {
   ref=$(git symbolic-ref HEAD 2> /dev/null) || return
@@ -43,8 +47,30 @@ function venv_prompt() {
   echo $venv_indicator
 }
 
+# Jujutsu Prompt
+#
+# autoload -Uz vcs_info
+autoload -U colors && colors
+
+zstyle ':vcs_info:*' enable jj git
+
+precmd_vcs_info() { vcs_info }
+precmd_functions+=( precmd_vcs_info )
+setopt prompt_subst
+
+zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
++vi-git-untracked(){
+    if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' ]] && \
+        git status --porcelain | grep '??' &> /dev/null ; then
+        hook_com[staged]+='!' # signify new files with a bang
+    fi
+}
+
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:*:*' formats " %{$fg[blue]%}(%s %{$fg[red]%}%m%u%{$fg[white]%}%{$fg[blue]%} %b%{$fg[blue]%})%{$reset_color%}"
+
 PROMPT='%{$fg_bold[white]%}$(get_pwd)%{$reset_color%} $ret_status '
-RPS1='$(nix_shell_prompt)$(venv_prompt) $(git_prompt_info)'
+RPS1="$(nix_shell_prompt)$(venv_prompt) \$vcs_info_msg_0_"
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[white]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"

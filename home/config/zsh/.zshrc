@@ -1,3 +1,4 @@
+ANTIGEN_LOG=$HOME/.antigen.log
 # Zsh Async Library
 source $ZDOTDIR/.zsh_custom/async.zsh
 
@@ -18,6 +19,7 @@ antigen bundle vi-mode
 
 antigen bundle git
 antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle rkh/zsh-jj@main
 # antigen bundle docker
 # antigen bundle docker-compose
 # antigen bundle kubectl
