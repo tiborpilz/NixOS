@@ -1,4 +1,4 @@
-{ inputs, libs, config, pkgs, ... }:
+{ inputs, lib, config, pkgs, ... }:
 
 with lib;
 let
@@ -13,8 +13,20 @@ in
 
     config = mkIf cfg.enable {
       programs.zk.enable = true;
-
       programs.zk.settings = { };
+
+      modules.shell.zsh.envInit = ''
+        export ZK_NOTEBOOK_DIR=${cfg.zkDataPath}
+      '';
+    };
+
+    home.file."${cfg.zkConfigPath}/templates/weekly.md" = {
+      text = ''
+      # Week of {{format-date (date "monday this week") "long"}}
+
+      ## Daily notes in this week
+      {{sh "zk list thisweek-daily --format='- {{link}}'"}}
+      '';
     };
 
     programs.zk.enable = true;
