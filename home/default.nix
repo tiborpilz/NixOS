@@ -152,7 +152,7 @@ with mylib;
     modules.dev.gleam.enable = true;
     modules.dev.lua.enable = true;
     modules.dev.python.enable = true;
-    # modules.dev.lean.enable = true;
+    modules.dev.lean.enable = true;
 
     modules.dev.colima.enable = pkgs.stdenv.isDarwin; # I only need a docker runtime on MacOs
 
