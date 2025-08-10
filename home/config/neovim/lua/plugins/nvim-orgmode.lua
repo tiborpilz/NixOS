@@ -64,6 +64,9 @@ return {
       local org_roam_directory = org_directory .. "/roam"
 
       require("org-roam").setup({
+        bindings = {
+          prefix = "<leader>nr",
+        },
         directory = org_roam_directory,
         -- optional
         org_files = { org_roam_directory },
