@@ -27,7 +27,8 @@ return {
             org_agenda = "<leader>na",
             org_capture = "<leader>nx",
           },
-        }
+        },
+        win_split_mode = "float",
       })
       -- TODO: Adjust this https://github.com/nvim-orgmode/orgmode/blob/master/DOCS.md#global-mappings with the current state in Emacs
 
@@ -87,25 +88,4 @@ return {
       vim.keymap.set("n", "<leader>li", require("telescope").extensions.orgmode.insert_link)
     end,
   },
-  -- {"vimwiki/vimwiki"},
-  -- {
-  --   "nvim-neorg/neorg",
-  --   lazy = false,
-  --   version = "*",
-  --   config = function()
-  --     require('neorg').setup {
-  --       load = {
-  --         ["core.defaults"] = {}, -- loads default behavior
-  --         ["core.concealer"] = {}, -- allows for use of pretty icons
-  --         ["core.dirman"] = { -- manages Neorg workspaces
-  --           config = {
-  --             workspace = {
-  --               notes = "~/neorg",
-  --             },
-  --           },
-  --         },
-  --       },
-  --     }
-  --   end,
-  -- },
 }

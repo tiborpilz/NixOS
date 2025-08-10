@@ -399,18 +399,6 @@
     ;; compile the treesit grammar file the first time
     (gleam-ts-install-grammar)))
 
-(with-eval-after-load 'lsp-mode
-  (add-to-list 'lsp-language-id-configuration '(lean4-mode . "lean"))
-  (lsp-register-client
-    (make-lsp-client :new-connection (lsp-stdio-connection '("lean --server"))
-                    :activation-fn (lsp-activate-on "lean")
-                    :server-id 'lean-ls)))
-
-(use-package! ob-lean4
-  :after org
-  :config
-  (add-to-list 'org-babel-load-languages '(lean4 . t)))
-
 (setq  corfu-auto-delay 0.1
        corfu-auto-prefix 2
        corfu-left-margin-width 2

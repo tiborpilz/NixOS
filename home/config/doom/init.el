@@ -153,7 +153,7 @@
         +fold
         +latexmk
         +lsp)
-       (lean)              ; for folks with too much to prove
+       ;; (lean)              ; for folks with too much to prove
        ;; (ledger)            ; be audit you can be
        lua               ; one-based indices? one-based indices
        (markdown +grip)          ; writing docs for people to ignore

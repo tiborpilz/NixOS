@@ -664,6 +664,14 @@ easy integration of Khal with Org.
 (khalel-add-capture-template)
 #+end_src
 
+** Querying & Combined Views
+
+~org-ql~ provides a query language for org files. These queries can be used for searching & filtering org content, but also for generating new views.
+
+#+begin_src elisp :tangle packages.el
+(package! org-ql)
+#+end_src
+
 * Workspaces & Projects
 ** Projectile Project Search Path
 
@@ -1019,6 +1027,49 @@ Gleam is a strictly typed functional language that runs on the Erlang VM (and ca
     (gleam-ts-install-grammar)))
 #+end_src
 
+*** Lean
+Lean is a proof-assistant language for formal mathematical verification.
+
+Even though Doom Emacs has a "lean" module, that one has issues when Helm is missing. (And also isn't meant for lean 4).
+
+Hence, I'm manually installing lean4-mode.
+
+#+begin_src elisp :tangle packages.el
+(package! lean4-mode
+  :recipe (:host github
+           :repo "leanprover-community/lean4-mode"
+           :files ("*.el" "data")))
+#+end_src
+
+Additionally, I'm registering support for LSP
+
+#+begin_src elisp
+(with-eval-after-load 'lsp-mode
+  (add-to-list 'lsp-language-id-configuration '(lean4-mode . "lean"))
+  (lsp-register-client
+    (make-lsp-client :new-connection (lsp-stdio-connection '("lean --server"))
+                    :activation-fn (lsp-activate-on "lean")
+                    :server-id 'lean-ls)))
+#+end_src
+
+To execute lean code blocks, I'll need another package:
+
+#+begin_src elisp :tangle packages.el
+(package! ob-lean4
+  :recipe (:host github
+           :repo "Maverobot/ob-lean4"
+           :files ("*.el")))
+#+end_src
+
+I'll need to set the path of the lean executable.
+
+#+begin_src elisp
+(use-package! ob-lean4
+  :after org
+  :config
+  (add-to-list 'org-babel-load-languages '(lean4 . t)))
+#+end_src
+
 ** Tools
 *** Code Completion
 
@@ -1269,14 +1320,14 @@ session has been created and removing it when the session is terminated.
        :desc "Restart" "r" #'dap-restart-frame
        :desc "Disconnect" "D" #'dap-disconnect
        :desc "Evaluate" "e" #'dap-eval
-       :desc "Add Expression" "a" #'dap-ui-expressions-add
-       (:prefix ("b" . "breakpoints")
-        :desc "Toggle" "t" #'dap-breakpoint-toggle
-        :desc "Add" "a" #'dap-breakpoint-add
-        :desc "Delete" "d" #'dap-breakpoint-delete
-        :desc "Set condition" "c" #'dap-breakpoint-condition
-        :desc "Set log message" "m" #'dap-breakpoint-log-message
-        :desc "Set hit condition" "h" #'dap-breakpoint-hit-condition)))
+       :desc "Add Expression" "a" #'dap-ui-expressions-add))
+       ;; (:prefix ("b" . "breakpoints")
+       ;;  :desc "Toggle" "t" #'dap-breakpoint-toggle
+       ;;  :desc "Add" "a" #'dap-breakpoint-add
+       ;;  :desc "Delete" "d" #'dap-breakpoint-delete
+       ;;  :desc "Set condition" "c" #'dap-breakpoint-condition
+       ;;  :desc "Set log message" "m" #'dap-breakpoint-log-message
+       ;;  :desc "Set hit condition" "h" #'dap-breakpoint-hit-condition)))
 
 #+end_src
 *** Syntax Checking

@@ -13,6 +13,7 @@ in
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
       unstable.neovim
+      unstable.lua52Packages.lua-utils-nvim
     ];
 
     modules.shell.zsh.aliases = {
