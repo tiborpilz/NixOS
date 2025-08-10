@@ -16,6 +16,7 @@ in
       unstable.jjui
     ];
 
+    # Completions
     modules.shell.zsh.fpathDirs = "${pkgs.unstable.jujutsu}/share/zsh/site-functions";
   };
 }
