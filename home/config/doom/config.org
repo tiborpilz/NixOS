@@ -262,6 +262,24 @@ I want to enable it per default in org-mode, but be able to toggle it with
                 :desc "Toggle org-tidy" "z" #'org-tidy-mode))
 #+end_src
 
+** Export
+
+~ox-hugo~ allows exporting org files into Hugo-compatible markdown.
+
+#+begin_src elisp :tangle packages.el
+(package! ox-hugo)
+#+end_src
+
+#+begin_src elisp
+(use-package! ox-hugo
+  :after org
+  :defer t
+  :config
+  (setq org-hugo-default-language "en"
+        org-hugo-auto-export-mode t
+        org-hugo-base-dir (concat org-directory "blog/")))
+#+end_src
+
 ** Babel
 
 Org-Babel provides two things related to code blocks:
@@ -670,6 +688,25 @@ easy integration of Khal with Org.
 
 #+begin_src elisp :tangle packages.el
 (package! org-ql)
+#+end_src
+
+Additionally, ~org-roam-ql~ provides similar functionality for org-roam files.
+
+#+begin_src elisp :tangle packages.el
+(package! org-roam-ql)
+#+end_src
+
+#+begin_src elisp
+(use-package! org-roam-ql
+  :after (org-roam)
+  :bind ((:map org-roam-mode-map
+          ;; Have org-roam-ql's transient available in org-roam-mode buffers
+          ("v" . org-roam-ql-buffer-dispatch)
+          :map minibuffer-mode-map
+          ;; Be able to add titles in queries while in minibuffer.
+          ;; This is similar to `org-roam-node-insert', but adds
+          ;; only title as a string.
+          ("C-c n i" . org-roam-ql-insert-node-title))))
 #+end_src
 
 * Workspaces & Projects

@@ -120,6 +120,14 @@
                 :localleader
                 :desc "Toggle org-tidy" "z" #'org-tidy-mode))
 
+(use-package! ox-hugo
+  :after org
+  :defer t
+  :config
+  (setq org-hugo-default-language "en"
+        org-hugo-auto-export-mode t
+        org-hugo-base-dir (concat org-directory "blog/")))
+
 (use-package! ob-http
   :defer t
   :commands org-babel-execute:http)
@@ -283,6 +291,17 @@
 (setq khalel-import-end-date "+30d")
 
 (khalel-add-capture-template)
+
+(use-package! org-roam-ql
+  :after (org-roam)
+  :bind ((:map org-roam-mode-map
+          ;; Have org-roam-ql's transient available in org-roam-mode buffers
+          ("v" . org-roam-ql-buffer-dispatch)
+          :map minibuffer-mode-map
+          ;; Be able to add titles in queries while in minibuffer.
+          ;; This is similar to `org-roam-node-insert', but adds
+          ;; only title as a string.
+          ("C-c n i" . org-roam-ql-insert-node-title))))
 
 (setq projectile-project-search-path '(("~/Code/" . 1)))
 
