@@ -81,15 +81,30 @@
   "⭠ now ─────────────────────────────────────────────────"
 
   org-modern-block-name
-  '(("src" . ""))
+  '(("src" . "")
+    ("src" . "󰌠")
+    ("result" . " result ")
+    ("quote" . " quote")
+    ("verse" . " verse")
+    ("example" . "󰇥 example")
+    ("comment" . " comment")
+    ("center" . " center"))
+
+  org-modern-keyword
+  '(("results" . " Results")
+    ("logbook" . " Logbook")
+    ("clock" . " Clock")
+    ("name" . " Name")
+    ("title" . "󰗴")
+    ("properties" . "󱌣" ))
 
   ;; Org-Modern settings
-  org-modern-star 'nil ;; Use old org-modern star icons
-)
+  org-modern-star 'nil) ;; Use old org-modern star icons
+
 
 ;; customize org-modern face
 (custom-set-faces!
-  '(org-modern-label :height 1.0))
+  '(org-modern-label :height 1.1))
 
 
 (global-org-modern-mode)
@@ -113,12 +128,20 @@
     (setq-local jit-lock-defer-time 0.05
                 jit-lock-stealth-time 1)))
 
-(use-package! org-tidy
+;; (use-package! org-tidy
+;;   :defer t
+;;   :hook (org-mode . org-tidy-mode)
+;;   :config (map! :map org-mode-map
+;;                 :localleader
+;;                 :desc "Toggle org-tidy" "z" #'org-tidy-mode))
+
+(use-package! ox-hugo
+  :after org
   :defer t
-  :hook (org-mode . org-tidy-mode)
-  :config (map! :map org-mode-map
-                :localleader
-                :desc "Toggle org-tidy" "z" #'org-tidy-mode))
+  :config
+  (setq org-hugo-default-language "en"
+        org-hugo-auto-export-mode t
+        org-hugo-base-dir (concat org-directory "blog/")))
 
 (use-package! ob-http
   :defer t
@@ -284,6 +307,17 @@
 
 (khalel-add-capture-template)
 
+(use-package! org-roam-ql
+  :after (org-roam)
+  :bind ((:map org-roam-mode-map
+          ;; Have org-roam-ql's transient available in org-roam-mode buffers
+          ("v" . org-roam-ql-buffer-dispatch)
+          :map minibuffer-mode-map
+          ;; Be able to add titles in queries while in minibuffer.
+          ;; This is similar to `org-roam-node-insert', but adds
+          ;; only title as a string.
+          ("C-c n i" . org-roam-ql-insert-node-title))))
+
 (setq projectile-project-search-path '(("~/Code/" . 1)))
 
 (setq +workspaces-on-switch-project-behavior nil)
@@ -398,6 +432,46 @@
   (unless (treesit-language-available-p 'gleam)
     ;; compile the treesit grammar file the first time
     (gleam-ts-install-grammar)))
+
+(with-eval-after-load 'lsp-mode
+  (add-to-list 'lsp-language-id-configuration '(lean4-mode . "lean"))
+  (lsp-register-client
+    (make-lsp-client :new-connection (lsp-stdio-connection '("lean --server"))
+                    :activation-fn (lsp-activate-on "lean")
+                    :server-id 'lean-ls)))
+
+(use-package! ob-lean4
+  :after org
+  :config
+  (add-to-list 'org-babel-load-languages '(lean4 . t)))
+
+;; Ob-sagemath supports only evaluating with a session.
+(setq org-babel-default-header-args:sage '((:session . t)
+                                           (:results . "output")))
+
+;; C-c c for asynchronous evaluating (only for SageMath code blocks).
+(with-eval-after-load "org"
+  (define-key org-mode-map (kbd "C-c c") 'ob-sagemath-execute-async))
+
+;; Do not confirm before evaluation
+(setq org-confirm-babel-evaluate nil)
+
+;; Do not evaluate code blocks when exporting.
+(setq org-export-babel-evaluate nil)
+
+;; Show images when opening a file.
+(setq org-startup-with-inline-images t)
+
+;; Show images after evaluating code blocks.
+(add-hook 'org-babel-after-execute-hook 'org-display-inline-images)
+
+;; (setq org-babel-default-header-args:sage
+;;       '((:session . "none")
+;;         (:cache . "no")
+;;         (:noeval . "no")
+;;         (:hlines . "no")
+;;         (:tangle . "no")
+;;         (:comments . "link")))
 
 (setq  corfu-auto-delay 0.1
        corfu-auto-prefix 2
@@ -601,6 +675,12 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
         (:prefix ("c" . "Code")
          :desc "Make" "m" #'justl))
   (map! :n "e" 'justl-exec-recipe))
+
+(setq org-babel-default-header-args:mermaid
+      '((:background-color. "transparent")
+        (:theme . "dark")
+        (:results . "file")
+        (:file . (lambda () (make-temp-file "mermaid" nil ".svg")))))
 
 (use-package markdown-mode
   :mode ("\\.md\\'" . gfm-mode)
