@@ -23,7 +23,22 @@
     (add-hook hook function)))
 
 (setq org-directory "~/org/")
-(setq org-agenda-files (append (list org-directory) '("~/org/roam/journal.org" "~/org/roam/inbox.org" "~/org/roam/todo.org")))
+
+;; Function to rebuild agenda files including all roam files
+(defun my/rebuild-org-agenda-files ()
+  "Rebuild org-agenda-files to include all org files in roam directory."
+  (interactive)
+  (setq org-agenda-files 
+        (append 
+         (list org-directory)
+         (directory-files-recursively (concat org-directory "roam") "\\.org$")))
+  (message "Rebuilt org-agenda-files with %d files" (length org-agenda-files)))
+
+;; Include ALL org files in roam directory recursively
+(my/rebuild-org-agenda-files)
+
+;; Performance optimization: larger cache for many files
+(setq org-agenda-files-cache-time 600)  ; Cache for 10 minutes
 
 (setq org-use-property-inheritance t)
 (setq org-log-done 'time) ; Log time when task completes
@@ -53,7 +68,6 @@
 
 (use-package! org-modern
   :defer t
-  :hook (org-mode . global-org-modern-mode)
   :config
   (setq org-modern-label-border 0.1
         org-modern-star 'replace))
@@ -231,7 +245,8 @@
 (use-package! org-tempo)
 
 (use-package! org-autolist
-  :hook (org-mode . org-autolist-mode))
+  :config
+  (add-hook 'org-mode-hook #'org-autolist-mode))
 
 (after! org
   (setq org-capture-templates
@@ -303,16 +318,205 @@
 
 (khalel-add-capture-template)
 
-(use-package! org-roam-ql
-  :after (org-roam)
-  :bind ((:map org-roam-mode-map
-          ;; Have org-roam-ql's transient available in org-roam-mode buffers
-          ("v" . org-roam-ql-buffer-dispatch)
-          :map minibuffer-mode-map
-          ;; Be able to add titles in queries while in minibuffer.
-          ;; This is similar to `org-roam-node-insert', but adds
-          ;; only title as a string.
-          ("C-c n i" . org-roam-ql-insert-node-title))))
+(use-package! org-ql)
+
+(defun my/refresh-org-databases ()
+  "Refresh both org-roam and org-ql databases to pick up new files."
+  (interactive)
+  (my/rebuild-org-agenda-files)  ; Rebuild agenda files to include new roam files
+  (when (featurep 'org-roam)
+    (org-roam-db-sync))
+  (when (featurep 'org-ql)
+    (org-ql-clear-cache))
+  (message "Refreshed org databases and agenda files"))
+
+;; Auto-refresh after saving any org file
+(add-hook 'after-save-hook
+          (lambda ()
+            (when (derived-mode-p 'org-mode)
+              (run-with-idle-timer 1 nil #'my/refresh-org-databases))))
+
+;; Keybinding for manual refresh
+(map! :leader
+      :desc "Refresh org databases" "n r r" #'my/refresh-org-databases
+      :desc "Rebuild agenda files" "n r a" #'my/rebuild-org-agenda-files)
+
+(defun my/org-ql-task-dashboard ()
+  "Open a comprehensive task dashboard using org-ql."
+  (interactive)
+  (org-ql-search (org-agenda-files)
+    '(and (todo "TODO" "NEXT" "DOING" "PROG" "WAIT")
+          (not (todo "DONE" "CANCELLED" "CANCELED")))
+    :title "Task Dashboard - Active Tasks Only"
+    :sort '(deadline scheduled priority todo)
+    :super-groups '((:name "Overdue"
+                     :deadline past
+                     :order 1)
+                    (:name "Due Today"
+                     :deadline today
+                     :order 2)
+                    (:name "Due This Week"
+                     :deadline (between today +7)
+                     :order 3)
+                    (:name "Scheduled Today"
+                     :scheduled today
+                     :order 4)
+                    (:name "High Priority"
+                     :priority "A"
+                     :order 5)
+                    (:name "In Progress"
+                     :todo ("DOING" "NEXT" "PROG")
+                     :order 6)
+                    (:name "Waiting"
+                     :todo "WAIT"
+                     :order 7)
+                    (:name "Other TODOs"
+                     :todo "TODO"
+                     :order 8))))
+
+(defun my/org-ql-stale-tasks ()
+  "Find potentially stale tasks - active TODOs without recent activity."
+  (interactive)
+  (org-ql-search (org-agenda-files)
+    '(and (todo "TODO" "NEXT" "DOING" "PROG" "WAIT")
+          (not (todo "DONE" "CANCELLED" "CANCELED"))
+          (not (ts :from -30)))
+    :title "Potentially Stale Active Tasks (>30 days old)"
+    :sort '(todo)
+    :super-groups '((:name "Very Old (>90 days)"
+                     :pred (lambda (item)
+                             (when-let ((ts (org-element-property :raw-value 
+                                            (org-element-property :timestamp 
+                                             (org-element-at-point)))))
+                               (time-less-p (date-to-time ts)
+                                          (time-subtract (current-time) 
+                                                       (days-to-time 90)))))
+                     :order 1)
+                    (:name "Old (30-90 days)"
+                     :order 2))))
+
+(defun my/org-ql-completed-tasks-review ()
+  "Review completed tasks for potential cleanup."
+  (interactive)
+  (org-ql-search (org-agenda-files)
+    '(todo "DONE" "CANCELLED" "CANCELED")
+    :title "Completed Tasks Review"
+    :sort '(todo)
+    :super-groups '((:name "Done Tasks"
+                     :todo "DONE"
+                     :order 1)
+                    (:name "Cancelled Tasks"
+                     :todo ("CANCELLED" "CANCELED")
+                     :order 2))))
+
+(defun my/org-ql-week-review ()
+  "Review tasks for the coming week."
+  (interactive)
+  (org-ql-search (org-agenda-files)
+    '(and (todo "TODO" "NEXT" "DOING" "PROG" "WAIT")
+          (not (todo "DONE" "CANCELLED" "CANCELED"))
+          (or (deadline (between today +7))
+              (scheduled (between today +7))
+              (priority "A")))
+    :title "Week Review - Focus Areas (Active Tasks Only)"
+    :sort '(deadline scheduled priority)
+    :super-groups '((:name "Critical This Week"
+                     :and (:deadline (between today +7)
+                           :priority "A")
+                     :order 1)
+                    (:name "Due This Week"
+                     :deadline (between today +7)
+                     :order 2)
+                    (:name "Scheduled This Week"
+                     :scheduled (between today +7)
+                     :order 3)
+                    (:name "High Priority (No Deadline)"
+                     :priority "A"
+                     :order 4))))
+
+(defun my/org-ql-tasks-by-context ()
+  "Group tasks by their containing file/context."
+  (interactive)
+  (org-ql-search (org-agenda-files)
+    '(and (todo "TODO" "NEXT" "DOING" "PROG" "WAIT")
+          (not (todo "DONE" "CANCELLED" "CANCELED")))
+    :title "Active Tasks by Context"
+    :sort '(todo)
+    :super-groups '((:auto-parent t))))
+
+(defun my/org-roam-ql-project-tasks ()
+  "Find all tasks in org-roam notes tagged with projects."
+  (interactive)
+  (if (and (featurep 'org-roam) (bound-and-true-p org-roam-directory))
+      (org-ql-search (list org-roam-directory)
+        '(and (todo "TODO" "NEXT" "DOING" "PROG" "WAIT")
+              (not (todo "DONE" "CANCELLED" "CANCELED"))
+              (tags "project"))
+        :title "Active Project Tasks (from Roam)")
+    (message "org-roam not available or not configured")))
+
+(defun my/org-ql-task-clusters ()
+  "Find where tasks are clustering to identify overcommitment."
+  (interactive)
+  (org-ql-search (org-agenda-files)
+    '(and (todo "TODO" "NEXT" "DOING" "PROG" "WAIT")
+          (not (todo "DONE" "CANCELLED" "CANCELED"))
+          (deadline (between today +14)))
+    :title "Active Task Clustering Analysis (Next 2 Weeks)"
+    :sort '(deadline scheduled)
+    :super-groups '((:auto-outline-path t))))
+
+(defun my/org-ql-toggle-task-done ()
+  "Quick toggle task state in org-ql buffers."
+  (interactive)
+  (org-todo 'done))
+
+(defun my/org-ql-reschedule-task ()
+  "Reschedule task in org-ql buffer."
+  (interactive)
+  (org-schedule nil))
+
+(defun my/org-ql-set-task-priority ()
+  "Set task priority in org-ql buffer."
+  (interactive)
+  (org-priority))
+
+;; Keybindings for org-ql buffers
+(map! :map org-ql-view-map
+      :n "t" #'my/org-ql-toggle-task-done
+      :n "s" #'my/org-ql-reschedule-task
+      :n "p" #'my/org-ql-set-task-priority
+      :n "gr" #'org-ql-view-refresh)
+
+;; Add keybindings to your existing leader key setup
+(map! :leader
+      :desc "Task dashboard" "n q d" #'my/org-ql-task-dashboard
+      :desc "Stale tasks" "n q s" #'my/org-ql-stale-tasks
+      :desc "Week review" "n q w" #'my/org-ql-week-review
+      :desc "Tasks by context" "n q c" #'my/org-ql-tasks-by-context
+      :desc "Task clusters" "n q l" #'my/org-ql-task-clusters
+      :desc "Project tasks" "n q p" #'my/org-roam-ql-project-tasks
+      :desc "Review completed tasks" "n q r" #'my/org-ql-completed-tasks-review)
+
+;; Replace default agenda with task dashboard
+(map! :leader
+      :desc "Task dashboard" "o A" #'my/org-ql-task-dashboard)
+
+;; Optimize org-ql for large numbers of files
+(setq org-ql-cache-persist t
+      org-ql-cache-size 1000)
+
+;; Only scan necessary directories for org-roam
+(setq org-roam-file-extensions '("org")
+      org-roam-scan-timeout 30)
+
+;; Async refreshing to avoid blocking
+(defun my/async-refresh-org-databases ()
+  "Asynchronously refresh org databases."
+  (run-with-timer 0.5 nil #'my/refresh-org-databases))
+
+;; Hook into org-roam capture to refresh database
+(add-hook 'org-roam-capture-new-node-hook #'my/async-refresh-org-databases)
 
 (setq projectile-project-search-path '(("~/Code/" . 1)))
 
@@ -320,7 +524,8 @@
 
 (use-package! jest
   :after (typescript-mode js-mode typescript-tsx-mode)
-  :hook (typescript-mode . jest-minor-mode))
+  :config
+  (add-hook 'typescript-mode-hook #'jest-minor-mode))
 
 (setq find-sibling-rules
       '(("src/\\(.*/\\)?\\([^/]+\\)\\.\\(ts\\|vue\\)\\'"
@@ -512,10 +717,10 @@
 
 (use-package! copilot
   :defer t
-  :hook
-  (prog-mode . copilot-mode)
-  (copilot-mode . (lambda ()
-                    (setq-local copilot--indent-warning-printed-p t)))
+  :config
+  (add-hook 'prog-mode-hook #'copilot-mode)
+  (add-hook 'copilot-mode-hook (lambda ()
+                                  (setq-local copilot--indent-warning-printed-p t)))
   :bind (:map copilot-completion-map
               ("C-<space>" . 'copilot-accept-completion)
               ("C-SPC" . 'copilot-accept-completion)
@@ -523,12 +728,9 @@
               ("C-<tab>" . 'copilot-accept-completion-by-word)))
 
 (map! :leader
-      (:prefix-map ("i" . "insert")
-       (:prefix ("g" . "github copilot")
-        :desc "Show Copilot Completion" "s" #'copilot-complete
-        :desc "Insert Copilot Completion" "c" #'copilot-accept-completion))
-      (:prefix ("t" . "toggle")
-       :desc "Toggle Copilot" "p" #'copilot-mode))
+      :desc "Show Copilot Completion" "i g s" #'copilot-complete
+      :desc "Insert Copilot Completion" "i g c" #'copilot-accept-completion
+      :desc "Toggle Copilot" "t p" #'copilot-mode)
 
 (use-package! aidermacs
   :defer t
@@ -618,8 +820,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (add-hook 'prog-mode-hook #'lsp-deferred)
 
 (map! :leader
-      (:prefix ("c" . "code")
-       :desc "Glance at documentation" "g" #'lsp-ui-doc-glance))
+      :desc "Glance at documentation" "c g" #'lsp-ui-doc-glance)
 
 (setq lsp-lens-enable t)
 
@@ -650,10 +851,9 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
       :desc "List all owned projects" "g l o" #'lab-list-all-owned-projects)
 
 (map! :leader
-      (:prefix ("D" . "devdocs")
-       :desc "Open devdocs" "o" #'devdocs-peruse
-       :desc "Search devdocs" "l" #'devdocs-lookup
-       :desc "Install devdocs set" "i" #'devdocs-install))
+      :desc "Open devdocs" "D o" #'devdocs-peruse
+      :desc "Search devdocs" "D l" #'devdocs-lookup
+      :desc "Install devdocs set" "D i" #'devdocs-install)
 
 (use-package! gptel
   :config
@@ -661,15 +861,13 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
   (setq! gptel-model "gpt-4"))
 
 (map! :leader
-      (:prefix ("o" . "open")
-       :desc "Open GPTel" "g" #'gptel))
+      :desc "Open GPTel" "o g" #'gptel)
 
 (use-package! justl
   :config
 
   (map! :leader
-        (:prefix ("c" . "Code")
-         :desc "Make" "m" #'justl))
+        :desc "Make" "c m" #'justl)
   (map! :n "e" 'justl-exec-recipe))
 
 (setq org-babel-default-header-args:mermaid
@@ -716,9 +914,8 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
   (impatient-mode -1))
 
 (map! :leader
-      (:prefix ("m" . "markdown")
-       :desc "Preview" "p" #'markdown-html-preview
-       :desc "Stop Preview" "s" #'markdown-html-preview-stop))
+      :desc "Preview" "m p" #'markdown-html-preview
+      :desc "Stop Preview" "m s" #'markdown-html-preview-stop)
 
 (setq catppuccin-flavor 'frappe)
 
@@ -747,15 +944,19 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 (add-hook 'treemacs-mode-hook (lambda () (hide-mode-line-mode)))
 
+;; (use-package! nano-modeline
+;;   :config
+;;   (nano-modeline-text-mode t))
+
 (use-package! spacious-padding
   :config
   (setq spacious-padding-width '(
-    :internal-border-width 15
-    :header-line-width 4
-    :mode-line-width 6
-    :tab-width 8
-    :right-divider-width 30
-    :scroll-bar-width 8)))
+    :internal-border-width 20
+    :header-line-width 8
+    :mode-line-width 12
+    :tab-width 16
+    :right-divider-width 60
+    :scroll-bar-width 12)))
 
 (setq spacious-padding-subtle-mode-line t)
 

@@ -102,6 +102,8 @@
 
 (package! kurecolor)
 
+;; (package! nano-modeline)
+
 (package! spacious-padding)
 
 (package! solaire-mode :disable t)
