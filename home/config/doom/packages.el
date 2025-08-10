@@ -52,6 +52,9 @@
            :repo "Maverobot/ob-lean4"
            :files ("*.el")))
 
+(package! sage-shell-mode)
+(package! ob-sagemath)
+
 (package! copilot
   :recipe (:host github
            :repo "copilot-emacs/copilot.el"
