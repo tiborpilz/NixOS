@@ -121,7 +121,7 @@ with mylib;
 
     programs.man.enable = true;
 
-    modules.shell.atuin.enable = true;
+    modules.shell.atuin.enable = false;
 
     modules.scripts.enable = true;
 

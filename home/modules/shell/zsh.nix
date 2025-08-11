@@ -39,14 +39,39 @@ in
 
   config = mkIf cfg.enable {
     programs.zsh = {
+      # sessionVariables = options.modules.shell.zsh.envInit;
+      # initExtraBeforeCompinit = options.modules.shell.zsh.fpathDirs;
+      initExtraFirst = ''
+        ${cfg.rcInit}
+        "PROMPT='%{$fg_bold[white]%}$(get_pwd)%{$reset_color%} $ret_status "
+      '';
+      # initExtraLast = options.modules.shell.zsh.envFiles;
+      dotDir = ".config/zsh";
       enable = true;
+      enableCompletion = true;
+      plugins = [
+        {
+          name = "vi-mode";
+          src = pkgs.zsh-vi-mode;
+          file = "share/zsh-vi-mode/zsh-vi-mode.plugin.zsh";
+        }
+        {
+          name = "zsh-async";
+          src = pkgs.fetchFromGitHub {
+            owner = "mafredri";
+            repo = "zsh-async";
+            rev = "v1.8.6";
+            sha256 = "sha256-Js/9vGGAEqcPmQSsumzLfkfwljaFWHJ9sMWOgWDi0NI=";
+          };
+        }
+      ];
     };
 
     home.packages = with pkgs; [
-      zsh
       zsh-completions
-      zsh-syntax-highlighting
-      nix-zsh-completions
+      # zsh-completions
+      # zsh-syntax-highlighting
+      # nix-zsh-completions
       fd
       fzf
       jq
@@ -79,7 +104,7 @@ in
       fpath=(${pkgs.zsh-completions}/share/zsh/site-functions $fpath)
     '';
 
-    programs.thefuck.enable = true;
+    # programs.thefuck.enable = true;
 
     modules.shell.zsh.aliases = {
       xclip = "xclip -selection clipboard";
@@ -93,17 +118,6 @@ in
     };
 
     # xdg.configFile."zsh" = { source = "${configDir}/zsh"; recursive = true; };
-
-    xdg.configFile."zsh/.zshrc" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Code/nixos/home/config/zsh/.zshrc";
-      recursive = true;
-    };
-
-    # Use powerlevel10k package
-    xdg.configFile."zsh/powerlevel10k" = {
-      source = "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k";
-      recursive = true;
-    };
 
     xdg.configFile."zsh/.zsh_custom" = {
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Code/nixos/home/config/zsh/.zsh_custom";
@@ -125,5 +139,9 @@ in
       ${concatMapStrings (path: "source '${path}'\n") cfg.envFiles}
        ${cfg.envInit}
     '';
+
+    # home.activation.runComptime = lib.hm.dag.entryAfter [ "WriteBoundary" "installPackages" "git" ] ''
+    #   "${pkgs.zsh}/bin/zsh" autoload -Uz compinit && compinit
+    # '';
   };
 }

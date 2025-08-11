@@ -140,39 +140,6 @@ in
         layout: [branch, ' ', divergence, '- ', flags]
     '';
 
-    # I'm only using starship as a panel for tmux, hence the config is here
-    programs.starship = {
-      enable = true;
-      settings = {
-        shell = {
-          disabled = true;
-        };
-        aws = {
-          disabled = true;
-        };
-        gcloud = {
-          disabled = true;
-        };
-        directory = {
-          disabled = true;
-        };
-        git_branch = {
-          format = "[$symbol$branch(:$remote_branch) ]($style)";
-          truncation_length = 12;
-        };
-        git_status = {
-          format = "[$modified$up_to_date ]($style)";
-          up_to_date = "✓";
-          modified = "✗";
-          stashed = "";
-        };
-        nix_shell = {
-          symbol = "❄️";
-          format = "[$symbol$name]($style)";
-        };
-      };
-    };
-
     home.sessionVariables = {
       TMUX_HOME = "${config.home.sessionVariables.XDG_CONFIG_HOME}/tmux";
       TMUXIFIER = "${config.home.sessionVariables.XDG_CONFIG_HOME}/tmuxifier";
