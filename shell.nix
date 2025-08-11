@@ -16,6 +16,7 @@ mkShell {
     cachix
     go-task
     deploy-rs
+    sops
   ];
   shellHook = ''
     export FLAKE="$PWD"
