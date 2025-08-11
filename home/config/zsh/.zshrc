@@ -1,6 +1,9 @@
 # Zsh Async Library
 source $ZDOTDIR/.zsh_custom/async.zsh
 
+# Zsh Options
+setopt prompt_subst
+
 # Antigen Plugin Manager
 if [[ ! -a $HOME/.antigen/antigen.zsh ]]; then
   git clone --branch master https://github.com/zsh-users/antigen.git ~/.antigen
