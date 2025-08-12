@@ -20,6 +20,16 @@ vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', { desc = 'Go
 --   vim.lsp.handlers.hover,
 --   { border = { " ", " ", " ", " ", " ", " ", " ", " " } }
 -- )
+--
+--
+
+
+-- Detect Gitlab CI Yaml files so that gitlab-ci-ls can use them
+vim.filetype.add({
+  pattern = {
+    ['%.gitlab%-ci%.ya?ml'] = 'yaml.gitlab',
+  },
+})
 
 return {
   -- -- Single languages
@@ -69,6 +79,7 @@ return {
       "nvimtools/none-ls-extras.nvim",
       "zapling/mason-lock.nvim",
       "folke/lazydev.nvim",
+      "artemave/workspace-diagnostics.nvim",
     },
     config = function()
       require("mason").setup({})
