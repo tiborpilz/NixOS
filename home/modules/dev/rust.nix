@@ -14,5 +14,8 @@ in
       cargo-watch # cargo subcommand for watching files and running commands
       cargo-make # cargo subcommand for running tasks defined in a toml file
     ];
+
+    # For when to compile rust outside of a nix-shell
+    home.sessionVariables.LIBRARY_PATH = ''${lib.makeLibraryPath [pkgs.libiconv]}''${LIBRARY_PATH:+:$LIBRARY_PATH}'';
   };
 }
