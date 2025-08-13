@@ -253,6 +253,7 @@ with lib;
         readarr.enable = true; # search & download books
         jackett.enable = true; # indexer for media
         flaresolverr.enable = true;
+        pinchflat.enable = true;
 
         komga.enable = true; # comic reader
         calibre.enable = true; # book reader

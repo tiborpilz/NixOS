@@ -11,6 +11,8 @@ creation_rules:
           - *server_homeserver
           - *server_edge
           - *server_klaus
+        pgp:
+          - 03746612698994281D322B09923BC5E9B4E9509B
   # - path_regex: secrets/[^/]+\.env$
   #   key_groups:
   #     - age:
