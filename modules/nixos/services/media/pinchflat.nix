@@ -1,9 +1,9 @@
 { inputs, pkgs, lib, config, ... }:
 
 with lib;
+with lib.my;
 let
   cfg = config.modules.services.media.pinchflat;
-  mylib = import ../../../../../lib { inherit inputs lib pkgs; };
   dataDir = "/data/media/pinchflat";
   downloadsDir = "/data/media/downloads";
   publicPort = 8945;
