@@ -173,32 +173,26 @@
 
 (setq org-roam-directory (concat org-directory "roam"))
 
-(defun my/org-roam-capture-inbox()
-  (interactive)
-  (org-roam-capture- :node (org-roam-node-create)
-                     :templates '(("i" "inbox" plain "* %?"
-                                  :if-new (file+head "Inbox.org" "#+title: Inbox\n")))))
+(setq org-roam-capture-templates
+      '(("d" "default" plain "%?" :target
+         (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+         :unnarrowed t)
 
-(defun my/org-roam-capture-todo()
-  (interactive)
-  (org-roam-capture- :node (org-roam-node-create)
-                     :templates '(("t" "todo" plain "* TODO %?"
-                                  :if-new (file+head "todo.org" "#+title: Inbox\n")))))
+        ("j" "journal" plain "%?" :target  ; j for journal
+         (file+head "journal/%<%Y-%m-%d>.org" "#+title: Journal %<%Y-%m-%d>\n")
+         :unnarrowed t)
 
-(defun my/org-roam-capture-journal()
-  (interactive)
-  (org-roam-capture- :node (org-roam-node-create)
-                     :templates '(("j" "journal" entry "* %T %?"
-                                  :if-new (file+datetree "journal.org" day)))))
+        ("p" "project" plain "%?" :target  ; p for project
+         (file+head "projects/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :project:\n")
+         :unnarrowed t)
 
-(map! :leader
-      :desc "inbox" "n r c i" #'my/org-roam-capture-inbox)
+        ("m" "meeting" plain "%?" :target  ; m for meeting
+         (file+head "meetings/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %<%Y-%m-%d>\n#+filetags: :meeting:\n")
+         :unnarrowed t)
 
-(map! :leader
-      :desc "todo" "n r c t" #'my/org-roam-capture-todo)
-
-(map! :leader
-      :desc "journal" "n r c j" #'my/org-roam-capture-journal)
+        ("i" "idea" plain "%?" :target     ; i for idea
+         (file+head "ideas/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :idea:\n")
+         :unnarrowed t)))
 
 (use-package! websocket
   :after org-roam
