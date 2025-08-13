@@ -59,7 +59,7 @@ with lib;
 
     boot.kernelParams = [ "cpufreq.default_governor=conservative" ];
 
-    boot.tmp.useTmpfs = true;
+    boot.tmp.useTmpfs = false;
 
 
     systemd.services.refresh-flake = {
@@ -286,7 +286,7 @@ with lib;
       dataDir = "/data/penpot";
     };
 
-    services.k3s.enable = true;
+    services.k3s.enable = false;
     services.k3s.role = "server";
     services.k3s.extraFlags = [ ]; # None for now
 
