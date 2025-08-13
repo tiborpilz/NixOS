@@ -3,10 +3,10 @@
 
   inputs = {
     nixpkgs-24-05.url = "nixpkgs/nixos-24.05";
-    nixpkgs.url = "nixpkgs/nixos-24.11";
+    nixpkgs.url = "nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
-    home-manager.url = "github:nix-community/home-manager/release-24.11";
+    home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     plasma-manager.url = "github:nix-community/plasma-manager";
@@ -29,10 +29,12 @@
 
     deploy-rs.url = "github:serokell/deploy-rs";
     authentik-nix.url = "github:nix-community/authentik-nix";
-
-    emacs-lsp-booster.url = "github:slotThe/emacs-lsp-booster-flake";
+    authentik-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
+
+    radicle-explorer.url = "github:radicle-dev/radicle-explorer";
+    radicle-explorer.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -45,8 +47,8 @@
     , flake-utils-plus
     , deploy-rs
     , authentik-nix
-    , emacs-lsp-booster
     , quadlet-nix
+    , radicle-explorer
     , ...
     } @ inputs:
     let
@@ -85,6 +87,7 @@
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
             authentik-nix.nixosModules.default
+            radicle-explorer.nixosModules.radicle-explorer
           ] ++ lib.my.mapModulesRec' (toString ./modules/shared) import;
         };
 
@@ -102,7 +105,6 @@
           })
           inputs.devshell.overlays.default
           inputs.emacs-overlay.overlays.default
-          emacs-lsp-booster.overlays.default
         ];
 
         hosts = nixosHosts;

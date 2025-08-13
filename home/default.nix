@@ -22,7 +22,8 @@ with mylib;
       nix
 
       # TODO: move fonts to own module
-      (nerdfonts.override { fonts = [ "FiraCode" ]; })
+      nerd-fonts.fira-code
+      nerd-fonts.hack
       etBook
       dejavu_fonts
 
@@ -156,7 +157,7 @@ with mylib;
     modules.dev.lua.enable = true;
     modules.dev.python.enable = true;
     modules.dev.lean.enable = true;
-    modules.dev.sage.enable = true;
+    modules.dev.sage.enable = false;
 
     modules.dev.colima.enable = pkgs.stdenv.isDarwin; # I only need a docker runtime on MacOs
 

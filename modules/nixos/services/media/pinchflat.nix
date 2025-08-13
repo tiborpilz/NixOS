@@ -4,23 +4,18 @@ with lib;
 with lib.my;
 let
   cfg = config.modules.services.media.pinchflat;
-  dataDir = "/data/media/pinchflat";
-  downloadsDir = "/data/media/downloads";
+  configDir = "/var/lib/pinchflat";
+  downloadsDir = "/data/media/pinchflat";
   publicPort = 8945;
 in
-with mylib;
 {
   options.modules.services.media.pinchflat = {
     enable = mkBoolOpt false;
-    pinchflat-version = mkOption {
-      type = types.str;
-      default = "latest";
-    };
   };
 
   config = mkIf cfg.enable {
     system.activationScripts.pinchflat = stringAfter [ "var" ] ''
-      mkdir -p ${dataDir}
+      mkdir -p ${configDir}
       mkdir -p ${downloadsDir}
     '';
 
@@ -30,15 +25,15 @@ with mylib;
       in
       {
         containers.pinchflat.containerConfig = {
-          image = "ghcr.io/kieraneglin/pinchflat:${cfg.pinchflat-version}";
+          image = "ghcr.io/kieraneglin/pinchflat:v2025.6.6";
           volumes = [
-            "${dataDir}:/config:rw"
+            "${configDir}:/config:rw"
             "${downloadsDir}:/downloads:rw"
             "/etc/localtime:/etc/localtime:ro"
           ];
           environments = {
             TZ = "UTC";
-            ENABLE_PROMETHEUS = true;
+            ENABLE_PROMETHEUS = "true";
           };
           pod = pods.pinchflat-pod.ref;
         };
