@@ -266,7 +266,7 @@ with lib;
     };
 
     services.authentik = {
-      enable = false; # Seems to require NixOS 25
+      enable = true; # Seems to require NixOS 25
       environmentFile = config.sops.secrets.authentikEnv.path;
       settings = {
         disable_startup_analytics = true;
