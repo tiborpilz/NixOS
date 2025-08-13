@@ -91,6 +91,7 @@
        ;;grammar           ; tasing grammar mistake every you make
 
        :tools
+       llm
        ;; ansible
        ;; biblio            ; Writes a PhD for you (citation needed)
        (debugger +lsp)          ; FIXME stepping through code, to help you add bugs

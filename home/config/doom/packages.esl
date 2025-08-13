@@ -1,0 +1,3 @@
+(package! gptel-mcp
+    :recipe (:host github
+             :repo "lizqwerscott/gptel-mcp"))
