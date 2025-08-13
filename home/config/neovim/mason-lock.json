@@ -1,6 +1,7 @@
 {
   "bash-debug-adapter": "untagged-438733f35feb8659d939",
   "bash-language-server": "5.6.0",
+  "biome": "2.1.4",
   "codelldb": "v1.11.5",
   "eslint-lsp": "4.10.0",
   "eslint_d": "14.3.0",

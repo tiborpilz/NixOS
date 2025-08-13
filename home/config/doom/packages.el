@@ -60,15 +60,13 @@
            :repo "copilot-emacs/copilot.el"
            :files ("*.el" "dist")))
 
-(package! aidermacs)
-
 (package! lab)
 
 (package! diff-ansi)
 
 (package! devdocs)
 
-(package! gptel)
+(package! ollama-buddy)
 
 (package! justl :recipe (:host github :repo "psibi/justl.el"))
 
@@ -110,6 +108,17 @@
 
 (package! k8s-mode)
 (package! k8s-mode)
+
+(package! ob-gptel
+  :recipe (:host github
+           :repo "jwiegley/ob-gptel"
+           :files ("*.el")))
+
+(package! mcp)
+
+(package! gptel-mcp
+    :recipe (:host github
+             :repo "lizqwerscott/gptel-mcp"))
 
 (unpin! pcre2el)
 

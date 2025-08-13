@@ -252,6 +252,7 @@ with lib;
         radarr.enable = true; # search & download movies
         readarr.enable = true; # search & download books
         jackett.enable = true; # indexer for media
+        flaresolverr.enable = true;
 
         komga.enable = true; # comic reader
         calibre.enable = true; # book reader
@@ -284,7 +285,10 @@ with lib;
       enable = false;
       dataDir = "/data/penpot";
     };
-    
+
+    services.k3s.enable = true;
+    services.k3s.role = "server";
+    services.k3s.extraFlags = [ ]; # None for now
 
     # sops.secrets.storagebox_nextcloud_smb_secrets = {
     #   sopsFile = ./secrets/secrets.yaml;

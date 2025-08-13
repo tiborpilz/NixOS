@@ -2,9 +2,9 @@
       user-mail-address "tibor@pilz.berlin")
 
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'normal)
-      doom-big-font (font-spec :family "FiraCode Nerd Font" :size 28 :weight 'light)
-      doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'light)
-      doom-variable-pitch-font (font-spec :family "DejaVu Serif" :size 16 :weight 'light))
+      doom-big-font (font-spec :family "FiraCode Nerd Font" :size 32 :weight 'light)
+      doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 16 :weight 'light)
+      doom-variable-pitch-font (font-spec :family "DejaVu Serif" :size 18 :weight 'light))
 
 (setq display-line-numbers-type 'visual)
 
@@ -23,22 +23,6 @@
     (add-hook hook function)))
 
 (setq org-directory "~/org/")
-
-;; Function to rebuild agenda files including all roam files
-(defun my/rebuild-org-agenda-files ()
-  "Rebuild org-agenda-files to include all org files in roam directory."
-  (interactive)
-  (setq org-agenda-files 
-        (append 
-         (list org-directory)
-         (directory-files-recursively (concat org-directory "roam") "\\.org$")))
-  (message "Rebuilt org-agenda-files with %d files" (length org-agenda-files)))
-
-;; Include ALL org files in roam directory recursively
-(my/rebuild-org-agenda-files)
-
-;; Performance optimization: larger cache for many files
-(setq org-agenda-files-cache-time 600)  ; Cache for 10 minutes
 
 (setq org-use-property-inheritance t)
 (setq org-log-done 'time) ; Log time when task completes
@@ -228,12 +212,12 @@
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
 
-(after! org
-  (setq time-stamp-active t
-        time-stamp-start "#\\+hugo_lastmod:[ \t]*"
-        time-stamp-end "$"
-        time-stamp-format "\[%Y-%m-%d\]")
-  (add-hook 'before-save-hook 'time-stamp))
+;; (after! org
+;;   (setq time-stamp-active t
+;;         time-stamp-start "#\\+hugo_lastmod:[ \t]*"
+;;         time-stamp-end "$"
+;;         time-stamp-format "\[%Y-%m-%d\]")
+;;   (add-hook 'before-save-hook 'time-stamp))
 
 ;; (load (expand-file-name "org-roam-logseq.el" doom-user-dir))
 
@@ -326,8 +310,6 @@
   (my/rebuild-org-agenda-files)  ; Rebuild agenda files to include new roam files
   (when (featurep 'org-roam)
     (org-roam-db-sync))
-  (when (featurep 'org-ql)
-    (org-ql-clear-cache))
   (message "Refreshed org databases and agenda files"))
 
 ;; Auto-refresh after saving any org file
@@ -732,13 +714,6 @@
       :desc "Insert Copilot Completion" "i g c" #'copilot-accept-completion
       :desc "Toggle Copilot" "t p" #'copilot-mode)
 
-(use-package! aidermacs
-  :defer t
-  :hook (aidermacs-minor-mode . (lambda () (setenv "OPENAI_API_KEY" (password-store-get "bitwarden/openai-gpt-key"))))
-  :custom
-  (aidermacs-use-architect-mode t)
-  (aidermacs-default-model "4o"))
-
 (setq dap-python-debugger 'debugpy)
 
 ;;;###autoload
@@ -855,13 +830,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
       :desc "Search devdocs" "D l" #'devdocs-lookup
       :desc "Install devdocs set" "D i" #'devdocs-install)
 
-(use-package! gptel
-  :config
-  (setq! gptel-api-key (lambda () (password-store-get "bitwarden/openai-gpt-key")))
-  (setq! gptel-model "gpt-4"))
-
-(map! :leader
-      :desc "Open GPTel" "o g" #'gptel)
+(use-package! ollama-buddy)
 
 (use-package! justl
   :config
@@ -996,6 +965,53 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (setq read-process-output-max (* 4 1024 1024)) ;; 4mb
 
 (fset #'jsonrpc--log-event #'ignore)
+
+(after! gptel
+  (setq gptel-model 'claude-sonnet-4-0)
+  (setq gptel-backend (gptel-make-openai "IU-Unified-Endpoint"
+                        :host "unified-endpoint-main.app.iu-it.org"
+                        :models '(gpt-4o-mini claude-opus-4-0 claude-sonnet-4-0 gemini-2.5-pro gemini-2.0-flash gpt-5 codestral-latest gpt-4-turbo gpt-4.1 gpt-5-nano)
+                        :protocol "https"
+                        :endpoint "/openai/v1/chat/completions"
+                        :stream t
+                        :key  (password-store-get "bitwarden/IU_OPENAI_API_KEY"))))
+
+(after! gptel
+  (gptel-make-kagi "Kagi" :key (password-store-get "bitwarden/kagi_token")))
+
+(after! gptel
+  (setq gptel-default-mode 'org-mode)
+  (setq gptel-org-branching-context t)
+  (setf (alist-get 'org-mode gptel-prompt-prefix-alist) "@user\n")
+  (setf (alist-get 'org-mode gptel-response-prefix-alist) "@assistant\n"))
+
+(use-package! ob-gptel
+  :hook ((org-mode . ob-gptel-install-completions))
+  :defines ob-gptel-install-completions
+  :config
+  (add-to-list 'org-babel-load-languages '(gptel . t))
+  (defun ob-gptel-install-completions ()
+    (add-hook 'completion-at-point-functions
+              'ob-gptel-capf nil t)))
+
+(add-to-list 'exec-path "/usr/local/bin")
+(setenv "PATH" (concat "/usr/local/bin:" (getenv "PATH")))
+
+(setq mcp-hub-servers
+      '(("fetch" . (:command "uvx" :args ("mcp-server-fetch")))
+        ("browser" . (:command "npx" :args ("-y" "@browsermcp/mcp@latest")))
+        ("atlassian" . (:command "docker"
+                        :args ("run"
+                               "--rm"
+                               "-i"
+                               "--env-file"
+                               "/tmp/atlassian"
+                               "ghcr.io/sooperset/mcp-atlassian:latest")))))
+(use-package! mcp)
+
+(use-package! gptel-mcp
+  :bind (:map gptel-mode-map
+              ("C-c m" . gptel-mcp-dispatch)))
 
 (use-package! elcord
   :config
