@@ -46,11 +46,6 @@ with lib;
       owner = "authentik";
     };
 
-    sops.secrets.authentikToken = {
-      sopsFile = ./secrets/secrets.yaml;
-      owner = "authentik";
-    };
-
     sops.secrets.linkwardenEnv = {
       sopsFile = ./secrets/secrets.yaml;
     };
@@ -122,10 +117,6 @@ with lib;
 
     services.nfs.server.enable = true;
 
-    fileSystems = {
-      "/".label = "nixos-root";
-    };
-
     services.openssh.enable = true;
     services.openssh.settings.PermitRootLogin = "yes";
 
@@ -142,7 +133,6 @@ with lib;
       tmux
       vim
       wireguard-tools
-      partition-manager
       gparted
       hdparm
       python3
@@ -161,6 +151,15 @@ with lib;
       uid = 1005;
       isSystemUser = true;
       group = "authentik";
+    };
+
+    users.groups.cloudflared = {};
+    users.users.cloudflared = {
+      uid = 1006;
+      isSystemUser = true;
+      group = "cloudflared";
+      home = "/var/lib/cloudflared";
+      shell = pkgs.zsh;
     };
 
     users.users.tibor = {
@@ -267,7 +266,7 @@ with lib;
     };
 
     services.authentik = {
-      enable = false;
+      enable = false; # Seems to require NixOS 25
       environmentFile = config.sops.secrets.authentikEnv.path;
       settings = {
         disable_startup_analytics = true;
@@ -290,6 +289,8 @@ with lib;
     services.k3s.enable = true;
     services.k3s.role = "server";
     services.k3s.extraFlags = [ ]; # None for now
+
+    services.radicle-explorer.enable = false;
 
     # sops.secrets.storagebox_nextcloud_smb_secrets = {
     #   sopsFile = ./secrets/secrets.yaml;

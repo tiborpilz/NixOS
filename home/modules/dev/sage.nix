@@ -7,10 +7,11 @@ in
   options.modules.dev.sage = {
     enable = mylib.mkBoolOpt false;
   };
+
   config = lib.mkIf cfg.enable {
     home.packages = with pkgs; [
-      sageWithDoc
-      sagetex
+      sage
     ];
   };
 }
+
