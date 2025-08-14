@@ -234,6 +234,7 @@ with lib;
       firefly-iii.enable = true;
       monitoring.enable = true;
       linkding.enable = true;
+      authentik.enable = false;
 
       nextcloud = {
         enable = false;
@@ -265,22 +266,6 @@ with lib;
       };
     };
 
-    services.authentik = {
-      enable = true; # Seems to require NixOS 25
-      environmentFile = config.sops.secrets.authentikEnv.path;
-      settings = {
-        disable_startup_analytics = true;
-        avatars = "initials";
-      };
-    };
-
-    modules.services.reverseProxy.proxies.authentik = {
-      publicPort = 9443;
-      targetHost = "127.0.0.1";
-      auth = false;
-      isHttps = true;
-    };
-
     modules.services.penpot = {
       enable = false;
       dataDir = "/data/penpot";
@@ -291,6 +276,7 @@ with lib;
     services.k3s.extraFlags = [ ]; # None for now
 
     services.radicle-explorer.enable = false;
+    services.radicle.enable = false;
 
     # sops.secrets.storagebox_nextcloud_smb_secrets = {
     #   sopsFile = ./secrets/secrets.yaml;

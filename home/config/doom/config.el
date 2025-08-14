@@ -194,6 +194,10 @@
          (file+head "ideas/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :idea:\n")
          :unnarrowed t)))
 
+        ("t" "todo" plain "%?" :target     ; t for todo
+        (file+head "todos/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :todo:\n#+todo: TODO\n")
+        :unnarrowed t)
+
 (use-package! websocket
   :after org-roam
   :defer t)

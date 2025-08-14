@@ -685,21 +685,23 @@
         ],
         "heartwood": "heartwood",
         "nixpkgs": [
+          "radicle-explorer",
+          "heartwood",
           "nixpkgs"
         ]
       },
       "locked": {
         "lastModified": 1753354229,
         "narHash": "sha256-Rzx+po/73S5W0KjNxUPOyN7ph5qoUubrk6sr+xvZHnM=",
-        "owner": "radicle-dev",
-        "repo": "radicle-explorer",
+        "ref": "refs/heads/master",
         "rev": "781045b2546d25823e03d3a40ce8865c80ea7d22",
-        "type": "github"
+        "revCount": 2289,
+        "type": "git",
+        "url": "https://iris.radicle.xyz/z4V1sjrXqjvFdnCUbxPFqd5p4DtH5.git"
       },
       "original": {
-        "owner": "radicle-dev",
-        "repo": "radicle-explorer",
-        "type": "github"
+        "type": "git",
+        "url": "https://iris.radicle.xyz/z4V1sjrXqjvFdnCUbxPFqd5p4DtH5.git"
       }
     },
     "root": {
