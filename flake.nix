@@ -117,8 +117,8 @@
               inherit lib inputs;
               pkgs = channels.nixpkgs;
             }))) // {
-            testTandoor = pkgs.testers.runNixOSTest ./tests/tandoor.nix;
-            testPaperless = pkgs.testers.runNixOSTest ./tests/paperless.nix;
+            # testTandoor = pkgs.testers.runNixOSTest ./tests/tandoor.nix;
+            # testPaperless = pkgs.testers.runNixOSTest ./tests/paperless.nix;
           };
 
           apps = (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages) // {

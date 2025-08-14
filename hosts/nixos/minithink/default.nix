@@ -65,7 +65,6 @@
     services.printing.enable = true;
 
     # Enable sound with pipewire.
-    sound.enable = true;
     hardware.pulseaudio.enable = false;
     security.rtkit.enable = true;
 
@@ -105,7 +104,6 @@
       tmux
       vim
       wireguard-tools
-      partition-manager
       gparted
       hdparm
       python3

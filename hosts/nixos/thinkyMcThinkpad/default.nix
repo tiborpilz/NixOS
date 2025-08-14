@@ -130,7 +130,6 @@
       tmux
       vim
       wireguard-tools
-      partition-manager
       gparted
       hdparm
       python3
