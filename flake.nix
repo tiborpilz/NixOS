@@ -33,8 +33,8 @@
 
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
 
-    radicle-explorer.url = "github:radicle-dev/radicle-explorer";
-    radicle-explorer.inputs.nixpkgs.follows = "nixpkgs";
+    radicle-explorer.url = "git+https://iris.radicle.xyz/z4V1sjrXqjvFdnCUbxPFqd5p4DtH5.git";
+    # radicle-explorer.inputs.nixpkgs.follows = "nixpkgs-unstable";
   };
 
   outputs =

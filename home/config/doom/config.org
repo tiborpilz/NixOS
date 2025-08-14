@@ -451,8 +451,27 @@ I think they aren't working
         ("i" "idea" plain "%?" :target     ; i for idea
          (file+head "ideas/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :idea:\n")
          :unnarrowed t)))
+
+        ("t" "todo" plain "%?" :target     ; t for todo
+        (file+head "todos/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :todo:\n#+todo: TODO\n")
+        :unnarrowed t)
 #+end_src
 
+
+
+
+Your capture templates look correct syntactically. If they aren't working, try these troubleshooting steps:
+
+1. *Evaluate the code*: Execute the code block with =C-c C-c=
+2. *Check org-roam-directory*: Ensure =org-roam-directory= is set to the right path
+3. *Test with*: =M-x org-roam-capture= and see if your templates appear
+4. *Check for errors*: Look in =*Messages*= buffer for any error messages
+
+Common issues:
+- Directory doesn't exist (org-roam won't create subdirectories like =journal/=, =projects/= automatically)
+- Org-roam database not initialized (=M-x org-roam-db-sync=)
+
+Would you like me to help debug a specific issue you're seeing?
 *** Add Org-Roam UI
 
 Org-Roam UI is a web-based interface for Org-roam. It is a separate package -
