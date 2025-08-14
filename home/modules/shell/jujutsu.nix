@@ -14,6 +14,8 @@ in
     home.packages = with pkgs; [
       unstable.jujutsu
       unstable.jjui
+      unstable.radicle-node
+      radicle-explorer
     ];
 
     # Completions
