@@ -88,7 +88,7 @@ in
         };
 
         penpot-db.containerConfig = {
-          image = "postgres:15";
+          image = "postgres:17";
           environments = dbEnv;
           volumes = [
             "${penpotDbDir}:/var/lib/postgresql/data"

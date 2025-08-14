@@ -37,7 +37,7 @@ with mylib;
       {
         containers = {
           authentik-db.containerConfig = {
-            image = "postgres:16-alpine";
+            image = "postgres:17-alpine";
             volumes = [
               "authentik-pgdata:/var/lib/postgresql/data"
             ];
