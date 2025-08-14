@@ -25,6 +25,8 @@
 
 (package! org-roam-ql)
 
+(package! org-similarity)
+
 (package! jest)
 
 (package! svelte-mode)
