@@ -34,7 +34,7 @@ with mylib;
       let inherit (config.virtualisation.quadlet) network pods; in
       {
         containers.linkwarden-db.containerConfig = {
-          image = "postgres:16-alpine";
+          image = "postgres:17-alpine";
           volumes = [
             "linkwarden-pgdata:/var/lib/postgresql/data"
           ];
