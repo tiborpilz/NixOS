@@ -19,7 +19,7 @@ in
     };
     influxdbPort   = mkOption {
         type = types.int;
-default = 8086;
+        default = 8086;
     };
     influxdbDatadir = mkOption {
         type = types.str;
@@ -151,12 +151,13 @@ default = 8086;
         };
       };
 
+
     services.prometheus = {
       enable = true;
       port = cfg.prometheusPort;
       exporters.node = {
         enable = true;
-        enabledCollectors = [ "systemd" ];
+        enabledCollectors = [ "systemd" "zfs" ];
       };
 
       scrapeConfigs = [
@@ -166,11 +167,33 @@ default = 8086;
         }
         {
           job_name = "unifipoller";
-          #static_configs = [{ targets = [ "127.0.0.1:${toString cfg.unifiPollerPort}" ]; }];
-          static_configs = [{ targets = [ "127.0.0.1:{toString config.services.prometheus.exporters.node.port}" ]; }];
+          static_configs = [{ targets = [ "127.0.0.1:${toString cfg.unifiPollerPort}" ]; }];
         }
       ];
     };
+
+    # services.zabbixAgent.enable = true;
+    # services.zabbixAgent.server = "localhost";
+    #
+    # services.zabbixServer.enable = true;
+    # services.zabbixWeb = {
+    #   enable = true;
+    #   virtualHost = {
+    #     hostName = "zabbix.localhost";
+    #     adminAddr = "webmaster@localhost";
+    #   };
+    # };
+    #
+    # services.loki = {
+    #   enable = false;
+    #
+    #   configuration = {
+    #     auth_enabled = false;
+    #     server = {
+    #       http_listen_port = 3100;
+    #     };
+    #   };
+    # };
 
     modules.services.reverseProxy.proxies.grafana = {
       publicPort = cfg.grafanaPort;

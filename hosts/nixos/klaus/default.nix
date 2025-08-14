@@ -50,6 +50,11 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
+    sops.secrets.woodpeckerEnv = {
+      sopsFile = ./secrets/secrets.yaml;
+      owner = "woodpecker";
+    };
+
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
 
@@ -162,6 +167,15 @@ with lib;
       shell = pkgs.zsh;
     };
 
+    users.groups.woodpecker = {};
+    users.users.woodpecker = {
+      uid = 1007;
+      isSystemUser = true;
+      group = "woodpecker";
+      home = "/var/lib/woodpecker";
+      shell = pkgs.zsh;
+    };
+
     users.users.tibor = {
       uid = 1000;
       extraGroups = [ "wheel" ];
@@ -233,8 +247,10 @@ with lib;
       paperless.enable = true;
       firefly-iii.enable = true;
       monitoring.enable = true;
+      monitoring.netdata.enable = true;
       linkding.enable = true;
-      authentik.enable = false;
+      authentik.enable = true;
+      authentik.envFile = config.sops.secrets.authentikEnv.path;
 
       nextcloud = {
         enable = false;
@@ -270,6 +286,13 @@ with lib;
       enable = false;
       dataDir = "/data/penpot";
     };
+
+    modules.services.woodpecker = {
+      enable = true;
+      envFile = config.sops.secrets.woodpeckerEnv.path;
+    };
+
+    modules.services.forgejo.enable = true;
 
     services.k3s.enable = false;
     services.k3s.role = "server";
