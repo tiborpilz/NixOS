@@ -317,6 +317,10 @@
       :desc "Refresh org databases" "n r r" #'my/refresh-org-databases
       :desc "Rebuild agenda files" "n r a" #'my/rebuild-org-agenda-files)
 
+(use-package org-similarity
+(setq org-directory "~/org/")
+  :load-path "org/similarity")t
+
 (defun my/org-ql-task-dashboard ()
   "Open a comprehensive task dashboard using org-ql."
   (interactive)

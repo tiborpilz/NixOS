@@ -728,6 +728,21 @@ Additionally, ~org-roam-ql~ provides similar functionality for org-roam files.
       :desc "Rebuild agenda files" "n r a" #'my/rebuild-org-agenda-files)
 #+end_src
 
+**** Org Similarity
+
+Compares multiple org notes with each other and finds duplicates, based on a silimarity score.
+
+#+begin_src elisp :tangle packages.el
+(package! org-similarity)
+#+end_src
+
+#+begin_src elisp
+(use-package org-similarity
+(setq org-directory "~/org/")
+  :load-path "org/similarity")t
+
+#+end_src
+
 **** Unified Task Views
 
 These views combine tasks from all your org files and roam notes, providing different perspectives on your work.
