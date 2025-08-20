@@ -223,7 +223,7 @@ with lib;
       hostname = "tiborpilz.xyz";
       localDomain = "klaus.tbr.gg";
       email = "tibor@pilz.berlin";
-      tunnelId = "14a104ab-2541-4142-ab22-12908058f156";
+      tunnelId = "7bc72af5-d729-4084-b8ee-42fb0f6f800a";
       basicAuth = {
         enable = true;
         username = "tibor";
