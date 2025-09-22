@@ -125,27 +125,12 @@ return {
 
           ["volar"] = function()
             require("lspconfig").volar.setup({
-              -- NOTE: Uncomment to enable volar in file types other than vue.
-              -- (Similar to Takeover Mode)
-
-              filetypes = { "vue", "javascript", "typescript", "javascriptreact", "typescriptreact", "json" },
-
-              -- NOTE: Uncomment to restrict Volar to only Vue/Nuxt projects. This will enable Volar to work alongside other language servers (tsserver).
-
-              -- root_dir = require("lspconfig").util.root_pattern(
-              --   "vue.config.js",
-              --   "vue.config.ts",
-              --   "nuxt.config.js",
-              --   "nuxt.config.ts"
-              -- ),
               init_options = {
                 vue = {
                   hybridMode = true,
                 },
-                -- NOTE: This might not be needed. Uncomment if you encounter issues.
-
                 typescript = {
-                  tsdk = vim.fn.getcwd() .. "/node_modules/typescript/lib",
+                  tsdk = vim.fn.stdpath("data") .. "/mason/packages" .. "/typescript-language-server/node_modules/typescript/lib",
                 },
               },
               settings = {
@@ -169,8 +154,54 @@ return {
                     },
                   },
                 },
-              },
+              }
             })
+            --   -- NOTE: Uncomment to enable volar in file types other than vue.
+            --   -- (Similar to Takeover Mode)
+            --
+            --   filetypes = { "vue", "javascript", "typescript", "javascriptreact", "typescriptreact", "json" },
+            --
+            --   -- NOTE: Uncomment to restrict Volar to only Vue/Nuxt projects. This will enable Volar to work alongside other language servers (tsserver).
+            --
+            --   -- root_dir = require("lspconfig").util.root_pattern(
+            --   --   "vue.config.js",
+            --   --   "vue.config.ts",
+            --   --   "nuxt.config.js",
+            --   --   "nuxt.config.ts"
+            --   -- ),
+            --   init_options = {
+            --     vue = {
+            --       hybridMode = false,
+            --     },
+            --     -- NOTE: This might not be needed. Uncomment if you encounter issues.
+            --     --
+            --     -- typescript = {
+            --     --   tsdk = vim.fn.getcwd() .. "/node_modules/typescript/lib",
+            --     -- },
+            --   },
+            --   settings = {
+            --     typescript = {
+            --       inlayHints = {
+            --         enumMemberValues = {
+            --           enabled = true,
+            --         },
+            --         functionLikeReturnTypes = {
+            --           enabled = true,
+            --         },
+            --         propertyDeclarationTypes = {
+            --           enabled = true,
+            --         },
+            --         parameterTypes = {
+            --           enabled = true,
+            --           suppressWhenArgumentMatchesName = true,
+            --         },
+            --         variableTypes = {
+            --           enabled = true,
+            --         },
+            --       },
+            --     },
+            --   },
+            -- })
           end,
 
           ["ts_ls"] = function()
