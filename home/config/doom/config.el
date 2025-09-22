@@ -192,11 +192,11 @@
 
         ("i" "idea" plain "%?" :target     ; i for idea
          (file+head "ideas/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :idea:\n")
-         :unnarrowed t)))
+         :unnarrowed t)
 
         ("t" "todo" plain "%?" :target     ; t for todo
         (file+head "todos/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :todo:\n#+todo: TODO\n")
-        :unnarrowed t)
+        :unnarrowed t)))
 
 (use-package! websocket
   :after org-roam
@@ -321,9 +321,8 @@
       :desc "Refresh org databases" "n r r" #'my/refresh-org-databases
       :desc "Rebuild agenda files" "n r a" #'my/rebuild-org-agenda-files)
 
-(use-package org-similarity
-(setq org-directory "~/org/")
-  :load-path "org/similarity")t
+;; (use-package org-similarity
+;;   :load-path "org/similarity")
 
 (defun my/org-ql-task-dashboard ()
   "Open a comprehensive task dashboard using org-ql."
@@ -832,7 +831,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
       :desc "Search devdocs" "D l" #'devdocs-lookup
       :desc "Install devdocs set" "D i" #'devdocs-install)
 
-(use-package! ollama-buddy)
+; (use-package! ollama-buddy)
 
 (use-package! justl
   :config

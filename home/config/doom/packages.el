@@ -25,7 +25,7 @@
 
 (package! org-roam-ql)
 
-(package! org-similarity)
+;; (package! org-similarity)
 
 (package! jest)
 
@@ -68,7 +68,7 @@
 
 (package! devdocs)
 
-(package! ollama-buddy)
+; (package! ollama-buddy)
 
 (package! justl :recipe (:host github :repo "psibi/justl.el"))
 

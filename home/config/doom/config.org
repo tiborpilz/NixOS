@@ -450,11 +450,11 @@ I think they aren't working
 
         ("i" "idea" plain "%?" :target     ; i for idea
          (file+head "ideas/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :idea:\n")
-         :unnarrowed t)))
+         :unnarrowed t)
 
         ("t" "todo" plain "%?" :target     ; t for todo
         (file+head "todos/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: :todo:\n#+todo: TODO\n")
-        :unnarrowed t)
+        :unnarrowed t)))
 #+end_src
 
 
@@ -738,14 +738,12 @@ Additionally, ~org-roam-ql~ provides similar functionality for org-roam files.
 Compares multiple org notes with each other and finds duplicates, based on a silimarity score.
 
 #+begin_src elisp :tangle packages.el
-(package! org-similarity)
+;; (package! org-similarity)
 #+end_src
 
 #+begin_src elisp
-(use-package org-similarity
-(setq org-directory "~/org/")
-  :load-path "org/similarity")t
-
+;; (use-package org-similarity
+;;   :load-path "org/similarity")
 #+end_src
 
 **** Unified Task Views
@@ -1848,11 +1846,11 @@ Ensures that we use the MELPA version.
 Docs: https://www.dyerdwelling.family/emacs/20250207092636-emacs--ollama-buddy-local-llm-integration-for-emacs/
 
 #+begin_src elisp :tangle packages.el
-(package! ollama-buddy)
+; (package! ollama-buddy)
 #+end_src
 
 #+begin_src elisp
-(use-package! ollama-buddy)
+; (use-package! ollama-buddy)
 #+end_src
 
 
