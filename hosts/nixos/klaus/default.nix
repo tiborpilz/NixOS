@@ -301,6 +301,18 @@ with lib;
     services.radicle-explorer.enable = false;
     services.radicle.enable = false;
 
+    services.vikunja = {
+      enable = true;
+      port = 3456; # Default, but let's be explicit
+      frontendScheme = "https";
+      frontendHostname = "vikunja.tiborpilz.xyz";
+    };
+
+    modules.services.reverseProxy.proxies.vikunja = {
+      publicPort = 3456;
+      auth = false;
+    };
+
     # sops.secrets.storagebox_nextcloud_smb_secrets = {
     #   sopsFile = ./secrets/secrets.yaml;
     #   path = "/etc/nixos/smb-secrets-storagebox-nextcloud";
