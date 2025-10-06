@@ -14,7 +14,7 @@ with lib;
       enable = true;
       font = {
         package = pkgs.fira-code;
-        size = 14;
+        size = 12;
         name = "Fira Code";
       };
       themeFile = "Nord";
@@ -22,7 +22,7 @@ with lib;
         enable_audio_bell = false;
       };
       extraConfig = ''
-        window_margin_width 32
+        window_margin_width 24
         macos_titlebar_color background
       '';
     };
