@@ -71,3 +71,6 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup("plugins")
+
+--- Color scheme
+require('nord').set()

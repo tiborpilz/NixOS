@@ -17,6 +17,8 @@ mkShell {
     go-task
     deploy-rs
     sops
+    nh
+    just
   ];
   shellHook = ''
     export FLAKE="$PWD"

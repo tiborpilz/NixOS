@@ -106,6 +106,9 @@ with mylib;
       # better man page replacements
       tldr # tldr pages
       cheat # cheat sheets
+
+      # 1password
+      _1password
     ];
 
     modules.shell.zsh.fpathDirs = ''
@@ -159,6 +162,7 @@ with mylib;
     modules.dev.lean.enable = true;
     modules.dev.sage.enable = false;
 
+    modules.dev.docker.enable = true;
     modules.dev.colima.enable = pkgs.stdenv.isDarwin; # I only need a docker runtime on MacOs
 
     # Bit of a catch-all for LSP stuff until I find a better spot
@@ -188,7 +192,7 @@ with mylib;
 
     modules.firefox.enable = !pkgs.stdenv.isDarwin; # Firefox packdge doesn't work on Darwin :(
 
-    modules.tools.aider.enable = true;
+    modules.tools.aider.enable = false; # it has sooo many dependencies
 
     modules.shell.jujutsu.enable = true;
 

@@ -30,9 +30,9 @@ return {
   },
   {
     "luukvbaal/statuscol.nvim",
-    dependencies = {
-      "fussenegger/nvim-dap",
-    },
+    -- dependencies = {
+    --   "fussenegger/nvim-dap",
+    -- },
       opts = function()
         local builtin = require('statuscol.builtin')
         return {

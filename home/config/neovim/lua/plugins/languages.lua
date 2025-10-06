@@ -58,8 +58,8 @@ return {
           },
         },
         -- DAP configuration
-        dap = {
-        },
+        -- dap = {
+        -- },
       }
     end
   },
@@ -71,9 +71,9 @@ return {
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
       "neovim/nvim-lspconfig",
-      "jay-babu/mason-nvim-dap.nvim",
-      "rcarriga/nvim-dap-ui",
-      "mfussenegger/nvim-dap",
+      -- "jay-babu/mason-nvim-dap.nvim",
+      -- "rcarriga/nvim-dap-ui",
+      -- "mfussenegger/nvim-dap",
       "nvim-neotest/nvim-nio",
       "nvimtools/none-ls.nvim",
       "nvimtools/none-ls-extras.nvim",
@@ -387,34 +387,34 @@ return {
   },
 
   -- DAP - Debug Adapter Protocol
-  {
-    "jay-babu/mason-nvim-dap.nvim",
-    config = function()
-      local mason_nvim_dap = require("mason-nvim-dap")
-
-      mason_nvim_dap.setup({
-        ensure_installed = {
-          "node2",
-          "firefox",
-        },
-        automatic_installation = true,
-        handlers = {
-          function(config)
-            mason_nvim_dap.default_setup(config)
-          end,
-        },
-      })
-    end,
-  },
-  { "mfussenegger/nvim-dap" },
-  {
-    "theHamsta/nvim-dap-virtual-text",
-    opts = {
-      commented = true,
-    },
-  },
-  { "nvim-telescope/telescope-dap.nvim" },
-
+  -- {
+  --   "jay-babu/mason-nvim-dap.nvim",
+  --   config = function()
+  --     local mason_nvim_dap = require("mason-nvim-dap")
+  --
+  --     mason_nvim_dap.setup({
+  --       ensure_installed = {
+  --         "node2",
+  --         "firefox",
+  --       },
+  --       automatic_installation = true,
+  --       handlers = {
+  --         function(config)
+  --           mason_nvim_dap.default_setup(config)
+  --         end,
+  --       },
+  --     })
+  --   end,
+  -- },
+  -- { "mfussenegger/nvim-dap" },
+  -- {
+  --   "theHamsta/nvim-dap-virtual-text",
+  --   opts = {
+  --     commented = true,
+  --   },
+  -- },
+  -- { "nvim-telescope/telescope-dap.nvim" },
+  --
   -- Web dev stuff
   {
     "roobert/tailwindcss-colorizer-cmp.nvim",
