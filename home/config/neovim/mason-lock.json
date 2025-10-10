@@ -1,4 +1,11 @@
 {
+  "emmylua-codeformat": "1.5.7",
+  "emmylua_ls": "0.14.0",
+  "lua-language-server": "3.15.0",
+  "prettier": "3.6.2",
   "prisma-language-server": "6.16.3",
-  "typescript-language-server": "5.0.0"
+  "terraform": "v1.13.3",
+  "terraform-ls": "v0.38.2",
+  "typescript-language-server": "5.0.1",
+  "vtsls": "0.2.9"
 }

@@ -354,6 +354,11 @@ return {
       { "<leader>cs", "<cmd>AerialToggle!<cr>", desc = "Show LSP Symbols" },
     },
   },
+  -- LSP Glances
+  {
+    'dnlhc/glance.nvim',
+    cmd = 'Glance'
+  },
 
   -- Treesitter
   {
