@@ -99,7 +99,7 @@
             };
             my = self.packages."${prev.system}";
             # Keep 24.05 bitwarden-cli as there are some build issues with the new one
-            bitwarden-cli = inputs.nixpkgs-24-05.legacyPackages.${prev.system}.bitwarden-cli;
+            # bitwarden-cli = inputs.nixpkgs-24-05.legacyPackages.${prev.system}.bitwarden-cli;
             # Temporary fix as I can't switch to 24.11 yet
             # ghostscript = nixpkgs-unstable.legacyPackages.${prev.system}.ghostscript;
           })

@@ -1,73 +1,92 @@
 #!/usr/bin/env bash
-
 set -eo pipefail
-# This script exports bitwarden passwords to pass
-# It requires the bitwarden cli to be installed and logged in
-# It requires pass to be installed and initialized
+# Requires: bw, jq, pass, GNU parallel, flock (util-linux)
+# Exports Bitwarden items into pass, with parallel processing but serialized pass inserts.
 
 check_bw_login() {
-    local status=$(bw status | jq -r '.status')
-    local interactive=$(tty -s && echo true || echo false)
+    local status
+    status=$(bw status | jq -r '.status')
+    local interactive
+    interactive=$(tty -s && echo true || echo false)
 
     if [[ "$status" == "unauthenticated" ]]; then
-        # Log in when we're in an interactive shell, exit otherwise
-        if [[ "$interactive" ]]; then
+        if [[ "$interactive" == "true" ]]; then
             result=$(bw login)
             key=$(echo "$result" | grep '^\$ export' | cut -d'=' -f2 | tr -d '"')
-            # export BW_SESSION="$key"
-            echo $key
+            echo "$key"
         else
-            echo "You're not logged in to Bitwarden, please run 'bw login' first"
+            echo "You're not logged in to Bitwarden, please run 'bw login' first" >&2
             exit 1
         fi
     fi
 }
 
-append_pass_value() {
-    local pass_value="$1"
-    local key="$2"
-    local value="$3"
+# Worker script: gets a single JSON line (a full item) as $1
+# Writes formatted pass value to a temp file, then uses flock to serialize pass insert.
+cat > /tmp/bw-pass-worker.sh <<'WORKER'
+#!/usr/bin/env bash
+set -euo pipefail
+item_json="$1"
 
-    if [ "$value" != "null" ]; then
-        pass_value=$(printf "%b\n" "$pass_value" "$key: $value")
-    fi
-    cat <<< $pass_value
-}
+# parse fields (guard against missing fields)
+name=$(jq -r '.name // empty' <<<"$item_json")
+username=$(jq -r '.login.username // empty' <<<"$item_json")
+password=$(jq -r '.login.password // empty' <<<"$item_json")
+url=$(jq -r '.login.uris[0].uri // empty' <<<"$item_json")
+notes=$(jq -r '.notes // empty' <<<"$item_json")
 
-insert_password() {
-    local name="$1"
-    local username="$2"
-    local password="$3"
-    local url="$4"
-    local notes="$5"
+# build pass content (first line = secret)
+pass_value="$password"
+if [[ -n "$username" ]]; then
+    pass_value+=$'\n'"Username: $username"
+fi
+if [[ -n "$url" ]]; then
+    pass_value+=$'\n'"Url: $url"
+fi
+if [[ -n "$notes" ]]; then
+    pass_value+=$'\n'"Notes: $notes"
+fi
 
-    local pass_name="bitwarden/$name"
+# temp file and a global lockfile for serializing pass inserts
+tmpfile=$(mktemp)
+trap 'rm -f "$tmpfile"' EXIT
+printf '%s\n' "$pass_value" > "$tmpfile"
 
-    pass_value="$password"
-    echo "$name"
+lockfile="/tmp/bitwarden-pass.lock"
+# ensure lockfile exists
+: > "$lockfile"
 
-    pass_value=$(append_pass_value "$pass_value" "Username" "$username")
-    pass_value=$(append_pass_value "$pass_value" "Url" "$url")
-    pass_value=$(append_pass_value "$pass_value" "Notes" "$notes")
+# Use flock to serialize the actual pass insert (so gpg won't be invoked concurrently)
+flock -x "$lockfile" -- bash -c "pass insert -m \"bitwarden/$name\" < \"$tmpfile\""
 
-    pass insert -m "$pass_name" <<< "$pass_value"
-}
+# remove tempfile and exit
+rm -f "$tmpfile"
+exit 0
+WORKER
 
-get_items() {
-    local items="$(bw list items)"
-    local item_count="$(echo "$items" | jq length)"
+chmod +x /tmp/bw-pass-worker.sh
 
-    for ((i=0; i<item_count; i++)); do
-        local item="$(echo "$items" | jq -r ".[$i]")"
-        local name="$(echo "$item" | jq -r '.name')"
-        local username="$(echo "$item" | jq -r '.login.username')"
-        local password="$(echo "$item" | jq -r '.login.password')"
-        local url="$(echo "$item" | jq -r '.login.uris[0].uri')"
-        local notes="$(echo "$item" | jq -r '.notes')"
-
-        insert_password "$name" "$username" "$password" "$url" "$notes"
-    done
-}
-
+# Ensure user is logged in (and get session if script produced one)
 check_bw_login
-get_items
+
+# Fetch items once
+items_json=$(bw list items)
+
+# If there are no items, exit quietly
+if [[ -z "$items_json" || "$(echo "$items_json" | jq length)" -eq 0 ]]; then
+    echo "No Bitwarden items found." >&2
+    exit 0
+fi
+
+# Create a newline-delimited stream of compact JSON objects
+echo "$items_json" | jq -c '.[]' > /tmp/bw_items.jsonl
+
+# Run the worker in parallel. Adjust -j N to control concurrency.
+# Using -j+0 lets GNU parallel choose number of jobs (number of CPU cores),
+# but you can set -j 4 or other number if you prefer.
+cat /tmp/bw_items.jsonl | parallel -j+0 --halt soon,fail=1 --line-buffer /tmp/bw-pass-worker.sh {}
+
+# clean up worker and tmp list
+rm -f /tmp/bw-pass-worker.sh /tmp/bw_items.jsonl
+
+echo "Done."
