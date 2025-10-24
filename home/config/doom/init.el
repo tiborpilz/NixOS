@@ -162,19 +162,19 @@
        (nix +lsp +tree-sitter)              ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
        (org
-        ;; +brain
+        +pr
         +crypt
-        ;; +dragndrop
+        +dragndrop
         +gnuplot
         +hugo
         ;; +ipython
         +journal
-        ; +jupyter
-        ;; +noter
+        +jupyter
+        +noter
         +pandoc
         +pomodoro
-        ;; +present
-        ;; +pretty
+        +present
+        +pretty
         +roam2)
        php               ; perl's insecure younger brother
        plantuml          ; diagrams for confusing people more
