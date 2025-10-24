@@ -1,9 +1,9 @@
 [user]
-  email = tibor.pilz@iu.org
+  email = tibor.pilz@liqid.de
   name = Tibor Pilz
-  signingkey = ~/.ssh/id_rsa.pub
+  signingkey = ~/.ssh/id.pub
 [author]
-  email = tibor.pilz@iu.org
+  email = tibor.pilz@liqid.de
 [filter "lfs"]
   clean = git-lfs clean -- %f
   smudge = git-lfs smudge -- %f
