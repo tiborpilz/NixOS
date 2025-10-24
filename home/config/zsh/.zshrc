@@ -43,7 +43,6 @@ source $ZDOTDIR/extra.zshrc
 
 # Aliases
 if type gfind >/dev/null; then alias find=gfind; fi
-alias k=kubectl
 
 # export PATH="/usr/local/bin:$PATH"
 
@@ -58,8 +57,11 @@ export PATH=$PATH:$HOME/bin
 export PATH=$PATH:$HOME/.npm-global/bin
 export PATH=$PATH:$HOME/go/bin
 
+# Make nix pkgs take precedence over system binaries
+export PATH=$HOME/.nix-profile/bin:$PATH
+
 export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
-export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
+export NIX_PATH=/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
 
 heck() {
   # Source THEFUCK only on demand
@@ -79,7 +81,6 @@ if [[ $TERM != dumb  ]]; then
   else
     compinit -C
   fi
-  source <(kubectl completion zsh)
 fi
 
 # Initialize zoxide
