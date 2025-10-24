@@ -113,6 +113,11 @@ with mylib;
 
       # 1password
       _1password
+
+
+      # Google Cloud Stuff
+      google-cloud-sdk
+      google-cloud-sql-proxy
     ];
 
     modules.shell.zsh.fpathDirs = ''

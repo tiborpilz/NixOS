@@ -15,11 +15,14 @@ with mylib;
 
     # Packages for web development, mostly for JavaScript
     home.packages = with pkgs.unstable; [
+      # Javascript Runtimes
+      nodejs_24
+      bun
+      deno
+
       # Package Managers
       nodePackages.pnpm
       nodePackages.yarn
-      bun
-      deno
 
       # Linting
       # nodePackages.prettier
