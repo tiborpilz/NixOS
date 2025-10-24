@@ -12,5 +12,10 @@ in
       docker-compose
       docker
     ];
+
+    modules.shell.zsh.fpathDirs = ''
+      ${pkgs.docker-compose}/share/zsh/site-functions
+      ${pkgs.docker}/share/zsh/site-functions
+    '';
   };
 }

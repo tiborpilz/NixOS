@@ -21,12 +21,24 @@ in
       # Rancher Kubernetes Engine
       rke
 
+      # Google
+      google-cloud-sdk
+      google-cloud-sql-proxy
+
       # iac n stuff
       terraform
       opentofu
-      # Terraform
       terraform
       unstable.terragrunt
     ];
+    
+    modules.shell.zsh.aliases.k = "kubectl";
+    modules.shell.zsh.aliases.tf = "terraform";
+
+    modules.shell.zsh.fpathDirs = ''
+      ${pkgs.google-cloud-sdk}/share/zsh/site-functions
+      ${pkgs.terraform}/share/zsh/site-functions
+      ${pkgs.kubectl}/share/zsh/site-functions
+    '';
   };
 }
