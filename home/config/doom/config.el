@@ -302,25 +302,6 @@
 
 (use-package! org-ql)
 
-(defun my/refresh-org-databases ()
-  "Refresh both org-roam and org-ql databases to pick up new files."
-  (interactive)
-  (my/rebuild-org-agenda-files)  ; Rebuild agenda files to include new roam files
-  (when (featurep 'org-roam)
-    (org-roam-db-sync))
-  (message "Refreshed org databases and agenda files"))
-
-;; Auto-refresh after saving any org file
-(add-hook 'after-save-hook
-          (lambda ()
-            (when (derived-mode-p 'org-mode)
-              (run-with-idle-timer 1 nil #'my/refresh-org-databases))))
-
-;; Keybinding for manual refresh
-(map! :leader
-      :desc "Refresh org databases" "n r r" #'my/refresh-org-databases
-      :desc "Rebuild agenda files" "n r a" #'my/rebuild-org-agenda-files)
-
 ;; (use-package org-similarity
 ;;   :load-path "org/similarity")
 
