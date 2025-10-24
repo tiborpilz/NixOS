@@ -98,6 +98,9 @@ return {
         debounce_hours = 1,  -- at least 1 hour between attempts to install/update
       })
 
+      local mason_packages = vim.fn.stdpath("data") .. "/mason/packages"
+      local volar_path = mason_packages .. "/vue-language-server/node_modules/@vue/language-server"
+
       require("mason-lock").setup({
         lockfile_path = vim.fn.stdpath("config") .. "/mason-lock.json", -- (default)
       })
@@ -119,128 +122,118 @@ return {
         ensure_installed = {},
 
         handlers = {
-          function(server_name) -- default handler
-            require("lspconfig")[server_name].setup({})
-          end,
+          -- function(server_name) -- default handler
+          --   require("lspconfig")[server_name].setup({})
+          -- end,
 
-          ["volar"] = function()
-            require("lspconfig").volar.setup({
-              init_options = {
-                vue = {
-                  hybridMode = true,
-                },
-                typescript = {
-                  tsdk = vim.fn.stdpath("data") .. "/mason/packages" .. "/typescript-language-server/node_modules/typescript/lib",
-                },
-              },
-              settings = {
-                typescript = {
-                  inlayHints = {
-                    enumMemberValues = {
-                      enabled = true,
-                    },
-                    functionLikeReturnTypes = {
-                      enabled = true,
-                    },
-                    propertyDeclarationTypes = {
-                      enabled = true,
-                    },
-                    parameterTypes = {
-                      enabled = true,
-                      suppressWhenArgumentMatchesName = true,
-                    },
-                    variableTypes = {
-                      enabled = true,
+          -- ["volar"] = function()
+          --   vim.lsp.config("volar", {
+          --     init_options = {
+          --       vue = {
+          --         hybridMode = false, -- Use false as in the second block, change to true if needed
+          --       },
+          --       typescript = {
+          --         tsdk = vim.fn.stdpath("data") .. "/mason/packages/typescript-language-server/node_modules/typescript/lib",
+          --         -- Uncomment below if you want to use project-local typescript
+          --         -- tsdk = vim.fn.getcwd() .. "/node_modules/typescript/lib",
+          --       },
+          --     },
+          --     settings = {
+          --       typescript = {
+          --         inlayHints = {
+          --           enumMemberValues = {
+          --             enabled = true,
+          --           },
+          --           functionLikeReturnTypes = {
+          --             enabled = true,
+          --           },
+          --           propertyDeclarationTypes = {
+          --             enabled = true,
+          --           },
+          --           parameterTypes = {
+          --             enabled = true,
+          --             suppressWhenArgumentMatchesName = true,
+          --           },
+          --           variableTypes = {
+          --             enabled = true,
+          --           },
+          --         },
+          --       },
+          --     },
+          --     -- NOTE: Uncomment to enable volar in file types other than vue.
+          --     -- (Similar to Takeover Mode)
+          --     filetypes = { "vue", "javascript", "typescript", "javascriptreact", "typescriptreact", "json" },
+          --
+          --     -- NOTE: Uncomment to restrict Volar to only Vue/Nuxt projects. This will enable Volar to work alongside other language servers (tsserver).
+          --     -- root_dir = require("lspconfig").util.root_pattern(
+          --       --   "vue.config.js",
+          --       --   "vue.config.ts",
+          --       --   "nuxt.config.js",
+          --       --   "nuxt.config.ts"
+          --       -- ),
+          --     })
+          --   end,
+          --
+          --
+            ["ts_ls"] = function()
+              vim.lsp.config("ts_ls", {
+                filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
+                init_options = {
+                  plugins = {
+                    {
+                      name = "@vue/typescript-plugin",
+                      location = volar_path,
+                      languages = { "vue" },
                     },
                   },
                 },
-              }
-            })
-            --   -- NOTE: Uncomment to enable volar in file types other than vue.
-            --   -- (Similar to Takeover Mode)
-            --
-            --   filetypes = { "vue", "javascript", "typescript", "javascriptreact", "typescriptreact", "json" },
-            --
-            --   -- NOTE: Uncomment to restrict Volar to only Vue/Nuxt projects. This will enable Volar to work alongside other language servers (tsserver).
-            --
-            --   -- root_dir = require("lspconfig").util.root_pattern(
-            --   --   "vue.config.js",
-            --   --   "vue.config.ts",
-            --   --   "nuxt.config.js",
-            --   --   "nuxt.config.ts"
-            --   -- ),
-            --   init_options = {
-            --     vue = {
-            --       hybridMode = false,
-            --     },
-            --     -- NOTE: This might not be needed. Uncomment if you encounter issues.
-            --     --
-            --     -- typescript = {
-            --     --   tsdk = vim.fn.getcwd() .. "/node_modules/typescript/lib",
-            --     -- },
-            --   },
-            --   settings = {
-            --     typescript = {
-            --       inlayHints = {
-            --         enumMemberValues = {
-            --           enabled = true,
-            --         },
-            --         functionLikeReturnTypes = {
-            --           enabled = true,
-            --         },
-            --         propertyDeclarationTypes = {
-            --           enabled = true,
-            --         },
-            --         parameterTypes = {
-            --           enabled = true,
-            --           suppressWhenArgumentMatchesName = true,
-            --         },
-            --         variableTypes = {
-            --           enabled = true,
-            --         },
-            --       },
-            --     },
-            --   },
-            -- })
-          end,
-
-          ["ts_ls"] = function()
-            local mason_packages = vim.fn.stdpath("data") .. "/mason/packages"
-            local volar_path = mason_packages .. "/vue-language-server/node_modules/@vue/language-server"
-
-            require("lspconfig").ts_ls.setup({
-              -- NOTE: To enable hybridMode, change HybrideMode to true above and uncomment the following filetypes block.
-
-              filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
-              init_options = {
-                plugins = {
-                  {
-                    name = "@vue/typescript-plugin",
-                    location = volar_path,
-                    languages = { "vue" },
+                settings = {
+                  typescript = {
+                    inlayHints = {
+                      includeInlayParameterNameHints = "all",
+                      includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                      includeInlayFunctionParameterTypeHints = true,
+                      includeInlayVariableTypeHints = true,
+                      includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+                      includeInlayPropertyDeclarationTypeHints = true,
+                      includeInlayFunctionLikeReturnTypeHints = true,
+                      includeInlayEnumMemberValueHints = true,
+                    },
                   },
                 },
-              },
-              settings = {
-                typescript = {
-                  inlayHints = {
-                    includeInlayParameterNameHints = "all",
-                    includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-                    includeInlayFunctionParameterTypeHints = true,
-                    includeInlayVariableTypeHints = true,
-                    includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-                    includeInlayPropertyDeclarationTypeHints = true,
-                    includeInlayFunctionLikeReturnTypeHints = true,
-                    includeInlayEnumMemberValueHints = true,
+              })
+
+              vim.lsp.config("ts_ls", {
+                filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
+                init_options = {
+                  plugins = {
+                    {
+                      name = "@vue/typescript-plugin",
+                      location = volar_path,
+                      languages = { "vue" },
+                    },
                   },
                 },
-              },
-            })
+                settings = {
+                  typescript = {
+                    inlayHints = {
+                      includeInlayParameterNameHints = "all",
+                      includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                      includeInlayFunctionParameterTypeHints = true,
+                      includeInlayVariableTypeHints = true,
+                      includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+                      includeInlayPropertyDeclarationTypeHints = true,
+                      includeInlayFunctionLikeReturnTypeHints = true,
+                      includeInlayEnumMemberValueHints = true,
+                    },
+                  },
+                },
+              })
           end,
 
 
           ["lua_ls"] = function()
-            require("lspconfig").lua_ls.setup({
+            vim.lsp.config("lua", {
               on_init = function(client)
                 local path = client.workspace_folders[1].name
                 if vim.loop.fs_stat(path .. "/.luarc.json") or vim.loop.fs_stat(path .. "/.luarc.jsonc") then
@@ -283,10 +276,9 @@ return {
         },
       })
 
-
-      require("lspconfig").gleam.setup({})
-
-      require("lspconfig").sourcekit.setup({})
+      --
+      vim.lsp.config("gleam", require("lspconfig.configs.gleam"))
+      vim.lsp.config("sourcekit", require("lspconfig.configs.sourcekit"))
     end,
   },
   -- LSP Actions Preview
@@ -358,6 +350,19 @@ return {
   {
     'dnlhc/glance.nvim',
     cmd = 'Glance'
+  },
+
+  -- Formatting via LSP/Mason
+  {
+    "jay-babu/mason-null-ls.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    dependencies = {
+      "williamboman/mason.nvim",
+      "nvimtools/none-ls.nvim",
+    },
+    config = function()
+      require("mason-null-ls").setup({})
+    end,
   },
 
   -- Treesitter

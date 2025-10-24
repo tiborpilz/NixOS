@@ -8,9 +8,6 @@ in
     enable = mylib.mkBoolOpt false;
   };
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgs; [
-      lua
-      luarocks
-    ];
+    home.packages = with pkgs; [ lua5_1 luarocks];
   };
 }

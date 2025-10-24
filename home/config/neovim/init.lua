@@ -52,6 +52,11 @@ vim.o.fillchars = "eob: "
 vim.opt.laststatus = 3
 vim.opt.splitkeep = "screen"
 
+--- Don't fix end of file, but expect newline
+vim.opt.fixendofline = false
+vim.opt.fileformats = "unix,dos,mac"
+vim.g.editorconfig = false
+
 --- Load plugins
 require('plugins')
 
@@ -72,5 +77,5 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup("plugins")
 
---- Color scheme
+-- Color scheme
 require('nord').set()
