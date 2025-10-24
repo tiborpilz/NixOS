@@ -19,6 +19,21 @@ mkShell {
     sops
     nh
     just
+    nodejs_22
+  ];
+
+  packages = with pkgs; [
+    git
+    nix-zsh-completions
+    node2nix
+    nixos-rebuild
+    cachix
+    go-task
+    deploy-rs
+    sops
+    nh
+    just
+    nodejs_22
   ];
   shellHook = ''
     export FLAKE="$PWD"

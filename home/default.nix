@@ -80,6 +80,10 @@ with mylib;
       php82
       php82Packages.composer
 
+      # Expo development utils
+      watchman
+      zulu # OpenJDK distro
+
       # Latex stuff TODO: move to a module
       # texlive.combined.scheme-full
       # GNU roff - typesetting, pdf converting stuff
@@ -196,9 +200,11 @@ with mylib;
 
     modules.shell.jujutsu.enable = true;
 
-    # Use clang++ instead of g++
     modules.shell.zsh.envInit = ''
+      # Use clang++ instead of g++
       export CXX=clang++
+      # Prioritize nix binaries of system ones
+      export PATH=$HOME/.nix-profile/bin:$PATH
     '';
 
     nix = {

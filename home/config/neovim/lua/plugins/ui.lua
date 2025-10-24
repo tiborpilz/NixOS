@@ -93,17 +93,17 @@ return {
   },
 
   -- Switching Colorschemes
-  {
-    "vague2k/huez.nvim",
-    -- if you want registry related features, uncomment this
-    -- import = "huez-manager.import"
-    branch = "stable",
-    event = "UIEnter",
-    config = function()
-      require("huez").setup({})
-    end,
-  },
-
+  -- {
+  --   "vague2k/huez.nvim",
+  --   -- if you want registry related features, uncomment this
+  --   -- import = "huez-manager.import"
+  --   branch = "stable",
+  --   event = "UIEnter",
+  --   config = function()
+  --     require("huez").setup({})
+  --   end,
+  -- },
+  --
   -- Color Buddy <3 --
   "tjdevries/colorbuddy.nvim",
 
@@ -117,27 +117,24 @@ return {
       vim.g.nord_italic = false
       vim.g.nord_uniform_diff_background = false
       vim.g.nord_bold = true
-
-      require('nord').set()
+      vim.cmd.colorscheme('nord')
     end,
   },
-  "rktjmp/lush.nvim",
-  "kdheepak/monochrome.nvim",
-  "Yazeed1s/minimal.nvim",
-  {
-    "zenbones-theme/zenbones.nvim",
-    -- Optionally install Lush. Allows for more configuration or extending the colorscheme
-    -- If you don't want to install lush, make sure to set g:zenbones_compat = 1
-    -- In Vim, compat mode is turned on as Lush only works in Neovim.
-    dependencies = "rktjmp/lush.nvim",
-    lazy = false,
-    priority = 1000,
-    -- you can set set configuration options here
-    config = function()
-      vim.g.zenbones_darken_comments = 45
-      vim.cmd.colorscheme('zenbones')
-    end
-  },
+  -- "rktjmp/lush.nvim",
+  -- "kdheepak/monochrome.nvim",
+  -- "Yazeed1s/minimal.nvim",
+  -- {
+  --   "zenbones-theme/zenbones.nvim",
+  --   -- Optionally install Lush. Allows for more configuration or extending the colorscheme
+  --   -- If you don't want to install lush, make sure to set g:zenbones_compat = 1
+  --   -- In Vim, compat mode is turned on as Lush only works in Neovim.
+  --   dependencies = "rktjmp/lush.nvim",
+  --   lazy = false,
+  --   priority = 1000,
+  --   -- you can set set configuration options here
+  --   config = function()
+  --   end
+  -- },
 
   --- Icons
   {
@@ -163,5 +160,44 @@ return {
         },
       })
     end,
+  },
+  -- Zen Mode
+  {
+    "folke/zen-mode.nvim",
+    cmd = "ZenMode",
+    keys = {
+      { "<leader>zz", "<cmd>ZenMode<cr>", desc = "Toggle Zen Mode" },
+    },
+    opts = {
+      window = {
+        width = 0.85, -- width will be 85% of the editor width
+        options = {
+          number = false,
+          relativenumber = true,
+          signcolumn = "no",
+          cursorline = false,
+          cursorcolumn = false,
+          foldcolumn = "0",
+          list = false,
+        },
+      },
+      plugins = {
+        gitsigns = { enabled = true },
+        tmux = { enabled = true },
+        diagnostics = { enabled = false }, -- disable diagnostics
+        kitty = {
+          enabled = false,
+          font = "+2", -- font size increment
+        },
+      },
+      on_open = function()
+        -- Disable status line in zen mode
+        vim.opt.laststatus = 0
+      end,
+      on_close = function()
+        -- Re-enable status line when exiting zen mode
+        vim.opt.laststatus = 2
+      end,
+    },
   },
 }

@@ -6,6 +6,7 @@ return {
     "antoinemadec/FixCursorHold.nvim",
     "nvim-treesitter/nvim-treesitter",
     "nvim-neotest/neotest-jest",
+    "marilari88/neotest-vitest",
   },
   event = "VeryLazy",
   config = function()
@@ -28,6 +29,8 @@ return {
         concurrent = 16,
       },
       config = function(_, opts)
+        local neotest = require("neotest")
+
         local neotest_ns = vim.api.nvim_create_namespace("neotest")
         vim.diagnostic.config({
           virtual_text = {
@@ -47,6 +50,10 @@ return {
           cwd = function()
             return vim.fn.getcwd()
           end,
+        }),
+        require("neotest-vitest")({
+          cwd = function(testFilePath) return vim.fs.root(testFilePath, "node_modules") end,
+          filter_dir = function(name, rel_path, root) return name ~= "node_modules" end,
         }),
       },
       consumers = {
