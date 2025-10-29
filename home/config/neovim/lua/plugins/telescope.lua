@@ -36,11 +36,11 @@ return {
             override_file_sorter = true,
             case_mode = "smart_case",
           },
-          frecency = {
-            db_safe_mode = true,
-            db_version = "v2",
-            matcher = "fuzzy",
-          },
+          -- frecency = {
+          --   db_safe_mode = true,
+          --   db_version = "v2",
+          --   matcher = "fuzzy",
+          -- },
           cmdline = {
             overseer = {
               enabled = true,
