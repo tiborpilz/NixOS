@@ -1,0 +1,6 @@
+[user]
+  email = tibor.pilz@liqid.de
+  name = Tibor Pilz
+  signingkey = ~/.ssh/id_liqid.pub
+[author]
+  email = tibor.pilz@liqid.de
