@@ -2,9 +2,36 @@
 
 local ret_status="%(?:%{$fg_bold[green]%}▸:%{$fg_bold[red]%}▸%s)"
 
+# Jujutsu Prompt
+# TODO: Move somewhere else
+
+autoload -Uz vcs_info
+autoload -U colors && colors
+
+zstyle ':vcs_info:*' enable jj git
+
+precmd_vcs_info() { vcs_info }
+precmd_functions+=( precmd_vcs_info )
+setopt prompt_subst
+
+zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
++vi-git-untracked(){
+    if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' ]] && \
+        git status --porcelain | grep '??' &> /dev/null ; then
+        hook_com[staged]+='!' # signify new files with a bang
+    fi
+}
+
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:*:*' formats " %{$fg[blue]%}(%s %{$fg[red]%}%m%u%{$fg[white]%}%{$fg[blue]%} %b%{$fg[blue]%})%{$reset_color%}"
+
 function git_prompt_info() {
   ref=$(git symbolic-ref HEAD 2> /dev/null) || return
   echo "$ZSH_THEME_GIT_PROMPT_PREFIX  $(current_branch | sed 's/\(.\{35\}\).*/\1.../')$ZSH_THEME_GIT_PROMPT_SUFFIX$(parse_git_dirty)"
+}
+
+function jj_prompt() {
+  echo "\${vcs_info_msg_0_}"
 }
 
 function get_pwd(){
@@ -44,14 +71,9 @@ function venv_prompt() {
 }
 
 PROMPT='%{$fg_bold[white]%}$(get_pwd)%{$reset_color%} $ret_status '
-RPS1='$(nix_shell_prompt)$(venv_prompt) $(git_prompt_info)'
+RPS1="$(nix_shell_prompt)$(venv_prompt) $(git_prompt_info) $(jj_prompt)"
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[white]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_DIRTY=" %{$fg[yellow]%}✗%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_CLEAN=" %{$fg[green]%}✓%{$reset_color%}"
-
-#ZSH_THEME_GIT_PROMPT_PREFIX="%{$reset_color%}[git:"
-#ZSH_THEME_GIT_PROMPT_SUFFIX="]%{$reset_color%}"
-#ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[red]%}+%{$reset_color%}"
-#ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[green]%}"
