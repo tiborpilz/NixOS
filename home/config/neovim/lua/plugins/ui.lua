@@ -120,6 +120,7 @@ return {
       vim.cmd.colorscheme('nord')
     end,
   },
+  { "catppuccin/nvim", name = "catppuccin" },
   -- "rktjmp/lush.nvim",
   -- "kdheepak/monochrome.nvim",
   -- "Yazeed1s/minimal.nvim",
