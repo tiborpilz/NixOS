@@ -14,6 +14,7 @@ in
     home.packages = with pkgs; [
       git
       git-cliff
+      git-absorb
       gitAndTools.gh
       gitAndTools.glab
       gitAndTools.git-open
@@ -27,13 +28,17 @@ in
 
     xdg.configFile = {
       "git/config".source = ../../config/git/config;
+      "git/config_liqid".source = ../../config/git/config_liqid;
       "git/ignore".source = ../../config/git/ignore;
       "git/attributes".source = ../../config/git/attributes;
       "git/gitk".source = ../../config/git/gitk;
       "git/ignore_global".source = ../../config/git/ignore_global;
     };
 
-    modules.shell.zsh.fpathDirs = "${pkgs.gitAndTools.gh}/share/zsh/site-functions";
+    modules.shell.zsh.fpathDirs = ''
+      ${pkgs.gitAndTools.gh}/share/zsh/site-functions
+      ${pkgs.git-absorb}/share/zsh/site-functions
+    '';
 
     modules.shell.zsh.rcInit = ''
       # fpath=(${pkgs.gitAndTools.glab}/share/zsh/site-functions $fpath)

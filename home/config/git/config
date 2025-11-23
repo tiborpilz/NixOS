@@ -2,6 +2,9 @@
   email = tibor@pilz.berlin
   name = Tibor Pilz
   signingkey = ~/.ssh/id.pub
+[author]
+  email = tibor@pilz.berlin
+  name = Tibor Pilz
 [filter "lfs"]
   clean = git-lfs clean -- %f
   smudge = git-lfs smudge -- %f
@@ -39,5 +42,9 @@
   difft = "-c diff.external=difft diff"
   dlog = "-c diff.external=difft log -p --ext-diff"
   conflicts = "diff --zname-only --diff-filter=U --relative"
+[absorb]
+  maxStack = 50
+  autoStageIfNothingStaged = true
+
 [includeIf "gitdir:~/Code/liqid/"]
   path = ~/.config/git/config_liqid
