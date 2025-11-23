@@ -13,5 +13,7 @@ with mylib;
   config = lib.mkIf cfg.enable {
     home.packages = [ pkgs.colima ];
     home.sessionVariables.DOCKER_HOST = "unix://$HOME/.config/colima/default/docker.sock";
+
+    modules.shell.zsh.fpathDirs = "${pkgs.colima}/share/zsh/site-functions";
   };
 }
