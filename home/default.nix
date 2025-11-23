@@ -30,7 +30,6 @@ with mylib;
       # Need later version of bash for nix-shell to work correctly on macos
       bash
 
-
       # GNU Parallel my beloved
       parallel
 
@@ -113,7 +112,6 @@ with mylib;
 
       # 1password
       _1password
-
 
       # Google Cloud Stuff
       google-cloud-sdk
