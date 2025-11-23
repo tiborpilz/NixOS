@@ -41,7 +41,7 @@ return {
 
       require('lualine').setup({
         options = {
-          theme = nord_theme_custom,
+          theme = 'auto',
           section_separators = { left = ' ', right = ' ' },
           component_separators = { left = ' ', right = ' ' },
           globalstatus = true,

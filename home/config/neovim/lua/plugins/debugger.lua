@@ -9,6 +9,13 @@ return {
     config = function()
       local dap = require("dap")
 
+      dap.adapters["node"] = {
+        type = "pwa-node",
+        request = "attach",
+        name = "Auto Attach",
+        cwd = vim.fn.getcwd()
+      }
+
       dap.adapters["pwa-node"] = {
         type = "server",
         host = "localhost",

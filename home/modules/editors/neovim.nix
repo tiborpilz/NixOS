@@ -14,6 +14,9 @@ in
     home.packages = with pkgs; [
       unstable.neovim
       unstable.lua52Packages.lua-utils-nvim
+
+      # Necessary for DBUi
+      postgresql
     ];
 
     modules.shell.zsh.aliases = {

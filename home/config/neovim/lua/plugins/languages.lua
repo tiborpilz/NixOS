@@ -395,6 +395,13 @@ return {
       })
     end,
   },
+  -- Treesitter context
+  {
+    "nvim-treesitter/nvim-treesitter-context",
+    config = function()
+      require("treesitter-context").setup()
+    end,
+  },
 
   -- DAP - Debug Adapter Protocol
   -- {
