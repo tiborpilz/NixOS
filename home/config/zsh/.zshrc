@@ -1,3 +1,6 @@
+# Make nix pkgs take precedence over system binaries
+export PATH=$HOME/.nix-profile/bin:$PATH
+
 # Zsh Async Library
 source $ZDOTDIR/.zsh_custom/async.zsh
 
