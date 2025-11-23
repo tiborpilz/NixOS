@@ -43,6 +43,9 @@ with mylib;
 
       # Debugger for DAP (neovim, emacs)
       vscode-js-debug
+
+      # API testing GUI
+      bruno
     ];
   };
 }
