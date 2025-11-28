@@ -84,7 +84,12 @@ return {
           lualine_c = {},
 
           lualine_x = {
-            'lsp_status',
+            {
+              'lsp_status',
+              ignore_lsp = {
+                'GitHub Copilot',
+              },
+            },
             {
               'lsp_progress',
               display_components = { 'lsp_client_name', 'spinner', { 'title', 'percentage', 'message' }},
