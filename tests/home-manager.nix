@@ -6,59 +6,63 @@ in
 {
   name = "home-manager-suite";
 
-  nodes.machine = { config, pkgs, lib, ... }: {
-    inherit lib;
-
-    virtualisation.diskSize = 8192;
-    
-    # Import home-manager NixOS module
-    imports = [ inputs.home-manager.nixosModules.home-manager ];
-
-    # 1. Setup X11 for visual tests
-    services.xserver.enable = true;
-    services.xserver.desktopManager.xterm.enable = false;
-    services.xserver.windowManager.i3.enable = true;
-    services.displayManager.defaultSession = "none+i3";
-
-    # 2. Configure Test User
-    users.users.testuser = {
-      isNormalUser = true;
-      password = "password";
-      shell = pkgs.zsh;
-    };
-
-    # 3. Import Home Manager Configuration
-    # We adapt the existing home configuration for the test user
-    home-manager.useGlobalPkgs = true;
-    home-manager.useUserPackages = true;
-    home-manager.users.testuser = { config, ... }: {
-      imports = [ ../home ];
-      
-      # Override inputs parameter that home config expects
-      _module.args.inputs = inputs;
-      
-      # Set required home-manager options
-      home.username = "testuser";
-      home.homeDirectory = "/home/testuser";
-      home.stateVersion = "23.11";
-      
-      # Disable graphical components for simpler testing
-      graphical = true;
-      
-      # Disable syncthing service for testing
-      modules.syncthing.service = false;
-      
-      # Override neovim config to use the actual config files in the nix store
-      # instead of out-of-store symlink which won't work in test VM
-      xdg.configFile."nvim" = lib.mkForce {
-        source = ../home/config/neovim;
-        recursive = true;
+  nodes.machine = { config, pkgs, lib, ... }:
+    let
+      testUserConfig = { config, ... }: {
+        imports = [ ../home ];
+        
+        # Override inputs parameter that home config expects
+        _module.args.inputs = inputs;
+        
+        # Set required home-manager options
+        home.username = "testuser";
+        home.homeDirectory = "/home/testuser";
+        home.stateVersion = "23.11";
+        
+        # Enable graphical for terminal/visual tests
+        graphical = true;
+        
+        # Disable syncthing service for testing
+        modules.syncthing.service = false;
+        
+        # Override neovim config to use the actual config files in the nix store
+        # instead of out-of-store symlink which won't work in test VM
+        xdg.configFile."nvim" = lib.mkForce {
+          source = ../home/config/neovim;
+          recursive = true;
+        };
       };
-    };
+    in
+    {
+      inherit lib;
 
-    # Ensure dependencies for testing (e.g. terminal) are present
-    environment.systemPackages = with pkgs; [ xterm ];
-  };
+      virtualisation.diskSize = 8192;
+      
+      # Import home-manager NixOS module
+      imports = [ inputs.home-manager.nixosModules.home-manager ];
+
+      # 1. Setup X11 for visual tests
+      services.xserver.enable = true;
+      services.xserver.desktopManager.xterm.enable = false;
+      services.xserver.windowManager.i3.enable = true;
+      services.displayManager.defaultSession = "none+i3";
+
+      # 2. Configure Test User
+      users.users.testuser = {
+        isNormalUser = true;
+        password = "password";
+        shell = pkgs.zsh;
+      };
+
+      # 3. Import Home Manager Configuration
+      # We adapt the existing home configuration for the test user
+      home-manager.useGlobalPkgs = true;
+      home-manager.useUserPackages = true;
+      home-manager.users.testuser = testUserConfig;
+
+      # Ensure dependencies for testing (e.g. terminal) are present
+      environment.systemPackages = with pkgs; [ xterm ];
+    };
 
   # Python Test Script
   testScript = ''
