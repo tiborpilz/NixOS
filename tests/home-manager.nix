@@ -80,14 +80,14 @@ in
     machine.succeed("su - testuser -c 'git --version'")
     
     # Check for configuration files
-    machine.succeed("su - testuser -c 'test -e ~/.config/nvim/init.lua || test -d ~/.config/nvim'")
+    machine.succeed("su - testuser -c 'test -e ~/.config/nvim/init.lua'")
 
     # Phase 2: Visual/GUI Tests
     machine.wait_for_x()
     
     # Open a terminal with Neovim running
-    # We run it in the background (&) so the script continues
-    machine.succeed("su - testuser -c 'DISPLAY=:0 xterm -e nvim &'")
+    # Use execute() for background processes to avoid race conditions
+    machine.execute("su - testuser -c 'DISPLAY=:0 xterm -e nvim &'")
     
     # Wait for Neovim to potentially load (give it 5-10 seconds)
     machine.sleep(10)
