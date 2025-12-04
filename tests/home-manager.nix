@@ -47,6 +47,13 @@ in
       
       # Disable syncthing service for testing
       modules.syncthing.service = false;
+      
+      # Override neovim config to use the actual config files in the nix store
+      # instead of out-of-store symlink which won't work in test VM
+      xdg.configFile."nvim" = lib.mkForce {
+        source = ../home/config/neovim;
+        recursive = true;
+      };
     };
 
     # Ensure dependencies for testing (e.g. terminal) are present
