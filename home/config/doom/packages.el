@@ -17,6 +17,9 @@
 
 (package! org-node-fakeroam)
 
+(package! org-excalidraw
+  :recipe (:host github :repo "wdavew/org-excalidraw"))
+
 (package! org-autolist)
 
 (package! khalel)

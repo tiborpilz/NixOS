@@ -548,6 +548,23 @@ Additionally, org-node-fakeroam can speed up org-roam itself, as well as allow f
   :defer)
 #+end_src
 
+** Combine Excalidraw Drawings with Orgmode Files
+
+#+begin_src elisp :tangle packages.el
+(package! org-excalidraw
+  :recipe (:host github :repo "wdavew/org-excalidraw"))
+#+end_src
+
+#+begin_src elisp :tangle
+(use-package! org-excalidraw
+  :after org
+  :config
+  (org-excalidraw-directory "~/org/excalidraw")
+  ;; Optionally set the default excalidraw binary or URL
+  (setq org-excalidraw-open "xdg-open")  ; Linux
+  )
+#+end_src
+
 ** Fixes and miscellanious improvements
 
 *** Prevent org-block face for latex fragments, since they look weird
