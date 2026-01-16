@@ -24,6 +24,13 @@ vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', { desc = 'Go
 --
 
 
+-- Set .cls filetype to Apex
+vim.filetype.add({
+  extension = {
+    cls = 'apex',
+  },
+})
+
 -- Detect Gitlab CI Yaml files so that gitlab-ci-ls can use them
 vim.filetype.add({
   pattern = {
@@ -62,6 +69,32 @@ return {
         -- },
       }
     end
+  },
+  -- Lean
+  {
+    'Julian/lean.nvim',
+    event = { 'BufReadPre *.lean', 'BufNewFile *.lean' },
+
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+
+      -- optional dependencies:
+
+      -- a completion engine
+      --    hrsh7th/nvim-cmp or Saghen/blink.cmp are popular choices
+      'hrsh7th/nvim-cmp',
+      'nvim-telescope/telescope.nvim',
+
+      -- 'nvim-telescope/telescope.nvim', -- for 2 Lean-specific pickers
+      -- 'andymass/vim-matchup',          -- for enhanced % motion behavior
+      -- 'andrewradev/switch.vim',        -- for switch support
+      -- 'tomtom/tcomment_vim',           -- for commenting
+    },
+
+    ---@type lean.Config
+    opts = { -- see below for full configuration options
+      mappings = true,
+    },
   },
   -- LSP config
   {
@@ -122,9 +155,10 @@ return {
         ensure_installed = {},
 
         handlers = {
-          -- function(server_name) -- default handler
-          --   require("lspconfig")[server_name].setup({})
-          -- end,
+          function(server_name) -- default handler
+            print("Setting up " .. server_name)
+            require("lspconfig")[server_name].setup({})
+          end,
 
           -- ["volar"] = function()
           --   vim.lsp.config("volar", {
@@ -273,9 +307,22 @@ return {
               },
             })
           end,
+
+          ["apex_ls"] = function()
+            vim.lsp.config("apex_ls", {
+              apex_jar_path = vim.fn.stdpath("data") .. "/mason/packages/apex-language-server/extension/dist/apex-jorje-lsp.jar",
+              apex_enable_semantic_errors = true,
+              apex_enable_completion_statistics = false,
+            })
+          end,
         },
       })
 
+      vim.lsp.config("apex_ls", {
+        apex_jar_path = vim.fn.stdpath("data") .. "/mason/packages/apex-language-server/extension/dist/apex-jorje-lsp.jar",
+        apex_enable_semantic_errors = true,
+        apex_enable_completion_statistics = false,
+      })
       --
       vim.lsp.config("gleam", require("lspconfig.configs.gleam"))
       vim.lsp.config("sourcekit", require("lspconfig.configs.sourcekit"))
