@@ -89,3 +89,10 @@ fi
 # Initialize zoxide
 # TODO: Once we get rid of the non-home-assistant zshrc, stuff like this should be also taken care of.
 source <(zoxide init zsh)
+
+# Android stuff
+# TODO move to nix
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+
