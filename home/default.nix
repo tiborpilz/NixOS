@@ -197,7 +197,9 @@ with mylib;
 
     modules.gui.plasma.enable = config.graphical;
 
-    modules.firefox.enable = !pkgs.stdenv.isDarwin; # Firefox packdge doesn't work on Darwin :(
+    # modules.firefox.enable = !pkgs.stdenv.isDarwin; # Firefox packdge doesn't work on Darwin :(
+
+    modules.firefox.enable = true;
 
     modules.tools.aider.enable = false; # it has sooo many dependencies
 
