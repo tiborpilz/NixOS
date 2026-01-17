@@ -26,7 +26,7 @@ in
       {
         containers = {
           paperless-ngx-broker.containerConfig = {
-            image = "docker.io/redis:6.2";
+            image = "docker.io/redis:8.4";
             volumes = [
               "paperless-redis:/data"
             ];
