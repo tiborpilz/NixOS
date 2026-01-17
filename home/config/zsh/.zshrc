@@ -21,7 +21,7 @@ export NVM_LAZY_LOAD=true
 antigen use oh-my-zsh
 
 antigen bundle vi-mode
-
+antigen bundle rkh/zsh-jj@main
 antigen bundle git
 antigen bundle zsh-users/zsh-syntax-highlighting
 # antigen bundle docker
