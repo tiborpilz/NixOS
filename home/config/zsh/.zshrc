@@ -41,9 +41,6 @@ COMPLETION_WAITING_DOTS="true"
 # Util functions
 source $ZDOTDIR/.zsh_custom/utils.zsh
 
-# Extra config from Nix
-source $ZDOTDIR/extra.zshrc
-
 # Aliases
 if type gfind >/dev/null; then alias find=gfind; fi
 
@@ -96,3 +93,5 @@ export ANDROID_HOME=$HOME/Library/Android/sdk
 export PATH=$PATH:$ANDROID_HOME/emulator
 export PATH=$PATH:$ANDROID_HOME/platform-tools
 
+# Extra config from Nix
+source $ZDOTDIR/extra.zshrc
