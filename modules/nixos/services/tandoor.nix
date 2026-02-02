@@ -54,7 +54,7 @@ in
           };
 
           tandoor.containerConfig = {
-            image = "docker.io/vabene1111/recipes:1.5.27";
+            image = "docker.io/vabene1111/recipes:1.5.35";
             volumes = [
               "/var/lib/tandoor/staticfiles:/opt/recipes/staticfiles"
               "/var/lib/tandoor/mediafiles:/opt/recipes/mediafiles"
