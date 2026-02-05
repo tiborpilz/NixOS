@@ -41,7 +41,7 @@ in
       {
         containers = {
           tandoor-db.containerConfig = {
-            image = "docker.io/postgres:13";
+            image = "docker.io/postgres:14";
             volumes = [
               "${pg_data}:/var/lib/postgresql/data"
             ];
@@ -54,7 +54,7 @@ in
           };
 
           tandoor.containerConfig = {
-            image = "docker.io/vabene1111/recipes:1.5.27";
+            image = "docker.io/vabene1111/recipes:2.4.2";
             volumes = [
               "/var/lib/tandoor/staticfiles:/opt/recipes/staticfiles"
               "/var/lib/tandoor/mediafiles:/opt/recipes/mediafiles"
@@ -67,6 +67,7 @@ in
               POSTGRES_USER = db_user;
               POSTGRES_PASSWORD = db_password;
               POSTGRES_DB = db_db;
+              TANDOOR_PORT = "8080";
               ALLOWED_HOSTS = "*";
               CSRF_TRUSTED_ORIGINS =
                 "https://tandoor.${config.modules.services.reverseProxy.hostname}";
