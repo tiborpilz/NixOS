@@ -227,7 +227,7 @@ with mylib;
         experimental-features = [ "nix-command flakes" ];
         cores = 0;
         max-jobs = "32";
-        trusted-users = [ "root" "tibor" "tibor.pilz" ];
+        trusted-users = [ "root" "tibor" "tibor.pilz" "tiborpilz" ];
         trusted-substituters = [ "https://cache.nixos.org/" "https://tiborpilz.cachix.org/" ];
         substituters = [
           "https://cache.nixos.org/"
