@@ -39,6 +39,14 @@ let
       };
     };
 
+  customEmacs = pkgs.emacs.overrideAttrs (old: {
+    # Add your custom compilation flags here
+    # configureFlags = (old.configureFlags or [ ]) ++ [
+    #   "--with-native-compilation"
+    # ];
+    # NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -O3";
+  });
+
   wrap = with pkgs;
     emacsPkg:
     let
@@ -67,6 +75,7 @@ let
     });
 in
 {
-  emacsWrapped = (wrap pkgs.emacs);
+  emacs = customEmacs;
+  emacsWrapped = (wrap customEmacs);
   emacs-lsp-booster = emacs-lsp-booster;
 }
