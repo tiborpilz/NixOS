@@ -347,7 +347,7 @@ See https://org-babel.readthedocs.io/en/latest/header-args/
         (:cache . "no")
         (:noeweb . "no")
         (:hlines . "no")
-        (:tangle . "no")
+        ; (:tangle . "no")
         (:comments . "link")))
 #+end_src
 
@@ -518,52 +518,43 @@ There's an Elisp Snippet from Bill Burdick that turns Logseq notes into Org-Roam
 ;; (load (expand-file-name "org-roam-logseq.el" doom-user-dir))
 #+end_src
 
-** Org-Node
-:PROPERTIES:
-:HEADER-ARGS: :tangle no
-:END:
-
-Org-Node is similar to Org-Roam - it allows for creating small notes and linking them, creating a knowledge graph.
-
-(In fact, it's so similar that an existing Org-Roam knowledge base should just work in org-node)
-
 #+begin_src elisp :tangle packages.el
-(package! org-node)
+; (package! org-node)
 #+end_src
 
 #+begin_src elisp
-(use-package! org-node
-  :after org
-  :config (org-node-cache-mode))
+; (use-package! org-node
+;   :after org
+;   :config (org-node-cache-mode))
 #+end_src
 
 Additionally, org-node-fakeroam can speed up org-roam itself, as well as allow for the usage of org-node and org-roam in parallel.
 
 #+begin_src elisp :tangle packages.el
-(package! org-node-fakeroam)
+; (package! org-node-fakeroam)
 #+end_src
 
 #+begin_src elisp
-(use-package! org-node-fakeroam
-  :defer)
+; (use-package! org-node-fakeroam
+  ; :defer)
 #+end_src
 
 ** Combine Excalidraw Drawings with Orgmode Files
 
-#+begin_src elisp :tangle packages.el
-(package! org-excalidraw
-  :recipe (:host github :repo "wdavew/org-excalidraw"))
-#+end_src
-
-#+begin_src elisp :tangle
-(use-package! org-excalidraw
-  :after org
-  :config
-  (org-excalidraw-directory "~/org/excalidraw")
-  ;; Optionally set the default excalidraw binary or URL
-  (setq org-excalidraw-open "xdg-open")  ; Linux
-  )
-#+end_src
+# #+begin_src elisp :tangle packages.el
+# (package! org-excalidraw
+#   :recipe (:host github :repo "wdavew/org-excalidraw"))
+# #+end_src
+#
+# #+begin_src elisp :tangle
+# (use-package! org-excalidraw
+#   :after org
+#   :config
+#   (org-excalidraw-directory "~/org/excalidraw")
+#   ;; Optionally set the default excalidraw binary or URL
+#   (setq org-excalidraw-open "xdg-open")  ; Linux
+#   )
+# #+end_src
 
 ** Fixes and miscellanious improvements
 
@@ -609,6 +600,18 @@ newline, etc.
   (add-hook 'org-mode-hook #'org-autolist-mode))
 #+end_src
 
+*** Use org-cycle instead of +fold/toggle for TAB
+
+~+fold/toggle~ breaks when trying to unfold, e.g. ~src~ blocks.
+
+#+begin_src elisp
+(after! org
+  (map! :map org-mode-map
+        :n [tab] #'org-cycle
+        :i [tab] #'org-cycle
+        :v [tab] #'org-cycle
+        :m [tab] #'org-cycle))
+#+end_src
 ** Capture
 
 *** Add / change capture templates
@@ -1732,7 +1735,7 @@ to offload this computation from emacs.
 
 To correctly use it, I need to adjust the lsp command called from within emacs:
 
-#+begin_src elisp :tangle no
+#+begin_src elisp
 (defun lsp-booster--advice-json-parse (old-fn &rest args)
   "Try to parse bytecode instead of json."
   (or
@@ -2287,7 +2290,6 @@ Ignore JSONRPC logs
 (fset #'jsonrpc--log-event #'ignore)
 #+end_src
 
-
 * AI
 
 Through gptel and a thriving ecosystem, Emacs has become extremely powerful when dealing with AI.
@@ -2301,17 +2303,6 @@ As it is enabled via a Doom module, I only need to make adjustments after the mo
 *** AI Model Backends
 
 I'm using the IU Unified Endpoint as a default. It behaves just like the openai one, which is why I have to take care to keep the settings aligned.
-#+begin_src elisp
-(after! gptel
-  (setq gptel-model 'claude-sonnet-4-0)
-  (setq gptel-backend (gptel-make-openai "IU-Unified-Endpoint"
-                        :host "unified-endpoint-main.app.iu-it.org"
-                        :models '(gpt-4o-mini claude-opus-4-0 claude-sonnet-4-0 gemini-2.5-pro gemini-2.0-flash gpt-5 codestral-latest gpt-4-turbo gpt-4.1 gpt-5-nano)
-                        :protocol "https"
-                        :endpoint "/openai/v1/chat/completions"
-                        :stream t
-                        :key  (password-store-get "bitwarden/IU_OPENAI_API_KEY"))))
-#+end_src
 
 Setting up Kagi is more or less straightforward.
 #+begin_src elisp
