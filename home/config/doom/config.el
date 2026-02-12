@@ -148,7 +148,7 @@
         (:cache . "no")
         (:noeweb . "no")
         (:hlines . "no")
-        (:tangle . "no")
+        ; (:tangle . "no")
         (:comments . "link")))
 
 (defun org-babel-tangle-config ()
@@ -219,6 +219,13 @@
 
 ;; (load (expand-file-name "org-roam-logseq.el" doom-user-dir))
 
+; (use-package! org-node
+;   :after org
+;   :config (org-node-cache-mode))
+
+; (use-package! org-node-fakeroam
+  ; :defer)
+
 (require 'org-src)
 (add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t)))
 
@@ -229,6 +236,13 @@
 (use-package! org-autolist
   :config
   (add-hook 'org-mode-hook #'org-autolist-mode))
+
+(after! org
+  (map! :map org-mode-map
+        :n [tab] #'org-cycle
+        :i [tab] #'org-cycle
+        :v [tab] #'org-cycle
+        :m [tab] #'org-cycle))
 
 (after! org
   (setq org-capture-templates
@@ -791,6 +805,37 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (setq lsp-ui-doc-max-height 400
       lsp-ui-doc-max-width 250)
 
+(defun lsp-booster--advice-json-parse (old-fn &rest args)
+  "Try to parse bytecode instead of json."
+  (or
+   (when (equal (following-char) ?#)
+     (let ((bytecode (read (current-buffer))))
+       (when (byte-code-function-p bytecode)
+         (funcall bytecode))))
+   (apply old-fn args)))
+(advice-add (if (progn (require 'json)
+                       (fboundp 'json-parse-buffer))
+                'json-parse-buffer
+              'json-read)
+            :around
+            #'lsp-booster--advice-json-parse)
+
+(defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+  "Prepend emacs-lsp-booster command to lsp CMD."
+  (let ((orig-result (funcall old-fn cmd test?)))
+    (if (and (not test?)                             ;; for check lsp-server-present?
+             (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+             lsp-use-plists
+             (not (functionp 'json-rpc-connection))  ;; native json-rpc
+             (executable-find "emacs-lsp-booster"))
+        (progn
+          (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+            (setcar orig-result command-from-exec-path))
+          (message "Using emacs-lsp-booster for %s!" orig-result)
+          (cons "emacs-lsp-booster" orig-result))
+      orig-result)))
+(advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+
 (eval-after-load 'git-timemachine
   '(progn
      (evil-make-overriding-map git-timemachine-mode-map 'normal)
@@ -947,16 +992,6 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (setq read-process-output-max (* 4 1024 1024)) ;; 4mb
 
 (fset #'jsonrpc--log-event #'ignore)
-
-(after! gptel
-  (setq gptel-model 'claude-sonnet-4-0)
-  (setq gptel-backend (gptel-make-openai "IU-Unified-Endpoint"
-                        :host "unified-endpoint-main.app.iu-it.org"
-                        :models '(gpt-4o-mini claude-opus-4-0 claude-sonnet-4-0 gemini-2.5-pro gemini-2.0-flash gpt-5 codestral-latest gpt-4-turbo gpt-4.1 gpt-5-nano)
-                        :protocol "https"
-                        :endpoint "/openai/v1/chat/completions"
-                        :stream t
-                        :key  (password-store-get "bitwarden/IU_OPENAI_API_KEY"))))
 
 (after! gptel
   (gptel-make-kagi "Kagi" :key (password-store-get "bitwarden/kagi_token")))
