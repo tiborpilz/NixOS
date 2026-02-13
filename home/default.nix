@@ -132,6 +132,8 @@ with mylib;
 
     programs.man.enable = true;
 
+    wayland.windowManager.hyprland.enable = true;
+
     modules.shell.atuin.enable = true;
 
     modules.scripts.enable = true;
@@ -196,6 +198,7 @@ with mylib;
     modules.shell.manix.enable = true;
 
     modules.gui.plasma.enable = config.graphical;
+    modules.gui.hyprland.enable = config.graphical;
 
     # modules.firefox.enable = !pkgs.stdenv.isDarwin; # Firefox packdge doesn't work on Darwin :(
 
