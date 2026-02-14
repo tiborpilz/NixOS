@@ -8,6 +8,5 @@
       system-features = [ "big-parallel" "kvm" "recursive-nix" "nixos-test" ];
       trusted-users = [ "tibor" "root" ];
     };
-    package = pkgs.nix;
   };
 }

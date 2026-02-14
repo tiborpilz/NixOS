@@ -1,4 +1,4 @@
-{ inputs, pkgs, lib, config, ... }:
+{ inputs, pkgs, lib, config, osConfig, ... }:
 
 with lib;
 
@@ -19,8 +19,6 @@ with mylib;
     };
 
     home.packages = with pkgs; [
-      nix
-
       # TODO: move fonts to own module
       nerd-fonts.fira-code
       nerd-fonts.hack
@@ -216,6 +214,7 @@ with mylib;
     '';
 
     nix = {
+      # package = mkDefault systemNixPkg;
       registry.nixpkgs.flake = inputs.nixpkgs;
       settings = {
         build-users-group = "nixbld";
