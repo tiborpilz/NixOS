@@ -6,26 +6,52 @@
 
 {
   imports =
-    [
-      # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+    [./hardware-configuration.nix];
 
   config = {
     # Bootloader.
-    boot.loader.grub.enable = true;
-    boot.loader.grub.device = "/dev/sda";
-    boot.loader.grub.useOSProber = true;
+    boot = {
+      loader.grub = {
+        enable = true;
+        device = "/dev/sda";
+        useOSProber = true;
+        enableCryptodisk=true;
+      };
+
+      initrd = {
+        secrets = {
+          "/crypto_keyfile.bin" = null;
+        };
+
+        luks.devices."luks-105a050d-9c7f-466d-b2af-6a18d7e56b81".keyFile = "/crypto_keyfile.bin";
+      };
+ 
+      plymouth = {
+        enable = true;
+        theme = "rings";
+        themePackages = with pkgs; [
+          (adi1090x-plymouth-themes.override {
+            selected_themes = [ "rings" ];
+          })
+        ];
+      };
+
+      consoleLogLevel = 3;
+      initrd.verbose = false;
+      kernelParams = [
+        "quiet"
+        "udev.logevel=3"
+        "sysemd.show_tatus=auth"
+      ];
+
+      loader.timeout = 0;
+    };
+    # Setup keyfile
 
     # boot.loader.systemd-boot.enable = true;
     # boot.loader.efi.canTouchEfiVariables = true;
 
     networking.hostName = "thinkyMcThinkpad"; # Define your hostname.
-    # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-    # Configure network proxy if necessary
-    # networking.proxy.default = "http://user:password@proxy:port/";
-    # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
     # Enable networking
     networking.networkmanager.enable = true;
@@ -52,6 +78,7 @@
     services.displayManager.sddm.enable = true;
     services.desktopManager.plasma6.enable = true;
 
+    programs.hyprland.enable = true;
 
     # Configure keymap in X11
     services.xserver = {
@@ -74,6 +101,7 @@
       };
 
       touchpad = {
+        naturalScrolling = true;
         accelProfile = "flat";
       };
     };
@@ -89,18 +117,7 @@
       alsa.enable = true;
       alsa.support32Bit = true;
       pulse.enable = true;
-      # If you want to use JACK applications, uncomment this
-      #jack.enable = true;
-
-      # use the example session manager (no others are packaged yet so this is enabled by default,
-      # no need to redefine it in your config for now)
-      #media-session.enable = true;
     };
-
-
-
-    # Enable touchpad support (enabled default in most desktopManager).
-    # services.xserver.libinput.enable = true;
 
     programs.zsh.enable = true;
 
@@ -144,6 +161,6 @@
       };
     };
 
-    system.stateVersion = "22.11";
+    system.stateVersion = "23.11";
   };
 }
