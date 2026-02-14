@@ -21,7 +21,7 @@ in
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
     home-manager.sharedModules = [
-      inputs.plasma-manager.homeManagerModules.plasma-manager
+      inputs.plasma-manager.homeModules.plasma-manager
     ];
     # home-manager.extraSpecialArgs = { inherit lib; };
     home-manager.users.tibor = mkMerge [

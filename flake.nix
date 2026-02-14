@@ -33,8 +33,12 @@
 
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
 
+    # Only necessary for the Home Manager module, if used by itself.
+    determinate-nix.url = "github:DeterminateSystems/nix-src";
+
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3.16.0";
+
     radicle-explorer.url = "git+https://iris.radicle.xyz/z4V1sjrXqjvFdnCUbxPFqd5p4DtH5.git";
-    # radicle-explorer.inputs.nixpkgs.follows = "nixpkgs-unstable";
   };
 
   outputs =
@@ -49,6 +53,7 @@
     , authentik-nix
     , quadlet-nix
     , radicle-explorer
+    , determinate
     , ...
     } @ inputs:
     let
@@ -88,6 +93,8 @@
             sops-nix.nixosModules.sops
             authentik-nix.nixosModules.default
             radicle-explorer.nixosModules.radicle-explorer
+            determinate.nixosModules.default
+            quadlet-nix.nixosModules.quadlet
           ] ++ lib.my.mapModulesRec' (toString ./modules/shared) import;
         };
 
@@ -154,8 +161,6 @@
                   home.username = user;
                   home.homeDirectory = homeDirectory;
                   modules.syncthing.service = enableSyncthing;
-
-                  nix.package = pkgs.nix;
                 }
               ];
             };
