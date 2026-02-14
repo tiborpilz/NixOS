@@ -15,7 +15,6 @@ in
       kitty
       waybar
       mako
-      wofi
       grim
       slurp
       wl-clipboard
@@ -25,7 +24,14 @@ in
 
     services.mako.enable = true;
 
-    programs.waybar.enable = true;
+    programs.wofi = {
+      enable = true;
+    };
+
+    programs.waybar = {
+      enable = true;
+      systemd.enable = true;
+    };
 
     # Hyprland config via HM
     wayland.windowManager.hyprland = {
@@ -85,5 +91,5 @@ in
         ];
       };
     };
-  }
-};
+  };
+}

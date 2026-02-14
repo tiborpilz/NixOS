@@ -111,7 +111,7 @@ with mylib;
       cheat # cheat sheets
 
       # 1password
-      _1password
+      _1password-cli
 
       # Google Cloud Stuff
       google-cloud-sdk
