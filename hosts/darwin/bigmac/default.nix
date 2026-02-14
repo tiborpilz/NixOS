@@ -26,7 +26,7 @@ with lib;
     ];
 
     homebrew.brews = [
-      "lima" # docker-desktop / vm alternative
+      # "lima" # docker-desktop / vm alternative
       "podman" # docker alternative
       "sketchybar"
       "yabai"
