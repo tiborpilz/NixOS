@@ -30,7 +30,6 @@ with mylib;
       # Typescript
       nodePackages.typescript
       nodePackages.typescript-language-server
-      nodePackages.ts-node
 
       # Vue
       vue-language-server
