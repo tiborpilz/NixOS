@@ -1,4 +1,4 @@
-{ inputs, pkgs, lib, config, osConfig, ... }:
+{ inputs, pkgs, lib, config, osConfig, system, ... }:
 
 with lib;
 
@@ -123,6 +123,8 @@ with mylib;
     # Let Home Manager install and manage itself.
     programs.home-manager.enable = true;
 
+    programs.nh.enable = true;
+
     # Regardlass of whether I'm using Bash (I'm not),
     # I need an up-to-date binary for nix-shell and some other settings in ".profile" that
     # are only there when `bash` is enabled.
@@ -213,8 +215,12 @@ with mylib;
       export PATH=$HOME/.nix-profile/bin:$PATH
     '';
 
-    nix = {
-      # package = mkDefault systemNixPkg;
+    nix = 
+    let
+      systemNixPkg = if osConfig != null then osConfig.nix.package else pkgs.nix;
+    in
+    {
+      package = mkDefault systemNixPkg;
       registry.nixpkgs.flake = inputs.nixpkgs;
       settings = {
         build-users-group = "nixbld";

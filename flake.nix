@@ -33,10 +33,11 @@
 
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
 
-    # Only necessary for the Home Manager module, if used by itself.
     determinate-nix.url = "github:DeterminateSystems/nix-src";
+    determinate-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3.16.0";
+    determinate.inputs.nix.follows = "determinate-nix";
 
     radicle-explorer.url = "git+https://iris.radicle.xyz/z4V1sjrXqjvFdnCUbxPFqd5p4DtH5.git";
   };
@@ -112,6 +113,7 @@
           })
           inputs.devshell.overlays.default
           inputs.emacs-overlay.overlays.default
+          # inputs.determinate-nix.overlays.default
         ];
 
         hosts = nixosHosts;
