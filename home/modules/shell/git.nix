@@ -1,9 +1,22 @@
 { inputs, config, lib, pkgs, ... }:
 
 with lib;
+with builtins;
 let
   cfg = config.modules.shell.git;
   mylib = import ../../../lib { inherit inputs lib pkgs; };
+
+  # TODO: make this configurable
+  # gitConfigSource = ../../config/git;
+  # gitConfigLinkSource = "${config.home.homeDirectory}/Code/nixos/home/config/git";
+  # gitFiles = attrNames (readDir gitConfigSource);
+  # gitConfigFiles = listToAttrs (map (file: {
+  #   name = "git/${file}";
+  #   value = {
+  #     source = config.lib.file.mkOutOfStoreSymlink "${gitConfigLinkSource}/${file}";
+  #     recursive = true;
+  #   };
+  # }) gitFiles);
 in
 {
   options.modules.shell.git = {
@@ -15,11 +28,11 @@ in
       git
       git-cliff
       git-absorb
-      gitAndTools.gh
-      gitAndTools.glab
-      gitAndTools.git-open
-      gitAndTools.diff-so-fancy
-      gitAndTools.git-crypt
+      gh
+      glab
+      git-open
+      diff-so-fancy
+      git-crypt
       difftastic
       act
       lazygit

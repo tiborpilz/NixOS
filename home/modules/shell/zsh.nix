@@ -59,8 +59,6 @@ in
       nodejs
       coreutils
 
-      thefuck
-
       #Markdown View
       glow
     ];
@@ -78,8 +76,6 @@ in
       fpath=(${pkgs.nix}/share/zsh/site-functions $fpath)
       fpath=(${pkgs.zsh-completions}/share/zsh/site-functions $fpath)
     '';
-
-    programs.thefuck.enable = true;
 
     modules.shell.zsh.aliases = {
       xclip = "xclip -selection clipboard";
