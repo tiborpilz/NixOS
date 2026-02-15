@@ -137,6 +137,13 @@
             # testPaperless = pkgs.testers.runNixOSTest ./tests/paperless.nix;
           };
 
+          checks = {
+            home-manager-test = channels.nixpkgs.testers.runNixOSTest (import ./tests/home-manager.nix {
+              inherit inputs lib;
+              pkgs = channels.nixpkgs;
+            });
+          };
+
           apps = (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages) // {
             default = apps.flakeRepl;
           };
