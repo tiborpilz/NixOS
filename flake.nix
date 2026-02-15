@@ -14,7 +14,10 @@
     plasma-manager.inputs.home-manager.follows = "home-manager";
 
     emacs-overlay.url = "github:nix-community/emacs-overlay";
-    nix-doom-emacs-unstraightened.url = "github:marienz/nix-doom-emacs-unstraightened";
+    emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    # nix-doom-emacs-unstraightened.url = "github:marienz/nix-doom-emacs-unstraightened";
+
+
 
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
@@ -41,6 +44,7 @@
 
     radicle-explorer.url = "git+https://iris.radicle.xyz/z4V1sjrXqjvFdnCUbxPFqd5p4DtH5.git";
   };
+      # 'aradicle-explorer.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
   outputs =
     { self
@@ -109,7 +113,7 @@
             # Keep 24.05 bitwarden-cli as there are some build issues with the new one
             # bitwarden-cli = inputs.nixpkgs-24-05.legacyPackages.${prev.system}.bitwarden-cli;
             # Temporary fix as I can't switch to 24.11 yet
-            # ghostscript = nixpkgs-unstable.legacyPackages.${prev.system}.ghostscript;
+            ghostscript = nixpkgs-unstable.legacyPackages.${prev.system}.ghostscript;
           })
           inputs.devshell.overlays.default
           inputs.emacs-overlay.overlays.default
@@ -157,7 +161,7 @@
 
               modules = [
                 ./home
-                inputs.nix-doom-emacs-unstraightened.hmModule
+                # inputs.nix-doom-emacs-unstraightened.hmModule
                 {
                   _module.args.inputs = inputs;
                   home.username = user;
