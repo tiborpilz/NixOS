@@ -103,10 +103,11 @@
 
 (global-org-modern-mode)
 
-(setq prettify-symbols-alist
-      '(("CLOCK:" . ?)
-        (":LOGBOOK:" . ?)
-        (":END:" . ?-)))
+;; (setq prettify-symbols-alist
+;;       '(("CLOCK:" . ?)
+;;         (":LOGBOOK:" . ?)
+;;         (":END:" . ?-)
+;;         (":PROPERTIES:" . "p")))
 
 (setq org-agenda-deadline-faces
       '((1.001 . error)
@@ -160,6 +161,14 @@
 (add-hook 'org-mode-hook
           (lambda ()
             (add-hook 'after-save-hook #'org-babel-tangle-config)))
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((typescript . t)))
+
+(with-eval-after-load 'org
+  (add-to-list 'org-src-lang-modes '("typescript" . typescript-ts))
+  (add-to-list 'org-src-lang-modes '("ts" . typescript-ts)))
 
 (setq org-export-headline-levels 5)
 
