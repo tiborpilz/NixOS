@@ -19,16 +19,17 @@ in
 
     programs.emacs.package = pkgs.my.emacsWrapped;
 
-    programs.doom-emacs = mkIf cfg.useNix {
-      enable = true;
-      doomDir = ../../config/doom;
-      emacs = pkgs.my.emacsWrapped;
-    };
-
+    # programs.doom-emacs = mkIf cfg.useNix {
+    #   enable = true;
+    #   doomDir = ../../config/doom;
+    #   emacs = pkgs.my.emacsWrapped;
+    # };
+    #
     services.emacs.enable = lib.mkIf (pkgs.stdenv.hostPlatform.isLinux) true;
 
     home.packages = with pkgs; [
       # emacsWithNativeComp
+      libgccjit
 
       fd # for projectile
       imagemagick # for image-dired
