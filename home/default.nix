@@ -109,6 +109,8 @@ with mylib;
       cheat
 
       _1password-cli
+
+      claude-code
     ];
 
     modules.shell.zsh.fpathDirs = ''
