@@ -183,6 +183,18 @@ with lib;
       shell = pkgs.zsh;
     };
 
+    users.users.remotebuild = {
+      isSystemUser = true;
+      group = "remotebuild";
+      useDefaultShell = true;
+
+      openssh.authorizedKeys.keyFiles = [ ./remotebuild.pub ];
+    };
+
+    users.groups.remotebuild = {};
+
+    nix.settings.trustedUsers = [ "remotebuild" ];
+
     virtualisation.oci-containers.backend = "podman";
     virtualisation.quadlet.autoEscape = true;
 
