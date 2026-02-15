@@ -105,15 +105,10 @@ with mylib;
       vdirsyncer
 
       # better man page replacements
-      tldr # tldr pages
-      cheat # cheat sheets
+      tldr
+      cheat
 
-      # 1password
       _1password-cli
-
-      # Google Cloud Stuff
-      google-cloud-sdk
-      google-cloud-sql-proxy
     ];
 
     modules.shell.zsh.fpathDirs = ''
@@ -157,14 +152,13 @@ with mylib;
 
     modules.editors.neovim.enable = true;
     modules.editors.emacs.enable = true;
-    modules.editors.emacs.useNix = false;
+    modules.editors.emacs.useNix = true;
 
     modules.dev.rust.enable = true;
     modules.dev.web.enable = true;
     modules.dev.jsonnet.enable = true;
     modules.dev.dhall.enable = true;
-    modules.dev.cloud.enable = true;
-    modules.dev.nix.enable = true;
+    modules.dev.cloud.enable = true; modules.dev.nix.enable = true;
     modules.dev.gleam.enable = true;
     modules.dev.lua.enable = true;
     modules.dev.python.enable = true;
@@ -226,7 +220,7 @@ with mylib;
         build-users-group = "nixbld";
         experimental-features = [ "nix-command flakes" ];
         cores = 0;
-        max-jobs = "32";
+        max-jobs = 4;
         trusted-users = [ "root" "tibor" "tibor.pilz" "tiborpilz" ];
         trusted-substituters = [ "https://cache.nixos.org/" "https://tiborpilz.cachix.org/" ];
         substituters = [
