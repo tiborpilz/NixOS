@@ -127,8 +127,6 @@ with mylib;
 
     programs.man.enable = true;
 
-    wayland.windowManager.hyprland.enable = true;
-
     modules.shell.atuin.enable = true;
 
     modules.scripts.enable = true;
