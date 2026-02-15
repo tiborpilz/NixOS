@@ -99,6 +99,7 @@ with lib;
     networking.useDHCP = false;
     networking.firewall.enable = false;
     networking.networkmanager.enable = true;
+    networking.networkmanager.plugins = lib.mkForce [];
 
 
     hardware.opengl = {
