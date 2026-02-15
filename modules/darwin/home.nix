@@ -21,14 +21,14 @@ in
     home-manager.useUserPackages = true;
     # home-manager.extraSpecialArgs = { inherit lib; };
     home-manager.users."tibor.pilz" = mkMerge [
-      inputs.nix-doom-emacs-unstraightened.hmModule
-      {
-        _module.args.inputs = inputs;
-        _module.args.lib.my = lib.my;
-        imports = [ ../../home ];
-        # home.file = mkAliasDefinitions options.home.file;
-        # xdg.configFile = mkAliasDefinitions options.home.configFile;
-      }
+      # inputs.nix-doom-emacs-unstraightened.hmModule
+      # {
+      #   _module.args.inputs = inputs;
+      #   _module.args.lib.my = lib.my;
+      #   imports = [ ../../home ];
+      #   # home.file = mkAliasDefinitions options.home.file;
+      #   # xdg.configFile = mkAliasDefinitions options.home.configFile;
+      # }
     ];
   };
 }
