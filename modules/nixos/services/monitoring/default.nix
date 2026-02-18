@@ -82,7 +82,7 @@ in
     };
 
     virtualisation.oci-containers.containers.unifipoller = {
-      image = "docker.io/golift/unifi-poller:v2.15.3";
+      image = "docker.io/golift/unifi-poller:v2.34.0";
       environment = {
         UP_UNIFI_DEFAULT_URL = "https://192.168.1.1:443";
         UP_UNIFI_DEFAULT_ROLE = "URL";
