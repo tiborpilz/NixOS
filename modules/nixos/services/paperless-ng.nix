@@ -73,7 +73,7 @@ in
           };
 
           paperless-ngx-gotenberg.containerConfig = {
-            image = "docker.io/thecodingmachine/gotenberg:8.11.1";
+            image = "docker.io/thecodingmachine/gotenberg:8.27.0";
             environments = {
               DISABLE_GOOGLE_CHROME = "1";
             };
