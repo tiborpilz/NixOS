@@ -83,7 +83,7 @@ in
         };
 
         penpot-redis.containerConfig = {
-          image = "redis:7";
+          image = "redis:8";
           pod = pods.${podName}.ref;
         };
 
