@@ -7,8 +7,8 @@ vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSig
 -- vim.diagnostic.config { float = { border = "" } }
 
 
--- Disable white border next to file tree
-vim.opt.fillchars = vim.opt.fillchars + 'vert: '
+-- Thin border next to file tree
+vim.opt.fillchars = vim.opt.fillchars + 'vert:│'
 
 vim.g.tpipeline_autoembed = 0
 
@@ -112,16 +112,36 @@ return {
     "shaunsingh/nord.nvim",
     config = function()
       vim.g.nord_contrast = true
-      vim.g.nord_borders = false
+      vim.g.nord_borders = true
       vim.g.nord_disable_background = false
       vim.g.nord_italic = false
       vim.g.nord_uniform_diff_background = false
       vim.g.nord_bold = true
       vim.cmd.colorscheme('nord')
+
+      local function set_muted_highlights()
+        local color = vim.g.terminal_color_0
+        if color then
+          vim.api.nvim_set_hl(0, "WinSeparator", { fg = color, bg = "NONE" })
+          vim.api.nvim_set_hl(0, "NeoTreeWinSeparator", { fg = color, bg = "NONE", force = true })
+          vim.api.nvim_set_hl(0, "NeoTreeVertSplit", { fg = color, bg = "NONE", force = true })
+        end
+      end
+      vim.schedule(set_muted_highlights)
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        callback = function() vim.schedule(set_muted_highlights) end,
+      })
+      -- Re-apply when neo-tree windows open (neo-tree sets winhighlight on FileType)
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "neo-tree",
+        callback = function()
+          vim.schedule(set_muted_highlights)
+        end,
+      })
     end,
   },
   { "catppuccin/nvim", name = "catppuccin" },
-  -- "rktjmp/lush.nvim",
+  "rktjmp/lush.nvim",
   -- "kdheepak/monochrome.nvim",
   -- "Yazeed1s/minimal.nvim",
   -- {
