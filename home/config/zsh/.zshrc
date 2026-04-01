@@ -63,16 +63,6 @@ export PATH=$HOME/.nix-profile/bin:$PATH
 export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
 export NIX_PATH=/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
 
-heck() {
-  # Source THEFUCK only on demand
-  if [[ -z $THEFUCK_INITIALISED ]]; then
-    echo "Sourcing..."
-    source <(thefuck --alias heck);
-    export THEFUCK_INITIALISED=true
-  fi
-  heck
-}
-
 # Load Completions
 if [[ $TERM != dumb  ]]; then
   autoload -Uz +X compinit
