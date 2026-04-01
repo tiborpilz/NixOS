@@ -194,8 +194,6 @@ with lib;
 
     users.groups.remotebuild = {};
 
-    nix.settings.trustedUsers = [ "remotebuild" ];
-
     virtualisation.oci-containers.backend = "podman";
     virtualisation.quadlet.autoEscape = true;
 
@@ -304,6 +302,8 @@ with lib;
       enable = false;
       envFile = config.sops.secrets.woodpeckerEnv.path;
     };
+
+    modules.services.frigate.enable = true;
 
     modules.services.forgejo.enable = true;
 
