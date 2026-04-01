@@ -1,5 +1,5 @@
 #+PROPERTY: header-args elisp :tangle ./config.el :results silent
-#+TITLE: Doom Emacs Config
+#+TITLE: Doom   Emacs Config
 
 * Base Settings
 ** Personal data
@@ -11,7 +11,7 @@ Set Name and mail adress
 #+end_src
 
 ** Font settings
-
+        
 #+begin_src elisp
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'normal)
       doom-big-font (font-spec :family "FiraCode Nerd Font" :size 32 :weight 'light)
@@ -2394,6 +2394,7 @@ I want the GPTel chat to be an org-mode document per default.
 
 * Unsorted Packages
 ** pcre2el
+
 
 pcre2el is included with doom emacs but pinned to a version that is currently throwing warnings because of an
 obsolete variable.
