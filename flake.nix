@@ -13,8 +13,8 @@
     plasma-manager.inputs.nixpkgs.follows = "nixpkgs";
     plasma-manager.inputs.home-manager.follows = "home-manager";
 
-    emacs-overlay.url = "github:nix-community/emacs-overlay";
-    emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    # emacs-overlay.url = "github:nix-community/emacs-overlay";
+    # emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
     # nix-doom-emacs-unstraightened.url = "github:marienz/nix-doom-emacs-unstraightened";
 
 
@@ -45,7 +45,6 @@
     radicle-explorer.url = "git+https://iris.radicle.xyz/z4V1sjrXqjvFdnCUbxPFqd5p4DtH5.git";
 
     claude-code.url = "github:sadjow/claude-code-nix";
-    claude-code.inputs.nixpkgs.follows = "nixpkgs";
   };
       # 'aradicle-explorer.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
@@ -119,7 +118,7 @@
             ghostscript = nixpkgs-unstable.legacyPackages.${prev.system}.ghostscript;
           })
           inputs.devshell.overlays.default
-          inputs.emacs-overlay.overlays.default
+          # inputs.emacs-overlay.overlays.default
           inputs.claude-code.overlays.default
         ];
 
