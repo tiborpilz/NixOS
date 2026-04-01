@@ -25,8 +25,6 @@ let
         hash = "sha256:uP/xJfXQtk8oaG5Zk+dw+C2fVFdjpUZTDASFuj1+eYs=";
       };
 
-      # The tests contain what are essentially benchmarks—it seems prudent not to
-      # stress our users' computers in that way every time they build the package.
       doCheck = false;
 
       meta = with lib; {
@@ -39,14 +37,12 @@ let
       };
     };
 
-  customEmacs =
-    (pkgs.emacs-git.overrideAttrs (old: {
-      stdenv = pkgs.ccacheStdenv;
-      NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -O3";
-    }));
-
-
-
+  # customEmacs =
+  #   (pkgs.emacs-git.overrideAttrs (old: {
+  #     stdenv = pkgs.ccacheStdenv;
+  #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -O3";
+  #   }));
+  #
   wrap = with pkgs;
     emacsPkg:
     let
@@ -75,7 +71,7 @@ let
     });
 in
 {
-  emacs = customEmacs;
-  emacsWrapped = (wrap customEmacs);
+  emacs = pkgs.emacs;
+  emacsWrapped = (wrap pkgs.emacs);
   emacs-lsp-booster = emacs-lsp-booster;
 }
