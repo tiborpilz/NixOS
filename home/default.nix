@@ -202,6 +202,8 @@ with mylib;
 
     modules.shell.jujutsu.enable = true;
 
+    modules.shell.pay-respects.enable = true;
+
     modules.shell.zsh.envInit = ''
       # Use clang++ instead of g++
       export CXX=clang++
