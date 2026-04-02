@@ -46,6 +46,16 @@ with lib;
       owner = "authentik";
     };
 
+    sops.secrets.authentik_grafana_client_id = {
+      sopsFile = ./secrets/secrets.yaml;
+      owner = "grafana";
+    };
+
+    sops.secrets.authentik_grafana_client_secret = {
+      sopsFile = ./secrets/secrets.yaml;
+      owner = "grafana";
+    };
+
     sops.secrets.linkwardenEnv = {
       sopsFile = ./secrets/secrets.yaml;
     };
@@ -116,6 +126,8 @@ with lib;
       nvidiaSettings = true;
       package = config.boot.kernelPackages.nvidiaPackages.stable;
     };
+
+    hardware.nvidia-container-toolkit.enable = true;
 
     i18n.defaultLocale = "en_US.UTF-8";
 
@@ -258,7 +270,7 @@ with lib;
       paperless.enable = true;
       firefly-iii.enable = true;
       monitoring.enable = true;
-      monitoring.netdata.enable = true;
+      monitoring.netdata.enable = false;
       linkding.enable = true;
       authentik.enable = true;
       authentik.envFile = config.sops.secrets.authentikEnv.path;
