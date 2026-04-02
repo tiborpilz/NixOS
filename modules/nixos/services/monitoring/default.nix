@@ -74,6 +74,23 @@ in
         root_url  = "https://grafana.${config.modules.services.reverseProxy.hostname}";
         serve_from_sub_path = false;
       };
+      settings."auth.generic_oauth" = {
+        enabled = true;
+        name = "Authentik";
+        client_id = "$__file{${config.sops.secrets.authentik_grafana_client_id.path}}";
+        client_secret = "$__file{${config.sops.secrets.authentik_grafana_client_secret.path}}";
+        scopes = "openid profile email";
+        auth_url = "https://auth.${config.modules.services.reverseProxy.hostname}/application/o/authorize/";
+        token_url = "https://auth.${config.modules.services.reverseProxy.hostname}/application/o/token/";
+        api_url = "https://auth.${config.modules.services.reverseProxy.hostname}/application/o/userinfo/";
+        use_pkce = false;
+        email_attribute_path = "email";
+        allow_assign_grafana_admin = true;
+        name_attribute_path = "name";
+        login_attribute_path = "preferred_username";
+        role_attribute_path = "contains(groups, 'Grafana Admins') && 'Admin' || 'Viewer'";
+        allow_sign_up = false;
+      };
     };
 
     environment.etc."grafana/dashboards/overview.json" = {
