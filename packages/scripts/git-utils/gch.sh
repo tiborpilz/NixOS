@@ -3,11 +3,13 @@
 fzf-git-branch() {
   git rev-parse HEAD > /dev/null 2>&1 || return # not a git repo
 
-  git branch --color=always --all --sort=-committerdate |
-    grep -v HEAD |
-    fzf --ansi --no-multi --preview-window right:65% \
+  git reflog --date=iso \
+    | grep 'checkout: moving from' \
+    | awk '{print $NF}' \
+    | awk '!seen[$0]++' \
+    | fzf --ansi --no-multi --preview-window right:65% \
       --preview 'git log -n 50 --color=always --date=short --pretty="format:%C(auto)%cd %h%d %s" $(sed "s/.* //" <<< {})' \
-      | sed "s/.* //"
+    | sed "s/.* //"
 }
 
 # Interactive git checkout
