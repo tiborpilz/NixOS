@@ -209,60 +209,60 @@ return {
           --   end,
           --
           --
-            ["ts_ls"] = function()
-              vim.lsp.config("ts_ls", {
-                filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
-                init_options = {
-                  plugins = {
-                    {
-                      name = "@vue/typescript-plugin",
-                      location = volar_path,
-                      languages = { "vue" },
-                    },
+          ["ts_ls"] = function()
+            vim.lsp.config("ts_ls", {
+              filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
+              init_options = {
+                plugins = {
+                  {
+                    name = "@vue/typescript-plugin",
+                    location = volar_path,
+                    languages = { "vue" },
                   },
                 },
-                settings = {
-                  typescript = {
-                    inlayHints = {
-                      includeInlayParameterNameHints = "all",
-                      includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-                      includeInlayFunctionParameterTypeHints = true,
-                      includeInlayVariableTypeHints = true,
-                      includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-                      includeInlayPropertyDeclarationTypeHints = true,
-                      includeInlayFunctionLikeReturnTypeHints = true,
-                      includeInlayEnumMemberValueHints = true,
-                    },
+              },
+              settings = {
+                typescript = {
+                  inlayHints = {
+                    includeInlayParameterNameHints = "all",
+                    includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                    includeInlayFunctionParameterTypeHints = true,
+                    includeInlayVariableTypeHints = true,
+                    includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+                    includeInlayPropertyDeclarationTypeHints = true,
+                    includeInlayFunctionLikeReturnTypeHints = true,
+                    includeInlayEnumMemberValueHints = true,
                   },
                 },
-              })
+              },
+            })
 
-              vim.lsp.config("ts_ls", {
-                filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
-                init_options = {
-                  plugins = {
-                    {
-                      name = "@vue/typescript-plugin",
-                      location = volar_path,
-                      languages = { "vue" },
-                    },
+            vim.lsp.config("ts_ls", {
+              filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
+              init_options = {
+                plugins = {
+                  {
+                    name = "@vue/typescript-plugin",
+                    location = volar_path,
+                    languages = { "vue" },
                   },
                 },
-                settings = {
-                  typescript = {
-                    inlayHints = {
-                      includeInlayParameterNameHints = "all",
-                      includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-                      includeInlayFunctionParameterTypeHints = true,
-                      includeInlayVariableTypeHints = true,
-                      includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-                      includeInlayPropertyDeclarationTypeHints = true,
-                      includeInlayFunctionLikeReturnTypeHints = true,
-                      includeInlayEnumMemberValueHints = true,
-                    },
+              },
+              settings = {
+                typescript = {
+                  inlayHints = {
+                    includeInlayParameterNameHints = "all",
+                    includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                    includeInlayFunctionParameterTypeHints = true,
+                    includeInlayVariableTypeHints = true,
+                    includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+                    includeInlayPropertyDeclarationTypeHints = true,
+                    includeInlayFunctionLikeReturnTypeHints = true,
+                    includeInlayEnumMemberValueHints = true,
                   },
                 },
-              })
+              },
+            })
           end,
 
 
@@ -310,7 +310,8 @@ return {
 
           ["apex_ls"] = function()
             vim.lsp.config("apex_ls", {
-              apex_jar_path = vim.fn.stdpath("data") .. "/mason/packages/apex-language-server/extension/dist/apex-jorje-lsp.jar",
+              apex_jar_path = vim.fn.stdpath("data") ..
+              "/mason/packages/apex-language-server/extension/dist/apex-jorje-lsp.jar",
               apex_enable_semantic_errors = true,
               apex_enable_completion_statistics = false,
             })
@@ -319,7 +320,8 @@ return {
       })
 
       vim.lsp.config("apex_ls", {
-        apex_jar_path = vim.fn.stdpath("data") .. "/mason/packages/apex-language-server/extension/dist/apex-jorje-lsp.jar",
+        apex_jar_path = vim.fn.stdpath("data") ..
+        "/mason/packages/apex-language-server/extension/dist/apex-jorje-lsp.jar",
         apex_enable_semantic_errors = true,
         apex_enable_completion_statistics = false,
       })
@@ -431,13 +433,20 @@ return {
           "gleam"
         },
 
-        -- Install parsers asynchronously...
         sync_install = false,
-        -- ...but make sure they'll get installed when they're missing (in the current buffer)
         auto_install = true,
 
         highlight = { enable = true },
-        incremental_selection = { enable = true },
+        incremental_selection = {
+          enable = true,
+          keymaps = {
+            init_selection = "<A-o>",
+            node_incremental = "<A-o>",
+            scope_incremental = "<A-O>",
+            node_decremental = "<A-i>",
+          },
+
+        },
         textobjects = { enable = true },
       })
     end,
