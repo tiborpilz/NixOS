@@ -7,7 +7,6 @@ vim.fn.sign_define("DiagnosticSignHint", { text = "", texthl = "DiagnosticSig
 -- vim.diagnostic.config { float = { border = "" } }
 
 
--- Thin border next to file tree
 vim.opt.fillchars = vim.opt.fillchars + 'vert:│'
 
 vim.g.tpipeline_autoembed = 0
@@ -37,8 +36,6 @@ return {
         local builtin = require('statuscol.builtin')
         return {
           setopt = true,
-          -- override the default list of segments with:
-          -- number-less fold indicator, then signs, then line number & separator
           segments = {
             { text = { builtin.foldfunc }, click = 'v:lua.ScFa' },
             { text = { '%s' }, click = 'v:lua.ScSa' },

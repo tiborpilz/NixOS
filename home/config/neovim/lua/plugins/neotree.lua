@@ -27,6 +27,7 @@ return {
           "document_symbols",
         },
         window = {
+          position = "right",
           mapping_options = {
             noremap = true,
             nowait = true,
