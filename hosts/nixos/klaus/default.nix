@@ -297,6 +297,10 @@ with lib;
         komga.enable = true; # comic reader
         calibre.enable = true; # book reader
 
+        audiobookshelf = {
+          enable = true;
+        };
+
         immich = {
           immich-version = "v1.132.3";
           enable = true;
