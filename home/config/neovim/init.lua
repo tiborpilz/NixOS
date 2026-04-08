@@ -3,7 +3,6 @@
 vim.o.encoding = "utf-8"
 vim.scriptencoding = "utf-8"
 
----- Basic Settings vim.o.compatible = false
 vim.o.shiftwidth = 2
 vim.o.tabstop = 2
 vim.o.expandtab = true
