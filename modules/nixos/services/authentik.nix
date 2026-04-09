@@ -67,7 +67,7 @@ with mylib;
           };
 
           authentik-server.containerConfig = {
-            image = "ghcr.io/goauthentik/server:2024.10";
+            image = "ghcr.io/goauthentik/server:2024.12";
             exec = "server";
             volumes = [
               "${cfg.dataDir}/media:/media"
@@ -94,7 +94,7 @@ with mylib;
           };
 
           authentik-worker.containerConfig = {
-            image = "ghcr.io/goauthentik/server:2024.10";
+            image = "ghcr.io/goauthentik/server:2024.12";
             exec = "worker";
             volumes = [
               "${cfg.dataDir}/media:/media"
