@@ -3,3 +3,4 @@ result
 home/config/doom/custom.el
 home/config/neovim/plugged
 .direnv
+screenshots/output/
