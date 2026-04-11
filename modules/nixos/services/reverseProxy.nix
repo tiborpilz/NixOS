@@ -29,10 +29,16 @@ let
         example = true;
         default = false;
       };
+      localOnly = mkOption {
+        type = types.bool;
+        description = "Only expose this service on the local domain, not publicly";
+        example = true;
+        default = false;
+      };
     };
   };
 
-  mkProxyConfig = { port, enableauth, username, password, host, targetHost, localDomain, isHttps, ... }:
+  mkExtraConfig = { port, enableauth, username, password, targetHost, isHttps, ... }:
     let
       protocol = if isHttps then "https" else "http";
       additionalTransportConfig = if isHttps then ''
@@ -40,23 +46,28 @@ let
           tls_insecure_skip_verify
         }
       '' else "";
-    in {
-      serverAliases = [ "http://${host}" "http://${localDomain}" ];
-      extraConfig =
-        let
-          reverseProxy = ''
-            reverse_proxy ${protocol}://${targetHost}:${toString port} {
-                header_up X-Forwarded-Proto https
-                ${additionalTransportConfig}
-            }
-          '';
-          basicAuth = if enableauth then ''
-            basicauth /* bcrypt {
-                ${username} ${password}
-            }
-          '' else "";
-        in
-          reverseProxy + basicAuth;
+      reverseProxy = ''
+        reverse_proxy ${protocol}://${targetHost}:${toString port} {
+            header_up X-Forwarded-Proto https
+            ${additionalTransportConfig}
+        }
+      '';
+      basicAuth = if enableauth then ''
+        basicauth /* bcrypt {
+            ${username} ${password}
+        }
+      '' else "";
+    in
+      reverseProxy + basicAuth;
+
+  mkPublicProxyConfig = { host, localDomain, ... }@args: {
+    serverAliases = [ "http://${host}" ] ++ lib.optional (localDomain != "") "http://${localDomain}";
+    extraConfig = mkExtraConfig args;
+  };
+
+  mkLocalProxyConfig = { localDomain, ... }@args: {
+    serverAliases = [ "http://${localDomain}" ];
+    extraConfig = mkExtraConfig args;
   };
 in
 {
@@ -129,21 +140,32 @@ in
       };
     };
 
-    services.caddy = mkIf (cfg.proxies != { }) (mkMerge [
+    services.caddy = mkIf (cfg.proxies != { }) (let
+      publicProxies = filterAttrs (_: v: !v.localOnly) cfg.proxies;
+      localOnlyProxies = filterAttrs (_: v: v.localOnly) cfg.proxies;
+
+      mkProxyArgs = n: v: {
+        port = v.publicPort;
+        enableauth = (cfg.basicAuth.enable && v.auth);
+        username = cfg.basicAuth.username;
+        password = cfg.basicAuth.password;
+        host = "${n}.${cfg.hostname}";
+        localDomain = if cfg.localDomain != null then "${n}.${cfg.localDomain}" else "";
+        targetHost = v.targetHost;
+        isHttps = v.isHttps;
+      };
+
+      publicHosts = mapAttrs'
+        (n: v: nameValuePair "${n}.${cfg.hostname}" (mkPublicProxyConfig (mkProxyArgs n v)))
+        publicProxies;
+
+      localOnlyHosts = mapAttrs'
+        (n: v: nameValuePair "${n}.${cfg.localDomain}" (mkLocalProxyConfig (mkProxyArgs n v)))
+        localOnlyProxies;
+    in mkMerge [
       {
-        virtualHosts = mapAttrs'
-          (n: v: nameValuePair "${n}.${cfg.hostname}" (mkProxyConfig {
-            port = v.publicPort;
-            enableauth = (cfg.basicAuth.enable && v.auth);
-            username = cfg.basicAuth.username;
-            password = cfg.basicAuth.password;
-            host = "${n}.${cfg.hostname}";
-            localDomain = if cfg.localDomain != null then "${n}.${cfg.localDomain}" else "";
-            targetHost = v.targetHost;
-            isHttps = v.isHttps;
-          }))
-          cfg.proxies // {
-          health = {
+        virtualHosts = publicHosts // localOnlyHosts // {
+          "health.${cfg.hostname}" = {
             serverAliases = [ "http://health.${cfg.hostname}" ];
             extraConfig = "respond \"OK\"";
           };
