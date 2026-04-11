@@ -7,7 +7,7 @@ return {
   {
     "nvim-neorg/neorg",
     lazy = false,
-    version = "v9.3.0", -- Pin Neorg to the latest stable release
+    version = "v9.4.0", -- Pin Neorg to the latest stable release
     config = true,
   },
 }

@@ -418,37 +418,27 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     config = function()
-      require('nvim-treesitter.configs').setup({
-        modules = {},
-        ignore_install = {},
+      require('nvim-treesitter').setup({})
 
-        ensure_installed = {
-          "typescript",
-          "javascript",
-          "vue",
-          "tsx",
-          "rust",
-          "lua",
-          "vim",
-          "gleam"
-        },
+      -- Install parsers
+      local wanted = { "typescript", "javascript", "vue", "tsx", "rust", "lua", "vim", "gleam" }
+      local installed = require('nvim-treesitter.config').get_installed()
+      local installed_set = {}
+      for _, p in ipairs(installed) do installed_set[p] = true end
+      local to_install = {}
+      for _, p in ipairs(wanted) do
+        if not installed_set[p] then
+          table.insert(to_install, p)
+        end
+      end
+      if #to_install > 0 then
+        vim.cmd('TSInstall ' .. table.concat(to_install, ' '))
+      end
 
-        sync_install = false,
-        auto_install = true,
-
-        highlight = { enable = true },
-        incremental_selection = {
-          enable = true,
-          keymaps = {
-            init_selection = "<A-o>",
-            node_incremental = "<A-o>",
-            scope_incremental = "<A-O>",
-            node_decremental = "<A-i>",
-          },
-
-        },
-        textobjects = { enable = true },
-      })
+      -- Incremental selection keymaps (built-in vim.treesitter)
+      vim.keymap.set('n', '<A-o>', function() vim.cmd('normal! vgnn') end, { desc = 'Init treesitter selection' })
+      vim.keymap.set('x', '<A-o>', 'gnn', { desc = 'Expand treesitter selection', remap = true })
+      vim.keymap.set('x', '<A-i>', 'gnp', { desc = 'Shrink treesitter selection', remap = true })
     end,
   },
   -- Treesitter context
