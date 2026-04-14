@@ -108,6 +108,9 @@ with mylib;
       tldr
       cheat
 
+      # Note taking (org-roam compatible)
+      logseq
+
       _1password-cli
 
       claude-code
@@ -128,6 +131,10 @@ with mylib;
     # programs.bash.enable = true;
 
     programs.man.enable = true;
+
+    services.syncthing.enable = true;
+    services.syncthing.tray = true;
+
 
     modules.shell.atuin.enable = true;
 
@@ -179,7 +186,7 @@ with mylib;
     modules.tools.vagrant.enable = false;
     modules.tools.podman.enable = true;
 
-    modules.syncthing.enable = true;
+    # modules.syncthing.enable = true;
 
     modules.bitwarden.enable = false;
     modules.password-store.enable = true;
