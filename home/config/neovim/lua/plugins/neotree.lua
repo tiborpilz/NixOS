@@ -34,9 +34,7 @@ return {
           },
           mappings = {
             ["<Tab>"] = "open_with_window_picker",
-            ["<space>"] = {
-              "none", -- disable space key in the tree
-            },
+            ["<space>"] = "none",
             ["<cr>"] = "open",
             ["ov"] = "open_vsplit",
             ["oh"] = "open_split",
