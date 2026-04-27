@@ -212,34 +212,14 @@ return {
           ["ts_ls"] = function()
             vim.lsp.config("ts_ls", {
               filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
+              on_attach = function(client, bufnr)
+                require("twoslash-queries").attach(client, bufnr)
+              end,
               init_options = {
-                plugins = {
-                  {
-                    name = "@vue/typescript-plugin",
-                    location = volar_path,
-                    languages = { "vue" },
-                  },
+                tsserver = {
+                  path = vim.fn.getcwd() .. "/node_modules/typescript/lib/tsserver.js",
+                  -- path = vim.fn.stdpath("data") .. "/mason/packages/typescript-language-server/node_modules/typescript/lib/tsserver.js",
                 },
-              },
-              settings = {
-                typescript = {
-                  inlayHints = {
-                    includeInlayParameterNameHints = "all",
-                    includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-                    includeInlayFunctionParameterTypeHints = true,
-                    includeInlayVariableTypeHints = true,
-                    includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-                    includeInlayPropertyDeclarationTypeHints = true,
-                    includeInlayFunctionLikeReturnTypeHints = true,
-                    includeInlayEnumMemberValueHints = true,
-                  },
-                },
-              },
-            })
-
-            vim.lsp.config("ts_ls", {
-              filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
-              init_options = {
                 plugins = {
                   {
                     name = "@vue/typescript-plugin",
@@ -417,28 +397,40 @@ return {
   -- Treesitter
   {
     "nvim-treesitter/nvim-treesitter",
+    branch = "master",
+    build = ":TSUpdate",
     config = function()
-      require('nvim-treesitter').setup({})
+      require('nvim-treesitter.configs').setup({
+        modules = {},
+        ignore_install = {},
 
-      -- Install parsers
-      local wanted = { "typescript", "javascript", "vue", "tsx", "rust", "lua", "vim", "gleam" }
-      local installed = require('nvim-treesitter.config').get_installed()
-      local installed_set = {}
-      for _, p in ipairs(installed) do installed_set[p] = true end
-      local to_install = {}
-      for _, p in ipairs(wanted) do
-        if not installed_set[p] then
-          table.insert(to_install, p)
-        end
-      end
-      if #to_install > 0 then
-        vim.cmd('TSInstall ' .. table.concat(to_install, ' '))
-      end
+        ensure_installed = {
+          "typescript",
+          "javascript",
+          "vue",
+          "tsx",
+          "rust",
+          "lua",
+          "vim",
+          "vimdoc",
+          "gleam",
+        },
 
-      -- Incremental selection keymaps (built-in vim.treesitter)
-      vim.keymap.set('n', '<A-o>', function() vim.cmd('normal! vgnn') end, { desc = 'Init treesitter selection' })
-      vim.keymap.set('x', '<A-o>', 'gnn', { desc = 'Expand treesitter selection', remap = true })
-      vim.keymap.set('x', '<A-i>', 'gnp', { desc = 'Shrink treesitter selection', remap = true })
+        sync_install = false,
+        auto_install = true,
+
+        highlight = { enable = true },
+        incremental_selection = {
+          enable = true,
+          keymaps = {
+            init_selection = "<A-o>",
+            node_incremental = "<A-o>",
+            scope_incremental = "<A-O>",
+            node_decremental = "<A-i>",
+          },
+        },
+        textobjects = { enable = true },
+      })
     end,
   },
   -- Treesitter context

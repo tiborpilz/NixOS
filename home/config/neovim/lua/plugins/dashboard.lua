@@ -1,122 +1,111 @@
-local function file_exists(file)
-  local f = io.open(file, "rb")
-  if f then f:close() end
-  return f ~= nil
-end
-
-
-local load_neovim_text = function()
-  local config_path = vim.fn.stdpath("config")
-  local ascii_text_file = config_path .. "/dashboard/neovim_slanted.txt"
-
-  if not file_exists(ascii_text_file) then return { "NEOVIM" } end
-  local lines = {}
-  for line in io.lines(ascii_text_file) do
-    lines[#lines + 1] = line
-  end
-  return lines
-end
-
-local load_neovim_logo = function()
-  local config_path = vim.fn.stdpath("config")
-  local ascii_text_file = config_path .. "/dashboard/neovim_logo_48.txt"
-
-  if not file_exists(ascii_text_file) then return { "NEOVIM" } end
-  local lines = {}
-  for line in io.lines(ascii_text_file) do
-    lines[#lines + 1] = line
-  end
-  return lines
-end
-
-local generate_random_neovim_text = function()
-  local figlist_file = assert(io.popen("figlist"))
-  local figlist_output = figlist_file:read('*all')
-
-  local figlist = {}
-
-  for line in figlist_output:gmatch("[^\r\n]+") do
-    -- if line doesn't contain ":" we're good to go
-    if not line:find(":") then
-      figlist[#figlist + 1] = line
-    end
-
-    -- If line starts with figlet control, we're done
-    if line:find("Control files") then
-      break
-    end
-  end
-
-  math.randomseed(os.time())
-  print(math.random(#figlist))
-
-  local font = figlist[math.random(#figlist)]
-
-  local file = assert(io.popen("figlet -f " .. font .. " NEOVIM"))
-  local output = file:read('*all')
-  file:close()
-  return output
-end
-
-local generate_slanted_neovim_text = function()
-  local file = assert(io.popen("figlet -f peaksslant NEOVIM"))
-  local output = file:read('*all')
-  file:close()
-  return output
-end
-  -- get config data
-  -- local config_path = vim.fn.stdpath("config")
-  -- local ascii_text_file = config_path .. "/dashboard/neovim_slanted.txt"
-  -- local f = io.open(ascii_text_file, "r")
+local SPLASH = "shader"
 
 vim.g.have_nerd_font = true
 
+local NORD_RAMP = {
+  "#2e3440", -- polar night 0
+  "#3b4252", -- polar night 1
+  "#434c5e", -- polar night 2
+  "#4c566a", -- polar night 3
+  "#81a1c1", -- frost — mid blue
+  "#e5e9f0", -- snow storm 1 foo
+}
+
+local function map_hex(hex)
+  if type(hex) ~= "string" or hex == "NONE" or #hex < 7 then return hex end
+  local r = tonumber(hex:sub(2, 3), 16)
+  local g = tonumber(hex:sub(4, 5), 16)
+  local b = tonumber(hex:sub(6, 7), 16)
+  if not (r and g and b) then return hex end
+  local lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  local curved = lum ^ 0.7
+  local idx = math.floor(curved * (#NORD_RAMP - 1) + 0.5) + 1
+  return NORD_RAMP[math.max(1, math.min(#NORD_RAMP, idx))]
+end
+
+local function recolor(data)
+  if not data.colors then return data end
+  for _, frame in ipairs(data.colors) do
+    for _, row in ipairs(frame) do
+      for _, run in ipairs(row) do
+        run[3] = map_hex(run[3])
+        run[4] = map_hex(run[4])
+      end
+    end
+  end
+  return data
+end
+
+local function apply_dashboard_hl()
+  vim.api.nvim_set_hl(0, "SnacksDashboardHeader",  { fg = "#3b4252" })
+  vim.api.nvim_set_hl(0, "SnacksDashboardFooter",  { fg = "#4c566a", italic = true })
+  vim.api.nvim_set_hl(0, "SnacksDashboardSpecial", { fg = "#4c566a", italic = true })
+  vim.api.nvim_set_hl(0, "SnacksDashboardKey",     { fg = "#88c0d0" })
+  vim.api.nvim_set_hl(0, "SnacksDashboardDesc",    { fg = "#d8dee9" })
+  vim.api.nvim_set_hl(0, "SnacksDashboardIcon",    { fg = "#81a1c1" })
+  vim.api.nvim_set_hl(0, "DashboardSubheader",     { fg = "#d8dee9" })
+end
+
 return {
-  -- Dasbhoard
   {
-    "goolord/alpha-nvim",
-    dependencies = {
-      "echasnovski/mini.icons",
-      { "juansalvatore/git-dashboard-nvim", dependencies = { "nvim-lua/plenary.nvim" } },
-      { "MaximilianLloyd/ascii.nvim", dependencies = { "MunifTanjim/nui.nvim" } },
-      { "MarcHamamji/ascii-text.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
-    },
-    config = function()
-      local dashboard = require("alpha.themes.dashboard")
-
-      local neovim_logo = load_neovim_logo()
-
-      dashboard.section.buttons.val = {
-        -- Browser projects
-        dashboard.button("SPC p f", "  Files", ":Telescope frecency workspace=CWD<CR>", { desc = "Find Files" }),
-        dashboard.button("SPC f h", "  Help", ":Telescope help_tags<CR>", { desc = "Help" }),
-        dashboard.button("SPC n a", "󰃭  Agenda", "<Cmd>lua require('orgmode').action('agenda.prompt')<CR>", { desc = "Agenda" }),
-      }
-
-
-      dashboard.section.header.val = neovim_logo
-      dashboard.section.subheader = {
-        type = "text",
-        val = "n  e  o  v  i  m",
-        opts = {
-          position = "center",
-          hl = "Type",
+    "amansingh-afk/milli.nvim",
+    lazy = false,
+  },
+  {
+    "folke/snacks.nvim",
+    priority = 1000,
+    lazy = false,
+    dependencies = { "amansingh-afk/milli.nvim" },
+    opts = function()
+      local splash = require("milli").load({ splash = SPLASH })
+      return {
+        dashboard = {
+          enabled = true,
+          preset = {
+            header = table.concat(splash.frames[1], "\n"),
+            keys = {},
+          },
+          sections = {
+            { section = "header", padding = 1 },
+            {
+              text = { { "n  e  o  v  i  m", hl = "DashboardSubheader" } },
+              align = "center",
+              padding = 1,
+            },
+            { section = "keys", gap = 1, padding = 1 },
+          },
         },
       }
+    end,
+    config = function(_, opts)
+      require("snacks").setup(opts)
 
-      dashboard.config.opts.margin = 0
-      dashboard.config.layout = {
-        { type = "padding", val = 0 },
-        dashboard.section.header,
-        { type = "padding", val = 3 },
-        dashboard.section.subheader,
-        { type = "padding", val = 8 },
-        dashboard.section.buttons,
-      }
+      local data = vim.deepcopy(require("milli").load({ splash = SPLASH }))
+      recolor(data)
+      require("milli").snacks({ data = data, loop = true })
 
-      require("alpha").setup(
-        dashboard.config
-      )
+      local group = vim.api.nvim_create_augroup("DashboardNordHL", { clear = true })
+      apply_dashboard_hl()
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = group,
+        callback = apply_dashboard_hl,
+      })
+      vim.api.nvim_create_autocmd("User", {
+        group = group,
+        pattern = { "SnacksDashboardOpened", "SnacksDashboardUpdatePost" },
+        callback = apply_dashboard_hl,
+      })
+
+      vim.api.nvim_create_autocmd("User", {
+        group = group,
+        pattern = "SnacksDashboardOpened",
+        callback = function()
+          pcall(vim.api.nvim_clear_autocmds, {
+            event = { "WinResized", "VimResized" },
+            group = "snacks_dashboard",
+          })
+        end,
+      })
     end,
   },
 }

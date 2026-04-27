@@ -48,7 +48,7 @@ return {
     dependencies = {
       { "hrsh7th/cmp-nvim-lsp" },
       { "onsails/lspkind-nvim" },
-      { "sudo-burger/cmp-org-roam", dependencies = { 'chipsenkbeil/org-roam.nvim' } },
+      -- { "sudo-burger/cmp-org-roam", dependencies = { 'chipsenkbeil/org-roam.nvim' } },
       { "brenoprata10/nvim-highlight-colors" },
     },
     event = "VeryLazy",
