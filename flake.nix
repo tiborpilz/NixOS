@@ -187,5 +187,17 @@
           remoteBuild = true;
         };
       };
+
+      checks = {
+        x86_64-linux = {
+          home-tibor = self.homeConfigurations.tibor.activationPackage;
+          edge = self.nixosConfigurations.edge.config.system.build.toplevel;
+          klaus = self.nixosConfigurations.klaus.config.system.build.toplevel;
+          thinkyMcThinkpad = self.nixosConfigurations.thinkyMcThinkpad.config.system.build.toplevel;
+        };
+        aarch64-darwin = {
+          home-tiborpilz = self.homeConfigurations.tiborpilz.activationPackage;
+        };
+      };
     };
 }
