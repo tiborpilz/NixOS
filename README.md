@@ -1,6 +1,5 @@
 # NixOS & Homemanager configuration
 
-[![built with garnix](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Ftiborpilz%2FNixOS)](https://garnix.io/repo/tiborpilz/NixOS)
 [![github actions](https://github.com/tiborpilz/nixos/actions/workflows/build.yml/badge.svg)](https://github.com/tiborpilz/NixOS/actions/workflows/build.yml)
 
 
@@ -21,11 +20,5 @@ To automatically inject the modules into the configuration, I'm using custom fun
 This repository contains my [literate emacs config](https://github.com/tiborpilz/NixOS/blob/main/home/config/doom/config.org).
 
 ## CI
-
-### Garnix
-
-To check whether the configuration is correct and evaluates during build, this project uses [Garnix](https://garnix.io/docs/steps).
-
-### Cachix
 
 This project uses Github Actions to automatically build the configurations (on linux_x86 and darwin_aarch64) and uses [Cachix](https://www.cachix.org/) to store them in a [binary cache](https://app.cachix.org/cache/tiborpilz#pins). This means once my configuration is pushed, I don't have to re-build packages on systems that use it.
