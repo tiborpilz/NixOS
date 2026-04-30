@@ -114,6 +114,10 @@ with mylib;
       _1password-cli
 
       claude-code
+      copilot-language-server
+
+      # AST-aware code search
+      ast-grep
     ];
 
     modules.shell.zsh.fpathDirs = ''
@@ -133,7 +137,7 @@ with mylib;
     programs.man.enable = true;
 
     services.syncthing.enable = true;
-    services.syncthing.tray = true;
+    # services.syncthing.tray = true;
 
 
     modules.shell.atuin.enable = true;
