@@ -96,6 +96,13 @@ I'm using ~~/org~ as my base directory for org files. (This is then synced acros
 (setq org-return-follows-link 1)
 (setq calendar-week-start-day 1) ;; start on monday
 (setq org-agenda-include-diary t)
+
+(setq org-agenda-files
+      (append
+       (directory-files org-directory t "\\.org\\'")
+       (directory-files-recursively
+        (expand-file-name "roam" org-directory)
+        "\\.org\\'")))
 #+end_src
 
 ** Visual improvements
@@ -963,6 +970,7 @@ Settings to ensure the query system remains responsive even with large numbers o
 (add-hook 'org-roam-capture-new-node-hook #'my/async-refresh-org-databases)
 #+end_src
 
+
 * Workspaces & Projects
 ** Projectile Project Search Path
 
@@ -984,6 +992,15 @@ instance, side-by-side editing. I'm disabling this behavior.
 * Development
 ** Language-Specific Settings
 *** Web Dev (JS/TS/CSS)
+**** Prisma
+Features for the Prisma ORM configuration language
+#+begin_src elisp :tangle packages.el
+(package! prisma-mode :recipe (:host github :repo "pimeys/emacs-prisma-mode" :branch "main"))
+#+end_src
+
+#+begin_src elisp
+(use-package! prisma-mode)
+#+end_src
 **** Testing
 
 Add a package for Jest testing
