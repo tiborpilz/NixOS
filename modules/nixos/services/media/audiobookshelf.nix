@@ -24,7 +24,7 @@ in
     virtualisation.oci-containers.containers.audiobookshelf = {
       image = "ghcr.io/advplyr/audiobookshelf:2.33.1";
       ports = [
-        "${toString audiobookshelfPort}:8080"
+        "${toString audiobookshelfPort}:80"
       ];
       volumes = [
         "${audiobookshelfConfigDir}:/config"
