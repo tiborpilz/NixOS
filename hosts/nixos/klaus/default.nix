@@ -278,6 +278,12 @@ with lib;
       linkding.enable = true;
       authentik.enable = true;
       authentik.envFile = config.sops.secrets.authentikEnv.path;
+      authentik.applications.paperless = {
+        displayName = "Paperless";
+        redirectUris = [
+          "https://paperless.tiborpilz.xyz/accounts/oidc/authentik/login/callback/"
+        ];
+      };
 
       nextcloud = {
         enable = false;
