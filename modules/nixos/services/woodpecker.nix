@@ -6,7 +6,11 @@ let
   mylib = import ../../../lib { inherit inputs lib pkgs; };
 
   hostname = config.modules.services.reverseProxy.hostname;
-  forgejoUrl = "https://forgejo.${hostname}";
+  # http:// (not https://) for the in-cluster URL: combined with the
+  # /etc/hosts override in reverseProxy.nix this resolves to local Caddy
+  # on :80 and bypasses Cloudflare Zero Trust for server-to-server calls.
+  # Browser redirects via this URL are upgraded to HTTPS by Cloudflare.
+  forgejoUrl = "http://forgejo.${hostname}";
   forgejoLocalApi = "http://localhost:${toString config.modules.services.forgejo.publicPort}/api/v1";
   woodpeckerUrl = "https://woodpecker.${hostname}";
 
@@ -33,6 +37,7 @@ with mylib;
       environment = {
         WOODPECKER_HOST = woodpeckerUrl;
         WOODPECKER_SERVER_ADDR = ":${toString cfg.publicPort}";
+        WOODPECKER_GRPC_ADDR = ":3008";
         WOODPECKER_OPEN = "true";
         WOODPECKER_FORGEJO = "true";
         WOODPECKER_FORGEJO_URL = forgejoUrl;
@@ -44,7 +49,7 @@ with mylib;
       enable = true;
       extraGroups = [ "podman" ];
       environment = {
-        WOODPECKER_SERVER = "localhost:9000";
+        WOODPECKER_SERVER = "localhost:3008";
         WOODPECKER_MAX_WORKFLOWS = "4";
         DOCKER_HOST = "unix:///run/podman/podman.sock";
         WOODPECKER_BACKEND = "docker";
