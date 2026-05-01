@@ -42,7 +42,7 @@ jobs:
           restore-keys: |
             nvim-lazy-${{ runner.os }}-
 
-      - name: Install Fira Code
+      - name: Install Fira Code (system fontconfig)
         run: |
           sudo apt-get update
           sudo apt-get install -y fonts-firacode
@@ -54,10 +54,11 @@ jobs:
       - name: Mock git repo
         run: nix develop .#screenshots -c bash screenshots/scripts/mock-git-repo.sh
 
-      - name: Run VHS tapes
-        env:
-          SCREENSHOTS_SKIP: neovim-dashboard
-        run: nix develop .#screenshots -c bash screenshots/scripts/run-tapes.sh
+      - name: Run terminal scenes under Xvfb
+        run: |
+          nix develop .#screenshots -c xvfb-run -a \
+            -s '-screen 0 1200x800x24 +extension GLX +render -noreset' \
+            bash screenshots/scripts/run-scenes.sh
 
       - uses: actions/upload-artifact@v4
         with:

@@ -5,15 +5,19 @@ let
 
   screenshotDeps = with pkgs; [
     git
-    vhs
-    ttyd
-    ffmpeg
   ] ++ pkgs.lib.optionals (!isDarwin) [
+    zsh
+    neovim
+    tmux
+    fzf
+    gitmux
+    zoxide
+    kitty
     xvfb-run
     imagemagick
     xdotool
+    mesa
     emacs
-    # Doom Emacs runtime deps
     ripgrep
     fd
     gcc
@@ -33,9 +37,11 @@ let
     nodejs_22
   ];
 
-  darwinChromeHook = pkgs.lib.optionalString isDarwin ''
-    # VHS needs a Chrome-compatible browser; use system Chrome on macOS
-    export CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+  linuxGlHook = pkgs.lib.optionalString (!isDarwin) ''
+    # Force software OpenGL and point libGL at nixpkgs Mesa's DRI drivers
+    # so Kitty/anything-GL works under Xvfb on non-NixOS Linux.
+    export LIBGL_ALWAYS_SOFTWARE=1
+    export LIBGL_DRIVERS_PATH="${pkgs.mesa.drivers or pkgs.mesa}/lib/dri"
   '';
 in
 {
@@ -46,12 +52,12 @@ in
       export FLAKE="$PWD"
       export NH_FLAKE="$PWD"
       export XDG_DATA_DIRS=$XDG_DATA_DIRS:/usr/local/share:/usr/share
-    '' + darwinChromeHook;
+    '' + linuxGlHook;
   };
 
   screenshots = pkgs.mkShell {
     buildInputs = screenshotDeps;
     packages = screenshotDeps;
-    shellHook = darwinChromeHook;
+    shellHook = linuxGlHook;
   };
 }
