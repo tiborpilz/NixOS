@@ -290,6 +290,12 @@ with lib;
           "https://forgejo.tiborpilz.xyz/user/oauth2/authentik/callback"
         ];
       };
+      authentik.applications.tandoor = {
+        displayName = "Tandoor";
+        redirectUris = [
+          "https://tandoor.tiborpilz.xyz/accounts/oidc/authentik/login/callback/"
+        ];
+      };
 
       nextcloud = {
         enable = false;
