@@ -246,7 +246,11 @@ with lib;
       hostname = "tiborpilz.xyz";
       localDomain = "klaus.tbr.gg";
       email = "tibor@pilz.berlin";
-      tunnelId = "7bc72af5-d729-4084-b8ee-42fb0f6f800a";
+
+      # Uses Cloudflare Tunnel
+      # Additionally Secured with Cloudflare Access using authentik as IdP.
+      # (Excluded from Cloudflare Access: Homeassistant & Authentik itself)
+      tunnelId = "7bc72af5-d729-4084-b8ee-42fb0f6f800a"; # Cloudflare Tunnel
       basicAuth = {
         enable = true;
         username = "tibor";
