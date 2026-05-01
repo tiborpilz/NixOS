@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Local-dev orchestrator: runs everything sequentially. CI invokes the
+# individual scripts directly to parallelize.
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUTPUT_DIR="${SCRIPT_DIR}/output"
-TAPES_DIR="${SCRIPT_DIR}/tapes"
 SCRIPTS_DIR="${SCRIPT_DIR}/scripts"
 
 mkdir -p "$OUTPUT_DIR"
@@ -14,33 +16,22 @@ echo ""
 # --- Pre-checks ---
 
 echo "Running pre-checks..."
-
 check_cmd() {
   if ! command -v "$1" &>/dev/null; then
     echo "ERROR: $1 not found. Run this inside nix-shell."
     exit 1
   fi
 }
-
 check_cmd vhs
 check_cmd nvim
 check_cmd tmux
 check_cmd git
 check_cmd fzf
-
 echo "  All required tools found."
 
-# Check neovim config exists
-if [[ -d "${HOME}/.config/nvim" ]]; then
-  echo "  Neovim config found."
-else
+if [[ ! -d "${HOME}/.config/nvim" ]]; then
   echo "WARNING: ~/.config/nvim not found. Neovim screenshots may not show plugins."
 fi
-
-# Ensure neovim plugins are installed
-echo "  Syncing neovim plugins (this may take a moment)..."
-nvim --headless "+Lazy! sync" +qa &>/dev/null || true
-echo "  Neovim plugins synced."
 
 # --- Create mock repo ---
 
@@ -52,44 +43,7 @@ bash "${SCRIPTS_DIR}/mock-git-repo.sh"
 
 echo ""
 echo "=== Generating terminal screenshots with VHS ==="
-
-TAPES=(
-  "zsh-prompt"
-  "fzf"
-  "tmux"
-  "neovim-dashboard"
-  "neovim-editing"
-  "neovim-telescope"
-)
-
-# Comma-separated list of tape names to skip (e.g. SCREENSHOTS_SKIP=neovim-dashboard)
-SKIP_RAW="${SCREENSHOTS_SKIP:-}"
-IFS=',' read -ra SKIP_LIST <<<"$SKIP_RAW"
-is_skipped() {
-  local needle="$1"
-  for s in "${SKIP_LIST[@]}"; do
-    [[ -n "$s" && "$s" == "$needle" ]] && return 0
-  done
-  return 1
-}
-
-for tape in "${TAPES[@]}"; do
-  tape_file="${TAPES_DIR}/${tape}.tape"
-  if is_skipped "$tape"; then
-    echo ""
-    echo "--- ${tape} (skipped via SCREENSHOTS_SKIP) ---"
-    continue
-  fi
-  if [[ -f "$tape_file" ]]; then
-    echo ""
-    echo "--- ${tape} ---"
-    # VHS outputs relative to its working directory
-    (cd "$SCRIPT_DIR" && vhs "$tape_file")
-    echo "  Done: ${tape}"
-  else
-    echo "WARNING: Tape file not found: ${tape_file}"
-  fi
-done
+bash "${SCRIPTS_DIR}/run-tapes.sh"
 
 # --- Emacs GUI screenshots ---
 
