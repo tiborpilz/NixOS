@@ -15,8 +15,8 @@ fi
 
 if [[ ! -d "$EMACS_CONFIG_DIR/.local" ]]; then
   echo "Running first-time doom install..."
-  yes "" | "$EMACS_CONFIG_DIR/bin/doom" --force install
+  "$EMACS_CONFIG_DIR/bin/doom" --force install </dev/null
 else
   echo "Running doom sync..."
-  "$EMACS_CONFIG_DIR/bin/doom" sync
+  "$EMACS_CONFIG_DIR/bin/doom" sync </dev/null
 fi

@@ -8,7 +8,11 @@ rm -rf "$MOCK_DIR"
 mkdir -p "$MOCK_DIR"
 cd "$MOCK_DIR"
 
+# CI runners typically have no global git identity; commits below would fail
+# without one. Set repo-local config so we don't pollute the system.
 git init
+git config user.name 'Showcase'
+git config user.email 'showcase@example.invalid'
 git checkout -b main
 
 # --- Sample files ---
