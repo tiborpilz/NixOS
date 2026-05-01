@@ -1,0 +1,96 @@
+name: 'Screenshots'
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
+    steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - uses: cachix/install-nix-action@v30
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            download-buffer-size = 524288000
+
+      - uses: cachix/cachix-action@v15
+        with:
+          name: tiborpilz
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+
+      - name: Cache Doom Emacs packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.config/emacs/.local
+          key: doom-${{ runner.os }}-${{ hashFiles('home/config/doom/packages.el', 'home/config/doom/init.el') }}
+          restore-keys: |
+            doom-${{ runner.os }}-
+
+      - name: Cache Neovim Lazy plugins
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/nvim/lazy
+          key: nvim-lazy-${{ runner.os }}-${{ hashFiles('home/config/neovim/lazy-lock.json') }}
+          restore-keys: |
+            nvim-lazy-${{ runner.os }}-
+
+      - name: Symlink editor configs into $HOME
+        run: nix develop -c bash screenshots/scripts/setup-ci-configs.sh
+
+      - name: Install Doom Emacs
+        run: nix develop -c bash screenshots/scripts/install-doom.sh
+
+      - name: Install Fira Code system-wide
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-firacode
+          fc-cache -fv
+
+      - name: Mock git repo
+        run: nix develop -c bash screenshots/scripts/mock-git-repo.sh
+
+      - name: Generate screenshots
+        env:
+          SCREENSHOTS_SKIP: neovim-dashboard
+        run: |
+          nix develop -c xvfb-run -a -s '-screen 0 1600x1000x24' \
+            bash screenshots/generate.sh
+
+      - name: Upload screenshots artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: screenshots/output/*.png
+          if-no-files-found: warn
+
+      - name: Commit screenshots back to main
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add screenshots/output/
+          if git diff --staged --quiet; then
+            echo "No screenshot changes to commit."
+          else
+            git commit -m "chore(screenshots): regenerate [skip ci]"
+            git push origin HEAD:main
+          fi
