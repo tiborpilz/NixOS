@@ -284,6 +284,12 @@ with lib;
           "https://paperless.tiborpilz.xyz/accounts/oidc/authentik/login/callback/"
         ];
       };
+      authentik.applications.forgejo = {
+        displayName = "Forgejo";
+        redirectUris = [
+          "https://forgejo.tiborpilz.xyz/user/oauth2/authentik/callback"
+        ];
+      };
 
       nextcloud = {
         enable = false;
