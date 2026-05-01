@@ -53,5 +53,4 @@ jobs:
         nix run github:Mic92/nix-fast-build -- \
           --skip-cached \
           --no-nom \
-          --flake '.#checks.aarch64-darwin' \
-          | awk '!/^copying path/'
+          --flake '.#checks.aarch64-darwin'
