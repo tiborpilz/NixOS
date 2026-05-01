@@ -7,6 +7,14 @@ set -euo pipefail
 #
 # SCREENSHOTS_SKIP=name1,name2 to skip specific scenes.
 
+# If we're not already inside an X session, start Xvfb with GLX/render
+# extensions so Kitty's OpenGL context can initialize.
+if [[ -z "${DISPLAY:-}" ]]; then
+  exec xvfb-run -a \
+    -s '-screen 0 1200x800x24 +extension GLX +render -noreset' \
+    bash "$0" "$@"
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCENES_DIR="${SCRIPT_DIR}/scenes"
 

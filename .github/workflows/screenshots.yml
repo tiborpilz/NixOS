@@ -48,11 +48,8 @@ jobs:
       - name: Mock git repo
         run: nix develop .#screenshots -c bash screenshots/scripts/mock-git-repo.sh
 
-      - name: Run terminal scenes under Xvfb
-        run: |
-          nix develop .#screenshots -c xvfb-run -a \
-            -s '-screen 0 1200x800x24 +extension GLX +render -noreset' \
-            bash screenshots/scripts/run-scenes.sh
+      - name: Run terminal scenes
+        run: nix develop .#screenshots -c bash screenshots/scripts/run-scenes.sh
 
       - uses: actions/upload-artifact@v4
         with:
@@ -100,10 +97,8 @@ jobs:
       - name: Mock git repo
         run: nix develop .#screenshots -c bash screenshots/scripts/mock-git-repo.sh
 
-      - name: Run Emacs screenshots under Xvfb
-        run: |
-          nix develop .#screenshots -c xvfb-run -a -s '-screen 0 1600x1000x24' \
-            bash screenshots/scripts/emacs-screenshot.sh
+      - name: Run Emacs screenshots
+        run: nix develop .#screenshots -c bash screenshots/scripts/emacs-screenshot.sh
 
       - uses: actions/upload-artifact@v4
         with:

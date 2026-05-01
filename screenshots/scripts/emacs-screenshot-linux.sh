@@ -2,19 +2,21 @@
 set -euo pipefail
 
 # Emacs GUI screenshot capture for Linux/CI using Xvfb + ImageMagick `import`.
-# Expects DISPLAY to point at a running Xvfb (e.g. :99). Caller is responsible
-# for starting Xvfb before invoking this script.
+# Self-wraps in xvfb-run if no X session is active.
+
+# If we're not already inside an X session, start Xvfb with GLX/render
+# extensions so Emacs's GUI frame can initialize.
+if [[ -z "${DISPLAY:-}" ]]; then
+  exec xvfb-run -a \
+    -s '-screen 0 1600x1000x24 +extension GLX +render -noreset' \
+    bash "$0" "$@"
+fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUTPUT_DIR="${SCRIPT_DIR}/../output"
 SETUP_EL="${SCRIPT_DIR}/emacs-setup.el"
 
 mkdir -p "$OUTPUT_DIR"
-
-if [[ -z "${DISPLAY:-}" ]]; then
-  echo "ERROR: DISPLAY is not set. Run inside xvfb-run or start Xvfb manually." >&2
-  exit 1
-fi
 
 if ! emacsclient --eval "(+ 1 1)" &>/dev/null; then
   echo "Starting Emacs daemon on DISPLAY=$DISPLAY..."
