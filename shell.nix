@@ -3,6 +3,9 @@
 let
   isDarwin = pkgs.stdenv.isDarwin;
 
+  # Tools the screenshot scenes need. Kitty itself is intentionally NOT here:
+  # nixpkgs Mesa 25 doesn't ship a usable software DRI driver, so we let the
+  # system (apt on CI / distro on local Linux) provide Kitty and its libGL.
   screenshotDeps = with pkgs; [
     git
   ] ++ pkgs.lib.optionals (!isDarwin) [
@@ -12,11 +15,8 @@ let
     fzf
     gitmux
     zoxide
-    kitty
-    xvfb-run
     imagemagick
     xdotool
-    mesa
     emacs
     ripgrep
     fd
@@ -37,21 +37,14 @@ let
     nodejs_22
   ];
 
-  linuxGlHook = pkgs.lib.optionalString (!isDarwin) ''
-    # Force software OpenGL and point libGL at nixpkgs Mesa's DRI drivers
-    # so Kitty/anything-GL works under Xvfb on non-NixOS Linux.
-    export LIBGL_ALWAYS_SOFTWARE=1
-    export LIBGL_DRIVERS_PATH="${pkgs.mesa}/lib/dri"
-  '';
-
   # Screenshots-only: point fontconfig at the nix-installed Nerd Font *and*
   # the system font dir so Kitty resolves "FiraCode Nerd Font Mono" while
   # Emacs still has its usual fallbacks.
-  linuxScreenshotsFontHook = pkgs.lib.optionalString (!isDarwin) ''
-    export FONTCONFIG_FILE=${pkgs.makeFontsConf {
+  screenshotsShellEnv = pkgs.lib.optionalAttrs (!isDarwin) {
+    FONTCONFIG_FILE = pkgs.makeFontsConf {
       fontDirectories = [ pkgs.nerd-fonts.fira-code "/usr/share/fonts" ];
-    }}
-  '';
+    };
+  };
 in
 {
   default = pkgs.mkShell {
@@ -61,12 +54,11 @@ in
       export FLAKE="$PWD"
       export NH_FLAKE="$PWD"
       export XDG_DATA_DIRS=$XDG_DATA_DIRS:/usr/local/share:/usr/share
-    '' + linuxGlHook;
+    '';
   };
 
-  screenshots = pkgs.mkShell {
+  screenshots = pkgs.mkShell ({
     buildInputs = screenshotDeps;
     packages = screenshotDeps;
-    shellHook = linuxGlHook + linuxScreenshotsFontHook;
-  };
+  } // screenshotsShellEnv);
 }
