@@ -9,6 +9,15 @@ let
     ffmpeg
   ] ++ pkgs.lib.optionals (!isDarwin) [
     chromium
+    xvfb-run
+    imagemagick
+    xdotool
+    emacs
+    # Doom Emacs runtime deps
+    ripgrep
+    fd
+    gcc
+    fira-code
   ];
 
   commonDeps = with pkgs; [

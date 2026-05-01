@@ -62,8 +62,24 @@ TAPES=(
   "neovim-telescope"
 )
 
+# Comma-separated list of tape names to skip (e.g. SCREENSHOTS_SKIP=neovim-dashboard)
+SKIP_RAW="${SCREENSHOTS_SKIP:-}"
+IFS=',' read -ra SKIP_LIST <<<"$SKIP_RAW"
+is_skipped() {
+  local needle="$1"
+  for s in "${SKIP_LIST[@]}"; do
+    [[ -n "$s" && "$s" == "$needle" ]] && return 0
+  done
+  return 1
+}
+
 for tape in "${TAPES[@]}"; do
   tape_file="${TAPES_DIR}/${tape}.tape"
+  if is_skipped "$tape"; then
+    echo ""
+    echo "--- ${tape} (skipped via SCREENSHOTS_SKIP) ---"
+    continue
+  fi
   if [[ -f "$tape_file" ]]; then
     echo ""
     echo "--- ${tape} ---"
@@ -75,15 +91,11 @@ for tape in "${TAPES[@]}"; do
   fi
 done
 
-# --- Emacs GUI screenshots (macOS only) ---
+# --- Emacs GUI screenshots ---
 
 echo ""
-if [[ "$(uname)" == "Darwin" ]]; then
-  echo "=== Generating Emacs GUI screenshots ==="
-  bash "${SCRIPTS_DIR}/emacs-screenshot.sh"
-else
-  echo "SKIP: Emacs GUI screenshots (macOS only)"
-fi
+echo "=== Generating Emacs GUI screenshots ==="
+bash "${SCRIPTS_DIR}/emacs-screenshot.sh"
 
 # --- Summary ---
 
