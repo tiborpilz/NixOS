@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - main
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   build-linux:
     runs-on: ubuntu-latest
@@ -25,7 +28,7 @@ jobs:
           --skip-cached \
           --no-nom \
           --flake '.#checks.x86_64-linux' \
-          | grep -v -E '^(copying path)'
+          | awk '!/^copying path/'
 
   build-mac:
     runs-on: macos-14
@@ -51,4 +54,4 @@ jobs:
           --skip-cached \
           --no-nom \
           --flake '.#checks.aarch64-darwin' \
-          | grep -v -E '^(copying path)'
+          | awk '!/^copying path/'
