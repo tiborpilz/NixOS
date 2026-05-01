@@ -42,6 +42,11 @@ jobs:
           restore-keys: |
             nvim-lazy-${{ runner.os }}-
 
+      - name: Install Kitty + Xvfb (system Mesa for working OpenGL)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y kitty xvfb
+
       - name: Symlink editor configs
         run: nix develop .#screenshots -c bash screenshots/scripts/setup-ci-configs.sh
 
@@ -87,6 +92,11 @@ jobs:
           key: doom-${{ runner.os }}-${{ hashFiles('home/config/doom/packages.el', 'home/config/doom/init.el') }}
           restore-keys: |
             doom-${{ runner.os }}-
+
+      - name: Install Xvfb (system Mesa)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
 
       - name: Symlink editor configs
         run: nix develop .#screenshots -c bash screenshots/scripts/setup-ci-configs.sh
