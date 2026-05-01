@@ -12,6 +12,15 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        check:
+          - home-tibor
+          - edge
+          - klaus
+          - thinkyMcThinkpad
+    name: build-linux (${{ matrix.check }})
     steps:
     - name: Free Disk Space (Ubuntu)
       uses: jlumbroso/free-disk-space@main
@@ -19,6 +28,8 @@ jobs:
     - uses: cachix/install-nix-action@v30
       with:
         nix_path: nixpkgs=channel:nixos-unstable
+        extra_nix_config: |
+          download-buffer-size = 524288000
     - uses: cachix/cachix-action@v15
       with:
         name: tiborpilz
@@ -27,8 +38,7 @@ jobs:
         nix run github:Mic92/nix-fast-build -- \
           --skip-cached \
           --no-nom \
-          --flake '.#checks.x86_64-linux' \
-          | awk '!/^copying path/'
+          --flake '.#checks.x86_64-linux.${{ matrix.check }}'
 
   build-mac:
     runs-on: macos-14
@@ -45,6 +55,8 @@ jobs:
     - uses: cachix/install-nix-action@v30
       with:
         nix_path: nixpkgs=channel:nixos-unstable
+        extra_nix_config: |
+          download-buffer-size = 524288000
     - uses: cachix/cachix-action@v15
       with:
         name: tiborpilz
