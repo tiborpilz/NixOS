@@ -27,3 +27,23 @@ link() {
 
 link "$REPO_ROOT/home/config/neovim" "$HOME/.config/nvim"
 link "$REPO_ROOT/home/config/doom" "$HOME/.config/doom"
+link "$REPO_ROOT/home/config/zsh/.zshrc" "$HOME/.zshrc"
+link "$REPO_ROOT/home/config/zsh/.zsh_custom" "$HOME/.zsh_custom"
+
+# Extract kitty.conf from the home-manager config so CI uses the user's
+# actual generated config (Nord theme, Fira Code, settings, extras) rather
+# than a hand-maintained mirror.
+echo "Extracting kitty.conf from homeConfigurations.tibor..."
+mkdir -p "$HOME/.config/kitty"
+KITTY_CONF=$(nix eval --raw \
+  "$REPO_ROOT#homeConfigurations.tibor.config.xdg.configFile.\"kitty/kitty.conf\".source")
+rm -f "$HOME/.config/kitty/kitty.conf"
+ln -s "$KITTY_CONF" "$HOME/.config/kitty/kitty.conf"
+echo "Linked: $HOME/.config/kitty/kitty.conf -> $KITTY_CONF"
+
+# .zshrc sources $ZDOTDIR/extra.zshrc (home-manager-generated) at the end;
+# create an empty stub so the source line doesn't error in CI.
+if [[ ! -e "$HOME/extra.zshrc" ]]; then
+  touch "$HOME/extra.zshrc"
+  echo "Created empty stub: $HOME/extra.zshrc"
+fi

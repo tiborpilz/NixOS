@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Local-dev orchestrator: runs everything sequentially. CI invokes the
-# individual scripts directly to parallelize.
+# Local-dev orchestrator: runs the terminal scenes (under Xvfb on Linux) and
+# the Emacs GUI screenshots sequentially. CI invokes the individual scripts
+# directly to parallelize.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUTPUT_DIR="${SCRIPT_DIR}/output"
@@ -13,45 +14,28 @@ mkdir -p "$OUTPUT_DIR"
 echo "=== Screenshot Generator ==="
 echo ""
 
-# --- Pre-checks ---
-
-echo "Running pre-checks..."
 check_cmd() {
   if ! command -v "$1" &>/dev/null; then
-    echo "ERROR: $1 not found. Run this inside nix-shell."
+    echo "ERROR: $1 not found. Run this inside the dev shell."
     exit 1
   fi
 }
-check_cmd vhs
 check_cmd nvim
 check_cmd tmux
 check_cmd git
 check_cmd fzf
-echo "  All required tools found."
-
-if [[ ! -d "${HOME}/.config/nvim" ]]; then
-  echo "WARNING: ~/.config/nvim not found. Neovim screenshots may not show plugins."
-fi
-
-# --- Create mock repo ---
 
 echo ""
 echo "=== Creating mock git repo ==="
 bash "${SCRIPTS_DIR}/mock-git-repo.sh"
 
-# --- VHS tape screenshots ---
-
 echo ""
-echo "=== Generating terminal screenshots with VHS ==="
-bash "${SCRIPTS_DIR}/run-tapes.sh"
-
-# --- Emacs GUI screenshots ---
+echo "=== Generating terminal screenshots (Kitty under Xvfb) ==="
+bash "${SCRIPTS_DIR}/run-scenes.sh"
 
 echo ""
 echo "=== Generating Emacs GUI screenshots ==="
 bash "${SCRIPTS_DIR}/emacs-screenshot.sh"
-
-# --- Summary ---
 
 echo ""
 echo "=== Generated Screenshots ==="
