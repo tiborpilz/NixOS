@@ -13,9 +13,9 @@ with lib;
     programs.kitty = {
       enable = true;
       font = {
-        package = pkgs.fira-code;
+        package = pkgs.nerd-fonts.fira-code;
         size = 14;
-        name = "Fira Code";
+        name = "FiraCode Nerd Font Mono";
       };
       themeFile = "Nord";
       settings = {

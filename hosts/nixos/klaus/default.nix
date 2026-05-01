@@ -337,7 +337,7 @@ with lib;
     };
 
     modules.services.woodpecker = {
-      enable = false;
+      enable = true;
       envFile = config.sops.secrets.woodpeckerEnv.path;
     };
 
