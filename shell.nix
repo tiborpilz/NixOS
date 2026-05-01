@@ -21,7 +21,7 @@ let
     ripgrep
     fd
     gcc
-    fira-code
+    nerd-fonts.fira-code
   ];
 
   commonDeps = with pkgs; [
@@ -43,6 +43,15 @@ let
     export LIBGL_ALWAYS_SOFTWARE=1
     export LIBGL_DRIVERS_PATH="${pkgs.mesa.drivers or pkgs.mesa}/lib/dri"
   '';
+
+  # Screenshots-only: point fontconfig at the nix-installed Nerd Font *and*
+  # the system font dir so Kitty resolves "FiraCode Nerd Font Mono" while
+  # Emacs still has its usual fallbacks.
+  linuxScreenshotsFontHook = pkgs.lib.optionalString (!isDarwin) ''
+    export FONTCONFIG_FILE=${pkgs.makeFontsConf {
+      fontDirectories = [ pkgs.nerd-fonts.fira-code "/usr/share/fonts" ];
+    }}
+  '';
 in
 {
   default = pkgs.mkShell {
@@ -58,6 +67,6 @@ in
   screenshots = pkgs.mkShell {
     buildInputs = screenshotDeps;
     packages = screenshotDeps;
-    shellHook = linuxGlHook;
+    shellHook = linuxGlHook + linuxScreenshotsFontHook;
   };
 }

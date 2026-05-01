@@ -42,12 +42,6 @@ jobs:
           restore-keys: |
             nvim-lazy-${{ runner.os }}-
 
-      - name: Install Fira Code (system fontconfig)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y fonts-firacode
-          fc-cache -fv
-
       - name: Symlink editor configs
         run: nix develop .#screenshots -c bash screenshots/scripts/setup-ci-configs.sh
 
@@ -96,12 +90,6 @@ jobs:
           key: doom-${{ runner.os }}-${{ hashFiles('home/config/doom/packages.el', 'home/config/doom/init.el') }}
           restore-keys: |
             doom-${{ runner.os }}-
-
-      - name: Install Fira Code
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y fonts-firacode
-          fc-cache -fv
 
       - name: Symlink editor configs
         run: nix develop .#screenshots -c bash screenshots/scripts/setup-ci-configs.sh
