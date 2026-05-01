@@ -24,7 +24,9 @@ jobs:
         nix run github:Mic92/nix-fast-build -- \
           --skip-cached \
           --no-nom \
-          --flake '.#checks.x86_64-linux'
+          --flake '.#checks.x86_64-linux' \
+          | grep -v -E '^(copying path)'
+
   build-mac:
     runs-on: macos-14
     steps:
@@ -48,4 +50,5 @@ jobs:
         nix run github:Mic92/nix-fast-build -- \
           --skip-cached \
           --no-nom \
-          --flake '.#checks.aarch64-darwin'
+          --flake '.#checks.aarch64-darwin' \
+          | grep -v -E '^(copying path)'
