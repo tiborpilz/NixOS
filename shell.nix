@@ -41,7 +41,7 @@ let
     # Force software OpenGL and point libGL at nixpkgs Mesa's DRI drivers
     # so Kitty/anything-GL works under Xvfb on non-NixOS Linux.
     export LIBGL_ALWAYS_SOFTWARE=1
-    export LIBGL_DRIVERS_PATH="${pkgs.mesa.drivers or pkgs.mesa}/lib/dri"
+    export LIBGL_DRIVERS_PATH="${pkgs.mesa}/lib/dri"
   '';
 
   # Screenshots-only: point fontconfig at the nix-installed Nerd Font *and*
