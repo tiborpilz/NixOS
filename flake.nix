@@ -140,9 +140,7 @@
             default = apps.flakeRepl;
           };
 
-          devShells = {
-            default = import ./shell.nix { pkgs = channels.nixpkgs; };
-          };
+          devShells = import ./shell.nix { pkgs = channels.nixpkgs; };
 
           formatter = pkgs.nixpkgs-fmt;
 
