@@ -88,6 +88,10 @@ in
         set -g focus-events on
         set -g renumber-windows on
 
+        # Propagate active window name + running binary to the terminal title
+        set -g set-titles on
+        set -g set-titles-string "#S: #{pane_current_command}"
+
         # Status Bar
         set -g status-position top
         set -g status-justify left
