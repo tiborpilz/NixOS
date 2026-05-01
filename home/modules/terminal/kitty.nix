@@ -14,7 +14,7 @@ with lib;
       enable = true;
       font = {
         package = pkgs.fira-code;
-        size = 12;
+        size = 14;
         name = "Fira Code";
       };
       themeFile = "Nord";
