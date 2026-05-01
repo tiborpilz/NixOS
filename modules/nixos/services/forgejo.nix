@@ -27,7 +27,7 @@ with mylib;
           ROOT_URL = "https://forgejo.${config.modules.services.reverseProxy.hostname}";
           HTTP_PORT = cfg.publicPort;
         };
-        service.DISABLE_REGISTRATION = true; 
+        service.DISABLE_REGISTRATION = true;
         actions = {
           ENABLED = true;
           DEFAULT_ACTIONS_URL = "github";
@@ -37,15 +37,36 @@ with mylib;
 
     sops.secrets.forgejo-admin-password.owner = "forgejo";
     systemd.services.forgejo.preStart =
-    let 
-      adminCmd = "${lib.getExe config.services.forgejo.package} admin user";
-      pwd = config.sops.secrets.forgejo-admin-password;
-      user = "tibor";
-    in ''
-      ${adminCmd} create --admin --email "root@localhost" --username ${user} --password "$(tr -d '\n' < ${pwd.path})" || true
-      ## uncomment this line to change an admin user which was already created
-      ${adminCmd} change-password --username ${user} --password "$(tr -d '\n' < ${pwd.path})" || true
-    '';
+      let
+        adminCmd = "${lib.getExe config.services.forgejo.package} admin user";
+        pwd = config.sops.secrets.forgejo-admin-password;
+        user = "tibor";
+      in
+      ''
+        ${adminCmd} create --admin --email "root@localhost" --username ${user} --password "$(tr -d '\n' < ${pwd.path})" || true
+        ## uncomment this line to change an admin user which was already created
+        ${adminCmd} change-password --username ${user} --password "$(tr -d '\n' < ${pwd.path})" || true
+      '';
+
+    environment.systemPackages =
+      let
+        cfg = config.services.forgejo;
+        forgejo-cli = pkgs.writeScriptBin "forgejo-cli" ''
+          #!${pkgs.runtimeShell}
+          cd ${cfg.stateDir}
+          sudo=exec
+          if [[ "$USER" != forgejo ]]; then
+            sudo='exec /run/wrappers/bin/sudo -u ${cfg.user} -g ${cfg.group} --preserve-env=GITEA_WORK_DIR --preserve-env=GITEA_CUSTOM'
+          fi
+          # Note that these variable names will change
+          export GITEA_WORK_DIR=${cfg.stateDir}
+          export GITEA_CUSTOM=${cfg.customDir}
+          $sudo ${lib.getExe cfg.package} "$@"
+        '';
+      in
+      [
+        forgejo-cli
+      ];
 
     modules.services.reverseProxy.proxies.forgejo = {
       publicPort = cfg.publicPort;
