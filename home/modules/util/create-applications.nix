@@ -13,9 +13,10 @@ with lib;
       lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         base_dir="$HOME/Applications/hm-apps"
         if [ -d "$base_dir" ]; then
-          rm -rf "$base_dir"
+          $DRY_RUN_CMD chmod -R u+w "$base_dir"
+          $DRY_RUN_CMD rm -rf "$base_dir"
         fi
-        mkdir -p "$base_dir"
+        $DRY_RUN_CMD mkdir -p "$base_dir"
         for app_file in ${apps}/Applications/*; do
           target="$base_dir/$(basename "$app_file")"
           $DRY_RUN_CMD cp ''${VERBOSE_ARG:+-v} -fHRL "$app_file" "$base_dir"
