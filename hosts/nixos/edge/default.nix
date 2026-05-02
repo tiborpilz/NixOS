@@ -17,9 +17,7 @@
 
   services.openssh = {
     enable = true;
-    # Port 22 stays here until Netmaker is running and Klaus has a stable mesh IP.
-    # At that point: move to 2222 and add NAT forward 22 → Klaus.
-    ports = [ 22 ];
+    ports = [ 2222 ];
   };
 
   users.users.root.hashedPassword = "$2b$05$jovulKizNS5VrRJ6cyQUjev861XRqF8LDAiZ3pdL5u/h/dIWKWLoy";
@@ -36,7 +34,20 @@
   environment.systemPackages = with pkgs; [
     tmux
     vim
+    netclient
   ];
+
+  systemd.services.netclient = {
+    description = "Netmaker client daemon";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.netclient}/bin/netclient daemon";
+      Restart = "on-failure";
+      StateDirectory = "netclient";
+    };
+  };
 
   system.stateVersion = "22.05";
 
@@ -48,10 +59,19 @@
     envFile = config.sops.secrets.netmakerEnv.path;
   };
 
+  networking.nat = {
+    enable = true;
+    enableIPv6 = false;
+    externalInterface = "enp1s0";
+    forwardPorts = [
+      { sourcePort = 22; destination = "10.64.1.1:22"; proto = "tcp"; }
+    ];
+  };
+
   networking.firewall = {
     enable = true;
     allowPing = true;
-    allowedTCPPorts = [ 22 80 443 1883 8883 ];
+    allowedTCPPorts = [ 22 2222 80 443 1883 8883 ];
     allowedUDPPorts = [ 51821 ];
   };
 }
