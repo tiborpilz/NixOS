@@ -126,12 +126,16 @@ in
     #   mapAttrs' (n: v: nameValuePair "${n}.${cfg.hostname}" "http://localhost:${v.publicPort}") cfg.proxies
     # ]);
 
-    # Make every public proxy FQDN resolve to localhost on this host.
-    # In-cluster traffic (e.g. Woodpecker → Forgejo) then bypasses the
+    # Make every public proxy FQDN resolve to localhost on this host. In-
+    # cluster traffic (e.g. Woodpecker → Forgejo) then bypasses the
     # Cloudflare Tunnel entirely and hits the local Caddy on :80.
-    networking.hosts = mkIf (cfg.proxies != { } && cfg.hostname != "") {
-      "127.0.0.1" = mapAttrsToList (n: _: "${n}.${cfg.hostname}") cfg.proxies;
-    };
+    networking.hosts = mkIf (cfg.proxies != { } && cfg.hostname != "") (
+      let hosts = mapAttrsToList (n: _: "${n}.${cfg.hostname}") cfg.proxies; in
+      {
+        "127.0.0.1" = hosts;
+        "::1" = hosts;
+      }
+    );
 
     services.cloudflared = mkIf (cfg.proxies != { }) {
       enable = true;

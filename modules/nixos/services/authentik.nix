@@ -60,7 +60,7 @@ with mylib;
     enable = mkBoolOpt false;
     publicPort = mkOption {
       type = types.int;
-      default = 9000;
+      default = 9020;
     };
     dataDir = mkOption {
       type = types.str;
