@@ -20,6 +20,11 @@ with mylib;
       default = 2169;
       description = "Port to expose Forgejo web UI on.";
     };
+    sshDomain = mkOption {
+      type = types.str;
+      default = "git.${config.modules.services.reverseProxy.hostname}";
+      description = "Public hostname for Forgejo SSH git operations.";
+    };
   };
 
   config = lib.mkIf cfg.enable (lib.mkMerge [
@@ -33,6 +38,8 @@ with mylib;
             DOMAIN = "forgejo.${config.modules.services.reverseProxy.hostname}";
             ROOT_URL = "https://forgejo.${config.modules.services.reverseProxy.hostname}";
             HTTP_PORT = cfg.publicPort;
+            SSH_DOMAIN = cfg.sshDomain;
+            SSH_PORT = 22;
           };
           service.DISABLE_REGISTRATION = true;
           actions = {

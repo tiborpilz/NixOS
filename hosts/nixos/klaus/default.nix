@@ -155,7 +155,20 @@ with lib;
       hdparm
       python3
       htop
+      netclient
     ];
+
+    systemd.services.netclient = {
+      description = "Netmaker client daemon";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
+      serviceConfig = {
+        ExecStart = "${pkgs.netclient}/bin/netclient daemon";
+        Restart = "on-failure";
+        StateDirectory = "netclient";
+      };
+    };
 
     # TODO: rotate github nix access token
     # nix.extraOptions = ''
@@ -299,6 +312,12 @@ with lib;
           "https://tandoor.tiborpilz.xyz/accounts/oidc/authentik/login/callback/"
         ];
       };
+      authentik.applications.sonarqube = {
+        displayName = "SonarQube";
+        redirectUris = [
+          "https://sonarqube.tiborpilz.xyz/oauth2/callback/oidc"
+        ];
+      };
 
       nextcloud = {
         enable = false;
@@ -344,9 +363,21 @@ with lib;
       envFile = config.sops.secrets.woodpeckerEnv.path;
     };
 
+    modules.services.sonarqube.enable = true;
+
+    modules.services.gitea-sonarqube-bot = {
+      enable = false;
+      # Add per-repo entries here as projects come online in SonarQube
+      # AND you've registered the corresponding webhook in Forgejo.
+      projects = [ ];
+    };
+
     modules.services.frigate.enable = true;
 
-    modules.services.forgejo.enable = true;
+    modules.services.forgejo = {
+      enable = true;
+      sshDomain = "git.tiborpilz.xyz";
+    };
 
     services.k3s.enable = false;
     services.k3s.role = "server";
