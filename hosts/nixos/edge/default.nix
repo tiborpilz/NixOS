@@ -4,6 +4,11 @@
     ./disko.nix
   ];
 
+  boot.loader.grub = {
+    enable = true;
+    efiSupport = false;
+    device = "/dev/sda";
+  };
   boot.tmp.cleanOnBoot = true;
   zramSwap.enable = true;
 
