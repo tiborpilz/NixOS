@@ -1,6 +1,7 @@
 { config, pkgs, lib, ... }: {
   imports = [
     ./hardware-configuration.nix
+    ./disko.nix
   ];
 
   boot.tmp.cleanOnBoot = true;
