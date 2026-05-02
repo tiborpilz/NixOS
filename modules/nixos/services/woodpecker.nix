@@ -84,7 +84,7 @@ with mylib;
           REDIRECT_URI="${woodpeckerUrl}/authorize"
           USERNAME="tibor"
           PASSWORD="$(tr -d '\n' < ${config.sops.secrets.forgejo-admin-password.path})"
-          API="${forgeJoUrl}/api/v1"
+          API="${forgejoUrl}/api/v1"
           BODY_TMP="$(mktemp)"
           trap 'rm -f "$BODY_TMP"' EXIT
 
