@@ -103,7 +103,7 @@
             radicle-explorer.nixosModules.radicle-explorer
             determinate.nixosModules.default
             quadlet-nix.nixosModules.quadlet
-            inputs.disko.nixosModules.diko
+            inputs.disko.nixosModules.disko
           ] ++ lib.my.mapModulesRec' (toString ./modules/shared) import;
         };
 
