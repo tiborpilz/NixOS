@@ -9,6 +9,7 @@ help:
 
 # Deploy a server
 deploy server mode="switch":
+  NIX_SSHOPTS="-p {{env_var_or_default(uppercase(server) + "_PORT", "22")}}" \
   nix run nixpkgs#nixos-rebuild -- \
     {{ if mode == "dry" { "dry-run"} else if mode == "switch" { "switch" } else { error("Unknown Mode") } }} \
     --flake .#{{server}} \

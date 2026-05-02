@@ -1,7 +1,7 @@
 keys:
   - &tibor age1gzf883y8p0wfy5yjn5l3l2axnqxdgtw2zdcp8jqsrk65m7gf6y6qzgkf63
   - &server_homeserver age1xjx03xm8yqmnykcy6hdgtpxadhurtgd4r8vhtwsf2pks3zxsgafsycs5tq
-  - &server_edge age1lqnlkxfkrfgctj22aj7qy02eyl696rtkaautwsuzwtp96ryp290s3drpx2
+  - &server_edge age17xvpd0l3k2g430m6fhzkyxjm3qjk8jg8ldyhu996vm62e2x7k4wq2agwm7
   - &server_klaus age1vuxs3pjmsrug6t57zy5tsf3wm3cqml5ew6dfywkppzv52kchxc9sduy2wf
 creation_rules:
   - path_regex: secrets/[^/]+$
