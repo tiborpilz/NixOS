@@ -20,9 +20,12 @@
 
   services.openssh = {
     enable = true;
-    ports = [ 2222 ];
+    # Port 22 stays here until Netmaker is running and Klaus has a stable mesh IP.
+    # At that point: move to 2222 and add NAT forward 22 → Klaus.
+    ports = [ 22 ];
   };
 
+  users.users.root.hashedPassword = "$2b$05$jovulKizNS5VrRJ6cyQUjev861XRqF8LDAiZ3pdL5u/h/dIWKWLoy";
   users.users.tibor.isNormalUser = true;
   users.users.root.openssh.authorizedKeys.keys = [
     "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDEyxiA698x3QgDpUhjGVXo5gtx4oApzYp5RmNleZrsMxGyT89zoGZU1Wi0xlSUF+R0LrTwbOdT+jC4Ym2Ebf497by/w5StxBmiiqHkpq4kGIb8dPP39ez9XaweH1Xi7G3UpNzaJvblDD6jCGWG0zV2CWuHuhRu8O4zRY+63qoh8gKd3aiDRrSJSPv2U1HwIs1ppk3rj7gPIFX/3lmwNo2LA2KKPAvYR1qTmkCnsEEkTzi2zIzztBoHCWSRHtv1374zF/L5EmV+EScL1BEK667kUUDbNAMXVL3juR/Hb/LRwjiO053rhj1NQ+jy2uH1UYwkdg7UM7N4uPKjFtPsC6oPNLCRCH0XpX9vp8U6T4GDz3ypVRzq1zfiRIYl5X+EgqgKw5eHEn/44VWSt/lKv5THcMmb3cMRTfYjUALNhp8XWF2/FsbS02Da7qKGLfUK7kreE+PPJYk3rAWpU+gMaeXU+ILz+sLrD2Lrkkeuq7PocxLAraz3KslO48xXNnM8sc8= tibor@workyMcWorkstation"
@@ -46,20 +49,10 @@
     envFile = config.sops.secrets.netmakerEnv.path;
   };
 
-  # Move edge SSH off port 22 so port 22 can be forwarded to Klaus for Forgejo
-  networking.nat = {
-    enable = true;
-    enableIPv6 = false;
-    externalInterface = "enp1s0";
-    forwardPorts = [
-      { sourcePort = 22; destination = "10.220.0.2:22"; proto = "tcp"; }
-    ];
-  };
-
   networking.firewall = {
     enable = true;
     allowPing = true;
-    allowedTCPPorts = [ 22 80 443 2222 1883 8883 ];
+    allowedTCPPorts = [ 22 80 443 1883 8883 ];
     allowedUDPPorts = [ 51821 ];
   };
 }
