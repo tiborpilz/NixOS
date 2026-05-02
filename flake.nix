@@ -17,7 +17,8 @@
     # emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
     # nix-doom-emacs-unstraightened.url = "github:marienz/nix-doom-emacs-unstraightened";
 
-
+    disko.url = "github:nix-community/disko";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
 
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
@@ -102,6 +103,7 @@
             radicle-explorer.nixosModules.radicle-explorer
             determinate.nixosModules.default
             quadlet-nix.nixosModules.quadlet
+            inputs.disko.nixosModules.diko
           ] ++ lib.my.mapModulesRec' (toString ./modules/shared) import;
         };
 
