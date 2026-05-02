@@ -5,9 +5,8 @@
   ];
 
   boot.loader.grub = {
-    enable = true;
-    efiSupport = false;
-    device = "/dev/sda";
+    efiSupport = true;
+    efiInstallAsRemovable = true;
   };
   boot.tmp.cleanOnBoot = true;
   zramSwap.enable = true;
