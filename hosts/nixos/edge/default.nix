@@ -4,12 +4,9 @@
     ./disko.nix
   ];
 
-  boot.loader.grub = {
-    efiSupport = true;
-    efiInstallAsRemovable = true;
-  };
-  boot.tmp.cleanOnBoot = true;
-  zramSwap.enable = true;
+  boot.loader.grub.enable = true;
+
+  # zramSwap.enable = true;
 
   sops.defaultSopsFile = ./secrets/secrets.yaml;
   sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
