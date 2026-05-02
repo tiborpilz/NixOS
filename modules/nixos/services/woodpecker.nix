@@ -6,13 +6,8 @@ let
   mylib = import ../../../lib { inherit inputs lib pkgs; };
 
   hostname = config.modules.services.reverseProxy.hostname;
-  # http:// (not https://) for the in-cluster URL: combined with the
-  # /etc/hosts override in reverseProxy.nix this resolves to local Caddy
-  # on :80 and bypasses Cloudflare Zero Trust for server-to-server calls.
-  # Browser redirects via this URL are upgraded to HTTPS by Cloudflare.
-  forgejoUrl = "http://forgejo.${hostname}";
-  forgejoLocalApi = "http://localhost:${toString config.modules.services.forgejo.publicPort}/api/v1";
-  woodpeckerUrl = "https://woodpecker.${hostname}";
+  forgejoUrl = "https://forgejo.${hostname}";
+  woodpeckerUrl = "https://ci.${hostname}";
 
   oauthStateDir = "/var/lib/woodpecker-forgejo-oauth";
   oauthCredFile = "${oauthStateDir}/credentials.env";
@@ -89,7 +84,7 @@ with mylib;
           REDIRECT_URI="${woodpeckerUrl}/authorize"
           USERNAME="tibor"
           PASSWORD="$(tr -d '\n' < ${config.sops.secrets.forgejo-admin-password.path})"
-          API="${forgejoLocalApi}"
+          API="${forgeJoUrl}/api/v1"
           BODY_TMP="$(mktemp)"
           trap 'rm -f "$BODY_TMP"' EXIT
 
@@ -202,7 +197,7 @@ with mylib;
       allowedTCPPorts = [ 53 ];
     };
 
-    modules.services.reverseProxy.proxies.woodpecker = {
+    modules.services.reverseProxy.proxies.ci = {
       publicPort = cfg.publicPort;
       auth = false;
     };

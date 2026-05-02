@@ -249,7 +249,10 @@ with lib;
 
       # Uses Cloudflare Tunnel
       # Additionally Secured with Cloudflare Access using authentik as IdP.
-      # (Excluded from Cloudflare Access: Homeassistant & Authentik itself)
+      # (Excluded from Cloudflare Access: Homeassistant, Authentik, Forgejo.
+      #  Forgejo runs its own OIDC against Authentik, so a CF Access gate in
+      #  front would double-auth the browser and block Woodpecker's API
+      #  callbacks.)
       tunnelId = "7bc72af5-d729-4084-b8ee-42fb0f6f800a"; # Cloudflare Tunnel
       basicAuth = {
         enable = true;
