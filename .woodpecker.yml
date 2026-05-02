@@ -1,0 +1,5 @@
+  steps:
+    check:
+      image: nixos/nix
+      commands:
+        - nix --extra-experimental-features 'nix-command flakes' flake check
