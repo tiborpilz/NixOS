@@ -363,7 +363,7 @@ with lib;
       envFile = config.sops.secrets.woodpeckerEnv.path;
     };
 
-    modules.services.sonarqube.enable = true;
+    modules.services.sonarqube.enable = false;
 
     modules.services.gitea-sonarqube-bot = {
       enable = false;
