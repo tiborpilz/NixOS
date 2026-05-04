@@ -4,6 +4,37 @@ with lib;
 let
   cfg = config.modules.services.netmaker;
   mylib = import ../../../lib { inherit inputs lib pkgs; };
+
+  mosquittoConf = pkgs.writeText "mosquitto.conf" ''
+    per_listener_settings false
+    listener 8883
+    protocol websockets
+    allow_anonymous false
+
+    listener 1883
+    protocol websockets
+    allow_anonymous false
+
+    password_file /mosquitto/password.txt
+  '';
+
+  waitSh = pkgs.writeScript "netmaker-mq-wait.sh" ''
+    #!/bin/ash
+
+    encrypt_password() {
+      echo "netmaker:''${MQ_ADMIN_PASSWORD}" > /mosquitto/password.txt
+      mosquitto_passwd -U /mosquitto/password.txt
+    }
+
+    main() {
+      encrypt_password
+      echo "Starting MQ..."
+      /docker-entrypoint.sh
+      /usr/sbin/mosquitto -c /mosquitto/config/mosquitto.conf
+    }
+
+    main "''${@}"
+  '';
 in
 with mylib;
 {
@@ -37,7 +68,7 @@ with mylib;
         };
 
         containers.netmaker-server.containerConfig = {
-          image = "gravitl/netmaker:v0.26.0";
+          image = "docker.io/gravitl/netmaker:v0.26.0";
           pod = pods.netmaker-pod.ref;
           volumes = [
             "netmaker-data:/root/data"
@@ -55,7 +86,7 @@ with mylib;
         };
 
         containers.netmaker-ui.containerConfig = {
-          image = "gravitl/netmaker-ui:v0.26.0";
+          image = "docker.io/gravitl/netmaker-ui:v0.26.0";
           pod = pods.netmaker-pod.ref;
           environments = {
             BACKEND_URL = "https://${cfg.domain}";
@@ -63,9 +94,12 @@ with mylib;
         };
 
         containers.netmaker-mq.containerConfig = {
-          image = "gravitl/netmaker-mq:v0.26.0";
+          image = "docker.io/eclipse-mosquitto:2.0.15-openssl";
           pod = pods.netmaker-pod.ref;
+          exec = "/mosquitto/config/wait.sh";
           volumes = [
+            "${mosquittoConf}:/mosquitto/config/mosquitto.conf:ro"
+            "${waitSh}:/mosquitto/config/wait.sh:ro"
             "netmaker-mq-data:/mosquitto/data"
             "netmaker-mq-logs:/mosquitto/log"
           ];
