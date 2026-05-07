@@ -1,5 +1,4 @@
 {
-  "eslint-lsp": "4.10.0",
   "json-lsp": "4.10.0",
   "jsonlint": "1.6.3",
   "lua-language-server": "3.17.1",
@@ -13,7 +12,7 @@
   "starlark-rust": "0.13.0",
   "terraform-ls": "v0.38.3",
   "tree-sitter-cli": "v0.26.8",
-  "typescript-language-server": "5.1.3",
+  "vtsls": "0.3.0",
   "yaml-language-server": "1.19.2",
   "yamlfix": "1.19.1",
   "yamlfmt": "v0.21.0",

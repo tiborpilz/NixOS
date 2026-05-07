@@ -350,6 +350,11 @@ return {
       require("lsp-file-operations").setup()
     end,
   },
+  -- Better renaming
+  {
+    "smjonas/inc-rename.nvim",
+    opts = {}
+  },
   -- LSP Symbol view
   {
     "stevearc/aerial.nvim",
