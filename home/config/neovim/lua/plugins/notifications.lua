@@ -141,6 +141,7 @@ return {
         bottom_search = false,
         command_palette = false,
         long_message_to_split = true,
+        inc_rename = true,
       },
     },
     config = function(_, opts)
