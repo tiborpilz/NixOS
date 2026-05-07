@@ -47,6 +47,8 @@ in
 
     services.grafana = {
       enable = true;
+      settings.auth.disable_login_form = true;
+      settings.users.allow_sign_up = false;
       provision = {
         enable = true;
         datasources.settings.datasources = [{
@@ -89,7 +91,7 @@ in
         name_attribute_path = "name";
         login_attribute_path = "preferred_username";
         role_attribute_path = "contains(groups, 'Grafana Admins') && 'Admin' || 'Viewer'";
-        allow_sign_up = false;
+        allow_sign_up = true;
       };
     };
 

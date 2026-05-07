@@ -98,7 +98,8 @@ with lib;
     #   "randomizedDelaySec" = "45min";
     # };
 
-    powerManagement.cpuFreqGovernor = "conservative";
+    powerManagement.enable = true;
+    powerManagement.cpuFreqGovernor = "powersave";
 
     networking.hostName = "klaus";
     networking.hostId = "a5fdeadb";
@@ -316,6 +317,12 @@ with lib;
         displayName = "SonarQube";
         redirectUris = [
           "https://sonarqube.tiborpilz.xyz/oauth2/callback/oidc"
+        ];
+      };
+      authentik.applications.grafana = {
+        displayName = "Grafana";
+        redirectUris = [
+          "https://grafana.tiborpilz.xyz/login/generic_oauth"
         ];
       };
 
