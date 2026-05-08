@@ -19,6 +19,9 @@ in
   config = mkIf cfg.enable {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
+    home-manager.sharedModules = [
+      inputs.nix-doom-emacs-unstraightened.homeModule
+    ];
     # home-manager.extraSpecialArgs = { inherit lib; };
     home-manager.users."tibor.pilz" = mkMerge [
       # inputs.nix-doom-emacs-unstraightened.hmModule
