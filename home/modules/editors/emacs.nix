@@ -17,14 +17,51 @@ in
       (setq lsp-use-plists t)
     '';
 
-    programs.emacs.package = pkgs.my.emacsWrapped;
+    programs.emacs.package = mkIf (!cfg.useNix) pkgs.my.emacsWrapped;
 
-    # programs.doom-emacs = mkIf cfg.useNix {
-    #   enable = true;
-    #   doomDir = ../../config/doom;
-    #   emacs = pkgs.my.emacsWrapped;
-    # };
-    #
+    programs.doom-emacs = mkIf cfg.useNix {
+      enable = true;
+      doomDir = pkgs.my.doom-emacs-config;
+      emacs = pkgs.my.emacsWrapped;
+      tangleArgs = "--all config.org";
+      extraPackages = epkgs: [
+        (epkgs.melpaBuild {
+          pname = "copilot";
+          version = "0.2.0";
+          src = pkgs.fetchFromGitHub {
+            owner = "copilot-emacs";
+            repo = "copilot.el";
+            rev = "v0.2.0";
+            sha256 = "sha256-hIA+qdWoOJI9/hqBUSHhmh+jjzDnPiZkIzszCPuQxd0=";
+          };
+          files = ''(:defaults "dist")'';
+          packageRequires = with epkgs; [
+            dash
+            editorconfig
+            f
+            jsonrpc
+            s
+          ];
+          propagatedUserEnvPkgs = [ pkgs.nodejs ];
+        })
+      ];
+      extraBinPackages = with pkgs; [
+        git
+        ripgrep
+        fd
+        imagemagick
+        pinentry-emacs
+        zstd
+        editorconfig-core-c
+        sqlite
+        gnuplot
+        pandoc
+        nodePackages.mermaid-cli
+        copilot-language-server
+        my.emacs-lsp-booster
+      ];
+    };
+
     services.emacs.enable = lib.mkIf (pkgs.stdenv.hostPlatform.isLinux) true;
 
     home.packages = with pkgs; [
