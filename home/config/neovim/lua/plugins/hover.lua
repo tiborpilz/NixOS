@@ -19,10 +19,10 @@ return {
               'Man',
               require('hovercraft.provider.man').new(),
             },
-            {
-              'Dictionary',
-              require('hovercraft.provider.dictionary').new(),
-            },
+            -- {
+            --   'Dictionary',
+            --   require('hovercraft.provider.dictionary').new(),
+            -- },
             {
               'Diagnostics',
               require('hovercraft.provider.diagnostics').new(),
@@ -31,10 +31,10 @@ return {
         },
 
         window = {
-          border = 'single',
+          -- border = 'single',
 
           -- enable this if you are a user of the MeanderingProgrammer/render-markdown.nvim plugin
-          render_markdown_compat_mode = true,
+          render_markdown_compat_mode = false,
         },
 
         keys = {
