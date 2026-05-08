@@ -13,6 +13,16 @@ return {
     ---@module "neo-tree"
     ---@type neotree.Config?
     config = function()
+      local lsp_symbols = require("neotree-lsp-symbols")
+      local events = require("neo-tree.events")
+      vim.api.nvim_create_autocmd("CursorMoved", {
+        group = vim.api.nvim_create_augroup("NeoTreeLspSymbolsFollowCursor", { clear = true }),
+        callback = function(args)
+          if vim.bo[args.buf].buftype ~= "" then return end
+          if vim.bo[args.buf].filetype == "neo-tree" then return end
+          lsp_symbols.follow_cursor_debounced()
+        end,
+      })
       require("neo-tree").setup({
         default_component_configs = {
           container = {
@@ -26,6 +36,16 @@ return {
           "git_status",
           "document_symbols",
         },
+        event_handlers = {
+          {
+            event = events.AFTER_RENDER,
+            handler = function(state)
+              if state.name == "filesystem" then
+                lsp_symbols.after_render(state)
+              end
+            end,
+          },
+        },
         window = {
           position = "right",
           mapping_options = {
@@ -33,9 +53,9 @@ return {
             nowait = true,
           },
           mappings = {
-            ["<Tab>"] = "open_with_window_picker",
+            ["<Tab>"] = "toggle_symbols",
             ["<space>"] = "none",
-            ["<cr>"] = "open",
+            ["<cr>"] = "open_symbol",
             ["ov"] = "open_vsplit",
             ["oh"] = "open_split",
             ["ot"] = "open_tabnew",
@@ -53,6 +73,20 @@ return {
             leave_dirs_open = false,
           },
           use_libuv_file_watcher = true, -- use libuv for file watching
+          commands = {
+            toggle_symbols = lsp_symbols.toggle_symbols,
+            open_symbol = lsp_symbols.open_symbol,
+          },
+          components = {
+            lsp_kind_icon = lsp_symbols.kind_icon_component,
+          },
+          renderers = {
+            lsp_symbol = {
+              { "indent" },
+              { "lsp_kind_icon" },
+              { "name" },
+            },
+          },
         },
       })
     end,
