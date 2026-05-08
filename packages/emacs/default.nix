@@ -72,6 +72,36 @@ let
 
   emacsWrapped = wrap pkgs.emacs;
 
+  treesitGrammars = with pkgs.tree-sitter.builtGrammars; {
+    bash = tree-sitter-bash;
+    css = tree-sitter-css;
+    gleam = tree-sitter-gleam;
+    go = tree-sitter-go;
+    gomod = tree-sitter-gomod;
+    gowork = tree-sitter-gowork;
+    html = tree-sitter-html;
+    javascript = tree-sitter-javascript;
+    json = tree-sitter-json;
+    nix = tree-sitter-nix;
+    prisma = tree-sitter-prisma;
+    python = tree-sitter-python;
+    rust = tree-sitter-rust;
+    svelte = tree-sitter-svelte;
+    tsx = tree-sitter-tsx;
+    typescript = tree-sitter-typescript;
+    yaml = tree-sitter-yaml;
+  };
+
+  treesitGrammarPath = pkgs.runCommand "emacs-treesit-grammars" { } (
+    ''
+      mkdir -p $out
+    '' + lib.concatStringsSep "\n" (lib.mapAttrsToList
+      (language: grammar: ''
+        ln -s ${grammar}/parser $out/libtree-sitter-${language}${pkgs.stdenv.hostPlatform.extensions.sharedLibrary}
+      '')
+      treesitGrammars)
+  );
+
   doomConfig = pkgs.stdenvNoCC.mkDerivation {
     pname = "doom-config";
     version = "dev";
@@ -92,6 +122,18 @@ let
       perl -0pi -e 's/\(package! copilot\s+:recipe \(:host github\s+:repo "copilot-emacs\/copilot\.el"\s+:files \("\*\.el" "dist"\)\)\)/;; copilot is supplied by programs.doom-emacs.extraPackages./s' \
         $out/packages.el \
         $out/config.org
+
+      substituteInPlace $out/packages.el $out/config.org \
+        --replace-fail "(unpin! pcre2el)" ";; pcre2el remains pinned for nix-doom-emacs-unstraightened."
+
+      printf '%s\n' \
+        "" \
+        "* Nix Package Integration" \
+        "#+begin_src elisp" \
+        ";;; Nix-provided tree-sitter grammars." \
+        "(add-to-list 'treesit-extra-load-path \"${treesitGrammarPath}\")" \
+        "#+end_src" \
+        >> $out/config.org
 
       runHook postInstall
     '';
@@ -141,12 +183,18 @@ let
       emacs-lsp-booster
     ];
   };
+
+  doomEmacs = (pkgs.emacsWithDoom doomArgs).overrideAttrs (old: {
+    meta = (old.meta or { }) // {
+      mainProgram = "emacs";
+    };
+  });
 in
 {
   emacs = pkgs.emacs;
   emacsWrapped = emacsWrapped;
   doom-emacs-config = doomConfig;
-  doom-emacs = pkgs.emacsWithDoom doomArgs;
+  doom-emacs = doomEmacs;
   doom-emacs-standalone = pkgs.doomEmacs doomArgs;
   emacs-lsp-booster = emacs-lsp-booster;
 }
