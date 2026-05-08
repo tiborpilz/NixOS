@@ -1,7 +1,9 @@
 {
+  "dockerfile-language-server": "0.15.0",
   "json-lsp": "4.10.0",
   "jsonlint": "1.6.3",
   "lua-language-server": "3.17.1",
+  "marksman": "2026-02-08",
   "nil": "2025-06-13",
   "nixpkgs-fmt": "1.3.0",
   "prettier": "3.8.0",
