@@ -100,6 +100,8 @@ with lib;
 
     powerManagement.enable = true;
     powerManagement.cpuFreqGovernor = "powersave";
+    powerManagement.cpupower.max = 1200000; # Force low speeds so the boi doesn't get hot
+    powerManagement.cpupower.min = 400000;
 
     networking.hostName = "klaus";
     networking.hostId = "a5fdeadb";
