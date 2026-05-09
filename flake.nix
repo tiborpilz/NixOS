@@ -80,8 +80,7 @@
       nixosHosts = mapModules ./hosts/nixos (hostPath: lib.my.mkHostAttrs hostPath {
         system = "x86_64-linux";
         modules = lib.my.mapModulesRec' (toString ./modules/nixos) import
-                  ++ [quadlet-nix.nixosModules.quadlet]
-                  ++ [inputs.nix-doom-emacs-unstraightened.nixosModule];
+                  ++ [quadlet-nix.nixosModules.quadlet];
         extraSpecialArgs = { inherit inputs; };
       });
 
@@ -204,9 +203,11 @@
           edge = self.nixosConfigurations.edge.config.system.build.toplevel;
           klaus = self.nixosConfigurations.klaus.config.system.build.toplevel;
           thinkyMcThinkpad = self.nixosConfigurations.thinkyMcThinkpad.config.system.build.toplevel;
+          doom-emacs = self.packages.doom-emacs.config.system.build.toplevel;
         };
         aarch64-darwin = {
           home-tiborpilz = self.homeConfigurations.tiborpilz.activationPackage;
+          doom-emacs = self.packages.doom-emacs.config.system.build.toplevel;
         };
       };
     };

@@ -23,6 +23,8 @@ in
     home-manager.sharedModules = [
       inputs.plasma-manager.homeModules.plasma-manager
       inputs.nix-doom-emacs-unstraightened.homeModule
+      inputs.determinate.homeModule
+      inputs.nix-doom-emacs-unstraightened.homeModule
     ];
     # home-manager.extraSpecialArgs = { inherit lib; };
     home-manager.users.tibor = mkMerge [
