@@ -1512,10 +1512,10 @@ I'm also tweaking some settings related to the hiding of the popup and its size.
 This package adds Github Copilot functionality to Emacs:
 
 #+begin_src elisp :tangle packages.el
-(package! copilot
-  :recipe (:host github
-           :repo "copilot-emacs/copilot.el"
-           :files ("*.el" "dist")))
+;; (package! copilot
+;;   :recipe (:host github
+;;            :repo "copilot-emacs/copilot.el"
+;;            :files ("*.el" "dist")))
 #+end_src
 
 When enabling copilot, I'm hooking into ~prog-mode~ to enable it for all programming modes.
@@ -1523,17 +1523,17 @@ Further, I'm disabling the warning about indentation (see https://github.com/zer
 and binding some keys.
 
 #+begin_src elisp
-(use-package! copilot
-  :defer t
-  :config
-  (add-hook 'prog-mode-hook #'copilot-mode)
-  (add-hook 'copilot-mode-hook (lambda ()
-                                  (setq-local copilot--indent-warning-printed-p t)))
-  :bind (:map copilot-completion-map
-              ("C-<space>" . 'copilot-accept-completion)
-              ("C-SPC" . 'copilot-accept-completion)
-              ("C-TAB" . 'copilot-accept-completion-by-word)
-              ("C-<tab>" . 'copilot-accept-completion-by-word)))
+;; (use-package! copilot
+;;   :defer t
+;;   :config
+;;   (add-hook 'prog-mode-hook #'copilot-mode)
+;;   (add-hook 'copilot-mode-hook (lambda ()
+;;                                   (setq-local copilot--indent-warning-printed-p t)))
+;;   :bind (:map copilot-completion-map
+;;               ("C-<space>" . 'copilot-accept-completion)
+;;               ("C-SPC" . 'copilot-accept-completion)
+;;               ("C-TAB" . 'copilot-accept-completion-by-word)
+;;               ("C-<tab>" . 'copilot-accept-completion-by-word)))
 #+end_src
 
 In insert mode, I'm binding  ~C-SPC~ to accept the complete suggestion. I'm also binding ~C-S-p~ and ~C-S-n~ to navigate through the suggestions.
@@ -1785,21 +1785,7 @@ To correctly use it, I need to adjust the lsp command called from within emacs:
             :around
             #'lsp-booster--advice-json-parse)
 
-(defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
-  "Prepend emacs-lsp-booster command to lsp CMD."
-  (let ((orig-result (funcall old-fn cmd test?)))
-    (if (and (not test?)                             ;; for check lsp-server-present?
-             (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
-             lsp-use-plists
-             (not (functionp 'json-rpc-connection))  ;; native json-rpc
-             (executable-find "emacs-lsp-booster"))
-        (progn
-          (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
-            (setcar orig-result command-from-exec-path))
-          (message "Using emacs-lsp-booster for %s!" orig-result)
-          (cons "emacs-lsp-booster" orig-result))
-      orig-result)))
-(advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+
 #+end_src
 
 **** Git
@@ -2427,7 +2413,7 @@ pcre2el is included with doom emacs but pinned to a version that is currently th
 obsolete variable.
 
 #+begin_src elisp :tangle packages.el
-(unpin! pcre2el)
+;; (unpin! pcre2el)
 #+end_src
 
 ** Discord Presence
