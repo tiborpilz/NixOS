@@ -1,3 +1,10 @@
+# Profiling: always on. Each shell appends a zprof report to $ZPROF_LOG
+# (default ~/.cache/zsh/zprof.log) with a header identifying the parent
+# process, so tmux-spawned vs nested shells can be compared.
+#   tail -100 ~/.cache/zsh/zprof.log    # most recent runs
+#   : > ~/.cache/zsh/zprof.log          # truncate
+zmodload zsh/zprof
+
 # Make nix pkgs take precedence over system binaries
 export PATH=$HOME/.nix-profile/bin:$PATH
 
@@ -64,13 +71,20 @@ export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
 export NIX_PATH=/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
 
 # Load Completions
-if [[ $TERM != dumb  ]]; then
-  autoload -Uz +X compinit
-  if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
-    compinit
-  else
-    compinit -C
-  fi
+# Rebuild the compdump at most once a day; otherwise skip the security audit
+# and reuse the cached dump. The `(#q...)` glob qualifier needs extendedglob,
+# which we enable locally inside the anonymous function.
+if [[ $TERM != dumb ]]; then
+  autoload -Uz compinit
+  () {
+    setopt local_options extendedglob
+    local _zdump=${ZDOTDIR:-$HOME}/.zcompdump
+    if [[ ! -e $_zdump || -n ${_zdump}(#qN.mh+24) ]]; then
+      compinit
+    else
+      compinit -C
+    fi
+  }
 fi
 
 # Initialize zoxide
@@ -85,3 +99,14 @@ export PATH=$PATH:$ANDROID_HOME/platform-tools
 
 # Extra config from Nix
 source $ZDOTDIR/extra.zshrc
+
+{
+  ZPROF_LOG=${ZPROF_LOG:-${ZSH_CACHE_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/zsh}/zprof.log}
+  mkdir -p ${ZPROF_LOG:h} 2>/dev/null
+  # Always append to the log; if ZSH_PROFILE is set, also echo to the terminal.
+  {
+    print -- "=== $(date '+%Y-%m-%d %H:%M:%S') SHLVL=$SHLVL pid=$$ ppid=$PPID parent=$(ps -o comm= -p $PPID 2>/dev/null) login=$([[ -o login ]] && print yes || print no) tty=${TTY:-?} term=$TERM_PROGRAM ==="
+    zprof
+    print
+  } | tee -a $ZPROF_LOG ${ZSH_PROFILE:+/dev/stderr} >/dev/null
+}

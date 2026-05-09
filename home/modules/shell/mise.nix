@@ -12,8 +12,10 @@ in {
 
   config = mkIf cfg.enable {
     home.packages = [ pkgs.unstable.mise ];
-    modules.shell.zsh.rcInit = ''
-      eval "$(${pkgs.unstable.mise}/bin/mise activate zsh)"
+    # Static PATH prepend instead of `mise activate --shims`, which adds a
+    # chpwd hook that costs ~270ms on cold shells.
+    modules.shell.zsh.envInit = ''
+      export PATH="$HOME/.local/share/mise/shims:$PATH"
     '';
     modules.shell.zsh.fpathDirs = "${pkgs.unstable.mise}/share/zsh/site-functions";
   };

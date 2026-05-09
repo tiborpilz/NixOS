@@ -74,6 +74,23 @@ mr() {
   glab mr create --web --title "$title" "$@"
 }
 
+# Show the Nth most recent zprof entry from the profiling log (default: latest).
+#   zprof-last      # newest run
+#   zprof-last 2    # second-newest, etc.
+zprof-last() {
+  local n=${1:-1}
+  local log=${ZPROF_LOG:-${ZSH_CACHE_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/zsh}/zprof.log}
+  awk -v want=$n '
+    /^=== / { idx++ }
+    { blocks[idx] = blocks[idx] $0 ORS }
+    END {
+      target = idx - want + 1
+      if (target < 1) { print "no entry " want " of " idx > "/dev/stderr"; exit 1 }
+      printf "%s", blocks[target]
+    }
+  ' $log
+}
+
 # Show current pipeline state abbreviated
 # TODO: move this into its own package and use in tmux, prompt, nvim or emacs
 cistatus() {
