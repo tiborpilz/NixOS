@@ -37,11 +37,18 @@ let
       };
     };
 
+  emacsBase =
+    if pkgs.stdenv.hostPlatform.isDarwin
+    then pkgs.unstable.emacs-git
+    else pkgs.emacs-git;
+
   customEmacsPkg =
-    (pkgs.emacs-git.overrideAttrs (old: {
+    (emacsBase.override {
+      withNativeCompilation = true;
+    }).overrideAttrs (old: {
       stdenv = pkgs.ccacheStdenv;
       NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -O3";
-    }));
+    });
 
   wrap = with pkgs;
     emacsPkg:
@@ -186,6 +193,25 @@ let
 
   doomEmacsRaw = pkgs.emacsWithDoom doomArgs;
 
+  # Pre-compile all Doom .el files to native code at build time.
+  # The resulting .eln files land in share/emacs/native-lisp/, which Emacs
+  # adds to native-comp-eln-load-path via NIX_PROFILES on startup.
+  doomEmacsElnFiles = pkgs.runCommand "doom-emacs-eln" { } ''
+    mkdir -p $out/share/emacs/native-lisp
+    find ${doomEmacsRaw} -name '*.el' ! -name '*.dir-locals.el' -print0 | \
+      xargs -0 -n 50 -P $NIX_BUILD_CORES ${doomEmacsRaw}/bin/emacs --batch \
+        --eval "(setq native-compile-target-directory \"$out/share/emacs/native-lisp\")" \
+        --eval "(setq native-comp-async-report-warnings-errors 'silent)" \
+        -f batch-native-compile \
+      || true
+  '';
+
+  # Merge the pre-compiled .eln files into the doom output tree.
+  doomEmacsWithNativeComp = pkgs.symlinkJoin {
+    name = "doom-emacs-native";
+    paths = [ doomEmacsElnFiles doomEmacsRaw ];
+  };
+
   doomEmacs = pkgs.runCommand "doom-emacs"
     {
       pname = "doom-emacs";
@@ -198,7 +224,7 @@ let
       };
     } ''
     mkdir -p $out/bin
-    for entry in ${doomEmacsRaw}/bin/*; do
+    for entry in ${doomEmacsWithNativeComp}/bin/*; do
       name=$(basename "$entry")
       if [ "$name" = "emacs" ]; then
         ln -s "$entry" "$out/bin/doom-emacs"
@@ -206,7 +232,7 @@ let
         ln -s "$entry" "$out/bin/$name"
       fi
     done
-    for entry in ${doomEmacsRaw}/*; do
+    for entry in ${doomEmacsWithNativeComp}/*; do
       name=$(basename "$entry")
       if [ "$name" != "bin" ]; then
         ln -s "$entry" "$out/$name"
