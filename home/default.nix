@@ -163,7 +163,6 @@ with mylib;
 
     modules.editors.neovim.enable = true;
     modules.editors.emacs.enable = true;
-    modules.editors.emacs.useNix = true;
 
     modules.dev.rust.enable = true;
     modules.dev.web.enable = true;
@@ -233,7 +232,7 @@ with mylib;
         build-users-group = "nixbld";
         experimental-features = [ "nix-command flakes" ];
         cores = 0;
-        max-jobs = 4;
+        max-jobs = 16;
         trusted-users = [ "root" "tibor" "tibor.pilz" "tiborpilz" ];
         trusted-substituters = [ "https://cache.nixos.org/" "https://tiborpilz.cachix.org/" ];
         substituters = [

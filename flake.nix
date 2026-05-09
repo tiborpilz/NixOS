@@ -13,7 +13,11 @@
     plasma-manager.inputs.nixpkgs.follows = "nixpkgs";
     plasma-manager.inputs.home-manager.follows = "home-manager";
 
+    emacs-overlay.url = "github:nix-community/emacs-overlay";
+    emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
+
     nix-doom-emacs-unstraightened.url = "github:marienz/nix-doom-emacs-unstraightened";
+    nix-doom-emacs-unstraightened.inputs.nixpkgs.follows = "nixpkgs";
 
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
@@ -76,7 +80,9 @@
       nixosHosts = mapModules ./hosts/nixos (hostPath: lib.my.mkHostAttrs hostPath {
         system = "x86_64-linux";
         modules = lib.my.mapModulesRec' (toString ./modules/nixos) import
-                  ++ [quadlet-nix.nixosModules.quadlet];
+                  ++ [quadlet-nix.nixosModules.quadlet]
+                  ++ [inputs.nix-doom-emacs-unstraightened.nixosModule];
+        extraSpecialArgs = { inherit inputs; };
       });
 
       # darwinHosts = mapModules ./hosts/darwin (hostPath: lib.my.mkHostAttrs hostPath {
@@ -116,10 +122,16 @@
             # bitwarden-cli = inputs.nixpkgs-24-05.legacyPackages.${prev.system}.bitwarden-cli;
             # Temporary fix as I can't switch to 24.11 yet
             ghostscript = nixpkgs-unstable.legacyPackages.${prev.system}.ghostscript;
+            # Backport of upstream nixpkgs alias (Feb 2026): drop the FHS-env
+            # wrapper. On Darwin its container-init build fails (`-static` needs
+            # crt0). epkgs.copilot.postPatch refers to this attribute, so even
+            # eval-only graphs fail without the override.
+            copilot-language-server-fhs = final.copilot-language-server;
           })
           inputs.devshell.overlays.default
           inputs.nix-doom-emacs-unstraightened.overlays.default
           inputs.claude-code.overlays.default
+          inputs.emacs-overlay.overlays.default
         ];
 
         hosts = nixosHosts;

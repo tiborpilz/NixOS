@@ -37,26 +37,26 @@ let
       };
     };
 
-  # customEmacs =
-  #   (pkgs.emacs-git.overrideAttrs (old: {
-  #     stdenv = pkgs.ccacheStdenv;
-  #     NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -O3";
-  #   }));
-  #
+  customEmacsPkg =
+    (pkgs.emacs-git.overrideAttrs (old: {
+      stdenv = pkgs.ccacheStdenv;
+      NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -O3";
+    }));
+
   wrap = with pkgs;
     emacsPkg:
     let
-      emacsScriptPath = emacsScript emacsPkg;
+      emacsScriptPath = emacsScript customEmacsPkg;
     in
     (symlinkJoin {
       name = "emacs";
-      paths = [ emacsScriptPath emacsPkg ];
+      paths = [ emacsScriptPath customEmacsPkg ];
       nativeBuildInputs = [ makeBinaryWrapper ];
       meta = {
-        platforms = emacsPkg.meta.platforms;
-        mainProgram = emacsPkg.meta.mainProgram;
+        platforms = customEmacsPkg.meta.platforms;
+        mainProgram = customEmacsPkg.meta.mainProgram;
       };
-      src = emacsPkg.src;
+      src = customEmacsPkg.src;
       postBuild = ''
         wrapProgram $out/bin/emacs \
           --set LSP_USE_PLISTS true \
@@ -70,7 +70,7 @@ let
       '';
     });
 
-  emacsWrapped = wrap pkgs.emacs;
+  emacsWrapped = wrap customEmacsPkg;
 
   treesitGrammars = with pkgs.tree-sitter.builtGrammars; {
     bash = tree-sitter-bash;
@@ -146,6 +146,7 @@ let
     tangleArgs = "--all config.org";
 
     extraPackages = epkgs: [
+      epkgs.treesit-grammars.with-all-grammars
       (epkgs.melpaBuild {
         pname = "copilot";
         version = "0.2.0";
@@ -184,11 +185,35 @@ let
     ];
   };
 
-  doomEmacs = (pkgs.emacsWithDoom doomArgs).overrideAttrs (old: {
-    meta = (old.meta or { }) // {
-      mainProgram = "emacs";
-    };
-  });
+  doomEmacsRaw = pkgs.emacsWithDoom doomArgs;
+
+  doomEmacs = pkgs.runCommand "doom-emacs"
+    {
+      pname = "doom-emacs";
+      version = doomEmacsRaw.version or "0";
+      meta = (doomEmacsRaw.meta or { }) // {
+        mainProgram = "doom-emacs";
+      };
+      passthru = (doomEmacsRaw.passthru or { }) // {
+        unwrapped = doomEmacsRaw;
+      };
+    } ''
+    mkdir -p $out/bin
+    for entry in ${doomEmacsRaw}/bin/*; do
+      name=$(basename "$entry")
+      if [ "$name" = "emacs" ]; then
+        ln -s "$entry" "$out/bin/doom-emacs"
+      else
+        ln -s "$entry" "$out/bin/$name"
+      fi
+    done
+    for entry in ${doomEmacsRaw}/*; do
+      name=$(basename "$entry")
+      if [ "$name" != "bin" ]; then
+        ln -s "$entry" "$out/$name"
+      fi
+    done
+  '';
 in
 {
   emacs = pkgs.emacs;
