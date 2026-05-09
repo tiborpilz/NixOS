@@ -179,7 +179,6 @@ let
       sqlite
       gnuplot
       pandoc
-      nodePackages.mermaid-cli
       copilot-language-server
       emacs-lsp-booster
     ];
@@ -223,3 +222,7 @@ in
   doom-emacs-standalone = pkgs.doomEmacs doomArgs;
   emacs-lsp-booster = emacs-lsp-booster;
 }
+
+nix why-depends \
+  "$(nix eval --raw github:tiborpilz/nixos#doom-emacs.drvPath)" \
+  "$(nix eval --raw nixpkgs#chromium.drvPath)"
