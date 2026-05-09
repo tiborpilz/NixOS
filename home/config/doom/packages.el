@@ -202,6 +202,10 @@
 (package! kurecolor)
 ;; Base 16 Themes:2 ends here
 
+;; [[file:config.org::*Doom Modeline][Doom Modeline:5]]
+(package! hide-mode-line)
+;; Doom Modeline:5 ends here
+
 ;; [[file:config.org::*Incorporate Nano Modeline][Incorporate Nano Modeline:1]]
 ;; (package! nano-modeline)
 ;; Incorporate Nano Modeline:1 ends here

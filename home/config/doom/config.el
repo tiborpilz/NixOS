@@ -1048,22 +1048,6 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
               'json-read)
             :around
             #'lsp-booster--advice-json-parse)
-
-(defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
-  "Prepend emacs-lsp-booster command to lsp CMD."
-  (let ((orig-result (funcall old-fn cmd test?)))
-    (if (and (not test?)                             ;; for check lsp-server-present?
-             (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
-             lsp-use-plists
-             (not (functionp 'json-rpc-connection))  ;; native json-rpc
-             (executable-find "emacs-lsp-booster"))
-        (progn
-          (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
-            (setcar orig-result command-from-exec-path))
-          (message "Using emacs-lsp-booster for %s!" orig-result)
-          (cons "emacs-lsp-booster" orig-result))
-      orig-result)))
-(advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
 ;; Emacs-LSP-Booster compatibility:1 ends here
 
 ;; [[file:config.org::*Disable Evil-Mode in timemachine mode][Disable Evil-Mode in timemachine mode:1]]
@@ -1204,9 +1188,12 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
   (line-number-mode -1))
 ;; Doom Modeline:4 ends here
 
-;; [[file:config.org::*Doom Modeline][Doom Modeline:5]]
-(add-hook 'treemacs-mode-hook (lambda () (hide-mode-line-mode)))
-;; Doom Modeline:5 ends here
+;; [[file:config.org::*Doom Modeline][Doom Modeline:6]]
+(add-hook 'treemacs-mode-hook
+          (lambda ()
+            (when (fboundp 'hide-mode-line-mode)
+              (hide-mode-line-mode))))
+;; Doom Modeline:6 ends here
 
 ;; [[file:config.org::*Incorporate Nano Modeline][Incorporate Nano Modeline:2]]
 ;; (use-package! nano-modeline
@@ -1249,7 +1236,10 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; Better Error Display:1 ends here
 
 ;; [[file:config.org::*Treemacs Modeline][Treemacs Modeline:1]]
-(add-hook 'treemacs-mode-hook #'hide-mode-line-mode)
+(add-hook 'treemacs-mode-hook
+          (lambda ()
+            (when (fboundp 'hide-mode-line-mode)
+              (hide-mode-line-mode))))
 ;; Treemacs Modeline:1 ends here
 
 ;; [[file:config.org::*Vertico][Vertico:1]]

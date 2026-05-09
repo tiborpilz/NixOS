@@ -2152,10 +2152,21 @@ Remove size indicator and column number mode
   (line-number-mode -1))
 #+end_src
 
-Hide Modeline in Treemacs
+Hide Modeline in Treemacs. Doom v2.1.0 (pinned by nix-doom-emacs-unstraightened)
+doesn't ship hide-mode-line as a core package; declare it explicitly so
+~hide-mode-line-mode~ is defined when ~treemacs-mode-hook~ fires. Without this,
+the hook errors mid-treemacs-mode init and leaves the buffer half-initialised
+(in-this-buffer set, projects-end nil), which crashes every post-command.
+
+#+begin_src elisp :tangle packages.el
+(package! hide-mode-line)
+#+end_src
 
 #+begin_src elisp
-(add-hook 'treemacs-mode-hook (lambda () (hide-mode-line-mode)))
+(add-hook 'treemacs-mode-hook
+          (lambda ()
+            (when (fboundp 'hide-mode-line-mode)
+              (hide-mode-line-mode))))
 #+end_src
 
 **** TODO Incorporate Nano Modeline
@@ -2239,9 +2250,14 @@ This snippet makes it disappear instantly:
 *** Treemacs Modeline
 
 I don't really need the modeline in the treemacs buffer, so I'm disabling it.
+Guard with ~fboundp~ in case ~hide-mode-line~ isn't available (see the earlier
+section under Doom Modeline for the full explanation).
 
 #+begin_src elisp
-(add-hook 'treemacs-mode-hook #'hide-mode-line-mode)
+(add-hook 'treemacs-mode-hook
+          (lambda ()
+            (when (fboundp 'hide-mode-line-mode)
+              (hide-mode-line-mode))))
 #+end_src
 
 *** Solaire-Mode
