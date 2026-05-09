@@ -115,6 +115,7 @@
             unstable = import nixpkgs-unstable {
               system = prev.system;
               config.allowUnfree = true;
+              overlays = [ inputs.emacs-overlay.overlays.default ];
             };
             my = self.packages."${prev.system}";
             # Keep 24.05 bitwarden-cli as there are some build issues with the new one
