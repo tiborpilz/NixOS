@@ -9,10 +9,10 @@ in
   };
   config = lib.mkIf cfg.enable {
     home.packages = with pkgs; [
-      # it's pronounced kubernetes not kubernetes
       kubectl
       kubernetes-helm
       kustomize
+
       # backup management
       velero
       # plugins
@@ -39,6 +39,7 @@ in
       ${pkgs.google-cloud-sdk}/share/zsh/site-functions
       ${pkgs.terraform}/share/zsh/site-functions
       ${pkgs.kubectl}/share/zsh/site-functions
+      ${pkgs.unstable.terragrunt}/share/zsh/site-functions
     '';
   };
 }
