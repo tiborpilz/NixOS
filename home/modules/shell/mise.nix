@@ -12,9 +12,8 @@ in {
 
   config = mkIf cfg.enable {
     home.packages = [ pkgs.unstable.mise ];
-    # Static PATH prepend instead of `mise activate --shims`, which adds a
-    # chpwd hook that costs ~270ms on cold shells.
-    modules.shell.zsh.envInit = ''
+    # Static PATH prepend instead of `mise activate --shims` (quicker)
+    modules.shell.zsh.rcInit = ''
       export PATH="$HOME/.local/share/mise/shims:$PATH"
     '';
     modules.shell.zsh.fpathDirs = "${pkgs.unstable.mise}/share/zsh/site-functions";
