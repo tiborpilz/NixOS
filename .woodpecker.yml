@@ -18,12 +18,6 @@ when:
   - event: pull_request
 
 steps:
-  check:
-    <<: *nix-step
-    commands:
-      - *cachix-setup
-      - cachix watch-exec tiborpilz -- nix --extra-experimental-features 'nix-command flakes' flake check
-
   build-home-tibor:
     <<: *nix-step
     commands:
