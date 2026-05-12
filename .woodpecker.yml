@@ -1,5 +1,31 @@
-  steps:
-    check:
+variables:
+  - &cachix-setup |
+    set -e
+    nix --extra-experimental-features 'nix-command flakes' profile install nixpkgs#cachix
+    cachix authtoken "$CACHIX_AUTH_TOKEN"
+    cachix use tiborpilz
+    cachix use nix-community
+
+  - &nix-step
       image: nixos/nix
-      commands:
-        - nix --extra-experimental-features 'nix-command flakes' flake check
+      environment:
+        CACHIX_AUTH_TOKEN:
+          from_secret: cachix_auth_token
+
+when:
+  - event: push
+    branch: main
+  - event: pull_request
+
+steps:
+  check:
+    <<: *nix-step
+    commands:
+      - *cachix-setup
+      - cachix watch-exec tiborpilz -- nix --extra-experimental-features 'nix-command flakes' flake check
+
+  build-home-tibor:
+    <<: *nix-step
+    commands:
+      - *cachix-setup
+      - cachix watch-exec tiborpilz -- nix --extra-experimental-features 'nix-command flakes' build .#checks.x86_64-linux.home-tibor
