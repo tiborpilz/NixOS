@@ -28,14 +28,19 @@ in
       git
       git-cliff
       git-absorb
-      gh
+      unstable.git-spice # Stacked Diffs
+
+      gh 
       glab
+
       git-open
-      diff-so-fancy
-      git-crypt
-      difftastic
-      act
-      lazygit
+      git-crypt # Stop committing keys, dummy
+
+      diff-so-fancy #nicer git diffs
+      difftastic # nicer git diffs with treesitter
+
+      act # GH actions at home
+      lazygit # for noobs
       unstable.opencommit
     ];
 
