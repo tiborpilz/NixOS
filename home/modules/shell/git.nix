@@ -27,10 +27,11 @@ in
     home.packages = with pkgs; [
       git
       git-cliff
-      git-absorb
+      git-absorb # who needs mercurulial
       unstable.git-spice # Stacked Diffs
 
-      gh 
+      # CLIs for varios free and non-free (*cough*) forges
+      gh
       glab
 
       git-open
@@ -56,20 +57,6 @@ in
     modules.shell.zsh.fpathDirs = ''
       ${pkgs.gitAndTools.gh}/share/zsh/site-functions
       ${pkgs.git-absorb}/share/zsh/site-functions
-    '';
-
-    modules.shell.zsh.rcInit = ''
-      # fpath=(${pkgs.gitAndTools.glab}/share/zsh/site-functions $fpath)
-      function opencommit() {
-        if [ -z "$OPENAI_API_KEY" ]; then
-          # TODO: make key configurable in global config
-          export OCO_API_KEY=$(pass bitwarden/openai-api-key)
-        else
-          export OCO_API_KEY=$OPENAI_API_KEY
-        fi
-        ${pkgs.unstable.opencommit}/bin/opencommit "$@"
-        alias oco="opencommit"
-      }
     '';
   };
 }
