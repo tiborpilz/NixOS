@@ -34,8 +34,6 @@
     devshell.url = "github:numtide/devshell";
 
     deploy-rs.url = "github:serokell/deploy-rs";
-    authentik-nix.url = "github:nix-community/authentik-nix";
-    authentik-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
 
@@ -60,7 +58,6 @@
     , flake-utils
     , flake-utils-plus
     , deploy-rs
-    , authentik-nix
     , quadlet-nix
     , radicle-explorer
     , determinate
@@ -101,7 +98,6 @@
           modules = [
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
-            authentik-nix.nixosModules.default
             radicle-explorer.nixosModules.radicle-explorer
             determinate.nixosModules.default
             quadlet-nix.nixosModules.quadlet
