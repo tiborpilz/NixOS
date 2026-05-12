@@ -21,6 +21,8 @@ jobs:
           - klaus
           - thinkyMcThinkpad
           - doom-emacs
+          - testTandoorUpgrade
+          - testPaperlessUpgrade
     name: build-linux (${{ matrix.check }})
     steps:
     - name: Free Disk Space (Ubuntu)
