@@ -2,7 +2,7 @@
 
 with lib;
 let
-  cfg = config.modules.dev.web;
+  cfg = config.modules.dev.colima;
   mylib = import ../../../lib { inherit inputs lib pkgs; };
 in
 with mylib;
