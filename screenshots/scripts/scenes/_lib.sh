@@ -44,9 +44,10 @@ launch_kitty() {
 
   local deadline=$((SECONDS + 15))
   while (( SECONDS < deadline )); do
-    KITTY_WID=$(xdotool search --class kitty 2>/dev/null | tail -1 || true)
+    KITTY_WID=$(xdotool search --onlyvisible --class kitty 2>/dev/null | tail -1 || true)
     if [[ -n "$KITTY_WID" ]]; then
-      xdotool windowactivate --sync "$KITTY_WID" 2>/dev/null || true
+      # No WM under Xvfb: windowactivate is a no-op, windowfocus sets X focus directly.
+      xdotool windowfocus --sync "$KITTY_WID" 2>/dev/null || true
       return 0
     fi
     sleep 0.25
@@ -57,6 +58,15 @@ launch_kitty() {
   cat /tmp/kitty.log >&2 || true
   return 1
 }
+
+dump_kitty_log_on_error() {
+  local exit_code=$?
+  if (( exit_code != 0 )); then
+    echo "--- kitty log (scene failed with exit $exit_code) ---" >&2
+    cat /tmp/kitty.log >&2 || true
+  fi
+}
+trap dump_kitty_log_on_error ERR
 
 cleanup_kitty() {
   if [[ -n "$KITTY_PID" ]]; then
@@ -69,12 +79,16 @@ cleanup_kitty() {
 trap cleanup_kitty EXIT
 
 type_keys() {
-  xdotool type --window "$KITTY_WID" --delay 25 -- "$@"
+  # Refocus before each batch; XSendEvent (--window) gets rejected by kitty,
+  # so we rely on XTestFakeKeyEvent into the focused window instead.
+  xdotool windowfocus --sync "$KITTY_WID" 2>/dev/null || true
+  xdotool type --delay 25 -- "$@"
 }
 
 press() {
+  xdotool windowfocus --sync "$KITTY_WID" 2>/dev/null || true
   for key in "$@"; do
-    xdotool key --window "$KITTY_WID" -- "$key"
+    xdotool key -- "$key"
   done
 }
 
