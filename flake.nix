@@ -144,8 +144,12 @@
               inherit lib inputs;
               pkgs = channels.nixpkgs;
             }))) // {
-            # testTandoor = pkgs.testers.runNixOSTest ./tests/tandoor.nix;
-            # testPaperless = pkgs.testers.runNixOSTest ./tests/paperless.nix;
+            testTandoorUpgrade = channels.nixpkgs.testers.runNixOSTest (import ./tests/upgrade/tandoor.nix {
+              inherit inputs lib; pkgs = channels.nixpkgs;
+            });
+            testPaperlessUpgrade = channels.nixpkgs.testers.runNixOSTest (import ./tests/upgrade/paperless.nix {
+              inherit inputs lib; pkgs = channels.nixpkgs;
+            });
           };
 
           apps = (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages) // {
@@ -205,6 +209,8 @@
           klaus = self.nixosConfigurations.klaus.config.system.build.toplevel;
           thinkyMcThinkpad = self.nixosConfigurations.thinkyMcThinkpad.config.system.build.toplevel;
           doom-emacs = self.packages.doom-emacs.config.system.build.toplevel;
+          testTandoorUpgrade = self.packages.x86_64-linux.testTandoorUpgrade;
+          testPaperlessUpgrade = self.packages.x86_64-linux.testPaperlessUpgrade;
         };
         aarch64-darwin = {
           home-tiborpilz = self.homeConfigurations.tiborpilz.activationPackage;
