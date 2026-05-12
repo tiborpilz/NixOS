@@ -15,7 +15,7 @@ in
   nodes.machine = { config, pkgs, lib, ... }: {
     inherit lib;
 
-    virtualisation.diskSize = 16384;
+    virtualisation.diskSize = 24576;
     virtualisation.cores = 2;
     virtualisation.memorySize = 6144;
 
@@ -49,7 +49,7 @@ in
     machine.wait_for_unit("${dbUnit}", timeout=600)
     machine.wait_for_unit("${appUnit}", timeout=600)
     machine.wait_for_open_port(${toString port}, timeout=900)
-    machine.sleep(60)  # paperless first-boot migrations are slow
+    machine.sleep(60)
 
     # Phase 2: switch back to the default (NEW) image against the existing pgdata.
     print("=== Phase 2: NEW image (default) ===")
@@ -57,7 +57,7 @@ in
     machine.wait_for_unit("${dbUnit}", timeout=600)
     machine.wait_for_unit("${appUnit}", timeout=600)
     machine.wait_for_open_port(${toString port}, timeout=900)
-    machine.sleep(60)  # let migrations run against existing schema
+    machine.sleep(60)
 
     # Phase 3: hit a DB-backed endpoint.
     print("=== Phase 3: verify ${verifyPath} ===")
