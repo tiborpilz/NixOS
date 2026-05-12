@@ -33,6 +33,7 @@ jobs:
         nix_path: nixpkgs=channel:nixos-unstable
         extra_nix_config: |
           download-buffer-size = 524288000
+          sandbox = false
     - uses: cachix/cachix-action@v15
       with:
         name: tiborpilz
@@ -60,6 +61,7 @@ jobs:
         nix_path: nixpkgs=channel:nixos-unstable
         extra_nix_config: |
           download-buffer-size = 524288000
+          sandbox = false
     - uses: cachix/cachix-action@v15
       with:
         name: tiborpilz

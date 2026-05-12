@@ -47,18 +47,17 @@ in
     machine.wait_for_unit("${dbUnit}", timeout=600)
     machine.wait_for_unit("${appUnit}", timeout=600)
     machine.wait_for_open_port(${toString port}, timeout=600)
-    machine.sleep(30)  # let Django finish migrations on first boot
+    machine.sleep(30)
 
-    # Phase 2: switch back to the default (NEW) image. The persisted podman
-    # volume from phase 1 is reused, so the new image must accept the old schema.
+    # Phase 2: switch back to the default (NEW) image against the existing pgdata.
     print("=== Phase 2: NEW image (default) ===")
     machine.succeed("/run/booted-system/bin/switch-to-configuration test")
     machine.wait_for_unit("${dbUnit}", timeout=600)
     machine.wait_for_unit("${appUnit}", timeout=600)
     machine.wait_for_open_port(${toString port}, timeout=600)
-    machine.sleep(30)  # let migrations run against the existing schema
+    machine.sleep(30)
 
-    # Phase 3: hit a DB-backed endpoint. Unauthenticated should yield 401/403,
+    # Phase 3: hit a DB-backed endpoint. Unauthenticated should yield 200/401/403,
     # not 500 (which would indicate a broken router/migration).
     print("=== Phase 3: verify ${verifyPath} ===")
     status = machine.succeed(
