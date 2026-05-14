@@ -16,6 +16,7 @@ when:
   - event: push
     branch: main
   - event: pull_request
+  - event: manual
 
 steps:
   build-home-tibor:
