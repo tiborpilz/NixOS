@@ -28,7 +28,7 @@ steps:
       kubernetes:
         resources:
           requests:
-            memory: 4Gi
+            memory: 8Gi
             cpu: 1
           limits:
-            memory: 6Gi
+            memory: 12Gi
