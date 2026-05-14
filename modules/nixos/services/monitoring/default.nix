@@ -147,7 +147,7 @@ in
       {
         containers = {
           monitoring-influxdb.containerConfig = {
-            image = "docker.io/influxdb:1.8.7";
+            image = "docker.io/influxdb:1.12.4";
             volumes = [ "monitoring-influxdb:/var/lib/influxdb" ];
             pod = pods.monitoring-pod.ref;
 
