@@ -355,7 +355,7 @@ with lib;
         };
 
         immich = {
-          immich-version = "v1.132.3";
+          immich-version = "v1.144.1";
           enable = true;
         };
         jellyfin.enable = true;
