@@ -28,9 +28,7 @@ with mylib;
   config = lib.mkIf cfg.enable {
     system.activationScripts.initFrigate = stringAfter [ "var" ] ''
       mkdir -p ${cfg.configDir}/config
-      mkdir -p ${cfg.dataDir}/clips
-      mkdir -p ${cfg.dataDir}/recordings
-      mkdir -p ${cfg.dataDir}/exports
+      mkdir -p ${cfg.dataDir}
     '';
 
     virtualisation.quadlet =
@@ -41,9 +39,7 @@ with mylib;
           podmanArgs = ["--device=nvidia.com/gpu=all"];
           volumes = [
             "${cfg.configDir}/config:/config"
-            "${cfg.dataDir}/clips:/clips"
-            "${cfg.dataDir}/recordings:/recordings"
-            "${cfg.dataDir}/exports:/exports"
+            "${cfg.dataDir}/:/media/frigate"
           ];
           environments = {
             FRIGATE_RTSP_PASSWORD = "password";
