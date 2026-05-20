@@ -60,6 +60,7 @@ export GPG_TTY=$(tty)
 
 # Env vars
 ## Add custom scripts etc. to Path
+export PATH=$PATH:$HOME/.local/bin
 export PATH=$PATH:$HOME/bin
 export PATH=$PATH:$HOME/.npm-global/bin
 export PATH=$PATH:$HOME/go/bin
