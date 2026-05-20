@@ -388,7 +388,7 @@ with lib;
       sshDomain = "git.tiborpilz.xyz";
     };
 
-    modules.services.hydra.enable = true;
+    modules.services.hydra.enable = false;
 
     services.k3s.enable = false;
     services.k3s.role = "server";
