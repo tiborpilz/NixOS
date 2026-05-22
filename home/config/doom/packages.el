@@ -71,9 +71,9 @@
 (package! svelte-mode)
 ;; Svelte:1 ends here
 
-;; [[file:config.org::*Astro][Astro:1]]
-(package! astro-ts-mode)
-;; Astro:1 ends here
+;; [[file:config.org::*Astro (Disabled for now)][Astro (Disabled for now):1]]
+;; (package! astro-ts-mode)
+;; Astro (Disabled for now):1 ends here
 
 ;; [[file:config.org::*Tailwind][Tailwind:1]]
 (package! lsp-tailwindcss
