@@ -60,10 +60,10 @@ emacsclient --eval '(showcase--show-org)'
 sleep 2
 capture_emacs_window "$OUTPUT_DIR/emacs-org.png"
 
-echo "=== Emacs Code + Treemacs ==="
-emacsclient --eval '(showcase--show-code-treemacs)'
-sleep 2
-capture_emacs_window "$OUTPUT_DIR/emacs-code-treemacs.png"
+# echo "=== Emacs Code + Treemacs ==="
+# emacsclient --eval '(showcase--show-code-treemacs)'
+# sleep 2
+# capture_emacs_window "$OUTPUT_DIR/emacs-code-treemacs.png"
 
 emacsclient --eval '(kill-emacs)' 2>/dev/null || true
 
