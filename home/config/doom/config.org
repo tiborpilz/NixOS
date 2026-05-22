@@ -1080,42 +1080,42 @@ Remove 1 space padding from ~<script>~ tags, set indent to 2.
   (setq web-mode-markup-indent-offset 2))
 #+end_src
 
-**** Astro
+**** Astro (Disabled for now)
 
 Add a package for a dedicated ~astro~ mode:
 
 #+begin_src elisp :tangle packages.el
-(package! astro-ts-mode)
+;; (package! astro-ts-mode)
 #+end_src
 
 Because ~astro-ts-mode~ uses treesitter, treesitter needs to be set up to handle
 ~.astro~ files properly.
 
 #+begin_src elisp
-(setq treesit-language-source-alist
-      '((astro "https://github.com/virchau13/tree-sitter-astro")
-        (css "https://github.com/tree-sitter/tree-sitter-css")
-        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")))
+;; (setq treesit-language-source-alist
+;;       '((astro "https://github.com/virchau13/tree-sitter-astro")
+;;         (css "https://github.com/tree-sitter/tree-sitter-css")
+;;         (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")))
 #+end_src
 
 Define Astro as a derived mode for ~.astro~ files.
 
 #+begin_src elisp
-(define-derived-mode astro-mode web-mode "astro")
-(setq auto-mode-alist
-      (append '(("\\.astro\\'" . astro-mode))
-              auto-mode-alist))
+;; (define-derived-mode astro-mode web-mode "astro")
+;; (setq auto-mode-alist
+;;       (append '(("\\.astro\\'" . astro-mode))
+;;               auto-mode-alist))
 #+end_src
 
 Register the astro-ls binary for lsp support.
 
 #+begin_src elisp
-(with-eval-after-load 'lsp-mode
-  (add-to-list 'lsp-language-id-configuration '(astro-mode . "astro"))
-  (lsp-register-client
-    (make-lsp-client :new-connection (lsp-stdio-connection '("astro-ls"))
-                    :activation-fn (lsp-activate-on "astro")
-                    :server-id 'astro-ls)))
+;; (with-eval-after-load 'lsp-mode
+;;   (add-to-list 'lsp-language-id-configuration '(astro-mode . "astro"))
+;;   (lsp-register-client
+;;     (make-lsp-client :new-connection (lsp-stdio-connection '("astro-ls"))
+;;                     :activation-fn (lsp-activate-on "astro")
+;;                     :server-id 'astro-ls)))
 #+end_src
 
 **** Tailwind

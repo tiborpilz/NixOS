@@ -665,28 +665,28 @@
   (setq web-mode-markup-indent-offset 2))
 ;; Vue:1 ends here
 
-;; [[file:config.org::*Astro][Astro:2]]
-(setq treesit-language-source-alist
-      '((astro "https://github.com/virchau13/tree-sitter-astro")
-        (css "https://github.com/tree-sitter/tree-sitter-css")
-        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")))
-;; Astro:2 ends here
+;; [[file:config.org::*Astro (Disabled for now)][Astro (Disabled for now):2]]
+;; (setq treesit-language-source-alist
+;;       '((astro "https://github.com/virchau13/tree-sitter-astro")
+;;         (css "https://github.com/tree-sitter/tree-sitter-css")
+;;         (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")))
+;; Astro (Disabled for now):2 ends here
 
-;; [[file:config.org::*Astro][Astro:3]]
-(define-derived-mode astro-mode web-mode "astro")
-(setq auto-mode-alist
-      (append '(("\\.astro\\'" . astro-mode))
-              auto-mode-alist))
-;; Astro:3 ends here
+;; [[file:config.org::*Astro (Disabled for now)][Astro (Disabled for now):3]]
+;; (define-derived-mode astro-mode web-mode "astro")
+;; (setq auto-mode-alist
+;;       (append '(("\\.astro\\'" . astro-mode))
+;;               auto-mode-alist))
+;; Astro (Disabled for now):3 ends here
 
-;; [[file:config.org::*Astro][Astro:4]]
-(with-eval-after-load 'lsp-mode
-  (add-to-list 'lsp-language-id-configuration '(astro-mode . "astro"))
-  (lsp-register-client
-    (make-lsp-client :new-connection (lsp-stdio-connection '("astro-ls"))
-                    :activation-fn (lsp-activate-on "astro")
-                    :server-id 'astro-ls)))
-;; Astro:4 ends here
+;; [[file:config.org::*Astro (Disabled for now)][Astro (Disabled for now):4]]
+;; (with-eval-after-load 'lsp-mode
+;;   (add-to-list 'lsp-language-id-configuration '(astro-mode . "astro"))
+;;   (lsp-register-client
+;;     (make-lsp-client :new-connection (lsp-stdio-connection '("astro-ls"))
+;;                     :activation-fn (lsp-activate-on "astro")
+;;                     :server-id 'astro-ls)))
+;; Astro (Disabled for now):4 ends here
 
 ;; [[file:config.org::*Tailwind][Tailwind:2]]
 (use-package! lsp-tailwindcss
