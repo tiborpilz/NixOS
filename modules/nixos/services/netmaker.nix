@@ -94,7 +94,7 @@ with mylib;
         };
 
         containers.netmaker-mq.containerConfig = {
-          image = "docker.io/eclipse-mosquitto:2.0.15-openssl";
+          image = "docker.io/eclipse-mosquitto:2.0.22-openssl";
           pod = pods.netmaker-pod.ref;
           exec = "/mosquitto/config/wait.sh";
           volumes = [
