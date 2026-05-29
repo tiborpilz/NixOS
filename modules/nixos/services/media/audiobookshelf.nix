@@ -22,7 +22,7 @@ in
     '';
 
     virtualisation.oci-containers.containers.audiobookshelf = {
-      image = "ghcr.io/advplyr/audiobookshelf:2.33.1";
+      image = "ghcr.io/advplyr/audiobookshelf:2.35.1";
       ports = [
         "${toString audiobookshelfPort}:80"
       ];
