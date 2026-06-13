@@ -179,6 +179,10 @@ return {
       })
     end,
   },
+  -- Image Rendering
+  {
+    "edluffy/hologram.nvim",
+  },
   -- Zen Mode
   {
     "folke/zen-mode.nvim",
