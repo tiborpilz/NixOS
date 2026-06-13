@@ -58,8 +58,8 @@ in
         bind-key -T copy-mode-vi y send-keys -X copy-selection
         bind-key -T copy-mode-vi r send-keys -X rectangle-toggle
 
-        # Actually copy to clipboard (on Linux)
-        bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'xclip -in -selection clipboard'
+        # Actually copy to clipboard
+        bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'pbcopy'
 
         # Switch to (another) workspace, broken for now
         # TODO: fix
@@ -107,7 +107,7 @@ in
         set -g pane-border-lines single
         set -g pane-border-style 'fg=colour0'
 
-        # Set active pane border to dark gay, same as pane-border
+        # Set active pane border to dark gray, same as pane-border
         set -g pane-active-border-style 'fg=colour0'
 
         # Only show active pane border when there's more than one pane
