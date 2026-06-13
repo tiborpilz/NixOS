@@ -33,10 +33,10 @@ echo ""
 echo "=== Generating terminal screenshots (Kitty under Xvfb) ==="
 bash "${SCRIPTS_DIR}/run-scenes.sh"
 
-echo ""
-echo "=== Generating Emacs GUI screenshots ==="
-bash "${SCRIPTS_DIR}/emacs-screenshot.sh"
-
+# echo ""
+# echo "=== Generating Emacs GUI screenshots ==="
+# bash "${SCRIPTS_DIR}/emacs-screenshot.sh"
+#
 echo ""
 echo "=== Generated Screenshots ==="
 echo ""
