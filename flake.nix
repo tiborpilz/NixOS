@@ -46,6 +46,8 @@
     radicle-explorer.url = "git+https://iris.radicle.xyz/z4V1sjrXqjvFdnCUbxPFqd5p4DtH5.git";
 
     claude-code.url = "github:sadjow/claude-code-nix";
+
+    rio.url = "github:raphamorim/rio/main";
   };
       # 'aradicle-explorer.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
