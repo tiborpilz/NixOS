@@ -116,34 +116,34 @@ jobs:
   #         path: screenshots/output/*.png
   #         if-no-files-found: error
 
-  commit:
-    needs: [terminal, emacs]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: true
-          fetch-depth: 0
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: terminal-screenshots
-          path: screenshots/output
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: emacs-screenshots
-          path: screenshots/output
-
-      - name: Commit screenshots back to main
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add -f screenshots/output/
-          if git diff --staged --quiet; then
-            echo "No screenshot changes to commit."
-          else
-            git commit -m "chore(screenshots): regenerate [skip ci]"
-            git push origin HEAD:main
-          fi
+  # commit:
+  #   needs: [terminal, emacs]
+  #   if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         persist-credentials: true
+  #         fetch-depth: 0
+  #
+  #     - uses: actions/download-artifact@v4
+  #       with:
+  #         name: terminal-screenshots
+  #         path: screenshots/output
+  #
+  #     - uses: actions/download-artifact@v4
+  #       with:
+  #         name: emacs-screenshots
+  #         path: screenshots/output
+  #
+  #     - name: Commit screenshots back to main
+  #       run: |
+  #         git config user.name 'github-actions[bot]'
+  #         git config user.email 'github-actions[bot]@users.noreply.github.com'
+  #         git add -f screenshots/output/
+  #         if git diff --staged --quiet; then
+  #           echo "No screenshot changes to commit."
+  #         else
+  #           git commit -m "chore(screenshots): regenerate [skip ci]"
+  #           git push origin HEAD:main
+  #         fi
