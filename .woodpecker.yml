@@ -23,12 +23,4 @@ steps:
     <<: *nix-step
     commands:
       - *cachix-setup
-      - cachix watch-exec tiborpilz -- nix --extra-experimental-features 'nix-command flakes' build .#checks.x86_64-linux.home-tibor
-    backend_options:
-      kubernetes:
-        resources:
-          requests:
-            memory: 4Gi
-            cpu: 1
-          limits:
-            memory: 6Gi
+      - cachix watch-exec tiborpilz -- nix --extra-experimental-features 'nix-command flakes' build .#doom-emacs-standalone
