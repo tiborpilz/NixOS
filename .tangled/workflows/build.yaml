@@ -1,13 +1,13 @@
 when:
-  - event: ["pull_request", push", "manual"]
+  - event: ["pull_request", "push", "manual"]
     branch: ["main"]
 
 engine: "nixery"
 
 dependencies:
   nixpkgs:
-    - nix
+    - coreutils
 
 steps:
-  - name: "Build flakeRepl"
-    command: "nix --extra-experimental-features 'nix-command flakes' build .#flakeRepl"
+  - name: "Hello"
+    command: "echo 'hello world'"
