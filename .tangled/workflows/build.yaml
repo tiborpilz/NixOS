@@ -1,7 +1,5 @@
 when:
-  - event: ["push"]
-    branch: ["main"]
-  - event: ["pull_request"]
+  - event: ["pull_request", push", "manual"]
     branch: ["main"]
 
 engine: "nixery"
