@@ -1,0 +1,15 @@
+when:
+  - event: ["push"]
+    branch: ["main"]
+  - event: ["pull_request"]
+    branch: ["main"]
+
+engine: "nixery"
+
+dependencies:
+  nixpkgs:
+    - nix
+
+steps:
+  - name: "Build flakeRepl"
+    command: "nix --extra-experimental-features 'nix-command flakes' build .#flakeRepl"
