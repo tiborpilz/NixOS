@@ -1,8 +1,7 @@
 variables:
-  - &cachix-setup |
+  - &cachix-use |
     set -e
     nix --extra-experimental-features 'nix-command flakes' profile install nixpkgs#cachix
-    cachix authtoken "$CACHIX_AUTH_TOKEN"
     cachix use tiborpilz
     cachix use nix-community
 
@@ -19,8 +18,20 @@ when:
   - event: manual
 
 steps:
-  build-home-tibor:
+  build-doom-emacs-standalone:
     <<: *nix-step
     commands:
-      - *cachix-setup
-      - cachix watch-exec tiborpilz -- nix --extra-experimental-features 'nix-command flakes' build .#doom-emacs-standalone
+      - *cachix-use
+      - |
+        set -e
+        # Push to cachix only on events where the secret is available
+        # (push to main, manual runs). Pull requests are build-only: Woodpecker
+        # withholds secrets from PR events, so an authtoken/push there would be
+        # anonymous and rejected.
+        if [ "$CI_PIPELINE_EVENT" = "push" ] || [ "$CI_PIPELINE_EVENT" = "manual" ]; then
+          cachix authtoken "$CACHIX_AUTH_TOKEN"
+          cachix watch-exec tiborpilz -- nix --extra-experimental-features 'nix-command flakes' build .#doom-emacs-standalone
+        else
+          echo "Event $CI_PIPELINE_EVENT: building without cachix push."
+          nix --extra-experimental-features 'nix-command flakes' build .#doom-emacs-standalone
+        fi
