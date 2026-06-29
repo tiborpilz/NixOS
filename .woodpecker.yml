@@ -18,6 +18,14 @@ when:
   - event: manual
 
 steps:
+  flake-check:
+    <<: *nix-step
+    commands:
+      - *cachix-use
+      # Cursory sanity check: evaluate every flake output (and any
+      # import-from-derivation) without building the real derivations.
+      - nix --extra-experimental-features 'nix-command flakes' flake check --no-build
+
   build-doom-emacs-standalone:
     <<: *nix-step
     commands:
