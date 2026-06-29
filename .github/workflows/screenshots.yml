@@ -63,7 +63,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: terminal-screenshots
-          path: screenshots/output/*.png
+          path: |
+            screenshots/output/*.png
+            screenshots/output/*.gif
           if-no-files-found: error
 
   # emacs:
