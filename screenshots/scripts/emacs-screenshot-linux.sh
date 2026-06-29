@@ -56,9 +56,12 @@ sleep 2
 capture_emacs_window "$OUTPUT_DIR/emacs-dashboard.png"
 
 echo "=== Emacs Org Mode ==="
-emacsclient --eval '(showcase--show-org)'
-sleep 2
-capture_emacs_window "$OUTPUT_DIR/emacs-org.png"
+for variant in current focus minimal; do
+  echo "=== Emacs Org Mode (${variant}) ==="
+  emacsclient --eval "(showcase--show-org '${variant})"
+  sleep 2
+  capture_emacs_window "$OUTPUT_DIR/emacs-org-${variant}.png"
+done
 
 # echo "=== Emacs Code + Treemacs ==="
 # emacsclient --eval '(showcase--show-code-treemacs)'

@@ -33,10 +33,16 @@ echo ""
 echo "=== Generating terminal screenshots (Kitty under Xvfb) ==="
 bash "${SCRIPTS_DIR}/run-scenes.sh"
 
-# echo ""
-# echo "=== Generating Emacs GUI screenshots ==="
-# bash "${SCRIPTS_DIR}/emacs-screenshot.sh"
-#
+if command -v emacsclient &>/dev/null; then
+  echo ""
+  echo "=== Generating Emacs GUI screenshots ==="
+  bash "${SCRIPTS_DIR}/emacs-screenshot.sh"
+else
+  echo ""
+  echo "=== Skipping Emacs GUI screenshots ==="
+  echo "emacsclient not found; run inside an environment with Doom Emacs installed."
+fi
+
 echo ""
 echo "=== Generated Screenshots ==="
 echo ""
