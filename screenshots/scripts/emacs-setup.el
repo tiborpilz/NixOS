@@ -32,7 +32,10 @@
           org-modern-label-border 0.1)))
 
 (defun showcase--apply-org-variant (variant)
-  "Apply Org screenshot VARIANT."
+  "Apply Org screenshot VARIANT.
+VARIANT may be `current' for the existing repo styling baseline,
+`focus' for a more indented presentation, or `minimal' for a plainer look.
+Unknown variants fall back to `current'."
   (pcase variant
     ('minimal
      (setq-local line-spacing nil))
