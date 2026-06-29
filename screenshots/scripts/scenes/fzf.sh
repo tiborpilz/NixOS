@@ -12,4 +12,4 @@ sleep 2
 type_keys "feat"
 sleep 2
 
-capture "$OUTPUT_DIR/fzf.png"
+capture "$OUTPUT_DIR/fzf.png" "fzf-git-branch"
