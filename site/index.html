@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tibor's NixOS Repo</title>
+    <meta
+      name="description"
+      content="A polished overview of the hosts, modules, services, and automation inside tiborpilz/NixOS."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <nav class="topbar">
+          <span class="brand">tiborpilz/NixOS</span>
+          <div class="topbar-links">
+            <a href="https://github.com/tiborpilz/NixOS">Repository</a>
+            <a href="https://github.com/tiborpilz/NixOS/blob/main/README.md">README</a>
+            <a href="https://github.com/tiborpilz/NixOS/blob/main/flake.nix">flake.nix</a>
+          </div>
+        </nav>
+
+        <div class="hero-content">
+          <div>
+            <p class="eyebrow">GitHub Pages overview</p>
+            <h1>A sleek map of the NixOS setup behind this repo.</h1>
+            <p class="lede">
+              This repository combines NixOS hosts, Home Manager modules, custom packages,
+              and editor tooling into one flake-powered setup for daily machines and homelab services.
+            </p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="https://github.com/tiborpilz/NixOS/tree/main/hosts">Browse hosts</a>
+              <a class="button button-secondary" href="https://github.com/tiborpilz/NixOS/tree/main/modules">Explore modules</a>
+            </div>
+          </div>
+
+          <section class="stat-grid" aria-label="Repository highlights">
+            <article class="stat-card">
+              <span class="stat-value">4</span>
+              <span class="stat-label">NixOS hosts</span>
+              <p>edge, klaus, minithink, and thinkyMcThinkpad.</p>
+            </article>
+            <article class="stat-card">
+              <span class="stat-value">35</span>
+              <span class="stat-label">Service modules</span>
+              <p>From Forgejo and Hydra to media, monitoring, and home automation.</p>
+            </article>
+            <article class="stat-card">
+              <span class="stat-value">45</span>
+              <span class="stat-label">Home modules</span>
+              <p>Editors, shells, GUI setup, developer tools, and machine ergonomics.</p>
+            </article>
+          </section>
+        </div>
+      </header>
+
+      <main>
+        <section class="section-grid">
+          <article class="panel">
+            <p class="eyebrow">Core layout</p>
+            <h2>What lives where</h2>
+            <ul class="feature-list">
+              <li><strong>hosts/</strong> defines machine-specific NixOS systems.</li>
+              <li><strong>modules/</strong> contains reusable NixOS and shared modules.</li>
+              <li><strong>home/</strong> packages the Home Manager side of the environment.</li>
+              <li><strong>packages/</strong> adds custom utilities and package overrides.</li>
+              <li><strong>tests/</strong> keeps upgrade coverage for key services.</li>
+            </ul>
+          </article>
+
+          <article class="panel">
+            <p class="eyebrow">Flake model</p>
+            <h2>One flake, multiple targets</h2>
+            <p>
+              The flake exports host configurations, Home Manager profiles, custom packages,
+              development shells, and checks. It also pulls in nix-darwin, deploy-rs,
+              sops-nix, and editor overlays to keep the setup modular.
+            </p>
+          </article>
+        </section>
+
+        <section class="panel stack-gap">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Machine inventory</p>
+              <h2>Hosts and responsibilities</h2>
+            </div>
+            <a href="https://github.com/tiborpilz/NixOS/tree/main/hosts/nixos">Open host definitions</a>
+          </div>
+
+          <div class="card-grid">
+            <article class="info-card">
+              <h3>edge</h3>
+              <p>Infrastructure-oriented NixOS host with its own hardware and disk layout.</p>
+            </article>
+            <article class="info-card">
+              <h3>klaus</h3>
+              <p>Main server-style host with service modules, secrets, networking, and Samba wiring.</p>
+            </article>
+            <article class="info-card">
+              <h3>minithink</h3>
+              <p>Compact machine profile defined as a standalone host target.</p>
+            </article>
+            <article class="info-card">
+              <h3>thinkyMcThinkpad</h3>
+              <p>Laptop-focused configuration tracked separately for reproducible local setup.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section-grid">
+          <article class="panel">
+            <p class="eyebrow">Service catalog</p>
+            <h2>Homelab and self-hosting</h2>
+            <p>
+              Reusable modules cover productivity, media, automation, and platform services:
+              Forgejo, Hydra, Nextcloud, Paperless, Tandoor, Authentik, Jellyfin, Sonarr,
+              Frigate, Linkwarden, OpenHAB, and more.
+            </p>
+          </article>
+
+          <article class="panel">
+            <p class="eyebrow">Developer experience</p>
+            <h2>Daily environment</h2>
+            <p>
+              Home Manager modules shape the shell, terminal, editors, browser, sync stack,
+              and language-specific tooling. The repo also ships a literate Doom Emacs config
+              and extensive Neovim customization.
+            </p>
+          </article>
+        </section>
+
+        <section class="panel stack-gap">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Look and feel</p>
+              <h2>Generated screenshots</h2>
+            </div>
+            <a href="https://github.com/tiborpilz/NixOS/tree/main/screenshots/output">View screenshot assets</a>
+          </div>
+
+          <div class="gallery-grid">
+            <figure class="gallery-card">
+              <img src="./assets/screenshots/neovim-editing.png" alt="Neovim editing screenshot" />
+              <figcaption>Neovim editing workflow</figcaption>
+            </figure>
+            <figure class="gallery-card">
+              <img src="./assets/screenshots/neovim-telescope.png" alt="Neovim telescope screenshot" />
+              <figcaption>Telescope-driven navigation</figcaption>
+            </figure>
+            <figure class="gallery-card">
+              <img src="./assets/screenshots/tmux.png" alt="tmux screenshot" />
+              <figcaption>Terminal multiplexing with tmux</figcaption>
+            </figure>
+            <figure class="gallery-card">
+              <img src="./assets/screenshots/zsh-prompt.png" alt="zsh prompt screenshot" />
+              <figcaption>Customized zsh prompt</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section class="section-grid">
+          <article class="panel">
+            <p class="eyebrow">Automation</p>
+            <h2>CI and deployment</h2>
+            <p>
+              GitHub Actions already builds the flake outputs and regenerates showcase screenshots.
+              This Pages workflow adds a lightweight public front door without changing the Nix setup itself.
+            </p>
+          </article>
+
+          <article class="panel">
+            <p class="eyebrow">Best entry points</p>
+            <h2>Where to dive in next</h2>
+            <ul class="link-list">
+              <li><a href="https://github.com/tiborpilz/NixOS/blob/main/README.md">Project overview</a></li>
+              <li><a href="https://github.com/tiborpilz/NixOS/tree/main/home/modules">Home Manager modules</a></li>
+              <li><a href="https://github.com/tiborpilz/NixOS/tree/main/modules/nixos/services">NixOS services</a></li>
+              <li><a href="https://github.com/tiborpilz/NixOS/tree/main/tests">Tests and upgrade checks</a></li>
+            </ul>
+          </article>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

@@ -15,6 +15,10 @@ For reproducibility, I'm using modules defined in the `modules` directory for my
 
 To automatically inject the modules into the configuration, I'm using custom functions defined in `lib`.
 
+## GitHub Pages
+
+A public overview page for this repository is published with GitHub Pages at [tiborpilz.github.io/NixOS](https://tiborpilz.github.io/NixOS/).
+
 ## Emacs Config
 
 This repository contains my [literate emacs config](https://github.com/tiborpilz/NixOS/blob/main/home/config/doom/config.org).
