@@ -1,0 +1,96 @@
+# Doom Emacs, Neovim and terminal screenshots.
+#
+# Generates the showcase screenshots and, on pushes to main, commits the
+# regenerated PNGs back to the repo. This mirrors
+# .github/workflows/screenshots.yml but additionally runs the Doom Emacs
+# capture that is currently disabled there.
+#
+# Why a Debian image instead of the `nixos/nix` image the build pipeline uses:
+# the terminal scenes drive a real Kitty under Xvfb and Emacs renders a real
+# GUI frame. Both need a *system* Kitty/Xvfb plus a working Mesa software-GL
+# driver (nixpkgs' Mesa ships no usable software DRI driver) - exactly what the
+# apt-based GitHub runner provides. So we use Debian + apt for those and install
+# Nix on top to enter the `.#screenshots` dev shell for the editors themselves.
+
+when:
+  - event: push
+    branch: main
+  - event: manual
+
+steps:
+  generate:
+    image: debian:bookworm-slim
+    environment:
+      DEBIAN_FRONTEND: noninteractive
+      # Xvfb has no GPU: force Mesa's software rasterizer for Kitty/Emacs GL.
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    commands:
+      # System Kitty + Xvfb + Mesa software-GL (from the distro, as on the
+      # apt-based GitHub runner) plus the Nix-installer prerequisites. Kitty is
+      # deliberately not a Nix dependency - it is picked up from PATH inside the
+      # dev shell.
+      - apt-get update
+      - >-
+        apt-get install -y --no-install-recommends
+        curl xz-utils ca-certificates git
+        kitty xvfb xauth libgl1-mesa-dri
+      # Install Nix (Determinate installer, container recipe: no init system,
+      # builds unsandboxed, flakes enabled globally so the scripts' bare
+      # `nix eval`/`nix develop` calls work).
+      - >-
+        curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix
+        | sh -s -- install linux --init none --no-confirm
+        --extra-conf "sandbox = false"
+        --extra-conf "experimental-features = nix-command flakes"
+      # Put Nix on PATH for the rest of the step. Woodpecker runs a step's
+      # commands in a single shell, so this persists to the commands below.
+      - |
+        if [ -e /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]; then
+          . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+        elif [ -e /etc/profile.d/nix.sh ]; then
+          . /etc/profile.d/nix.sh
+        fi
+        nix --version
+      # Pull cached builds for the dev shell (anonymous read; no token needed).
+      - nix run nixpkgs#cachix -- use tiborpilz
+      - nix run nixpkgs#cachix -- use nix-community
+      # Symlink the in-repo editor/terminal configs into $HOME and build the
+      # mock git repo the scenes operate on.
+      - nix develop .#screenshots -c bash screenshots/scripts/setup-ci-configs.sh
+      - nix develop .#screenshots -c bash screenshots/scripts/mock-git-repo.sh
+      # Terminal + Neovim scenes (Kitty under Xvfb): zsh prompt, fzf, tmux,
+      # neovim editing and neovim telescope.
+      - nix develop .#screenshots -c bash screenshots/scripts/run-scenes.sh
+      # Doom Emacs: install/sync against the in-repo config, then capture the
+      # GUI frames (dashboard + org-mode) under Xvfb.
+      - nix develop .#screenshots -c bash screenshots/scripts/install-doom.sh
+      - nix develop .#screenshots -c bash screenshots/scripts/emacs-screenshot.sh
+
+  commit:
+    image: alpine/git
+    # Only persist screenshots for real pushes to main; manual runs are
+    # dry-runs you can inspect from the job logs.
+    when:
+      - event: push
+        branch: main
+    environment:
+      GIT_PUSH_TOKEN:
+        from_secret: git_push_token
+    commands:
+      - |
+        set -eu
+        if [ -z "${GIT_PUSH_TOKEN:-}" ]; then
+          echo "git_push_token secret not configured; skipping screenshot commit."
+          echo "Add a push token in Woodpecker to enable committing back to main."
+          exit 0
+        fi
+        git config user.name 'woodpecker-ci[bot]'
+        git config user.email 'woodpecker-ci@users.noreply.github.com'
+        # screenshots/output is gitignored, so force-add.
+        git add -f screenshots/output/
+        if git diff --staged --quiet; then
+          echo "No screenshot changes to commit."
+          exit 0
+        fi
+        git commit -m "chore(screenshots): regenerate [skip ci]"
+        git push "https://x-access-token:${GIT_PUSH_TOKEN}@github.com/tiborpilz/nixos.git" HEAD:main
