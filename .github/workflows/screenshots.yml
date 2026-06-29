@@ -53,6 +53,10 @@ jobs:
       - name: Mock git repo
         run: nix develop .#screenshots -c bash screenshots/scripts/mock-git-repo.sh
 
+      - name: Run termshot scenes
+        # Command-output scenes; no Xvfb/Kitty needed, just the dev shell + mock repo.
+        run: nix develop .#screenshots -c bash screenshots/scripts/run-termshot-scenes.sh
+
       - name: Run terminal scenes
         run: nix develop .#screenshots -c bash screenshots/scripts/run-scenes.sh
 

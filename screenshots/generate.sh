@@ -24,10 +24,16 @@ check_cmd nvim
 check_cmd tmux
 check_cmd git
 check_cmd fzf
+check_cmd termshot
+check_cmd bat
 
 echo ""
 echo "=== Creating mock git repo ==="
 bash "${SCRIPTS_DIR}/mock-git-repo.sh"
+
+echo ""
+echo "=== Generating command-output screenshots (termshot, no display) ==="
+bash "${SCRIPTS_DIR}/run-termshot-scenes.sh"
 
 echo ""
 echo "=== Generating terminal screenshots (Kitty under Xvfb) ==="
