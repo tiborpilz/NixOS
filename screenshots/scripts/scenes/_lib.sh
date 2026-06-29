@@ -29,15 +29,42 @@ export LIBGL_ALWAYS_SOFTWARE=1
 
 KITTY_PID=""
 KITTY_WID=""
+KITTY_W=""
+KITTY_H=""
+KITTY_CONF=""
+
+# Resolve the kitty config the scenes must render with. We always want the
+# repo's config (Nord theme, Fira Code, window margins), never kitty's built-in
+# defaults. setup-ci-configs.sh symlinks the home-manager-generated kitty.conf
+# to ~/.config/kitty/kitty.conf (CI); on the owner's machine that path already
+# is the live home-manager config. $KITTY_CONFIG overrides for tests/ad-hoc runs.
+resolve_kitty_conf() {
+  local conf="${KITTY_CONFIG:-$HOME/.config/kitty/kitty.conf}"
+  if [[ ! -s "$conf" ]]; then
+    echo "ERROR: kitty config not found or empty: $conf" >&2
+    echo "       Screenshots must render with the repo's kitty config, not kitty defaults." >&2
+    echo "       Run screenshots/scripts/setup-ci-configs.sh first (CI does), or point" >&2
+    echo "       \$KITTY_CONFIG at a kitty.conf." >&2
+    return 1
+  fi
+  printf '%s' "$conf"
+}
 
 launch_kitty() {
   local cmd="${1:-zsh -i}"
   local width="${2:-1200}"
   local height="${3:-800}"
+  KITTY_W="$width"
+  KITTY_H="$height"
 
-  # Kitty picks up ~/.config/kitty/kitty.conf by default; setup-ci-configs.sh
-  # symlinks it from the home-manager-generated config.
+  # Pin kitty to the repo's config explicitly instead of relying on default
+  # discovery. If ~/.config/kitty/kitty.conf is missing - or XDG_CONFIG_HOME
+  # points somewhere else - default discovery silently falls back to kitty's
+  # built-in theme/font; --config plus the existence check make that fail loudly.
+  KITTY_CONF="$(resolve_kitty_conf)" || return 1
+
   kitty \
+    --config "$KITTY_CONF" \
     --override "remember_window_size=no" \
     --override "initial_window_width=${width}" \
     --override "initial_window_height=${height}" \
@@ -47,8 +74,20 @@ launch_kitty() {
 
   local deadline=$((SECONDS + 15))
   while (( SECONDS < deadline )); do
-    KITTY_WID=$(xdotool search --onlyvisible --class kitty 2>/dev/null | tail -1 || true)
-    if [[ -n "$KITTY_WID" ]]; then
+    # Gather *every* visible kitty window. A leaked instance from a prior scene
+    # would let `tail -1` silently grab the wrong window, so detect >1 and fail.
+    local wids count
+    wids=$(xdotool search --onlyvisible --class kitty 2>/dev/null || true)
+    if [[ -n "$wids" ]]; then
+      count=$(printf '%s\n' "$wids" | grep -c .)
+      if (( count > 1 )); then
+        echo "ERROR: expected exactly one kitty window, found ${count}:" >&2
+        printf '  wid=%s\n' $wids >&2
+        echo "--- kitty log ---" >&2
+        cat /tmp/kitty.log >&2 || true
+        return 1
+      fi
+      KITTY_WID="$wids"
       # No WM under Xvfb: windowactivate is a no-op, windowfocus sets X focus directly.
       xdotool windowfocus --sync "$KITTY_WID" 2>/dev/null || true
       return 0
@@ -168,10 +207,53 @@ frame() {
   rm -f "$content" "$bar"
 }
 
+# Verify the grab will hit a *live* kitty window, not a crashed/stale one. Run
+# right before `import` so we fail loudly instead of capturing whatever X left
+# behind. Uses only xdotool (xprop isn't in the dev shell).
+assert_kitty_live() {
+  if [[ -z "$KITTY_PID" ]] || ! kill -0 "$KITTY_PID" 2>/dev/null; then
+    echo "ERROR: kitty process (pid=${KITTY_PID:-none}) is not running at capture time" >&2
+    return 1
+  fi
+  if [[ -z "$KITTY_WID" ]]; then
+    echo "ERROR: no kitty window id recorded at capture time" >&2
+    return 1
+  fi
+  # Re-confirm the recorded id is still a visible window of class kitty.
+  if ! xdotool search --onlyvisible --class kitty 2>/dev/null | grep -qx "$KITTY_WID"; then
+    echo "ERROR: window ${KITTY_WID} is no longer a visible kitty window at capture time" >&2
+    return 1
+  fi
+}
+
+# Sanity-check a fresh grab before we frame it. Catches two silent failures:
+#   * a degenerate grab (1x1 icon, destroyed window) - guarded by a size floor;
+#   * an all-one-color frame (kitty up but nothing rendered, or an empty window)
+#     - %k is the unique-color count, and real anti-aliased text has many shades.
+assert_sane_grab() {
+  local img="$1" w h colors
+  read -r w h <<<"$(magick identify -format '%w %h' "$img" 2>/dev/null || true)"
+  if [[ -z "$w" || -z "$h" ]]; then
+    echo "ERROR: could not read dimensions of grab '$img'" >&2
+    return 1
+  fi
+  if (( w < 200 || h < 200 )); then
+    echo "ERROR: grab '$img' is ${w}x${h}, too small to be a real terminal" >&2
+    return 1
+  fi
+  colors=$(magick identify -format '%k' "$img" 2>/dev/null || echo 0)
+  if ! [[ "$colors" =~ ^[0-9]+$ ]] || (( colors < 16 )); then
+    echo "ERROR: grab '$img' has ${colors:-0} unique color(s) - looks blank" >&2
+    return 1
+  fi
+}
+
 capture() {
   local out="$1" title="${2:-}" raw
+  assert_kitty_live
   raw="$(mktemp --suffix=.png)"
   import -window "$KITTY_WID" "$raw"
+  assert_sane_grab "$raw"
   frame "$raw" "$out" "$title"
   rm -f "$raw"
   echo "Captured: $out"
