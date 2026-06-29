@@ -1,9 +1,13 @@
 name: 'Screenshots'
 
+# Screenshot generation has moved to Woodpecker CI
+# (.woodpecker/screenshots.yaml), which regenerates and commits the screenshots
+# on pushes to main (and additionally captures Doom Emacs). This workflow is
+# kept as a manual-only fallback so the two CI systems don't both commit to
+# main. Trigger it by hand from the Actions tab if needed; it builds artifacts
+# but no longer commits (the commit job below is push-only). Safe to delete once
+# the Woodpecker pipeline is confirmed working.
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 concurrency:
