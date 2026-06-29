@@ -47,8 +47,19 @@ launch_kitty() {
 
   local deadline=$((SECONDS + 15))
   while (( SECONDS < deadline )); do
-    KITTY_WID=$(xdotool search --onlyvisible --class kitty 2>/dev/null | tail -1 || true)
-    if [[ -n "$KITTY_WID" ]]; then
+    # Gather *every* visible kitty window. A leaked instance from a prior scene
+    # would make `tail -1` silently grab the wrong window, so detect >1 and fail
+    # loudly instead.
+    local wids count
+    wids=$(xdotool search --onlyvisible --class kitty 2>/dev/null || true)
+    if [[ -n "$wids" ]]; then
+      count=$(printf '%s\n' "$wids" | grep -c .)
+      if (( count > 1 )); then
+        echo "ERROR: expected exactly one kitty window, found ${count}:" >&2
+        printf '  wid=%s\n' $wids >&2
+        return 1
+      fi
+      KITTY_WID="$wids"
       # No WM under Xvfb: windowactivate is a no-op, windowfocus sets X focus directly.
       xdotool windowfocus --sync "$KITTY_WID" 2>/dev/null || true
       return 0
@@ -168,10 +179,43 @@ frame() {
   rm -f "$content" "$bar"
 }
 
+# Verify the grab will hit a *live* kitty window, not a crashed/stale one. Run
+# right before `import` so we fail loudly instead of capturing whatever X left
+# behind. Uses only xdotool (xprop isn't in the dev shell).
+assert_kitty_live() {
+  if [[ -z "$KITTY_PID" ]] || ! kill -0 "$KITTY_PID" 2>/dev/null; then
+    echo "ERROR: kitty process (pid=${KITTY_PID:-none}) is not running at capture time" >&2
+    return 1
+  fi
+  if [[ -z "$KITTY_WID" ]]; then
+    echo "ERROR: no kitty window id recorded at capture time" >&2
+    return 1
+  fi
+  # Re-confirm the recorded id is still a visible window of class kitty.
+  if ! xdotool search --onlyvisible --class kitty 2>/dev/null | grep -qx "$KITTY_WID"; then
+    echo "ERROR: window ${KITTY_WID} is no longer a visible kitty window at capture time" >&2
+    return 1
+  fi
+}
+
+# Reject an all-one-color grab (kitty up but nothing rendered yet, or we grabbed
+# an empty/destroyed window). `%k` is the unique-color count; a real terminal
+# frame has many shades from anti-aliased text, so anything tiny is broken.
+assert_not_blank() {
+  local img="$1" colors
+  colors=$(magick identify -format '%k' "$img" 2>/dev/null || echo 0)
+  if [[ -z "$colors" || "$colors" -lt 16 ]]; then
+    echo "ERROR: captured image '${img}' has ${colors:-0} unique color(s) - looks blank" >&2
+    return 1
+  fi
+}
+
 capture() {
   local out="$1" title="${2:-}" raw
+  assert_kitty_live
   raw="$(mktemp --suffix=.png)"
   import -window "$KITTY_WID" "$raw"
+  assert_not_blank "$raw"
   frame "$raw" "$out" "$title"
   rm -f "$raw"
   echo "Captured: $out"
