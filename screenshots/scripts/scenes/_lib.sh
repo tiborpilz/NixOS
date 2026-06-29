@@ -6,7 +6,10 @@
 #   sleep N; type_keys "..."; press Return; ...
 #   capture "$OUTPUT_DIR/<name>.png"
 
-set -euo pipefail
+# -E (errtrace) is essential: without it the ERR trap below is NOT inherited by
+# shell functions, so an error inside frame()/capture()/launch_kitty() would
+# abort the scene via `set -e` with zero diagnostics (a silent exit 1).
+set -Eeuo pipefail
 
 SCENE_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPTS_DIR="$(cd "${SCENE_LIB_DIR}/.." && pwd)"
@@ -61,10 +64,9 @@ launch_kitty() {
 
 dump_kitty_log_on_error() {
   local exit_code=$?
-  if (( exit_code != 0 )); then
-    echo "--- kitty log (scene failed with exit $exit_code) ---" >&2
-    cat /tmp/kitty.log >&2 || true
-  fi
+  echo "--- scene failed (exit ${exit_code}) at ${BASH_SOURCE[1]:-?}:${BASH_LINENO[0]:-?}: ${BASH_COMMAND}" >&2
+  echo "--- kitty log ---" >&2
+  cat /tmp/kitty.log >&2 2>/dev/null || true
 }
 trap dump_kitty_log_on_error ERR
 
@@ -109,7 +111,14 @@ TITLE_FONT="$(fc-match -f '%{file}' 'FiraCode Nerd Font Mono' 2>/dev/null || tru
 frame() {
   local in="$1" out="$2" title="${3:-}"
   local pad=18 tbh=40 radius=10 cw ch
-  read -r cw ch < <(magick identify -format '%w %h' "$in")
+  # `magick identify -format` emits no trailing newline, so `read … < <(…)`
+  # would hit EOF without a delimiter and return non-zero, aborting the scene
+  # under `set -e`. A here-string appends the newline, so the read succeeds.
+  read -r cw ch <<<"$(magick identify -format '%w %h' "$in")"
+  if [[ -z "$cw" || -z "$ch" ]]; then
+    echo "ERROR: frame: could not read dimensions of grab '$in'" >&2
+    return 1
+  fi
 
   local content bar
   content="$(mktemp --suffix=.png)"
