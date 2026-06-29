@@ -59,16 +59,16 @@ export ZDOTDIR="$ZDOTDIR"
 EOF
 echo "Wrote $HOME/.zshenv (ZDOTDIR=$ZDOTDIR)"
 
-# Use the user's real generated configs: kitty (Nord theme, Fira Code) and
-# tmux/gitmux (status bar + theme) rather than the tools' defaults.
-echo "Extracting generated configs from homeConfigurations.tibor..."
-extract_hm "$HOME/.config/kitty/kitty.conf" \
-  'xdg.configFile."kitty/kitty.conf".source'
-extract_hm "$HOME/.config/tmux/tmux.conf" \
-  'xdg.configFile."tmux/tmux.conf".source' \
-  'home.file.".tmux.conf".source'
-extract_hm "$HOME/.config/gitmux/gitmux.conf" \
-  'xdg.configFile."gitmux/gitmux.conf".source'
+# Extract kitty.conf from the home-manager config so CI uses the user's
+# actual generated config (Nord theme, Fira Code, settings, extras) rather
+# than a hand-maintained mirror.
+echo "Extracting kitty.conf from homeConfigurations.tibor..."
+mkdir -p "$HOME/.config/kitty"
+KITTY_CONF=$(nix eval --raw \
+  "$REPO_ROOT#homeConfigurations.tibor.config.xdg.configFile.\"kitty/kitty.conf\".source")
+rm -f "$HOME/.config/kitty/kitty.conf"
+ln -s "$KITTY_CONF" "$HOME/.config/kitty/kitty.conf"
+echo "Linked: $HOME/.config/kitty/kitty.conf -> $KITTY_CONF"
 
 # .zshrc sources $ZDOTDIR/extra.zshrc (home-manager-generated) at the end;
 # create an empty stub so the source line doesn't error in CI.

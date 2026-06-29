@@ -29,8 +29,8 @@ jobs:
         nix run github:Mic92/nix-fast-build -- \
           --skip-cached \
           --no-nom \
-          --flake '.#doomemacs'
-  
+          --flake '.#doom-emacs'
+
   # build-linux:
   #   runs-on: ubuntu-latest
   #   permissions:
@@ -86,4 +86,4 @@ jobs:
         nix run github:Mic92/nix-fast-build -- \
           --skip-cached \
           --no-nom \
-          --flake '.#doomemacs'
+          --flake '.#doom-emacs'
