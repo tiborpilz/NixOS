@@ -8,4 +8,4 @@ sleep 6
 type_keys " op"
 sleep 2
 
-capture "$OUTPUT_DIR/neovim-editing.png"
+capture "$OUTPUT_DIR/neovim-editing.png" "nvim config.nix"

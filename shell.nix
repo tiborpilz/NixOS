@@ -16,6 +16,7 @@ let
     gitmux
     zoxide
     imagemagick
+    fontconfig
     xdotool
     emacs
     ripgrep

@@ -92,8 +92,78 @@ press() {
   done
 }
 
+# Nord palette for the window chrome (matches the kitty Nord theme).
+NORD_BG="#2E3440"        # nord0  - content/window background
+NORD_TITLEBAR="#3B4252"  # nord1  - titlebar
+NORD_FG="#D8DEE9"        # nord4  - title text + button icons
+NORD_CLOSE="#BF616A"     # nord11 - close button accent
+
+# Best-effort: resolve the Fira Code file for the titlebar title text. If
+# fontconfig can't find it we just omit the text (the buttons still render).
+TITLE_FONT="$(fc-match -f '%{file}' 'FiraCode Nerd Font Mono' 2>/dev/null || true)"
+
+# Wrap a raw terminal grab in a KDE/Breeze-style window: a Nord titlebar with
+# minimise/maximise/close buttons on the right, interior padding, rounded
+# corners, a soft drop shadow, and a transparent margin - so it reads like a
+# real window floating on the desktop.
+frame() {
+  local in="$1" out="$2" title="${3:-}"
+  local pad=18 tbh=40 radius=10 cw ch
+  read -r cw ch < <(magick identify -format '%w %h' "$in")
+
+  local content bar
+  content="$(mktemp --suffix=.png)"
+  bar="$(mktemp --suffix=.png)"
+
+  # Interior padding (window background showing around the terminal content).
+  magick "$in" -background "$NORD_BG" \
+    -gravity West -splice "${pad}x0" \
+    -gravity East -splice "${pad}x0" \
+    -gravity South -splice "0x${pad}" \
+    "$content"
+
+  local pw=$((cw + 2 * pad))
+  local fh=$((tbh + ch + pad))
+
+  # Titlebar + Breeze-style window buttons (minimise | maximise | close).
+  local cy=$((tbh / 2)) r=6
+  local x_close=$((pw - 22)) x_max x_min
+  x_max=$((x_close - 26))
+  x_min=$((x_max - 26))
+  magick -size "${pw}x${tbh}" "xc:${NORD_TITLEBAR}" \
+    -fill none -strokewidth 2 \
+    -stroke "$NORD_FG" \
+    -draw "line $((x_min - r)),$((cy + r)) $((x_min + r)),$((cy + r))" \
+    -draw "rectangle $((x_max - r)),$((cy - r)) $((x_max + r)),$((cy + r))" \
+    -stroke "$NORD_CLOSE" \
+    -draw "line $((x_close - r)),$((cy - r)) $((x_close + r)),$((cy + r))" \
+    -draw "line $((x_close - r)),$((cy + r)) $((x_close + r)),$((cy - r))" \
+    "$bar"
+
+  if [[ -n "$TITLE_FONT" && -n "$title" ]]; then
+    magick "$bar" -font "$TITLE_FONT" -pointsize 15 -fill "$NORD_FG" \
+      -gravity West -annotate +18+0 "$title" "$bar"
+  fi
+
+  # Stack titlebar over content, round the corners, add shadow + margin.
+  magick \( "$bar" "$content" -append \) \
+    \( -size "${pw}x${fh}" xc:none -fill white \
+       -draw "roundrectangle 0,0 $((pw - 1)),$((fh - 1)) ${radius},${radius}" \) \
+    -compose DstIn -composite \
+    -compose Over \
+    \( +clone -background black -shadow 55x18+0+14 \) \
+    +swap -background none -layers merge +repage \
+    -bordercolor none -border 40 \
+    "$out"
+
+  rm -f "$content" "$bar"
+}
+
 capture() {
-  local out="$1"
-  import -window "$KITTY_WID" "$out"
+  local out="$1" title="${2:-}" raw
+  raw="$(mktemp --suffix=.png)"
+  import -window "$KITTY_WID" "$raw"
+  frame "$raw" "$out" "$title"
+  rm -f "$raw"
   echo "Captured: $out"
 }

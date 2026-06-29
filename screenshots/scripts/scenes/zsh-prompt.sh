@@ -5,6 +5,11 @@
 launch_kitty "cd /tmp/showcase && exec zsh -i" 1200 400
 sleep 2
 
+# Wipe shell-startup output (antigen apply, etc.) so only the prompt demo shows.
+type_keys "clear"
+press Return
+sleep 0.5
+
 type_keys "git status --short"
 press Return
 sleep 1
@@ -21,4 +26,4 @@ type_keys "echo 'nix-shell active'"
 press Return
 sleep 1
 
-capture "$OUTPUT_DIR/zsh-prompt.png"
+capture "$OUTPUT_DIR/zsh-prompt.png" "zsh"

@@ -11,4 +11,4 @@ sleep 2
 type_keys "config"
 sleep 2
 
-capture "$OUTPUT_DIR/neovim-telescope.png"
+capture "$OUTPUT_DIR/neovim-telescope.png" "nvim — telescope"
