@@ -16,16 +16,66 @@
   (+doom-dashboard/open (selected-frame))
   (redisplay t))
 
-(defun showcase--show-org ()
-  "Open the sample org file with org-modern styling."
+(defun showcase--reset-org-variant ()
+  "Reset Org styling overrides before applying a variant."
+  (setq-local line-spacing nil
+              org-hide-leading-stars nil
+              org-startup-indented nil
+              org-adapt-indentation nil)
+  (visual-line-mode -1)
+  (org-indent-mode -1)
+  (when (fboundp 'mixed-pitch-mode)
+    (mixed-pitch-mode -1))
+  (when (fboundp 'org-modern-mode)
+    (org-modern-mode -1)
+    (setq org-modern-star nil
+          org-modern-label-border 0.1)))
+
+(defun showcase--apply-current-org-variant ()
+  "Apply the baseline Org screenshot styling."
+  (setq-local line-spacing 0.2)
+  (when (fboundp 'mixed-pitch-mode)
+    (mixed-pitch-mode 1))
+  (when (fboundp 'org-modern-mode)
+    (setq org-modern-star nil
+          org-modern-label-border 0.1)
+    (org-modern-mode 1)))
+
+(defun showcase--apply-org-variant (variant)
+  "Apply Org screenshot VARIANT.
+VARIANT may be `current' for the existing repo styling baseline,
+`focus' for a more indented presentation, or `minimal' for a plainer look.
+Unknown variants fall back to `current'."
+  (pcase variant
+    ('minimal
+     (setq-local line-spacing nil))
+    ('focus
+     (setq-local line-spacing 0.3
+                 org-hide-leading-stars t
+                 org-startup-indented t
+                 org-adapt-indentation nil)
+     (visual-line-mode 1)
+     (org-indent-mode 1)
+     (when (fboundp 'mixed-pitch-mode)
+       (mixed-pitch-mode 1))
+     (when (fboundp 'org-modern-mode)
+       (setq org-modern-star 'replace
+             org-modern-label-border 0.2)
+       (org-modern-mode 1)))
+    ('current
+     (showcase--apply-current-org-variant))
+    (_
+     (showcase--apply-current-org-variant))))
+
+(defun showcase--show-org (&optional variant)
+  "Open the sample org file with Org styling VARIANT."
   (showcase--set-frame-size)
   (find-file "/tmp/showcase/notes.org")
+  (showcase--reset-org-variant)
+  (showcase--apply-org-variant (or variant 'current))
   (goto-char (point-min))
   (org-overview)
   (org-show-entry)
-  ;; Ensure org-modern is active
-  (when (fboundp 'org-modern-mode)
-    (org-modern-mode 1))
   (redisplay t))
 
 (defun showcase--show-code-treemacs ()
