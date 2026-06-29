@@ -33,33 +33,30 @@
 
 (defun showcase--apply-org-variant (variant)
   "Apply Org screenshot VARIANT."
-  (let ((resolved-variant (if (memq variant '(current focus minimal))
-                              variant
-                            'current)))
-    (pcase resolved-variant
-      ('minimal
-       (setq-local line-spacing nil))
-      ('focus
-       (setq-local line-spacing 0.3
-                   org-hide-leading-stars t
-                   org-startup-indented t
-                   org-adapt-indentation nil)
-       (visual-line-mode 1)
-       (org-indent-mode 1)
-       (when (fboundp 'mixed-pitch-mode)
-         (mixed-pitch-mode 1))
-       (when (fboundp 'org-modern-mode)
-         (setq org-modern-star 'replace
-               org-modern-label-border 0.2)
-         (org-modern-mode 1)))
-      ('current
-       (setq-local line-spacing 0.2)
-       (when (fboundp 'mixed-pitch-mode)
-         (mixed-pitch-mode 1))
-       (when (fboundp 'org-modern-mode)
-         (setq org-modern-star nil
-               org-modern-label-border 0.1)
-         (org-modern-mode 1))))))
+  (pcase variant
+    ('minimal
+     (setq-local line-spacing nil))
+    ('focus
+     (setq-local line-spacing 0.3
+                 org-hide-leading-stars t
+                 org-startup-indented t
+                 org-adapt-indentation nil)
+     (visual-line-mode 1)
+     (org-indent-mode 1)
+     (when (fboundp 'mixed-pitch-mode)
+       (mixed-pitch-mode 1))
+     (when (fboundp 'org-modern-mode)
+       (setq org-modern-star 'replace
+             org-modern-label-border 0.2)
+       (org-modern-mode 1)))
+    (_
+     (setq-local line-spacing 0.2)
+     (when (fboundp 'mixed-pitch-mode)
+       (mixed-pitch-mode 1))
+     (when (fboundp 'org-modern-mode)
+       (setq org-modern-star nil
+             org-modern-label-border 0.1)
+       (org-modern-mode 1)))))
 
 (defun showcase--show-org (&optional variant)
   "Open the sample org file with Org styling VARIANT."
