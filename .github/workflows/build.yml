@@ -29,7 +29,7 @@ jobs:
         nix run github:Mic92/nix-fast-build -- \
           --skip-cached \
           --no-nom \
-          --flake '.#doom-emacs'
+          --flake '.#packages.x86_64-linux.doom-emacs'
 
   # build-linux:
   #   runs-on: ubuntu-latest
@@ -86,4 +86,4 @@ jobs:
         nix run github:Mic92/nix-fast-build -- \
           --skip-cached \
           --no-nom \
-          --flake '.#doom-emacs'
+          --flake '.#packages.aarch64-darwin.doom-emacs'
