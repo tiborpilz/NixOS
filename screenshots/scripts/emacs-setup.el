@@ -27,15 +27,15 @@
   (when (fboundp 'mixed-pitch-mode)
     (mixed-pitch-mode -1))
   (when (fboundp 'org-modern-mode)
-    (org-modern-mode -1))
-  (setq org-modern-star nil
-        org-modern-label-border 0.1))
+    (org-modern-mode -1)
+    (setq org-modern-star nil
+          org-modern-label-border 0.1)))
 
 (defun showcase--apply-org-variant (variant)
   "Apply Org screenshot VARIANT."
   (pcase variant
     ('minimal
-     nil)
+     (setq-local line-spacing nil))
     ('focus
      (setq-local line-spacing 0.3
                  org-hide-leading-stars t
@@ -49,14 +49,16 @@
        (setq org-modern-star 'replace
              org-modern-label-border 0.2)
        (org-modern-mode 1)))
-    (_
+    ('current
      (setq-local line-spacing 0.2)
      (when (fboundp 'mixed-pitch-mode)
        (mixed-pitch-mode 1))
      (when (fboundp 'org-modern-mode)
        (setq org-modern-star nil
              org-modern-label-border 0.1)
-       (org-modern-mode 1)))))
+       (org-modern-mode 1))))
+    (_
+     (showcase--apply-org-variant 'current))))
 
 (defun showcase--show-org (&optional variant)
   "Open the sample org file with Org styling VARIANT."
