@@ -29,7 +29,6 @@
     darwin.inputs.nixpkgs.follows = "nixpkgs";
 
     flake-utils.url = "github:numtide/flake-utils";
-    flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
 
     devshell.url = "github:numtide/devshell";
 
@@ -57,8 +56,6 @@
     , nixpkgs-unstable
     , home-manager
     , sops-nix
-    , flake-utils
-    , flake-utils-plus
     , deploy-rs
     , quadlet-nix
     , radicle-explorer
@@ -73,13 +70,47 @@
           hm = home-manager.lib;
         });
       inherit (lib.my) mapModules;
+      emacs = (import ./packages/emacs/flake.nix).outputs {
+        inherit nixpkgs nixpkgs-unstable;
+        inherit (inputs) flake-utils emacs-overlay nix-doom-emacs-unstraightened claude-code;
+      };
 
-      pkgs = self.pkgs.x86_64-linux.nixpkgs;
+      mkUnstable = system: import nixpkgs-unstable {
+        inherit system;
+        config.allowUnfree = true;
+      };
+
+      sharedOverlays = [
+        (final: prev: {
+          unstable = mkUnstable prev.system;
+          my = self.packages.${prev.system};
+        })
+        inputs.devshell.overlays.default
+        inputs.claude-code.overlays.default
+      ];
+
+      channels = lib.genAttrs supportedSystems (system: {
+        nixpkgs = import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+          overlays = sharedOverlays;
+        };
+        nixpkgs-unstable = mkUnstable system;
+      });
+
+      sharedHostModules = [
+        home-manager.nixosModules.home-manager
+        sops-nix.nixosModules.sops
+        radicle-explorer.nixosModules.radicle-explorer
+        determinate.nixosModules.default
+        quadlet-nix.nixosModules.quadlet
+        inputs.disko.nixosModules.disko
+      ] ++ lib.my.mapModulesRec' (toString ./modules/shared) import;
 
       nixosHosts = mapModules ./hosts/nixos (hostPath: lib.my.mkHostAttrs hostPath {
         system = "x86_64-linux";
         modules = lib.my.mapModulesRec' (toString ./modules/nixos) import
-                  ++ [quadlet-nix.nixosModules.quadlet];
+                  ++ [ quadlet-nix.nixosModules.quadlet ];
       });
 
       # darwinHosts = mapModules ./hosts/darwin (hostPath: lib.my.mkHostAttrs hostPath {
@@ -87,85 +118,56 @@
       #   modules = lib.my.mapModulesRec' (toString ./modules/darwin) import;
       # });
 
+      packageSets = system:
+        lib.attrValues (lib.filterAttrs (name: _: name != "emacs")
+          (mapModules ./packages (p: import p {
+            inherit lib inputs;
+            pkgs = channels.${system}.nixpkgs;
+          })));
+
     in
-    flake-utils-plus.lib.mkFlake
-      rec {
-        inherit lib self inputs supportedSystems;
+    rec {
+      inherit lib inputs supportedSystems channels;
+      pkgs = channels;
 
-        channels.nixpkgs-unstable.config = { allowUnfree = true; };
-        channels.nixpkgs.config = { allowUnfree = true; };
+      nixosConfigurations = lib.mapAttrs (_: host:
+        host.builder {
+          inherit (host) system specialArgs;
+          modules = sharedHostModules ++ host.modules;
+        }
+      ) nixosHosts;
 
-        hostDefaults = {
-          channelName = "nixpkgs";
-          modules = [
-            home-manager.nixosModules.home-manager
-            sops-nix.nixosModules.sops
-            radicle-explorer.nixosModules.radicle-explorer
-            determinate.nixosModules.default
-            quadlet-nix.nixosModules.quadlet
-            inputs.disko.nixosModules.disko
-          ] ++ lib.my.mapModulesRec' (toString ./modules/shared) import;
-        };
+      packages = lib.genAttrs supportedSystems (system:
+        lib.foldAttrs (item: acc: item) { }
+          (packageSets system ++ [ emacs.packages.${system} ]) // {
+          testTandoorUpgrade = channels.${system}.nixpkgs.testers.runNixOSTest (import ./tests/upgrade/tandoor.nix {
+            inherit inputs lib;
+            pkgs = channels.${system}.nixpkgs;
+          });
+          testPaperlessUpgrade = channels.${system}.nixpkgs.testers.runNixOSTest (import ./tests/upgrade/paperless.nix {
+            inherit inputs lib;
+            pkgs = channels.${system}.nixpkgs;
+          });
+        });
 
-        sharedOverlays = [
-          (final: prev: {
-            unstable = import nixpkgs-unstable {
-              system = prev.system;
-              config.allowUnfree = true;
-              overlays = [ inputs.emacs-overlay.overlays.default ];
-            };
-            my = self.packages."${prev.system}";
-            # Keep 24.05 bitwarden-cli as there are some build issues with the new one
-            # bitwarden-cli = inputs.nixpkgs-24-05.legacyPackages.${prev.system}.bitwarden-cli;
-            # Temporary fix as I can't switch to 24.11 yet
-            ghostscript = nixpkgs-unstable.legacyPackages.${prev.system}.ghostscript;
-            # Backport of upstream nixpkgs alias (Feb 2026): drop the FHS-env
-            # wrapper. On Darwin its container-init build fails (`-static` needs
-            # crt0). epkgs.copilot.postPatch refers to this attribute, so even
-            # eval-only graphs fail without the override.
-            copilot-language-server-fhs = final.copilot-language-server;
-          })
-          inputs.devshell.overlays.default
-          inputs.nix-doom-emacs-unstraightened.overlays.default
-          inputs.claude-code.overlays.default
-          inputs.emacs-overlay.overlays.default
-        ];
+      apps = lib.genAttrs supportedSystems (system:
+        (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages.${system}) // {
+          default = apps.${system}.flakeRepl;
+        });
 
-        hosts = nixosHosts;
+      devShells = lib.genAttrs supportedSystems (system:
+        import ./shell.nix { pkgs = channels.${system}.nixpkgs; });
 
-        outputsBuilder = channels: rec {
-          inherit channels;
+      formatter = lib.genAttrs supportedSystems (system:
+        channels.${system}.nixpkgs.nixpkgs-fmt);
 
-          packages = lib.foldAttrs (item: acc: item) { }
-            (lib.attrValues (mapModules ./packages (p: import p {
-              inherit lib inputs;
-              pkgs = channels.nixpkgs;
-            }))) // {
-            testTandoorUpgrade = channels.nixpkgs.testers.runNixOSTest (import ./tests/upgrade/tandoor.nix {
-              inherit inputs lib; pkgs = channels.nixpkgs;
-            });
-            testPaperlessUpgrade = channels.nixpkgs.testers.runNixOSTest (import ./tests/upgrade/paperless.nix {
-              inherit inputs lib; pkgs = channels.nixpkgs;
-            });
-          };
-
-          apps = (lib.mapAttrs' (name: value: { inherit name; value = lib.my.mkApp value; }) packages) // {
-            default = apps.flakeRepl;
-          };
-
-          devShells = import ./shell.nix { pkgs = channels.nixpkgs; };
-
-          formatter = pkgs.nixpkgs-fmt;
-
-        };
-
-        homeConfigurations = lib.my.mergeAttrs (lib.forEach supportedSystems (system:
+      homeConfigurations = lib.my.mergeAttrs (lib.forEach supportedSystems (system:
           let
             isDarwin = (system == "x86_64-darwin" || system == "aarch64-darwin");
             user = if (isDarwin) then "tiborpilz" else "tibor";
-            homeDirectory = if (isDarwin) then "/Users/${user}" else "/home/${user}";
-            pkgs = self.channels.${system}.nixpkgs;
-            enableSyncthing = (system == "x86_64-linux");
+            homeDirectory = if isDarwin then "/Users/${user}" else "/home/${user}";
+            pkgs = channels.${system}.nixpkgs;
+            enableSyncthing = system == "x86_64-linux";
             hosts = lib.attrNames self.nixosConfigurations;
             mkHostAliases = map (h: "${user}@${h}") hosts;
             aliases = mkHostAliases;
@@ -173,7 +175,7 @@
               inherit lib pkgs;
 
               modules = [
-                inputs.nix-doom-emacs-unstraightened.homeModule
+                emacs.homeModules.default
                 ./home
                 {
                   _module.args.inputs = inputs;
@@ -188,8 +190,8 @@
           { "${user}" = homeConfiguration; } // aliasConfigurations
         ));
 
-        nixosModules = lib.my.mapModulesRec (toString ./modules) import;
-      } // {
+      nixosModules = lib.my.mapModulesRec (toString ./modules) import;
+
       deploy.nodes.klaus = {
         hostname = "klaus";
         profiles.system = {
