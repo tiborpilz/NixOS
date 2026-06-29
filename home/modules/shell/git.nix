@@ -43,6 +43,9 @@ in
       act # GH actions at home
       lazygit # for noobs
       unstable.opencommit
+
+      # Worktree Management
+      my.wtp
     ];
 
     xdg.configFile = {
@@ -57,6 +60,11 @@ in
     modules.shell.zsh.fpathDirs = ''
       ${pkgs.gitAndTools.gh}/share/zsh/site-functions
       ${pkgs.git-absorb}/share/zsh/site-functions
+    '';
+
+    # wtp completion + shell integration (the `wtp cd` navigation hook)
+    modules.shell.zsh.rcInit = ''
+      eval "$(${pkgs.my.wtp}/bin/wtp shell-init zsh)"
     '';
   };
 }
