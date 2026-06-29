@@ -27,8 +27,16 @@ link() {
 
 link "$REPO_ROOT/home/config/neovim" "$HOME/.config/nvim"
 link "$REPO_ROOT/home/config/doom" "$HOME/.config/doom"
-link "$REPO_ROOT/home/config/zsh/.zshrc" "$HOME/.zshrc"
-link "$REPO_ROOT/home/config/zsh/.zsh_custom" "$HOME/.zsh_custom"
+
+ZDOTDIR="$HOME/.config/zsh"
+mkdir -p "$ZDOTDIR"
+link "$REPO_ROOT/home/config/zsh/.zshrc" "$ZDOTDIR/.zshrc"
+link "$REPO_ROOT/home/config/zsh/.zsh_custom" "$ZDOTDIR/.zsh_custom"
+
+cat >"$HOME/.zshenv" <<EOF
+export ZDOTDIR="$ZDOTDIR"
+EOF
+echo "Wrote $HOME/.zshenv (ZDOTDIR=$ZDOTDIR)"
 
 # Extract kitty.conf from the home-manager config so CI uses the user's
 # actual generated config (Nord theme, Fira Code, settings, extras) rather
@@ -43,7 +51,7 @@ echo "Linked: $HOME/.config/kitty/kitty.conf -> $KITTY_CONF"
 
 # .zshrc sources $ZDOTDIR/extra.zshrc (home-manager-generated) at the end;
 # create an empty stub so the source line doesn't error in CI.
-if [[ ! -e "$HOME/extra.zshrc" ]]; then
-  touch "$HOME/extra.zshrc"
-  echo "Created empty stub: $HOME/extra.zshrc"
+if [[ ! -e "$ZDOTDIR/extra.zshrc" ]]; then
+  touch "$ZDOTDIR/extra.zshrc"
+  echo "Created empty stub: $ZDOTDIR/extra.zshrc"
 fi
