@@ -28,7 +28,10 @@ jobs:
           rm -rf _site
           mkdir -p _site/assets/screenshots
           cp -r site/. _site/
-          cp screenshots/output/*.png _site/assets/screenshots/
+          # Copy both stills and animated GIFs; tolerate either set being empty
+          # (e.g. before the Screenshots workflow has regenerated assets).
+          cp screenshots/output/*.png _site/assets/screenshots/ 2>/dev/null || true
+          cp screenshots/output/*.gif _site/assets/screenshots/ 2>/dev/null || true
 
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -16,6 +16,9 @@ let
     gitmux
     zoxide
     imagemagick
+    # ffmpeg's x11grab records the live Kitty window region for the animated
+    # GIF scenes (a true constant-FPS framebuffer read; see scenes/_lib.sh).
+    ffmpeg
     fontconfig
     xdotool
     emacs

@@ -30,6 +30,12 @@ export LIBGL_ALWAYS_SOFTWARE=1
 KITTY_PID=""
 KITTY_WID=""
 
+# GIF recording state (see start_record/stop_record below).
+FFMPEG_PID=""
+REC_TMP=""
+REC_FPS=12
+REC_MAX_WIDTH=1000
+
 launch_kitty() {
   local cmd="${1:-zsh -i}"
   local width="${2:-1200}"
@@ -78,7 +84,24 @@ cleanup_kitty() {
   fi
 }
 
-trap cleanup_kitty EXIT
+# Tear down a still-running recorder (e.g. when a scene errors mid-capture) so
+# we never leak an ffmpeg grabbing the X display after the scene exits.
+cleanup_record() {
+  if [[ -n "$FFMPEG_PID" ]]; then
+    kill "$FFMPEG_PID" 2>/dev/null || true
+    wait "$FFMPEG_PID" 2>/dev/null || true
+    FFMPEG_PID=""
+  fi
+  [[ -n "$REC_TMP" ]] && rm -f "$REC_TMP" 2>/dev/null || true
+  REC_TMP=""
+}
+
+cleanup_all() {
+  cleanup_record
+  cleanup_kitty
+}
+
+trap cleanup_all EXIT
 
 type_keys() {
   # Refocus before each batch; XSendEvent (--window) gets rejected by kitty,
@@ -92,6 +115,73 @@ press() {
   for key in "$@"; do
     xdotool key -- "$key"
   done
+}
+
+# --- GIF recording ---------------------------------------------------------
+# Record the live Kitty window as an animated GIF. We grab the X framebuffer
+# region directly with ffmpeg's x11grab, which reads at a true constant FPS -
+# unlike a per-frame `import -window` loop, whose effective rate is throttled to
+# ~3-5fps by PNG-encode latency and yields visibly choppy motion. The grab goes
+# to a lossless intermediate, then stop_record builds a dithered palette in two
+# passes for clean Nord colors. Grabbing a real Kitty window (rather than an
+# asciinema-style replay) is the whole point: it preserves Fira Code ligatures
+# and Nerd Font glyphs that a font-substituting player would mangle.
+#
+# Usage inside a scene, wrapping only the interesting motion (skip slow startup):
+#   launch_kitty "..."; sleep 6
+#   start_record
+#   ...keystrokes/sleeps...
+#   stop_record "$OUTPUT_DIR/<name>.gif"
+start_record() {
+  local fps="${1:-$REC_FPS}"
+  # Window geometry on the (WM-less) Xvfb root -> X, Y, WIDTH, HEIGHT.
+  local X Y WIDTH HEIGHT
+  eval "$(xdotool getwindowgeometry --shell "$KITTY_WID")"
+  if [[ -z "${WIDTH:-}" || -z "${HEIGHT:-}" ]]; then
+    echo "ERROR: start_record: could not read kitty window geometry" >&2
+    return 1
+  fi
+  REC_TMP="$(mktemp --suffix=.nut)"
+  REC_FPS="$fps"
+  # ffv1 in nut: lossless, so the palette pass works from pristine pixels.
+  ffmpeg -loglevel error -y \
+    -f x11grab -draw_mouse 0 -framerate "$fps" \
+    -video_size "${WIDTH}x${HEIGHT}" -i "${DISPLAY}+${X},${Y}" \
+    -c:v ffv1 "$REC_TMP" &
+  FFMPEG_PID=$!
+  # Let ffmpeg attach to the display before the scene starts animating.
+  sleep 0.4
+}
+
+# stop_record <out.gif> [title]
+# `title` is accepted for symmetry with capture() but unused: GIFs ship without
+# the ImageMagick window chrome to stay lean (Kitty's own Nord padding reads
+# cleanly on its own).
+stop_record() {
+  local out="$1"
+  if [[ -z "$FFMPEG_PID" || -z "$REC_TMP" ]]; then
+    echo "ERROR: stop_record called without a matching start_record" >&2
+    return 1
+  fi
+  # SIGINT lets ffmpeg flush and finalize the container cleanly.
+  kill -INT "$FFMPEG_PID" 2>/dev/null || true
+  wait "$FFMPEG_PID" 2>/dev/null || true
+  FFMPEG_PID=""
+
+  local pal vf
+  pal="$(mktemp --suffix=.png)"
+  # Cap width for web while preserving aspect (-2 keeps height even for gif).
+  vf="fps=${REC_FPS},scale='min(${REC_MAX_WIDTH},iw)':-2:flags=lanczos"
+
+  ffmpeg -loglevel error -y -i "$REC_TMP" \
+    -vf "${vf},palettegen=stats_mode=diff" "$pal"
+  ffmpeg -loglevel error -y -i "$REC_TMP" -i "$pal" \
+    -lavfi "${vf}[s];[s][1:v]paletteuse=dither=sierra2_4a:diff_mode=rectangle" \
+    "$out"
+
+  rm -f "$REC_TMP" "$pal"
+  REC_TMP=""
+  echo "Recorded: $out"
 }
 
 # Nord palette for the window chrome (matches the kitty Nord theme).

@@ -10,20 +10,20 @@ type_keys "clear"
 press Return
 sleep 0.5
 
+start_record
 type_keys "git status --short"
 press Return
-sleep 1
+sleep 1.0
 
 type_keys "ls"
 press Return
-sleep 1
+sleep 1.0
 
 type_keys "IN_NIX_SHELL=1 exec zsh -i"
 press Return
-sleep 2
+sleep 1.5
 
 type_keys "echo 'nix-shell active'"
 press Return
-sleep 1
-
-capture "$OUTPUT_DIR/zsh-prompt.png" "zsh"
+sleep 1.0
+stop_record "$OUTPUT_DIR/zsh-prompt.gif" "zsh"

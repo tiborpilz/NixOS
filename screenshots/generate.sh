@@ -26,6 +26,8 @@ check_cmd git
 check_cmd fzf
 check_cmd termshot
 check_cmd bat
+check_cmd ffmpeg
+check_cmd xdotool
 
 echo ""
 echo "=== Creating mock git repo ==="
