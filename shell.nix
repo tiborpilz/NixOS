@@ -23,6 +23,12 @@ let
     fd
     gcc
     nerd-fonts.fira-code
+    # termshot renders command output straight to a framed PNG (no display
+    # server) for the command-output scenes; bat provides the syntax-highlighted
+    # source view used by the bat scene. The interactive TUI scenes still use
+    # the Kitty-under-Xvfb pipeline above.
+    termshot
+    bat
   ];
 
   commonDeps = with pkgs; [
