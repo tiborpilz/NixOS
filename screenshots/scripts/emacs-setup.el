@@ -31,6 +31,16 @@
     (setq org-modern-star nil
           org-modern-label-border 0.1)))
 
+(defun showcase--apply-current-org-variant ()
+  "Apply the baseline Org screenshot styling."
+  (setq-local line-spacing 0.2)
+  (when (fboundp 'mixed-pitch-mode)
+    (mixed-pitch-mode 1))
+  (when (fboundp 'org-modern-mode)
+    (setq org-modern-star nil
+          org-modern-label-border 0.1)
+    (org-modern-mode 1)))
+
 (defun showcase--apply-org-variant (variant)
   "Apply Org screenshot VARIANT.
 VARIANT may be `current' for the existing repo styling baseline,
@@ -52,14 +62,10 @@ Unknown variants fall back to `current'."
        (setq org-modern-star 'replace
              org-modern-label-border 0.2)
        (org-modern-mode 1)))
+    ('current
+     (showcase--apply-current-org-variant))
     (_
-     (setq-local line-spacing 0.2)
-     (when (fboundp 'mixed-pitch-mode)
-       (mixed-pitch-mode 1))
-     (when (fboundp 'org-modern-mode)
-       (setq org-modern-star nil
-             org-modern-label-border 0.1)
-       (org-modern-mode 1)))))
+     (showcase--apply-current-org-variant))))
 
 (defun showcase--show-org (&optional variant)
   "Open the sample org file with Org styling VARIANT."
