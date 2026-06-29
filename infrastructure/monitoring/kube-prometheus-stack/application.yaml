@@ -1,0 +1,137 @@
+# Argo CD Application: kube-prometheus-stack
+#
+# Deploys prometheus-community/kube-prometheus-stack (Prometheus Operator,
+# Prometheus, Alertmanager, Grafana, node-exporter, kube-state-metrics + a
+# curated set of dashboards and alert rules) onto the target cluster.
+#
+# This repo is the NixOS config for some bare-metal hosts; the Kubernetes
+# cluster targeted here is external and NOT managed by NixOS. This file just
+# holds the desired state. Deploy it by pointing Argo CD at this path (an
+# app-of-apps), or apply it directly:
+#
+#   kubectl apply -f infrastructure/monitoring/kube-prometheus-stack/application.yaml
+#
+# Chart:     https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+# Version:   87.3.0  (appVersion / prometheus-operator v0.92.0)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd # where Argo CD watches for Application resources
+  finalizers:
+    # Cascade-delete the chart's resources when this Application is removed.
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default # change if you use a dedicated Argo CD AppProject
+
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 87.3.0
+    helm:
+      releaseName: kube-prometheus-stack
+      # Inline values. Anything cluster-specific (storage class, ingress host,
+      # Grafana admin secret) is left commented -- fill it in for your cluster.
+      valuesObject:
+        # --- Prometheus -------------------------------------------------
+        prometheus:
+          prometheusSpec:
+            retention: 15d
+            # Scrape ServiceMonitors / PodMonitors / PrometheusRules from ALL
+            # namespaces, not just those carrying this release's label.
+            serviceMonitorSelectorNilUsesHelmValues: false
+            podMonitorSelectorNilUsesHelmValues: false
+            ruleSelectorNilUsesHelmValues: false
+            probeSelectorNilUsesHelmValues: false
+            scrapeConfigSelectorNilUsesHelmValues: false
+            resources:
+              requests:
+                cpu: 200m
+                memory: 512Mi
+              limits:
+                memory: 2Gi
+            # Persist the TSDB. Set storageClassName to one that exists on your
+            # cluster; without this Prometheus is ephemeral (data lost on every
+            # pod restart).
+            # storageSpec:
+            #   volumeClaimTemplate:
+            #     spec:
+            #       storageClassName: <your-storage-class>
+            #       accessModes: ["ReadWriteOnce"]
+            #       resources:
+            #         requests:
+            #           storage: 50Gi
+
+        # --- Alertmanager -----------------------------------------------
+        alertmanager:
+          alertmanagerSpec:
+            resources:
+              requests:
+                cpu: 50m
+                memory: 64Mi
+              limits:
+                memory: 128Mi
+            # storage:
+            #   volumeClaimTemplate:
+            #     spec:
+            #       storageClassName: <your-storage-class>
+            #       accessModes: ["ReadWriteOnce"]
+            #       resources:
+            #         requests:
+            #           storage: 5Gi
+
+        # --- Grafana ----------------------------------------------------
+        grafana:
+          enabled: true
+          defaultDashboardsTimezone: browser
+          # SECURITY: the chart default login is admin / prom-operator. Create a
+          # secret and reference it instead of shipping a password in git:
+          #   kubectl -n monitoring create secret generic grafana-admin \
+          #     --from-literal=admin-user=admin \
+          #     --from-literal=admin-password='<strong-password>'
+          # admin:
+          #   existingSecret: grafana-admin
+          #   userKey: admin-user
+          #   passwordKey: admin-password
+          # persistence:
+          #   enabled: true
+          #   storageClassName: <your-storage-class>
+          #   size: 10Gi
+          # ingress:
+          #   enabled: true
+          #   ingressClassName: <your-ingress-class>
+          #   hosts: ["grafana.example.com"]
+          #   tls:
+          #     - secretName: grafana-tls
+          #       hosts: ["grafana.example.com"]
+
+        # --- Control-plane scraping -------------------------------------
+        # On managed clusters (EKS/GKE/AKS) the control plane isn't reachable,
+        # so leaving these enabled produces permanently-firing "TargetDown"
+        # alerts. Disable the ones that don't apply to your cluster.
+        # kubeControllerManager: { enabled: false }
+        # kubeScheduler: { enabled: false }
+        # kubeEtcd: { enabled: false }
+        # kubeProxy: { enabled: false }
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      # Argo CD creates the destination namespace itself.
+      - CreateNamespace=true
+      # The kube-prometheus-stack CRDs are too large for client-side apply (the
+      # last-applied-configuration annotation overflows the 256 KiB limit);
+      # server-side apply avoids that.
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 30s
+        factor: 2
+        maxDuration: 5m

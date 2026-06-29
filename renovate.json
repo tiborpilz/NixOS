@@ -3,6 +3,9 @@
   "extends": ["config:recommended"
   ],
   "nix": { "enabled": true },
+  "argocd": {
+    "fileMatch": ["^infrastructure/.+\\.ya?ml$"]
+  },
   "customManagers": [
     {
       "customType": "regex",
