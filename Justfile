@@ -10,12 +10,12 @@ help:
 # Deploy a server
 deploy server mode="switch":
   NIX_SSHOPTS="-p {{env_var_or_default(uppercase(server) + "_PORT", "22")}}" \
-  nix run nixpkgs#nixos-rebuild -- \
-    {{ if mode == "dry" { "dry-run"} else if mode == "switch" { "switch" } else { error("Unknown Mode") } }} \
-    --flake .#{{server}} \
+  nh os \
+    {{ if mode == "dry" { "build" } else if mode == "switch" { "switch" } else { error("Unknown Mode") } }} \
+    --hostname {{server}} \
     --target-host root@{{env_var(uppercase(server))}} \
     --build-host root@{{env_var(uppercase(server))}} \
-    --fast
+    .
 
 # Switch the home-manager configuration
 homemanager:
