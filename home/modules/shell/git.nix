@@ -57,11 +57,6 @@ in
       "git/ignore_global".source = ../../config/git/ignore_global;
     };
 
-    modules.shell.zsh.fpathDirs = ''
-      ${pkgs.gitAndTools.gh}/share/zsh/site-functions
-      ${pkgs.git-absorb}/share/zsh/site-functions
-    '';
-
     # wtp completion + shell integration (the `wtp cd` navigation hook)
     modules.shell.zsh.rcInit = ''
       eval "$(${pkgs.my.wtp}/bin/wtp shell-init zsh)"

@@ -120,10 +120,6 @@ with mylib;
       ast-grep
     ];
 
-    modules.shell.zsh.fpathDirs = ''
-      ${pkgs.just}/share/zsh/site-functions
-    '';
-
     # Let Home Manager install and manage itself.
     programs.home-manager.enable = true;
 

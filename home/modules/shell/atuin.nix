@@ -18,7 +18,6 @@ in
     };
 
     modules.shell.zsh = {
-      fpathDirs = "${pkgs.atuin}/share/zsh/site-functions";
       rcInit = "eval \"\$(${pkgs.atuin}/bin/atuin init zsh --disable-up-arrow)\"";
     };
   };

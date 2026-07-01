@@ -11,7 +11,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    modules.shell.zsh.fpathDirs = "${pkgs.zoxide}/share/zsh/site-functions";
     home.packages = [ pkgs.zoxide pkgs.fzf ];
   };
 }

@@ -18,7 +18,5 @@ in
       radicle-explorer
     ];
 
-    # Completions
-    modules.shell.zsh.fpathDirs = "${pkgs.unstable.jujutsu}/share/zsh/site-functions";
   };
 }

@@ -16,6 +16,5 @@ in {
     modules.shell.zsh.rcInit = ''
       export PATH="$HOME/.local/share/mise/shims:$PATH"
     '';
-    modules.shell.zsh.fpathDirs = "${pkgs.unstable.mise}/share/zsh/site-functions";
   };
 }
