@@ -34,7 +34,6 @@ let
   commonDeps = with pkgs; [
     git
     nix-zsh-completions
-    node2nix
     cachix
     go-task
     deploy-rs

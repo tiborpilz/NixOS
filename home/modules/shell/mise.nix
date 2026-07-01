@@ -11,7 +11,7 @@ in {
   };
 
   config = mkIf cfg.enable {
-    home.packages = [ pkgs.unstable.mise ];
+    home.packages = [ pkgs.mise ];
     # Static PATH prepend instead of `mise activate --shims` (quicker)
     modules.shell.zsh.rcInit = ''
       export PATH="$HOME/.local/share/mise/shims:$PATH"
