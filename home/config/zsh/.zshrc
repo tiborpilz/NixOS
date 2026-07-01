@@ -113,3 +113,4 @@ source $ZDOTDIR/extra.zshrc
     print
   } | tee -a $ZPROF_LOG ${ZSH_PROFILE:+/dev/stderr} >/dev/null
 }
+
