@@ -76,6 +76,7 @@ in
         root_url  = "https://grafana.${config.modules.services.reverseProxy.hostname}";
         serve_from_sub_path = false;
       };
+      settings.security.secret_key = "$__file{${config.sops.secrets.grafana_secret_key.path}}";
       settings."auth.generic_oauth" = {
         enabled = true;
         name = "Authentik";
