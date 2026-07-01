@@ -34,12 +34,5 @@ in
     
     modules.shell.zsh.aliases.k = "kubectl";
     modules.shell.zsh.aliases.tf = "terraform";
-
-    modules.shell.zsh.fpathDirs = ''
-      ${pkgs.google-cloud-sdk}/share/zsh/site-functions
-      ${pkgs.terraform}/share/zsh/site-functions
-      ${pkgs.kubectl}/share/zsh/site-functions
-      ${pkgs.unstable.terragrunt}/share/zsh/site-functions
-    '';
   };
 }

@@ -72,6 +72,8 @@ export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
 export NIX_PATH=/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
 
 # Load Completions
+fpath=($HOME/.nix-profile/share/zsh/site-functions $fpath)
+
 # Rebuild the compdump at most once a day; otherwise skip the security audit
 # and reuse the cached dump. The `(#q...)` glob qualifier needs extendedglob,
 # which we enable locally inside the anonymous function.
