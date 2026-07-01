@@ -3,10 +3,10 @@
 
   inputs = {
     nixpkgs-24-05.url = "nixpkgs/nixos-24.05";
-    nixpkgs.url = "nixpkgs/nixos-25.05";
+    nixpkgs.url = "nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
-    home-manager.url = "github:nix-community/home-manager/release-25.05";
+    home-manager.url = "github:nix-community/home-manager/release-26.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     plasma-manager.url = "github:nix-community/plasma-manager";
@@ -92,8 +92,14 @@
       rec {
         inherit lib self inputs supportedSystems;
 
-        channels.nixpkgs-unstable.config = { allowUnfree = true; };
-        channels.nixpkgs.config = { allowUnfree = true; };
+        channels.nixpkgs-unstable.config = {
+          allowUnfree = true;
+          permittedInsecurePackages = [ "electron-39.8.10" ];
+        };
+        channels.nixpkgs.config = {
+          allowUnfree = true;
+          permittedInsecurePackages = [ "electron-39.8.10" ];
+        };
 
         hostDefaults = {
           channelName = "nixpkgs";
