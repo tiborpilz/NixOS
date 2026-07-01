@@ -56,6 +56,11 @@ with lib;
       owner = "grafana";
     };
 
+    sops.secrets.grafana_secret_key = {
+      sopsFile = ./secrets/secrets.yaml;
+      owner = "grafana";
+    };
+
     sops.secrets.linkwardenEnv = {
       sopsFile = ./secrets/secrets.yaml;
     };
