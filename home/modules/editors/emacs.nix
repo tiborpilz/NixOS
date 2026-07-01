@@ -68,7 +68,7 @@ in
       pandoc
 
       # Mermaid diagramming
-      nodePackages.mermaid-cli
+      # nodePackages.mermaid-cli
 
       # Copilot
       github-copilot-cli

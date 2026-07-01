@@ -19,21 +19,18 @@ with mylib;
       deno
 
       # Package Managers
-      nodePackages.pnpm
-      nodePackages.yarn
+      # pnpm
+      yarn
 
       # Linting
       # nodePackages.prettier
 
       # Typescript
-      nodePackages.typescript
-      nodePackages.typescript-language-server
-
-      # Vue
-      vue-language-server
+      typescript
+      typescript-language-server
 
       # Astrojs language server
-      nodePackages."@astrojs/language-server"
+      astro-language-server
 
       # Load Testing
       k6

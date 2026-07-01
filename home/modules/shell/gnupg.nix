@@ -38,15 +38,26 @@ in
           '');
     };
 
-    home.file.".gnupg/gpg-agent.conf" = {
-      text = ''
-        default-cache-ttl ${toString cfg.cacheTTL}
-        pinentry-program ${pkgs.pinentry.gtk2}/bin/pinentry
-        enable-ssh-support
-        default-cache-ttl-ssh ${toString cfg.cacheTTL}
-        max-cache-ttl ${toString cfg.maxCacheTTL}
-      '';
-    };
+    home.file.".gnupg/gpg-agent.conf" =
+      let
+        pinentryPkg =
+          if pkgs.stdenv.hostPlatform.isDarwin
+          then pkgs.pinentry_mac
+          else pkgs.pinentry-gtk2;
+        pinentryBin =
+          if pkgs.stdenv.hostPlatform.isDarwin
+          then "${pinentryPkg}/Applications/pinentry-mac.app/Contents/MacOS/pinentry-mac"
+          else "${pinentryPkg}/bin/pinentry";
+      in
+      {
+        text = ''
+          default-cache-ttl ${toString cfg.cacheTTL}
+          pinentry-program ${pinentryBin}
+          enable-ssh-support
+          default-cache-ttl-ssh ${toString cfg.cacheTTL}
+          max-cache-ttl ${toString cfg.maxCacheTTL}
+        '';
+      };
     home.file.".gnupg/scdaemon.conf" = {
       text = ''
         card-timeout 5
