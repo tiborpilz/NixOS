@@ -7,7 +7,7 @@ in {
   config = mkIf config.services.xserver.enable {
     assertions = [
       {
-        assertion = (countAttrs (n: v: n == "enable" && value) cfg) < 2;
+        assertion = (countAttrs (n: v: n == "enable" && v) cfg) < 2;
         message = "Can't have more than one desktop environment enabled at a time";
       }
       {

@@ -64,8 +64,6 @@
         });
       inherit (lib.my) mapModules;
 
-      pkgs = self.pkgs.x86_64-linux.nixpkgs;
-
       nixosHosts = mapModules ./hosts/nixos (hostPath: lib.my.mkHostAttrs hostPath {
         system = "x86_64-linux";
         modules = lib.my.mapModulesRec' (toString ./modules/nixos) import
@@ -148,7 +146,7 @@
 
           devShells = import ./shell.nix { pkgs = channels.nixpkgs; };
 
-          formatter = pkgs.nixpkgs-fmt;
+          formatter = channels.nixpkgs.nixpkgs-fmt;
 
         };
 

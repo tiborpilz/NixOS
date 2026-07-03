@@ -393,8 +393,6 @@ with lib;
       sshDomain = "git.tiborpilz.xyz";
     };
 
-    modules.services.hydra.enable = false;
-
     services.k3s.enable = false;
     services.k3s.role = "server";
     services.k3s.extraFlags = [ ]; # None for now

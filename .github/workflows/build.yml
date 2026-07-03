@@ -29,7 +29,7 @@ jobs:
         nix run github:Mic92/nix-fast-build -- \
           --skip-cached \
           --no-nom \
-          --flake '.#doom-emacs'
+          --flake '.#checks.x86_64-linux.doom-emacs'
 
   # build-linux:
   #   runs-on: ubuntu-latest
@@ -68,7 +68,7 @@ jobs:
   #         --no-nom \
   #        --flake '.#checks.x86_64-linux.${{ matrix.check }}'
 
-  build-enacs-mac:
+  build-emacs-mac:
     runs-on: macos-14
     steps:
     - uses: actions/checkout@v4
@@ -86,4 +86,4 @@ jobs:
         nix run github:Mic92/nix-fast-build -- \
           --skip-cached \
           --no-nom \
-          --flake '.#doom-emacs'
+          --flake '.#checks.aarch64-darwin.doom-emacs'
