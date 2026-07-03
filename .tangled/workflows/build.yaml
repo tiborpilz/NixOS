@@ -7,10 +7,15 @@ engine: "nixery"
 dependencies:
   nixpkgs:
     - coreutils
+    - nix-fast-build
+
+environment:
+  NIX_CONFIG: "sandbox = false"
 
 steps:
   - name: "Emacs"
-    command: nix run github:Mic92/nix-fast-build -- \
-      --skip-cached \
-      --no-nom \
-      --flake '.#checks.x86_64-linux.doom-emacs'
+    command: |
+      nix-fast-build \
+        --skip-cached \
+        --no-nom \
+        --flake '.#checks.x86_64-linux.doom-emacs'
