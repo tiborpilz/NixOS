@@ -9,5 +9,8 @@ dependencies:
     - coreutils
 
 steps:
-  - name: "Hello"
-    command: "echo 'hello world'"
+  - name: "Emacs"
+    command: nix run github:Mic92/nix-fast-build -- \
+      --skip-cached \
+      --no-nom \
+      --flake '.#checks.x86_64-linux.doom-emacs'
