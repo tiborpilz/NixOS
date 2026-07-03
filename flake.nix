@@ -187,13 +187,17 @@
           edge = self.nixosConfigurations.edge.config.system.build.toplevel;
           klaus = self.nixosConfigurations.klaus.config.system.build.toplevel;
           thinkyMcThinkpad = self.nixosConfigurations.thinkyMcThinkpad.config.system.build.toplevel;
+          emacs = self.packages.x86_64-linux.emacsWrapped;
           doom-emacs = self.packages.x86_64-linux.doom-emacs;
+          doom-emacs-standalone = self.packages.x86_64-linux.doom-emacs-standalone;
           testTandoorUpgrade = self.packages.x86_64-linux.testTandoorUpgrade;
           testPaperlessUpgrade = self.packages.x86_64-linux.testPaperlessUpgrade;
         };
         aarch64-darwin = {
           home-tiborpilz = self.homeConfigurations.tiborpilz.activationPackage;
+          emacs = self.packages.aarch64-darwin.emacsWrapped;
           doom-emacs = self.packages.aarch64-darwin.doom-emacs;
+          doom-emacs-standalone = self.packages.aarch64-darwin.doom-emacs-standalone;
         };
       };
     };

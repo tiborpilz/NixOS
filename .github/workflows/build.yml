@@ -26,10 +26,12 @@ jobs:
         name: tiborpilz
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: |
-        nix run github:Mic92/nix-fast-build -- \
-          --skip-cached \
-          --no-nom \
-          --flake '.#checks.x86_64-linux.doom-emacs'
+        for attr in emacs doom-emacs doom-emacs-standalone; do
+          nix run github:Mic92/nix-fast-build -- \
+            --skip-cached \
+            --no-nom \
+            --flake ".#checks.x86_64-linux.$attr"
+        done
 
   # build-linux:
   #   runs-on: ubuntu-latest
@@ -83,7 +85,9 @@ jobs:
         name: tiborpilz
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: |
-        nix run github:Mic92/nix-fast-build -- \
-          --skip-cached \
-          --no-nom \
-          --flake '.#checks.aarch64-darwin.doom-emacs'
+        for attr in emacs doom-emacs doom-emacs-standalone; do
+          nix run github:Mic92/nix-fast-build -- \
+            --skip-cached \
+            --no-nom \
+            --flake ".#checks.aarch64-darwin.$attr"
+        done
