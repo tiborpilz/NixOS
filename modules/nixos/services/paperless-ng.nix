@@ -67,7 +67,7 @@ in
             };
 
             paperless-ngx-webserver.containerConfig = {
-              image = "ghcr.io/paperless-ngx/paperless-ngx:2.16.0";
+              image = "ghcr.io/paperless-ngx/paperless-ngx:2.20.15";
               volumes = [
                 "/var/lib/paperless/data:/usr/src/paperless/data"
                 "/data/media/paperless/media:/usr/src/paperless/media"
