@@ -399,7 +399,6 @@ with lib;
     services.k3s.role = "server";
     services.k3s.extraFlags = [ ]; # None for now
 
-    services.radicle-explorer.enable = false;
     services.radicle.enable = false;
 
     services.vikunja = {

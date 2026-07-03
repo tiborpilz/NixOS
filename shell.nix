@@ -29,7 +29,6 @@ let
     nix-zsh-completions
     cachix
     go-task
-    deploy-rs
     sops
     nh
     just
