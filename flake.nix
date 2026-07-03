@@ -2,7 +2,6 @@
   description = "NixOS and Home-Manager configurations";
 
   inputs = {
-    nixpkgs-24-05.url = "nixpkgs/nixos-24.05";
     nixpkgs.url = "nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
 
@@ -28,12 +27,10 @@
     darwin.url = "github:LnL7/nix-darwin";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
 
-    flake-utils.url = "github:numtide/flake-utils";
     flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
 
     devshell.url = "github:numtide/devshell";
-
-    deploy-rs.url = "github:serokell/deploy-rs";
+    devshell.inputs.nixpkgs.follows = "nixpkgs";
 
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
 
@@ -43,13 +40,9 @@
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3.16.0";
     determinate.inputs.nix.follows = "determinate-nix";
 
-    radicle-explorer.url = "git+https://iris.radicle.xyz/z4V1sjrXqjvFdnCUbxPFqd5p4DtH5.git";
-
     claude-code.url = "github:sadjow/claude-code-nix";
-
-    rio.url = "github:raphamorim/rio/main";
+    claude-code.inputs.nixpkgs.follows = "nixpkgs";
   };
-      # 'aradicle-explorer.inputs.nixpkgs.follows = "nixpkgs-unstable";
 
   outputs =
     { self
@@ -57,11 +50,8 @@
     , nixpkgs-unstable
     , home-manager
     , sops-nix
-    , flake-utils
     , flake-utils-plus
-    , deploy-rs
     , quadlet-nix
-    , radicle-explorer
     , determinate
     , ...
     } @ inputs:
@@ -106,7 +96,6 @@
           modules = [
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
-            radicle-explorer.nixosModules.radicle-explorer
             determinate.nixosModules.default
             quadlet-nix.nixosModules.quadlet
             inputs.disko.nixosModules.disko
@@ -121,8 +110,6 @@
               overlays = [ inputs.emacs-overlay.overlays.default ];
             };
             my = self.packages."${prev.system}";
-            # Keep 24.05 bitwarden-cli as there are some build issues with the new one
-            # bitwarden-cli = inputs.nixpkgs-24-05.legacyPackages.${prev.system}.bitwarden-cli;
             # Temporary fix as I can't switch to 24.11 yet
             ghostscript = nixpkgs-unstable.legacyPackages.${prev.system}.ghostscript;
             # Backport of upstream nixpkgs alias (Feb 2026): drop the FHS-env
@@ -196,15 +183,6 @@
 
         nixosModules = lib.my.mapModulesRec (toString ./modules) import;
       } // {
-      deploy.nodes.klaus = {
-        hostname = "klaus";
-        profiles.system = {
-          user = "root";
-          path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.klaus;
-          remoteBuild = true;
-        };
-      };
-
       checks = {
         x86_64-linux = {
           home-tibor = self.homeConfigurations.tibor.activationPackage;
