@@ -46,7 +46,6 @@ let
     (emacsBase.override {
       withNativeCompilation = true;
     }).overrideAttrs (old: {
-      stdenv = pkgs.ccacheStdenv;
       NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -O3";
     });
 
