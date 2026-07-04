@@ -300,6 +300,7 @@ with lib;
       monitoring.enable = true;
       monitoring.netdata.enable = false;
       linkding.enable = true;
+      matrix.enable = true;
       authentik.enable = true;
       authentik.envFile = config.sops.secrets.authentikEnv.path;
       authentik.applications.paperless = {
@@ -330,6 +331,12 @@ with lib;
         displayName = "Grafana";
         redirectUris = [
           "https://grafana.tiborpilz.xyz/login/generic_oauth"
+        ];
+      };
+      authentik.applications.matrix = {
+        displayName = "Matrix";
+        redirectUris = [
+          "https://matrix.tiborpilz.xyz/_synapse/client/oidc/callback"
         ];
       };
 
