@@ -23,29 +23,14 @@ jobs:
 
       - uses: actions/configure-pages@v5
 
-      - name: Assemble site
+      - uses: cachix/install-nix-action@v30
+
+      - name: Build site
         run: |
+          nix build .#site
           rm -rf _site
-          mkdir -p _site/assets/screenshots
-          cp site/styles.css _site/
-          cp screenshots/output/*.png _site/assets/screenshots/
-
-          {
-            cat README.md
-            echo
-            echo "## Screenshots"
-            for f in screenshots/output/*.png; do
-              name=$(basename "$f" .png)
-              echo
-              echo "![${name}](assets/screenshots/${name}.png)"
-            done
-          } > index.md
-
-          pandoc index.md \
-            --standalone \
-            --metadata pagetitle="tiborpilz/NixOS" \
-            --css styles.css \
-            -o _site/index.html
+          cp -rL result _site
+          chmod -R u+w _site
 
       - uses: actions/upload-pages-artifact@v3
         with:

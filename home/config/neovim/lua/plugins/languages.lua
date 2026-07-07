@@ -418,11 +418,26 @@ return {
         "gleam",
       })
 
-      -- The main branch has no highlight module; start highlighting per buffer
+      -- The main branch has no highlight module; start highlighting per buffer.
+      -- It also has no auto_install option, so install missing parsers on demand.
       vim.api.nvim_create_autocmd("FileType", {
         group = vim.api.nvim_create_augroup("treesitter_highlight", { clear = true }),
         callback = function(args)
-          pcall(vim.treesitter.start, args.buf)
+          local ts = require("nvim-treesitter")
+          local lang = vim.treesitter.language.get_lang(args.match)
+          if not lang then
+            return
+          end
+
+          if vim.tbl_contains(ts.get_installed(), lang) then
+            pcall(vim.treesitter.start, args.buf, lang)
+          elseif vim.tbl_contains(ts.get_available(), lang) then
+            ts.install(lang):await(function()
+              if vim.api.nvim_buf_is_valid(args.buf) then
+                pcall(vim.treesitter.start, args.buf, lang)
+              end
+            end)
+          end
         end,
       })
     end,
