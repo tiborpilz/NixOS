@@ -27,8 +27,25 @@ jobs:
         run: |
           rm -rf _site
           mkdir -p _site/assets/screenshots
-          cp -r site/. _site/
+          cp site/styles.css _site/
           cp screenshots/output/*.png _site/assets/screenshots/
+
+          {
+            cat README.md
+            echo
+            echo "## Screenshots"
+            for f in screenshots/output/*.png; do
+              name=$(basename "$f" .png)
+              echo
+              echo "![${name}](assets/screenshots/${name}.png)"
+            done
+          } > index.md
+
+          pandoc index.md \
+            --standalone \
+            --metadata pagetitle="tiborpilz/NixOS" \
+            --css styles.css \
+            -o _site/index.html
 
       - uses: actions/upload-pages-artifact@v3
         with:
