@@ -433,6 +433,11 @@ return {
             pcall(vim.treesitter.start, args.buf, lang)
           elseif vim.tbl_contains(ts.get_available(), lang) then
             ts.install(lang):await(function()
+              -- query.get memoizes nil lookups made before the install
+              -- finished; clear it or the highlighter attaches queryless
+              pcall(function()
+                vim.treesitter.query.get:clear()
+              end)
               if vim.api.nvim_buf_is_valid(args.buf) then
                 pcall(vim.treesitter.start, args.buf, lang)
               end
