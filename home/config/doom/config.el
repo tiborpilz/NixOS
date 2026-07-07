@@ -330,6 +330,8 @@
 ;; Faster insertion of org structures (i.e. source blocks):1 ends here
 
 ;; [[file:config.org::*Automatic list item insertion][Automatic list item insertion:2]]
+(add-to-list 'native-comp-jit-compilation-deny-list "org-autolist")
+
 (use-package! org-autolist
   :config
   (add-hook 'org-mode-hook #'org-autolist-mode))
@@ -826,6 +828,11 @@
 ;;         (:comments . "link")))
 ;; Some Org-Babel Settings:1 ends here
 
+;; [[file:config.org::*Agda][Agda:1]]
+(add-to-list 'auto-mode-alist '("\\.lagda\\.\\(md\\|org\\|rst\\|tex\\|tree\\|typ\\)\\'" . agda2-mode))
+(modify-coding-system-alist 'file "\\.lagda\\.\\(md\\|org\\|rst\\|tex\\|tree\\|typ\\)\\'" 'utf-8)
+;; Agda:1 ends here
+
 ;; [[file:config.org::*Handling][Handling:1]]
 (setq  corfu-auto-delay 0.1
        corfu-auto-prefix 2
@@ -1003,7 +1010,16 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 ;; [[file:config.org::*Handling][Handling:4]]
 (setq lsp-auto-guess-root t)
-(add-hook 'prog-mode-hook #'lsp-deferred)
+
+(defvar my/lsp-excluded-modes '(agda2-mode)
+  "Major modes in which `lsp-deferred' should not be started.")
+
+(defun my/lsp-deferred-unless-excluded ()
+  "Run `lsp-deferred' unless the buffer's mode is in `my/lsp-excluded-modes'."
+  (unless (apply #'derived-mode-p my/lsp-excluded-modes)
+    (lsp-deferred)))
+
+(add-hook 'prog-mode-hook #'my/lsp-deferred-unless-excluded)
 ;; Handling:4 ends here
 
 ;; [[file:config.org::*UI][UI:1]]
@@ -1298,6 +1314,110 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
     (add-hook 'completion-at-point-functions
               'ob-gptel-capf nil t)))
 ;; Babel evaluation via ob-gptel:2 ends here
+
+;; [[file:config.org::*Babel evaluation via Claude Code][Babel evaluation via Claude Code:1]]
+(defvar ob-claude-code-command "claude"
+  "Command used to invoke the Claude Code CLI.")
+
+(defvar ob-claude-code--sessions (make-hash-table :test #'equal)
+  "Map of :session header values to Claude Code session IDs.")
+
+(defvar org-babel-default-header-args:claude-code
+  '((:results . "replace")
+    (:exports . "both")
+    (:model . nil)
+    (:session . nil)
+    (:tools . nil)
+    (:permission-mode . nil)
+    (:format . "org"))
+  "Default header arguments for claude-code source blocks.")
+
+(defun ob-claude-code--parse-response (output)
+  "Extract (TEXT . SESSION-ID) from OUTPUT, the CLI's JSON reply.
+Falls back to (OUTPUT . nil) when OUTPUT is not valid JSON."
+  (condition-case nil
+      (let ((json (json-parse-string output :object-type 'alist)))
+        (cons (alist-get 'result json) (alist-get 'session_id json)))
+    (error (cons output nil))))
+
+(defun ob-claude-code--finalize (placeholder buffer session fmt stderr-buffer proc _event)
+  "Replace PLACEHOLDER in BUFFER with PROC's reply once it finishes."
+  (when (memq (process-status proc) '(exit signal))
+    (let* ((raw (with-current-buffer (process-buffer proc)
+                  (string-trim (buffer-string))))
+           (success (zerop (process-exit-status proc)))
+           (response (ob-claude-code--parse-response raw))
+           (text (if (stringp (car response)) (car response) raw))
+           (result
+            (cond ((not success)
+                   (format "Claude Code failed (exit %d): %s"
+                           (process-exit-status proc)
+                           (string-trim
+                            (concat raw "\n"
+                                    (with-current-buffer stderr-buffer
+                                      (buffer-string))))))
+                  ((and (equal fmt "org")
+                        (progn (require 'gptel-org nil t)
+                               (fboundp 'gptel--convert-markdown->org)))
+                   (gptel--convert-markdown->org text))
+                  (t text))))
+      (when (and success session (stringp (cdr response)))
+        (puthash session (cdr response) ob-claude-code--sessions))
+      (when (buffer-live-p buffer)
+        (with-current-buffer buffer
+          (save-excursion
+            (save-restriction
+              (widen)
+              (goto-char (point-min))
+              (when (search-forward placeholder nil t)
+                (delete-region (match-beginning 0) (match-end 0))
+                (insert result))))))
+      (kill-buffer (process-buffer proc))
+      (kill-buffer stderr-buffer))))
+
+(defun org-babel-execute:claude-code (body params)
+  "Send BODY to the Claude Code CLI and insert the reply asynchronously."
+  (require 'org-id)
+  (let* ((model (cdr (assq :model params)))
+         (session (cdr (assq :session params)))
+         (session (and session (not (member session '("none" "no" "nil"))) session))
+         (tools (cdr (assq :tools params)))
+         (permission-mode (cdr (assq :permission-mode params)))
+         (fmt (cdr (assq :format params)))
+         (buffer (current-buffer))
+         (placeholder (concat "<claude_code_working_" (org-id-uuid) ">"))
+         (resume-id (and session (gethash session ob-claude-code--sessions)))
+         (command
+          (append (list ob-claude-code-command "-p" "--output-format" "json")
+                  (when model (list "--model" (format "%s" model)))
+                  (when tools (list "--allowedTools" tools))
+                  (when permission-mode (list "--permission-mode" permission-mode))
+                  (when resume-id (list "--resume" resume-id))))
+         (stderr-buffer (generate-new-buffer " *ob-claude-code-stderr*"))
+         (proc (make-process
+                :name "ob-claude-code"
+                :buffer (generate-new-buffer " *ob-claude-code*")
+                :command command
+                :connection-type 'pipe
+                :stderr (make-pipe-process :name "ob-claude-code-stderr"
+                                           :buffer stderr-buffer
+                                           :sentinel #'ignore))))
+    ;; config.el is tangled without a lexical-binding cookie, so the sentinel
+    ;; context is bound via apply-partially instead of a closure.
+    (set-process-sentinel
+     proc (apply-partially #'ob-claude-code--finalize
+                           placeholder buffer session fmt stderr-buffer))
+    (process-send-string proc body)
+    (process-send-eof proc)
+    placeholder))
+
+(defun org-babel-prep-session:claude-code (session _params)
+  "Claude Code conversations are threaded via the :session header argument."
+  session)
+
+(with-eval-after-load 'org-src
+  (add-to-list 'org-src-lang-modes '("claude-code" . text)))
+;; Babel evaluation via Claude Code:1 ends here
 
 ;; [[file:config.org::*MCP][MCP:2]]
 (add-to-list 'exec-path "/usr/local/bin")

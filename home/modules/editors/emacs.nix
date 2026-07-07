@@ -35,6 +35,9 @@ in
           wrapfig amsmath ulem hyperref capt-of etoolbox titlesec;
       })
 
+      # :lang agda (same package as the doom-emacs wrapper so versions match)
+      (agda.withPackages (p: [ p.standard-library ]))
+
       # Haskell language server
       haskell-language-server
 
