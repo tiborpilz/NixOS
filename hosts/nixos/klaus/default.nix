@@ -31,6 +31,12 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
+    # Gluetun-only env file: it must NOT see the legacy PASSWORD variable from
+    # the deluge secret, which gluetun treats as an alias for OPENVPN_PASSWORD.
+    sops.secrets.gluetun = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
     sops.secrets.nextcloud_admin_pass = mkIf config.modules.services.nextcloud.enable {
       owner = "nextcloud";
     };
@@ -132,7 +138,8 @@ with lib;
       powerManagement.enable = true;
       open = false; # The proprietary one is just better :(
       nvidiaSettings = true;
-      package = config.boot.kernelPackages.nvidiaPackages.stable;
+      # GTX 1080 (Pascal) was dropped from the 595+ driver series; it needs the 580.xx legacy branch
+      package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
     };
 
     hardware.nvidia-container-toolkit.enable = true;
@@ -343,7 +350,7 @@ with lib;
       media = {
         deluge = {
           enable = true;
-          credentialsFile = config.sops.secrets.deluge.path;
+          credentialsFile = config.sops.secrets.gluetun.path;
         };
         sonarr.enable = true; # search & download tv shows
         radarr.enable = true; # search & download movies
