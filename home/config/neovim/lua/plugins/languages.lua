@@ -402,39 +402,42 @@ return {
   -- Treesitter
   {
     "nvim-treesitter/nvim-treesitter",
-    branch = "master",
+    branch = "main",
     build = ":TSUpdate",
+    lazy = false,
     config = function()
-      require('nvim-treesitter.configs').setup({
-        modules = {},
-        ignore_install = {},
+      require("nvim-treesitter").install({
+        "typescript",
+        "javascript",
+        "vue",
+        "tsx",
+        "rust",
+        "lua",
+        "vim",
+        "vimdoc",
+        "gleam",
+      })
 
-        ensure_installed = {
-          "typescript",
-          "javascript",
-          "vue",
-          "tsx",
-          "rust",
-          "lua",
-          "vim",
-          "vimdoc",
-          "gleam",
+      -- The main branch has no highlight module; start highlighting per buffer
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("treesitter_highlight", { clear = true }),
+        callback = function(args)
+          pcall(vim.treesitter.start, args.buf)
+        end,
+      })
+    end,
+  },
+  -- Incremental selection (dropped from nvim-treesitter main)
+  {
+    "sustech-data/wildfire.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    config = function()
+      require("wildfire").setup({
+        keymaps = {
+          init_selection = "<A-o>",
+          node_incremental = "<A-o>",
+          node_decremental = "<A-i>",
         },
-
-        sync_install = false,
-        auto_install = true,
-
-        highlight = { enable = true },
-        incremental_selection = {
-          enable = true,
-          keymaps = {
-            init_selection = "<A-o>",
-            node_incremental = "<A-o>",
-            scope_incremental = "<A-O>",
-            node_decremental = "<A-i>",
-          },
-        },
-        textobjects = { enable = true },
       })
     end,
   },
