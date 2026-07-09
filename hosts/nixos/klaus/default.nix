@@ -76,6 +76,11 @@ with lib;
       owner = "woodpecker";
     };
 
+    sops.secrets.tailscale_auth_key = {
+      sopsFile = ./secrets/secrets.yaml;
+      mode = "0400";
+    };
+
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
 
@@ -183,6 +188,13 @@ with lib;
         Restart = "on-failure";
         StateDirectory = "netclient";
       };
+    };
+
+    # Tailscale gives CI access to Klaus that is independent of the
+    # Cloudflare Tunnel.
+    services.tailscale = {
+      enable = true;
+      authKeyFile = config.sops.secrets.tailscale_auth_key.path;
     };
 
     # TODO: rotate github nix access token
