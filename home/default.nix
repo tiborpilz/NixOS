@@ -22,6 +22,7 @@ with mylib;
       # TODO: move fonts to own module
       nerd-fonts.fira-code
       nerd-fonts.hack
+      nerd-fonts.symbols-only # "Symbols Nerd Font Mono", used by nerd-icons in Emacs
       etBook
       dejavu_fonts
 

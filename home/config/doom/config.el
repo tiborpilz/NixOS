@@ -7,7 +7,7 @@
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'normal)
       doom-big-font (font-spec :family "FiraCode Nerd Font" :size 32 :weight 'light)
       doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 16 :weight 'light)
-      doom-variable-pitch-font (font-spec :family "DejaVu Serif" :size 18 :weight 'light))
+      doom-variable-pitch-font (font-spec :family "DejaVu Serif" :size 18))
 ;; Font settings:1 ends here
 
 ;; [[file:config.org::*Line numbers][Line numbers:1]]
@@ -331,6 +331,7 @@
 
 ;; [[file:config.org::*Automatic list item insertion][Automatic list item insertion:2]]
 (add-to-list 'native-comp-jit-compilation-deny-list "org-autolist")
+(add-to-list 'native-comp-jit-compilation-deny-list "evil-escape")
 
 (use-package! org-autolist
   :config
@@ -1230,7 +1231,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; General Padding:2 ends here
 
 ;; [[file:config.org::*General Padding][General Padding:3]]
-(setq spacious-padding-subtle-mode-line t)
+(setq spacious-padding-subtle-mode-line nil)
 ;; General Padding:3 ends here
 
 ;; [[file:config.org::*General Padding][General Padding:4]]
@@ -1238,7 +1239,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; General Padding:4 ends here
 
 ;; [[file:config.org::*Better Error Display][Better Error Display:1]]
-(when (featurep! :checkers syntax +childframe)
+(when (modulep! :checkers syntax +childframe)
   (defun flycheck-posframe-monitor-post-command ()
     (when (not (flycheck-posframe-check-position))
       (posframe-hide flycheck-posframe-buffer)))
