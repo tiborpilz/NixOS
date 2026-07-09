@@ -224,6 +224,10 @@ with lib;
       shell = pkgs.zsh;
     };
 
+    # Deploy key for the deploy workflow (private half is the DEPLOY_SSH_KEY
+    # secret). See docs/deploy-rs.md.
+    users.users.root.openssh.authorizedKeys.keyFiles = [ ./deploy.pub ];
+
     users.users.remotebuild = {
       isSystemUser = true;
       group = "remotebuild";
@@ -274,6 +278,10 @@ with lib;
       hostname = "tiborpilz.xyz";
       localDomain = "klaus.tbr.gg";
       email = "tibor@pilz.berlin";
+
+      # sshd via the tunnel (ssh.tiborpilz.xyz) for deploy-rs, gated by
+      # Cloudflare Access. See docs/deploy-rs.md.
+      ssh.enable = true;
 
       # Uses Cloudflare Tunnel
       # Additionally Secured with Cloudflare Access using authentik as IdP.
