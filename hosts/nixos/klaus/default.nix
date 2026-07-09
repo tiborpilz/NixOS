@@ -296,6 +296,8 @@ with lib;
     };
 
     modules.services = {
+      homepage.enable = true;
+
       linkwarden = {
         enable = true;
         envFile = config.sops.secrets.linkwardenEnv.path;
