@@ -212,7 +212,7 @@
           doom-emacs-standalone = self.packages.x86_64-linux.doom-emacs-standalone;
           testTandoorUpgrade = self.packages.x86_64-linux.testTandoorUpgrade;
           testPaperlessUpgrade = self.packages.x86_64-linux.testPaperlessUpgrade;
-        } // inputs.deploy-rs.lib.x86_64-linux.deployChecks self.deploy;
+        };
         aarch64-darwin = {
           home-tiborpilz = self.homeConfigurations.tiborpilz.activationPackage;
           emacs = self.packages.aarch64-darwin.emacsWrapped;
