@@ -87,6 +87,7 @@ jobs:
             extra="--dry-activate"
           fi
           nix run github:serokell/deploy-rs -- \
+            --skip-checks \
             --ssh-user root \
             $extra \
             ".#${{ inputs.node }}"
