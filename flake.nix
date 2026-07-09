@@ -45,6 +45,9 @@
 
     nixos-wsl.url = "github:nix-community/nixos-wsl/main";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
+
+    deploy-rs.url = "github:serokell/deploy-rs";
+    deploy-rs.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -184,6 +187,26 @@
 
         nixosModules = lib.my.mapModulesRec (toString ./modules) import;
       } // {
+      # deploy-rs nodes. Transport is plain SSH; how we *reach* a node's
+      # hostname (e.g. Klaus's sshd behind a Cloudflare Tunnel) is left to
+      # ~/.ssh/config so the same node works from CI (service token) and from
+      # a laptop (browser auth) without baking a ProxyCommand in here.
+      deploy.nodes.klaus = {
+        hostname = "ssh.tiborpilz.xyz";
+        sshUser = "root";
+        magicRollback = true;
+        # A little slack: activating a config that also touches the tunnel can
+        # briefly drop the confirm connection while cloudflared restarts.
+        confirmTimeout = 60;
+        profiles.system = {
+          user = "root";
+          # Build on the target, mirroring the old `nixos-rebuild --build-host
+          # = klaus` behaviour and keeping the CI runner light.
+          remoteBuild = true;
+          path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.klaus;
+        };
+      };
+
       checks = {
         x86_64-linux = {
           home-tibor = self.homeConfigurations.tibor.activationPackage;
@@ -195,7 +218,7 @@
           doom-emacs-standalone = self.packages.x86_64-linux.doom-emacs-standalone;
           testTandoorUpgrade = self.packages.x86_64-linux.testTandoorUpgrade;
           testPaperlessUpgrade = self.packages.x86_64-linux.testPaperlessUpgrade;
-        };
+        } // inputs.deploy-rs.lib.x86_64-linux.deployChecks self.deploy;
         aarch64-darwin = {
           home-tiborpilz = self.homeConfigurations.tiborpilz.activationPackage;
           emacs = self.packages.aarch64-darwin.emacsWrapped;

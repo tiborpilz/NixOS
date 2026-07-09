@@ -17,6 +17,12 @@ deploy server mode="switch":
     --build-host root@{{env_var(uppercase(server))}} \
     --fast
 
+# Deploy a host with deploy-rs (SSH transport comes from ~/.ssh/config, e.g.
+# a `ProxyCommand cloudflared access ssh --hostname %h` for Klaus). Extra args
+# pass straight through, e.g. `just deploy-rs klaus --dry-activate`.
+deploy-rs node="klaus" *ARGS:
+  nix run github:serokell/deploy-rs -- .#{{node}} {{ARGS}}
+
 # Switch the home-manager configuration
 homemanager:
   nh home switch

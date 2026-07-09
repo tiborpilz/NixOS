@@ -1,0 +1,98 @@
+name: Deploy
+run-name: "Deploy ${{ inputs.node }} (${{ inputs.mode }})"
+
+# Manual-only: run it from the Actions tab ("Deploy" -> "Run workflow").
+on:
+  workflow_dispatch:
+    inputs:
+      node:
+        description: "deploy-rs node to deploy"
+        type: choice
+        options:
+          - klaus
+        default: klaus
+      mode:
+        description: "switch (activate) or dry-activate (build + preview only)"
+        type: choice
+        options:
+          - switch
+          - dry-activate
+        default: switch
+
+# Never let two deploys of the same node overlap.
+concurrency:
+  group: deploy-${{ inputs.node }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v30
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+            download-buffer-size = 524288000
+
+      # Pull pre-built store paths so remote eval/copy stays cheap.
+      - uses: cachix/cachix-action@v15
+        with:
+          name: tiborpilz
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+
+      # Provide cloudflared from nixpkgs rather than pinning a GitHub release
+      # tag: some cloudflared builds (e.g. 2026.6.0) regressed service-token
+      # auth, and this keeps the version tied to the pinned channel.
+      - name: Provision cloudflared
+        id: cfd
+        run: |
+          set -euo pipefail
+          out="$(nix build --no-link --print-out-paths nixpkgs#cloudflared)"
+          echo "bin=${out}/bin/cloudflared" >> "$GITHUB_OUTPUT"
+          "${out}/bin/cloudflared" --version
+
+      # deploy-rs is pure SSH. We reach Klaus's sshd through the Cloudflare
+      # Tunnel: the ProxyCommand runs `cloudflared access ssh`, which
+      # authenticates to Cloudflare Access with the service token (via the
+      # TUNNEL_SERVICE_TOKEN_* env vars) and pipes the SSH stream through the
+      # tunnel. sshd on Klaus then authenticates the deploy key.
+      - name: Configure SSH over Cloudflare Access
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          cat > ~/.ssh/config <<EOF
+          Host ssh.tiborpilz.xyz
+            User root
+            IdentityFile ~/.ssh/deploy_key
+            IdentitiesOnly yes
+            StrictHostKeyChecking accept-new
+            UserKnownHostsFile ~/.ssh/known_hosts
+            ProxyCommand ${{ steps.cfd.outputs.bin }} access ssh --hostname %h
+          EOF
+          chmod 600 ~/.ssh/config
+
+      - name: Deploy with deploy-rs
+        env:
+          # Consumed by the cloudflared ProxyCommand to authenticate to
+          # Cloudflare Access non-interactively.
+          TUNNEL_SERVICE_TOKEN_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          TUNNEL_SERVICE_TOKEN_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          set -euo pipefail
+          extra=""
+          if [ "${{ inputs.mode }}" = "dry-activate" ]; then
+            extra="--dry-activate"
+          fi
+          nix run github:serokell/deploy-rs -- \
+            --ssh-user root \
+            $extra \
+            ".#${{ inputs.node }}"

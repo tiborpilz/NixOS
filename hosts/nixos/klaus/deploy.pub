@@ -1,0 +1,17 @@
+# PLACEHOLDER — replace the contents of this file with the PUBLIC half of the
+# deploy keypair used by .github/workflows/deploy.yml.
+#
+# Generate a dedicated keypair (do NOT reuse a personal key):
+#
+#   ssh-keygen -t ed25519 -C "github-actions-deploy@klaus" -f deploy_key -N ""
+#
+# Then:
+#   * put the contents of deploy_key.pub into THIS file (replacing these lines)
+#   * store the contents of deploy_key (the private key) in the GitHub repo
+#     secret named DEPLOY_SSH_KEY
+#   * delete the local deploy_key / deploy_key.pub afterwards
+#
+# sshd ignores blank lines and lines beginning with '#', so until you replace
+# this file no CI key is trusted by root — the config still evaluates and
+# builds fine. Bootstrap the first switch over the LAN/VPN with
+# `just deploy klaus` so root picks up the real key before deploying from CI.

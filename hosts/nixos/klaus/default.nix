@@ -224,6 +224,11 @@ with lib;
       shell = pkgs.zsh;
     };
 
+    # Public half of the keypair used by the GitHub "Deploy" workflow (its
+    # private half lives in the DEPLOY_SSH_KEY repo secret). deploy-rs connects
+    # as root to run the system activation. See docs/deploy-rs.md.
+    users.users.root.openssh.authorizedKeys.keyFiles = [ ./deploy.pub ];
+
     users.users.remotebuild = {
       isSystemUser = true;
       group = "remotebuild";
@@ -274,6 +279,11 @@ with lib;
       hostname = "tiborpilz.xyz";
       localDomain = "klaus.tbr.gg";
       email = "tibor@pilz.berlin";
+
+      # Expose sshd at ssh.tiborpilz.xyz through the Cloudflare Tunnel so
+      # deploy-rs (and manual SSH) can reach Klaus without the LAN/VPN. Gate it
+      # with a Cloudflare Access application. See docs/deploy-rs.md.
+      ssh.enable = true;
 
       # Uses Cloudflare Tunnel
       # Additionally Secured with Cloudflare Access using authentik as IdP.
