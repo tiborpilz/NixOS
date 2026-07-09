@@ -45,6 +45,9 @@
 
     nixos-wsl.url = "github:nix-community/nixos-wsl/main";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
+
+    deploy-rs.url = "github:serokell/deploy-rs";
+    deploy-rs.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -184,6 +187,20 @@
 
         nixosModules = lib.my.mapModulesRec (toString ./modules) import;
       } // {
+      # "klaus" resolves via ~/.ssh/config to its Netmaker mesh IP (CI maps it
+      # to vars.KLAUS_NETMAKER_IP). See docs/deploy-rs.md.
+      deploy.nodes.klaus = {
+        hostname = "klaus";
+        sshUser = "root";
+        magicRollback = true;
+        profiles.system = {
+          user = "root";
+          # Build on the target (mirrors the old --build-host = klaus).
+          remoteBuild = true;
+          path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.klaus;
+        };
+      };
+
       checks = {
         x86_64-linux = {
           home-tibor = self.homeConfigurations.tibor.activationPackage;
@@ -195,7 +212,7 @@
           doom-emacs-standalone = self.packages.x86_64-linux.doom-emacs-standalone;
           testTandoorUpgrade = self.packages.x86_64-linux.testTandoorUpgrade;
           testPaperlessUpgrade = self.packages.x86_64-linux.testPaperlessUpgrade;
-        };
+        } // inputs.deploy-rs.lib.x86_64-linux.deployChecks self.deploy;
         aarch64-darwin = {
           home-tiborpilz = self.homeConfigurations.tiborpilz.activationPackage;
           emacs = self.packages.aarch64-darwin.emacsWrapped;

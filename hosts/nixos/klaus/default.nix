@@ -224,6 +224,10 @@ with lib;
       shell = pkgs.zsh;
     };
 
+    # Deploy key for the deploy workflow (private half is the DEPLOY_SSH_KEY
+    # secret). See docs/deploy-rs.md.
+    users.users.root.openssh.authorizedKeys.keyFiles = [ ./deploy.pub ];
+
     users.users.remotebuild = {
       isSystemUser = true;
       group = "remotebuild";

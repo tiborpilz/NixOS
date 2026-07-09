@@ -1,0 +1,4 @@
+# Replace with the deploy key's public half. See docs/deploy-rs.md.
+#   ssh-keygen -t ed25519 -C github-actions-deploy@klaus -f deploy_key -N ""
+# deploy_key.pub -> here; deploy_key -> DEPLOY_SSH_KEY secret.
+# sshd ignores '#'/blank lines, so this placeholder trusts no key.
