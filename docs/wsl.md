@@ -34,6 +34,24 @@ You need three things:
 3. **This repo checked out** on that build host, on the branch that contains
    the `wsl` host.
 
+## Skip the build: grab the CI image
+
+The [`Build WSL image`](../.github/workflows/wsl.yml) GitHub Actions workflow
+builds the tarball on every relevant push to `main` (and on manual dispatch) and
+publishes it to a rolling **`wsl-latest`** pre-release. If you just want to run
+it on Windows, download `nixos.wsl` from the release and jump to step 2:
+
+```powershell
+# stable URL, always the newest build off main
+curl.exe -L -o nixos.wsl `
+  https://github.com/tiborpilz/NixOS/releases/download/wsl-latest/nixos.wsl
+wsl --install --from-file nixos.wsl --name NixOS
+```
+
+Every run also uploads the image as a workflow artifact, so older builds stay
+retrievable from the Actions run page. Building it yourself (below) is only
+needed when you want a change that isn't on `main` yet.
+
 ## Install (first time)
 
 A genuine three-step sequence: build → import → launch.
