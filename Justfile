@@ -10,12 +10,16 @@ help:
 # Deploy a server
 deploy server mode="switch":
   NIX_SSHOPTS="-p {{env_var_or_default(uppercase(server) + "_PORT", "22")}}" \
-  nh os \
-    {{ if mode == "dry" { "build" } else if mode == "switch" { "switch" } else { error("Unknown Mode") } }} \
-    --hostname {{server}} \
+  nix run nixpkgs#nixos-rebuild -- \
+    {{ if mode == "dry" { "dry-run"} else if mode == "switch" { "switch" } else { error("Unknown Mode") } }} \
+    --flake .#{{server}} \
     --target-host root@{{env_var(uppercase(server))}} \
     --build-host root@{{env_var(uppercase(server))}} \
-    .
+    --fast
+
+# Deploy a host with deploy-rs (SSH transport from ~/.ssh/config)
+deploy-rs node="klaus" *ARGS:
+  nix run github:serokell/deploy-rs -- .#{{node}} {{ARGS}}
 
 # Switch the home-manager configuration
 homemanager:

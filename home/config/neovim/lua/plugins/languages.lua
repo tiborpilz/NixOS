@@ -402,39 +402,62 @@ return {
   -- Treesitter
   {
     "nvim-treesitter/nvim-treesitter",
-    branch = "master",
+    branch = "main",
     build = ":TSUpdate",
+    lazy = false,
     config = function()
-      require('nvim-treesitter.configs').setup({
-        modules = {},
-        ignore_install = {},
+      require("nvim-treesitter").install({
+        "typescript",
+        "javascript",
+        "vue",
+        "tsx",
+        "rust",
+        "lua",
+        "vim",
+        "vimdoc",
+        "gleam",
+      })
 
-        ensure_installed = {
-          "typescript",
-          "javascript",
-          "vue",
-          "tsx",
-          "rust",
-          "lua",
-          "vim",
-          "vimdoc",
-          "gleam",
+      -- The main branch has no highlight module; start highlighting per buffer.
+      -- It also has no auto_install option, so install missing parsers on demand.
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("treesitter_highlight", { clear = true }),
+        callback = function(args)
+          local ts = require("nvim-treesitter")
+          local lang = vim.treesitter.language.get_lang(args.match)
+          if not lang then
+            return
+          end
+
+          if vim.tbl_contains(ts.get_installed(), lang) then
+            pcall(vim.treesitter.start, args.buf, lang)
+          elseif vim.tbl_contains(ts.get_available(), lang) then
+            ts.install(lang):await(function()
+              -- query.get memoizes nil lookups made before the install
+              -- finished; clear it or the highlighter attaches queryless
+              pcall(function()
+                vim.treesitter.query.get:clear()
+              end)
+              if vim.api.nvim_buf_is_valid(args.buf) then
+                pcall(vim.treesitter.start, args.buf, lang)
+              end
+            end)
+          end
+        end,
+      })
+    end,
+  },
+  -- Incremental selection (dropped from nvim-treesitter main)
+  {
+    "sustech-data/wildfire.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    config = function()
+      require("wildfire").setup({
+        keymaps = {
+          init_selection = "<A-o>",
+          node_incremental = "<A-o>",
+          node_decremental = "<A-i>",
         },
-
-        sync_install = false,
-        auto_install = true,
-
-        highlight = { enable = true },
-        incremental_selection = {
-          enable = true,
-          keymaps = {
-            init_selection = "<A-o>",
-            node_incremental = "<A-o>",
-            scope_incremental = "<A-O>",
-            node_decremental = "<A-i>",
-          },
-        },
-        textobjects = { enable = true },
       })
     end,
   },

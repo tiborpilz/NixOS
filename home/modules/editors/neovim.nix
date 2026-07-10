@@ -15,6 +15,9 @@ in
       unstable.neovim
       unstable.lua52Packages.lua-utils-nvim
 
+      # nvim-treesitter (main branch) needs the tree-sitter CLI to build parsers
+      unstable.tree-sitter
+
       # Necessary for DBUi
       postgresql
     ];

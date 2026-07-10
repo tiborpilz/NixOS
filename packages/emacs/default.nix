@@ -152,6 +152,8 @@ let
       git
       ripgrep
       fd
+      # :lang agda (+local loads agda2-mode via `agda-mode locate`)
+      (agda.withPackages (p: [ p.standard-library ]))
       imagemagick
       pinentry-emacs
       zstd

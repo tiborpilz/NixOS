@@ -17,11 +17,13 @@ A real NixOS system — not a shell layered on Ubuntu. The kernel comes from WSL
 everything above it is your config.
 
 - **Full NixOS** — systemd, declarative, rollback-able
-- **Default user** `tibor` — zsh shell, passwordless sudo
-- **Containers** — Podman, Docker-compatible, daemonless
+- **Default user** `tibor` — passwordless sudo (via the nixos-wsl module)
+- **Home Manager** — enabled, with `graphical = false` (no desktop pulled in)
 - **Caches** — Cachix + garnix already trusted, so rebuilds pull prebuilt paths
 - **Not included** — no bootloader, no X11 (WSL boots it, Windows draws the GUI)
-- **Locale** — en_US + de_DE, Europe/Berlin timezone
+
+The host is intentionally minimal — extend it in `hosts/nixos/wsl/default.nix`
+(enable a service, add packages) exactly like any other host.
 
 ## Before you start
 
@@ -116,13 +118,13 @@ module and your shared modules.
 ```nix
 imports = [ inputs.nixos-wsl.nixosModules.default ];
 
-wsl.enable             = true;
-wsl.defaultUser        = "tibor";
-wsl.startMenuLaunchers = true;   # .desktop apps in the Start menu
+wsl.enable      = true;
+wsl.defaultUser = "tibor";
 
-users.users.tibor.shell      = pkgs.zsh;
-virtualisation.podman.enable  = true;
-system.stateVersion          = "24.05";
+home.enable     = true;
+home.graphical  = false;
+
+system.stateVersion = "26.05";
 ```
 
 Every service module under `modules/nixos/` is still imported but stays off

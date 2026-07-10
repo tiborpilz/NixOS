@@ -31,6 +31,12 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
+    # Gluetun-only env file: it must NOT see the legacy PASSWORD variable from
+    # the deluge secret, which gluetun treats as an alias for OPENVPN_PASSWORD.
+    sops.secrets.gluetun = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
     sops.secrets.nextcloud_admin_pass = mkIf config.modules.services.nextcloud.enable {
       owner = "nextcloud";
     };
@@ -68,6 +74,11 @@ with lib;
     sops.secrets.woodpeckerEnv = {
       sopsFile = ./secrets/secrets.yaml;
       owner = "woodpecker";
+    };
+
+    sops.secrets.tailscale_auth_key = {
+      sopsFile = ./secrets/secrets.yaml;
+      mode = "0400";
     };
 
     boot.loader.systemd-boot.enable = true;
@@ -132,7 +143,8 @@ with lib;
       powerManagement.enable = true;
       open = false; # The proprietary one is just better :(
       nvidiaSettings = true;
-      package = config.boot.kernelPackages.nvidiaPackages.stable;
+      # GTX 1080 (Pascal) was dropped from the 595+ driver series; it needs the 580.xx legacy branch
+      package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
     };
 
     hardware.nvidia-container-toolkit.enable = true;
@@ -178,6 +190,13 @@ with lib;
       };
     };
 
+    # Tailscale gives CI access to Klaus that is independent of the
+    # Cloudflare Tunnel.
+    services.tailscale = {
+      enable = true;
+      authKeyFile = config.sops.secrets.tailscale_auth_key.path;
+    };
+
     # TODO: rotate github nix access token
     # nix.extraOptions = ''
     #   !include ${config.sops.secrets.nixAccessTokens.path}
@@ -216,6 +235,10 @@ with lib;
       isNormalUser = true;
       shell = pkgs.zsh;
     };
+
+    # Deploy key for the deploy workflow (private half is the DEPLOY_SSH_KEY
+    # secret). See docs/deploy-rs.md.
+    users.users.root.openssh.authorizedKeys.keyFiles = [ ./deploy.pub ];
 
     users.users.remotebuild = {
       isSystemUser = true;
@@ -268,6 +291,10 @@ with lib;
       localDomain = "klaus.tbr.gg";
       email = "tibor@pilz.berlin";
 
+      # sshd via the tunnel (ssh.tiborpilz.xyz) for deploy-rs, gated by
+      # Cloudflare Access. See docs/deploy-rs.md.
+      ssh.enable = true;
+
       # Uses Cloudflare Tunnel
       # Additionally Secured with Cloudflare Access using authentik as IdP.
       # (Excluded from Cloudflare Access: Homeassistant, Authentik, Forgejo.
@@ -289,6 +316,8 @@ with lib;
     };
 
     modules.services = {
+      homepage.enable = true;
+
       linkwarden = {
         enable = true;
         envFile = config.sops.secrets.linkwardenEnv.path;
@@ -343,7 +372,7 @@ with lib;
       media = {
         deluge = {
           enable = true;
-          credentialsFile = config.sops.secrets.deluge.path;
+          credentialsFile = config.sops.secrets.gluetun.path;
         };
         sonarr.enable = true; # search & download tv shows
         radarr.enable = true; # search & download movies

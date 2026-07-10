@@ -16,8 +16,12 @@ Set Name and mail adress
 (setq doom-font (font-spec :family "FiraCode Nerd Font" :size 14 :weight 'normal)
       doom-big-font (font-spec :family "FiraCode Nerd Font" :size 32 :weight 'light)
       doom-unicode-font (font-spec :family "FiraCode Nerd Font" :size 16 :weight 'light)
-      doom-variable-pitch-font (font-spec :family "DejaVu Serif" :size 18 :weight 'light))
+      doom-variable-pitch-font (font-spec :family "DejaVu Serif" :size 18))
 #+end_src
+
+DejaVu Serif is only installed in its regular weight - asking for ~:weight
+'light~ makes every frame-wide font resize (~doom/increase-font-size~ and
+friends) fail with "No fonts match", so the weight stays unspecified.
 
 ** Line numbers
 
@@ -612,7 +616,12 @@ newline, etc.
 (package! org-autolist)
 #+end_src
 
+org-autolist.el (unmaintained since 2022) uses a quoted ~condition-case~ handler (~('error ...)~), which the byte compiler in Emacs 32 warns about whenever the file gets JIT native-compiled, i.e. on the first start after every rebuild. The same applies to evil-escape.el, which Doom's evil module pulls in and loads right at startup - that one is the warning that shows up on launch. Denying native compilation for both silences the warnings; the byte-compiled versions are plenty for packages this size. The deny-list entries have to be set before the packages are loaded, hence outside ~:config~.
+
 #+begin_src elisp
+(add-to-list 'native-comp-jit-compilation-deny-list "org-autolist")
+(add-to-list 'native-comp-jit-compilation-deny-list "evil-escape")
+
 (use-package! org-autolist
   :config
   (add-hook 'org-mode-hook #'org-autolist-mode))
@@ -1435,6 +1444,21 @@ Additionally, I want to set up the parameters a bit, no default latex output for
 ;;         (:comments . "link")))
 #+end_src
 
+
+*** Agda
+
+Agda is a dependently typed functional programming language. It is an extension of Martin-Löf’s type theory
+and the latest in the tradition of languages developed in the programming logic group at Chalmers.
+
+The Doom module is enabled as ~(agda +local)~ in [[file:init.el][init.el]], which loads ~agda2-mode~ from the Agda installation itself (via ~agda-mode locate~) instead of a separately pinned MELPA package. That way the elisp always matches the =agda= binary: nix puts ~agda.withPackages~ (including the standard library) on the doom-emacs wrapper's PATH, and the same package is installed via home-manager for shell use.
+
+Agda's emacs mode only registers =.agda= and =.lagda= in ~auto-mode-alist~. For literate programming the other literate variants (markdown, org, reST, TeX, Typst, forester) need to be associated too; they type-check with ~C-c C-l~ just like a plain =.agda= file.
+
+#+begin_src elisp
+(add-to-list 'auto-mode-alist '("\\.lagda\\.\\(md\\|org\\|rst\\|tex\\|tree\\|typ\\)\\'" . agda2-mode))
+(modify-coding-system-alist 'file "\\.lagda\\.\\(md\\|org\\|rst\\|tex\\|tree\\|typ\\)\\'" 'utf-8)
+#+end_src
+
 ** Tools
 *** Code Completion
 
@@ -1720,10 +1744,19 @@ Show completion item kind
 (setq lsp-completion-show-kind t)
 #+end_src
 
-Automatically start LSP on file open, guess root.
+Automatically start LSP on file open, guess root. Some prog-mode derivatives have no LSP server and their own interaction machinery instead (Agda), so those are excluded rather than letting lsp-mode warn about a missing languageId on every file visit.
 #+begin_src elisp
 (setq lsp-auto-guess-root t)
-(add-hook 'prog-mode-hook #'lsp-deferred)
+
+(defvar my/lsp-excluded-modes '(agda2-mode)
+  "Major modes in which `lsp-deferred' should not be started.")
+
+(defun my/lsp-deferred-unless-excluded ()
+  "Run `lsp-deferred' unless the buffer's mode is in `my/lsp-excluded-modes'."
+  (unless (apply #'derived-mode-p my/lsp-excluded-modes)
+    (lsp-deferred)))
+
+(add-hook 'prog-mode-hook #'my/lsp-deferred-unless-excluded)
 #+end_src
 
 **** UI
@@ -2209,13 +2242,12 @@ with the following:
     :scroll-bar-width 12)))
 #+end_src
 
-Furthermore, there's a "subtle mode line setting", Which subdues the modelines a
-bit. There's the possibility to target individual faces of the modelines and
-change them based on whether they're active or not  - but I'm content with just
-setting the modeline to have the window's background color.
+Furthermore, there's a "subtle mode line setting", which subdues the modelines a
+bit - but it draws a thin overline across the top of the modeline, which I
+don't want, so it stays disabled.
 
 #+begin_src elisp
-(setq spacious-padding-subtle-mode-line t)
+(setq spacious-padding-subtle-mode-line nil)
 #+end_src
 
 Now that everything's set up, I'm enabling the mode.
@@ -2234,7 +2266,7 @@ for a while, and does not disappear until you stop moving the cursor.
 This snippet makes it disappear instantly:
 
 #+begin_src elisp
-(when (featurep! :checkers syntax +childframe)
+(when (modulep! :checkers syntax +childframe)
   (defun flycheck-posframe-monitor-post-command ()
     (when (not (flycheck-posframe-check-position))
       (posframe-hide flycheck-posframe-buffer)))
@@ -2381,6 +2413,124 @@ I want the GPTel chat to be an org-mode document per default.
   (defun ob-gptel-install-completions ()
     (add-hook 'completion-at-point-functions
               'ob-gptel-capf nil t)))
+#+end_src
+
+*** Babel evaluation via Claude Code
+
+ob-gptel talks to raw model APIs, but I also want to drive Claude Code from org source blocks: it runs on my subscription (with Fable as the default model), and it brings agentic tools with it, so a block can read or even modify a repo instead of just answering from context. There is no existing babel backend for the Claude CLI, so this is a small hand-rolled one. It pipes the block body to ~claude -p~ and asynchronously replaces a placeholder with the reply, the same pattern ob-gptel uses.
+
+Supported header arguments:
+- ~:dir~ sets the working directory, pointing Claude at a repo (handled by org-babel itself).
+- ~:model~ passes ~--model~; without it, the CLI default applies.
+- ~:session~ threads a conversation across blocks. The CLI mints a new session id on every ~-p~ run, so the JSON output's ~session_id~ is stored under the session name and passed via ~--resume~ on the next block.
+- ~:tools~ passes ~--allowedTools~ (e.g. ~"Bash(git:*),Edit"~).
+- ~:permission-mode~ passes ~--permission-mode~ (e.g. ~acceptEdits~ for blocks that should edit files).
+- ~:format~ is ~org~ by default, converting the markdown reply via gptel's converter; set it to ~markdown~ to keep the raw text.
+
+Agentic blocks can run for a while; a pending block can be cancelled by killing the ~ *ob-claude-code*~ buffer's process. For multi-line prose answers, ~:results raw~ inserts more nicely than the default fixed-width block.
+
+#+begin_src elisp
+(defvar ob-claude-code-command "claude"
+  "Command used to invoke the Claude Code CLI.")
+
+(defvar ob-claude-code--sessions (make-hash-table :test #'equal)
+  "Map of :session header values to Claude Code session IDs.")
+
+(defvar org-babel-default-header-args:claude-code
+  '((:results . "replace")
+    (:exports . "both")
+    (:model . nil)
+    (:session . nil)
+    (:tools . nil)
+    (:permission-mode . nil)
+    (:format . "org"))
+  "Default header arguments for claude-code source blocks.")
+
+(defun ob-claude-code--parse-response (output)
+  "Extract (TEXT . SESSION-ID) from OUTPUT, the CLI's JSON reply.
+Falls back to (OUTPUT . nil) when OUTPUT is not valid JSON."
+  (condition-case nil
+      (let ((json (json-parse-string output :object-type 'alist)))
+        (cons (alist-get 'result json) (alist-get 'session_id json)))
+    (error (cons output nil))))
+
+(defun ob-claude-code--finalize (placeholder buffer session fmt stderr-buffer proc _event)
+  "Replace PLACEHOLDER in BUFFER with PROC's reply once it finishes."
+  (when (memq (process-status proc) '(exit signal))
+    (let* ((raw (with-current-buffer (process-buffer proc)
+                  (string-trim (buffer-string))))
+           (success (zerop (process-exit-status proc)))
+           (response (ob-claude-code--parse-response raw))
+           (text (if (stringp (car response)) (car response) raw))
+           (result
+            (cond ((not success)
+                   (format "Claude Code failed (exit %d): %s"
+                           (process-exit-status proc)
+                           (string-trim
+                            (concat raw "\n"
+                                    (with-current-buffer stderr-buffer
+                                      (buffer-string))))))
+                  ((and (equal fmt "org")
+                        (progn (require 'gptel-org nil t)
+                               (fboundp 'gptel--convert-markdown->org)))
+                   (gptel--convert-markdown->org text))
+                  (t text))))
+      (when (and success session (stringp (cdr response)))
+        (puthash session (cdr response) ob-claude-code--sessions))
+      (when (buffer-live-p buffer)
+        (with-current-buffer buffer
+          (save-excursion
+            (save-restriction
+              (widen)
+              (goto-char (point-min))
+              (when (search-forward placeholder nil t)
+                (delete-region (match-beginning 0) (match-end 0))
+                (insert result))))))
+      (kill-buffer (process-buffer proc))
+      (kill-buffer stderr-buffer))))
+
+(defun org-babel-execute:claude-code (body params)
+  "Send BODY to the Claude Code CLI and insert the reply asynchronously."
+  (require 'org-id)
+  (let* ((model (cdr (assq :model params)))
+         (session (cdr (assq :session params)))
+         (session (and session (not (member session '("none" "no" "nil"))) session))
+         (tools (cdr (assq :tools params)))
+         (permission-mode (cdr (assq :permission-mode params)))
+         (fmt (cdr (assq :format params)))
+         (buffer (current-buffer))
+         (placeholder (concat "<claude_code_working_" (org-id-uuid) ">"))
+         (resume-id (and session (gethash session ob-claude-code--sessions)))
+         (command
+          (append (list ob-claude-code-command "-p" "--output-format" "json")
+                  (when model (list "--model" (format "%s" model)))
+                  (when tools (list "--allowedTools" tools))
+                  (when permission-mode (list "--permission-mode" permission-mode))
+                  (when resume-id (list "--resume" resume-id))))
+         (stderr-buffer (generate-new-buffer " *ob-claude-code-stderr*"))
+         (proc (make-process
+                :name "ob-claude-code"
+                :buffer (generate-new-buffer " *ob-claude-code*")
+                :command command
+                :connection-type 'pipe
+                :stderr (make-pipe-process :name "ob-claude-code-stderr"
+                                           :buffer stderr-buffer
+                                           :sentinel #'ignore))))
+    ;; config.el is tangled without a lexical-binding cookie, so the sentinel
+    ;; context is bound via apply-partially instead of a closure.
+    (set-process-sentinel
+     proc (apply-partially #'ob-claude-code--finalize
+                           placeholder buffer session fmt stderr-buffer))
+    (process-send-string proc body)
+    (process-send-eof proc)
+    placeholder))
+
+(defun org-babel-prep-session:claude-code (session _params)
+  "Claude Code conversations are threaded via the :session header argument."
+  session)
+
+(with-eval-after-load 'org-src
+  (add-to-list 'org-src-lang-modes '("claude-code" . text)))
 #+end_src
 
 *** MCP

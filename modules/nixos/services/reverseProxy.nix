@@ -119,6 +119,20 @@ in
       type = types.str;
       description = "Cloudflare Tunnel ID";
     };
+    ssh = {
+      enable = mkBoolOpt false;
+      subdomain = mkOption {
+        type = types.str;
+        default = "ssh";
+        description = "Subdomain under `hostname` routed to sshd through the tunnel (ssh -> ssh.$hostname). Gate it with Cloudflare Access.";
+        example = "ssh";
+      };
+      port = mkOption {
+        type = types.port;
+        default = 22;
+        description = "Local SSH port the tunnel forwards to.";
+      };
+    };
   };
 
   config = mkIf cfg.enable {
@@ -137,16 +151,27 @@ in
       }
     );
 
-    services.cloudflared = mkIf (cfg.proxies != { }) {
+    services.cloudflared = mkIf (cfg.proxies != { } || cfg.ssh.enable) {
       enable = true;
       tunnels = {
         ${cfg.tunnelId} = {
           credentialsFile = config.sops.secrets.cloudflared.path;
           default = "http_status:404";
           # ingress = mapAttrs' (n: v: nameValuePair "${n}.${cfg.hostname}" "http://${v.targetHost}:${toString v.publicPort}") cfg.proxies;
-          ingress = {
-            "*.${cfg.hostname}" = "http://localhost:80";
-          };
+          #
+          # cloudflared matches ingress top-down, so SSH must precede the
+          # "*.hostname" catch-all. The module emits attrset-valued rules before
+          # string-valued ones, hence SSH as a submodule and the wildcard as a
+          # string.
+          ingress =
+            (optionalAttrs (cfg.proxies != { }) {
+              "*.${cfg.hostname}" = "http://localhost:80";
+            })
+            // (optionalAttrs cfg.ssh.enable {
+              "${cfg.ssh.subdomain}.${cfg.hostname}" = {
+                service = "ssh://localhost:${toString cfg.ssh.port}";
+              };
+            });
         };
       };
     };

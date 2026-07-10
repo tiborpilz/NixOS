@@ -5,7 +5,7 @@ with lib.my;
 let
   delugeConfigDir = "/var/lib/deluge/config";
   delugeDataDir = "/data/downloads/deluge";
-  # envFile = "${delugeConfigDir}/deluge.env";
+  gluetunDataDir = "/var/lib/gluetun";
   publicPort = 8112;
 
   cfg = config.modules.services.media.deluge;
@@ -13,18 +13,21 @@ in
 {
   options.modules.services.media.deluge = {
     enable = mkBoolOpt false;
-    piaCountry = mkOption {
+    autoStart = mkBoolOpt true;
+    serverRegions = mkOption {
       type = types.str;
-      default = "switzerland";
+      default = "Netherlands";
       description = ''
-        The country to connect to.
+        Comma-separated list of PIA regions gluetun may connect to.
+        Must be regions that support port forwarding.
       '';
     };
     credentialsFile = mkOption {
       type = types.nullOr types.str;
       default = null;
       description = ''
-        Path to a sops-encrypted file containing env variables for the VPN connection.
+        Path to a sops-encrypted env file containing OPENVPN_USER and
+        OPENVPN_PASSWORD (PIA account credentials) for gluetun.
       '';
     };
     delugePassword = mkOption {
@@ -40,51 +43,61 @@ in
     system.activationScripts.createDelugeDirs = stringAfter [ "var" ] ''
       mkdir -p ${delugeConfigDir}
       mkdir -p ${delugeDataDir}
+      mkdir -p ${gluetunDataDir}
     '';
 
-    virtualisation.oci-containers.containers.deluge = {
-      image = "binhex/arch-delugevpn";
+    # VPN sidecar.
+    virtualisation.oci-containers.containers.deluge-vpn = {
+      image = "qmcgaw/gluetun:v3.41.1";
+      # All ports for the shared network namespace are published here,
+      # not on the deluge container.
       ports = [
-        "8112:8112"
-        "8118:8118"
-        "9118:9118"
-        "58846:58846"
-        "58946:58946"
-        "58946:58946/udp"
+        "8112:8112" # deluge web UI
+        "58846:58846" # deluge daemon RPC (sonarr/radarr)
       ];
+      volumes = [
+        "${gluetunDataDir}:/gluetun"
+      ];
+      environment = {
+        "VPN_SERVICE_PROVIDER" = "private internet access";
+        "VPN_TYPE" = "openvpn"; # gluetun's PIA support is openvpn-only
+        "SERVER_REGIONS" = cfg.serverRegions;
+        "PRIVATE_INTERNET_ACCESS_OPENVPN_ENCRYPTION_PRESET" = "normal";
+        "VPN_PORT_FORWARDING" = "on";
+        "PORT_FORWARD_ONLY" = "true";
+        # Written to ${gluetunDataDir}/forwarded_port on the host; deluge's
+        # listen port has to be pointed at it for incoming peers.
+        "VPN_PORT_FORWARDING_STATUS_FILE" = "/gluetun/forwarded_port";
+        # Published ports that must accept connections from the LAN
+        # (web UI, daemon RPC).
+        "FIREWALL_INPUT_PORTS" = "8112,58846";
+      };
+      environmentFiles = [
+        cfg.credentialsFile
+      ];
+      extraOptions = [
+        "--cap-add=NET_ADMIN"
+        "--device=/dev/net/tun"
+      ];
+    };
+
+    virtualisation.oci-containers.containers.deluge = {
+      image = "lscr.io/linuxserver/deluge:2.2.0";
+      inherit (cfg) autoStart;
+      dependsOn = [ "deluge-vpn" ];
       volumes = [
         "${delugeDataDir}:/data"
         "${delugeConfigDir}:/config"
         "/etc/localtime:/etc/localtime:ro"
       ];
       environment = {
-        "VPN_ENABLED" = "yes";
-        "VPN_PROV" = "pia";
-        "VPN_CLIENT" = "wireguard";
-        "VPN_REMOTE_SERVER" = "swiss.privacy.network";
-        "ENABLE_STARTUP_SCRIPTS" = "no";
-        "ENABLE_PRIVOXY" = "yes";
-        "STRICT_PORT_FORWARD" = "yes";
-        "USERSPACE_WIREGUARD" = "no";
-        "ENABLE_SOCKS" = "yes";
-        "SOCKS_USER" = "admin";
-        "SOCKS_PASS" = "socks";
-        "LAN_NETWORK" = "192.168.2.0/24";
-        "NAME_SERVERS" = "1.1.1.1,1.0.0.1";
-        "DELUGE_DAEMON_LOG_LEVEL" = "info";
-        "DELUGE_WEB_LOG_LEVEL" = "info";
-        "DELUGE_ENABLE_WEBUI_PASSWORD" = "yes";
-        "DEBUG" = "false";
-        "UMASK" = "000";
         "PUID" = "0";
         "PGID" = "0";
+        "UMASK" = "000";
+        "DELUGE_LOGLEVEL" = "info";
       };
-      environmentFiles = [
-        cfg.credentialsFile
-      ];
       extraOptions = [
-        "--sysctl=net.ipv4.conf.all.src_valid_mark=1"
-        "--privileged=true"
+        "--network=container:deluge-vpn"
       ];
     };
 
