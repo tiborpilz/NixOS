@@ -33,11 +33,17 @@ jobs:
       - uses: actions/checkout@v4
 
       # A full NixOS closure + rootfs tarball needs more than the runner's
-      # default free space.
+      # default free space. Inlined instead of a third-party action so there's
+      # no unpinned dependency to audit.
       - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
+        run: |
+          sudo rm -rf \
+            /usr/share/dotnet \
+            /usr/local/lib/android \
+            /opt/ghc \
+            /usr/local/share/boost || true
+          sudo docker image prune --all --force || true
+          df -h /
 
       - uses: cachix/install-nix-action@v30
         with:
