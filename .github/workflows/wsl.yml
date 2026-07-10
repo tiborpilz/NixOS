@@ -1,0 +1,92 @@
+name: 'Build WSL image'
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish the image to the wsl-latest release'
+        type: boolean
+        default: true
+  push:
+    branches:
+      - main
+    paths:
+      - 'flake.nix'
+      - 'flake.lock'
+      - 'hosts/nixos/wsl/**'
+      - 'modules/nixos/**'
+      - 'modules/shared/**'
+      - '.github/workflows/wsl.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-wsl:
+    runs-on: ubuntu-latest
+    name: build-wsl
+    steps:
+      - uses: actions/checkout@v4
+
+      # A full NixOS closure + rootfs tarball needs more than the runner's
+      # default free space.
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+
+      - uses: cachix/install-nix-action@v30
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            download-buffer-size = 524288000
+            sandbox = false
+            extra-substituters = https://tiborpilz.cachix.org https://nix-community.cachix.org https://cache.garnix.io
+            extra-trusted-public-keys = tiborpilz.cachix.org-1:KyBjAXY8eblxntQ+OG13IjT+M222VxT+25yw1lqnQS4= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g=
+
+      - uses: cachix/cachix-action@v15
+        with:
+          name: tiborpilz
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+
+      # No-op when flake.lock already pins nixos-wsl; adds it if it's missing so
+      # the build never fails on an incomplete lockfile.
+      - name: Ensure flake inputs are locked
+        run: nix flake lock
+
+      - name: Build the WSL rootfs
+        run: |
+          nix build .#nixosConfigurations.wsl.config.system.build.tarballBuilder
+          sudo ./result/bin/nixos-wsl-tarball-builder
+          ls -lh nixos.wsl
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nixos-wsl
+          path: nixos.wsl
+          if-no-files-found: error
+
+      - name: Publish rolling release
+        if: >-
+          github.ref == 'refs/heads/main' &&
+          (github.event_name != 'workflow_dispatch' || inputs.publish)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: wsl-latest
+          name: NixOS-WSL image (latest)
+          prerelease: true
+          files: nixos.wsl
+          body: |
+            Rolling NixOS-WSL rootfs, rebuilt from `${{ github.sha }}`.
+
+            Import on Windows (PowerShell):
+
+                wsl --install --from-file nixos.wsl --name NixOS
+
+            Then manage it in place with `sudo nixos-rebuild switch --flake .#wsl`.
