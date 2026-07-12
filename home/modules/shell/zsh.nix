@@ -40,6 +40,8 @@ in
   config = mkIf cfg.enable {
     programs.zsh = {
       enable = true;
+      # XDG dotDir would collide with the xdg.configFile zsh symlinks below
+      dotDir = config.home.homeDirectory;
     };
 
     home.packages = with pkgs; [
