@@ -170,6 +170,7 @@ with mylib;
     modules.dev.lua.enable = true;
     modules.dev.python.enable = true;
     modules.dev.lean.enable = true;
+    modules.dev.pie.enable = true;
     modules.dev.sage.enable = false;
 
     modules.dev.docker.enable = true;

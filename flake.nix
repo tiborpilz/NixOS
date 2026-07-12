@@ -43,6 +43,13 @@
     claude-code.url = "github:sadjow/claude-code-nix";
     claude-code.inputs.nixpkgs.follows = "nixpkgs";
 
+    # Pie language source (from *The Little Typer*). `flake = false` — the hash
+    # lives in flake.lock, no manual sha256. Built by packages/pie.
+    pie-src = {
+      url = "github:the-little-typer/pie/2c89553a693ac6688b16d722f416914f2e9aa4c3";
+      flake = false;
+    };
+
     nixos-wsl.url = "github:nix-community/nixos-wsl/main";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
 

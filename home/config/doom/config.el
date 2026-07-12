@@ -834,6 +834,34 @@
 (modify-coding-system-alist 'file "\\.lagda\\.\\(md\\|org\\|rst\\|tex\\|tree\\|typ\\)\\'" 'utf-8)
 ;; Agda:1 ends here
 
+;; [[file:config.org::*Pie][Pie:1]]
+(add-to-list 'auto-mode-alist '("\\.pie\\'" . racket-mode))
+;; Pie:1 ends here
+
+;; [[file:config.org::*Pie][Pie:2]]
+(defvar ob-pie-racket "racket"
+  "Command used to run Pie source blocks.
+Defaults to the pie-aware `racket' wrapper from the pie package on PATH.")
+
+(defun org-babel-execute:pie (body _params)
+  "Execute a Pie source block by running BODY through Racket.
+`#lang pie' is prepended unless BODY already declares a language; the
+normal forms Pie prints (and any type-checker error) become the result."
+  (let ((tmp (org-babel-temp-file "pie-" ".pie"))
+        (src (if (string-match-p "\\`[ \t\n]*#lang " body)
+                 body
+               (concat "#lang pie\n" body))))
+    (with-temp-file tmp (insert src))
+    (with-temp-buffer
+      (call-process ob-pie-racket nil t nil tmp)
+      (string-trim (buffer-string)))))
+
+(with-eval-after-load 'org
+  (add-to-list 'org-babel-load-languages '(pie . t)))
+(with-eval-after-load 'org-src
+  (add-to-list 'org-src-lang-modes '("pie" . racket)))
+;; Pie:2 ends here
+
 ;; [[file:config.org::*Handling][Handling:1]]
 (setq  corfu-auto-delay 0.1
        corfu-auto-prefix 2
