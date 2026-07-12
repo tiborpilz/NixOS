@@ -19,6 +19,8 @@ in
 
   config.programs.password-store = mkIf cfg.enable {
     enable = true;
+    # keep the pre-26.05 default since the store already lives here
+    settings = { PASSWORD_STORE_DIR = "$XDG_DATA_HOME/password-store"; };
   };
   config.services.password-store-sync = mkIf (cfg.enable && cfg.enable-sync) {
     enable = true;
