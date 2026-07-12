@@ -1459,6 +1459,40 @@ Agda's emacs mode only registers =.agda= and =.lagda= in ~auto-mode-alist~. For 
 (modify-coding-system-alist 'file "\\.lagda\\.\\(md\\|org\\|rst\\|tex\\|tree\\|typ\\)\\'" 'utf-8)
 #+end_src
 
+*** Pie
+
+Pie is the little dependently typed language from /The Little Typer/, implemented as a Racket ~#lang~. It isn't in nixpkgs, so [[https://github.com/the-little-typer/pie][pie]] is built in-repo by ~packages/pie~ and ~modules.dev.pie~ puts the resulting pie-aware ~racket~ wrapper on PATH — racket-mode's default ~racket-program~ ("racket") resolves to it, so ~racket-run~ (=C-c C-c=) drops a =.pie= buffer straight into a Pie REPL. The Doom module is enabled as ~(racket +xp)~ in [[file:init.el][init.el]]; racket-mode doesn't know the =.pie= extension, so associate it here.
+
+#+begin_src elisp
+(add-to-list 'auto-mode-alist '("\\.pie\\'" . racket-mode))
+#+end_src
+
+Org-Babel can evaluate Pie too: a =#+begin_src pie= block is written to a temporary =#lang pie= file and run through the same pie-aware ~racket~, so the normalized results — or the type checker's complaint — come back inline. There is no upstream ~ob-pie~, so this is a small hand-rolled backend; =C-c '= edits blocks in racket-mode, and a block that already opens with its own ~#lang~ line is run as-is. Registering ~(pie . t)~ keeps Doom's lazy loader from trying to ~require~ a nonexistent ~ob-pie~.
+
+#+begin_src elisp
+(defvar ob-pie-racket "racket"
+  "Command used to run Pie source blocks.
+Defaults to the pie-aware `racket' wrapper from the pie package on PATH.")
+
+(defun org-babel-execute:pie (body _params)
+  "Execute a Pie source block by running BODY through Racket.
+`#lang pie' is prepended unless BODY already declares a language; the
+normal forms Pie prints (and any type-checker error) become the result."
+  (let ((tmp (org-babel-temp-file "pie-" ".pie"))
+        (src (if (string-match-p "\\`[ \t\n]*#lang " body)
+                 body
+               (concat "#lang pie\n" body))))
+    (with-temp-file tmp (insert src))
+    (with-temp-buffer
+      (call-process ob-pie-racket nil t nil tmp)
+      (string-trim (buffer-string)))))
+
+(with-eval-after-load 'org
+  (add-to-list 'org-babel-load-languages '(pie . t)))
+(with-eval-after-load 'org-src
+  (add-to-list 'org-src-lang-modes '("pie" . racket)))
+#+end_src
+
 ** Tools
 *** Code Completion
 

@@ -548,6 +548,23 @@
         "type": "indirect"
       }
     },
+    "pie-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1625681735,
+        "narHash": "sha256-vmkZ4dow+StCoQOVZbk9kkZGKtmoJ07dznFKjuWHc0M=",
+        "owner": "the-little-typer",
+        "repo": "pie",
+        "rev": "2c89553a693ac6688b16d722f416914f2e9aa4c3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "the-little-typer",
+        "repo": "pie",
+        "rev": "2c89553a693ac6688b16d722f416914f2e9aa4c3",
+        "type": "github"
+      }
+    },
     "plasma-manager": {
       "inputs": {
         "home-manager": [
@@ -602,6 +619,7 @@
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-unstable": "nixpkgs-unstable",
+        "pie-src": "pie-src",
         "plasma-manager": "plasma-manager",
         "quadlet-nix": "quadlet-nix",
         "sops-nix": "sops-nix"
