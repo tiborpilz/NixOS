@@ -168,16 +168,38 @@ let
 
   doomEmacsRaw = pkgs.emacsWithDoom doomArgs;
 
-  # Pre-compile all Doom .el files to native code at build time.
-  # The resulting .eln files land in share/emacs/native-lisp/, which Emacs
-  # adds to native-comp-eln-load-path via NIX_PROFILES on startup.
+  # Pre-compile Doom's packages to native code at build time, so they aren't
+  # JIT-compiled on the first Emacs start after every rebuild. That runtime
+  # compilation prints byte-compiler warnings (e.g. deprecated quoted
+  # `condition-case` handlers in lsp-mode, evil-escape, etc.) to the daemon's
+  # stderr, which `native-comp-async-report-warnings-errors' cannot suppress
+  # (it only governs in-Emacs display, not the async child process's stderr).
+  #
+  # We discover the files to compile from the Doom Emacs load-path (the packages
+  # live in a separate propagated store path, so `find ${doomEmacsRaw}` sees
+  # nothing) and skip Emacs's own built-in lisp, which already ships .eln files.
+  # Results go to share/emacs/native-lisp/, which Emacs adds to
+  # native-comp-eln-load-path via NIX_PROFILES on startup. Byte-compiler
+  # warnings stay in the build log instead of surfacing at runtime.
   doomEmacsElnFiles = pkgs.runCommand "doom-emacs-eln" { } ''
+    export HOME=$TMPDIR
     mkdir -p $out/share/emacs/native-lisp
-    find ${doomEmacsRaw} -name '*.el' ! -name '*.dir-locals.el' -print0 | \
-      xargs -0 -n 50 -P $NIX_BUILD_CORES ${doomEmacsRaw}/bin/emacs --batch \
-        --eval "(setq native-compile-target-directory \"$out/share/emacs/native-lisp\")" \
+    ${doomEmacsRaw}/bin/emacs --batch \
+      --eval "(let ((builtin (file-truename (file-name-directory (directory-file-name (file-name-directory (locate-library \"subr\")))))))
+                (dolist (dir (copy-sequence load-path))
+                  (when (and (file-directory-p dir)
+                             (not (string-prefix-p builtin (file-truename dir))))
+                    (dolist (f (directory-files dir t))
+                      (when (and (string-suffix-p \".el\" f)
+                                 (not (string-suffix-p \"-autoloads.el\" f))
+                                 (not (string-suffix-p \"-pkg.el\" f)))
+                        (princ f) (terpri))))))" \
+      > $TMPDIR/doom-el-files.txt
+    < $TMPDIR/doom-el-files.txt xargs -r -d '\n' -n 20 -P $NIX_BUILD_CORES \
+      ${doomEmacsRaw}/bin/emacs --batch \
+        --eval "(push \"$out/share/emacs/native-lisp\" native-comp-eln-load-path)" \
         --eval "(setq native-comp-async-report-warnings-errors 'silent)" \
-        -f batch-native-compile \
+        --eval "(progn (dolist (f command-line-args-left) (ignore-errors (native-compile f))) (setq command-line-args-left nil))" \
       || true
   '';
 

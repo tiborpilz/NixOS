@@ -4,3 +4,5 @@
   signingkey = ~/.ssh/id_liqid.pub
 [author]
   email = tibor.pilz@liqid.de
+[core]
+  sshCommand = "ssh -i ~/.ssh/id_liqid -o IdentitiesOnly=yes"
