@@ -76,6 +76,8 @@
       };
     };
 
+    modules.desktop.keyd.enable = true;
+
     services.libinput = {
       enable = true;
 
