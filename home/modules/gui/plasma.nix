@@ -54,6 +54,18 @@ in
           };
         };
 
+        # Device entries only apply on machines with matching hardware
+        input.touchpads = [
+          {
+            # thinkyMcThinkpad
+            name = "ETPS/2 Elantech Touchpad";
+            vendorId = "0002";
+            productId = "000e";
+            enable = true;
+            naturalScroll = true;
+          }
+        ];
+
         shortcuts = {
           kwin = {
             "Overview" = "Meta+W";
