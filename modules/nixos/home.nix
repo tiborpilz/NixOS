@@ -22,19 +22,19 @@ in
     home-manager.useUserPackages = true;
     home-manager.sharedModules = [
       inputs.plasma-manager.homeModules.plasma-manager
-      inputs.nix-doom-emacs-unstraightened.homeModule
+      # inputs.nix-doom-emacs-unstraightened.homeModule
     ];
     # home-manager.extraSpecialArgs = { inherit lib; };
     home-manager.users.tibor = mkMerge [
-      # inputs.nix-doom-emacs-unstraightened.hmModule
-      # {
-      #   _module.args.inputs = inputs;
-      #   _module.args.lib = lib;
-      #   imports = [ ../../home ];
-      #   home.file = mkAliasDefinitions options.home.file;
-      #   xdg.configFile = mkAliasDefinitions options.home.configFile;
-      #   graphical = cfg.graphical;
-      # }
+      inputs.nix-doom-emacs-unstraightened.hmModule
+      {
+        _module.args.inputs = inputs;
+        _module.args.lib = lib;
+        imports = [ ../../home ];
+        home.file = mkAliasDefinitions options.home.file;
+        xdg.configFile = mkAliasDefinitions options.home.configFile;
+        graphical = cfg.graphical;
+      }
     ];
 
 

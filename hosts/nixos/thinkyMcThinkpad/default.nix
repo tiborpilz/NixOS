@@ -3,7 +3,6 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, ... }:
-
 {
   imports =
     [./hardware-configuration.nix];
@@ -13,19 +12,12 @@
     boot = {
       loader.grub = {
         enable = true;
-        device = "/dev/sda";
-        useOSProber = true;
-        enableCryptodisk=true;
+        device = "nodev";
+        efiSupport = true;
       };
 
-      initrd = {
-        secrets = {
-          "/crypto_keyfile.bin" = null;
-        };
+      loader.efi.canTouchEfiVariables = true;
 
-        luks.devices."luks-105a050d-9c7f-466d-b2af-6a18d7e56b81".keyFile = "/crypto_keyfile.bin";
-      };
- 
       plymouth = {
         enable = true;
         theme = "rings";
@@ -46,22 +38,13 @@
 
       loader.timeout = 0;
     };
-    # Setup keyfile
 
-    # boot.loader.systemd-boot.enable = true;
-    # boot.loader.efi.canTouchEfiVariables = true;
-
-    networking.hostName = "thinkyMcThinkpad"; # Define your hostname.
-
-    # Enable networking
+    networking.hostName = "thinkyMcThinkpad";
     networking.networkmanager.enable = true;
 
-    # Set your time zone.
     time.timeZone = "Europe/Berlin";
 
-    # Select internationalisation properties.
     i18n.defaultLocale = "en_US.UTF-8";
-
     i18n.extraLocaleSettings = {
       LC_ADDRESS = "de_DE.UTF-8";
       LC_IDENTIFICATION = "de_DE.UTF-8";
@@ -101,7 +84,7 @@
       };
 
       touchpad = {
-        naturalScrolling = true;
+        naturalScrolling = false;
         accelProfile = "flat";
       };
     };
@@ -138,6 +121,10 @@
     home.enable = true;
     home.graphical = true;
 
+    services.fprintd.enable = true;
+    services.fprintd.tod.enable = true;
+    services.fprintd.tod.driver = pkgs.libfprint-2-tod1-goodix;
+
     # modules.services.paperless.enable = true;
 
     # List packages installed in system profile. To search, run:
@@ -150,6 +137,7 @@
       gparted
       hdparm
       python3
+      fprintd
     ];
 
     virtualisation = {
@@ -161,6 +149,6 @@
       };
     };
 
-    system.stateVersion = "23.11";
+    system.stateVersion = "26.05";
   };
 }

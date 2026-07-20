@@ -23,8 +23,6 @@ in
         hyprpaper
       ];
 
-      services.mako.enable = true;
-
       programs.wofi = {
         enable = true;
       };

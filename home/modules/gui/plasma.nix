@@ -51,6 +51,40 @@ in
           };
         };
 
+        shortcuts = {
+          kwin = {
+            "Overview" = "Meta+W";
+            "Grid View" = "Meta+G";
+            "Show Desktop" = "Meta+D";
+            "Edit Tiles" = "Meta+T";
+          };
+          plasmashell = {
+            "manage activities" = "Meta+Q";
+            "next activity" = "Meta+A";
+            "previous activity" = "Meta+Shift+A";
+            "show-on-mouse-pos" = "Meta+V"; # clipboard popup
+          };
+          org_kde_powerdevil = {
+            "powerProfile" = [ "Battery" "Meta+B" ];
+          };
+        };
+
+        configFile = {
+          kdeglobals = {
+            General.AccentColor = "104,107,111";
+            KDE.widgetStyle = "Breeze";
+          };
+          kwinrc = {
+            Effect-overview.BorderActivate = 9; # Overview on screen-edge
+            Plugins.slideEnabled = false; # no desktop-slide animation
+          };
+          ksplashrc.KSplash = {
+            Engine = "none";
+            Theme = "None";
+          };
+          kwalletrc.Wallet."First Use" = false;
+        };
+
         panels = [
           {
             location = "top";
@@ -62,7 +96,7 @@ in
               "org.kde.plasma.systemtray"
               "org.kde.plasma.digitalclock"
             ];
-            height = 20;
+            height = 32;
             floating = true;
           }
         ];
