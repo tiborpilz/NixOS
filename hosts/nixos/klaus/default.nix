@@ -389,7 +389,7 @@ with lib;
         };
 
         immich = {
-          immich-version = "v1.132.3";
+          immich-version = "v3.0.3";
           enable = true;
         };
         jellyfin.enable = true;

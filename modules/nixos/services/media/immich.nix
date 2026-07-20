@@ -44,12 +44,13 @@ in
           immich-server.containerConfig = {
             image = "ghcr.io/immich-app/immich-server:${cfg.immich-version}";
             volumes = [
-              "${dataDir}/upload:/usr/src/app/upload"
-              "${photoDir}:/data/media/photos"
+              # media location moved from /usr/src/app/upload to /data in v2.0.0
+              "${dataDir}/upload:/data"
+              # external library must live outside the media location (/data) in v2+
+              "${photoDir}:/external/photos"
               "/etc/localtime:/etc/localtime:ro"
             ];
             environments = {
-              UPLOAD_LOCATION = "./library";
               DB_PASSWORD = cfg.db_password;
               DB_USERNAME = cfg.db_user;
               DB_DATABASE_NAME = cfg.db_name;
@@ -69,16 +70,17 @@ in
           };
 
           immich-redis.containerConfig = {
-            image = "redis:7.4";
+            image = "docker.io/valkey/valkey:8-bookworm";
             pod = pods.immich-pod.ref;
           };
 
           immich-db.containerConfig = {
-            image = "tensorchord/pgvecto-rs:pg14-v0.2.0";
+            image = "ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0";
             environments = {
               POSTGRES_USER = cfg.db_user;
               POSTGRES_PASSWORD = cfg.db_password;
               POSTGRES_DB = cfg.db_name;
+              POSTGRES_INITDB_ARGS = "--data-checksums";
             };
             volumes = [
               "immich-pgdata:/var/lib/postgresql/data"
@@ -90,6 +92,7 @@ in
           publishPorts = [
             "${toString publicPort}:2283"
           ];
+          shmSize = "128m";
         };
       };
 
