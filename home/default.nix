@@ -119,6 +119,8 @@ with mylib;
 
       # AST-aware code search
       ast-grep
+
+      unstable.devenv
     ];
 
     # Let Home Manager install and manage itself.
