@@ -11,6 +11,8 @@ in
   config = mkIf cfg.enable (mkMerge [
     # Hack because we can't be sure that the plasma exists (for instance on darwin)
     (if (hasAttr "plasma" options.programs) then {
+      home.packages = [ pkgs.nordic ];
+
       programs.plasma = {
 
         enable = true;
@@ -18,6 +20,7 @@ in
 
         workspace = {
           lookAndFeel = "org.kde.breezedark.desktop";
+          colorScheme = "Nordic";
           wallpaperPictureOfTheDay = {
             provider = "apod";
           };
@@ -57,6 +60,7 @@ in
             "Grid View" = "Meta+G";
             "Show Desktop" = "Meta+D";
             "Edit Tiles" = "Meta+T";
+            "Window Fullscreen" = "Meta+Ctrl+F";
           };
           plasmashell = {
             "manage activities" = "Meta+Q";
@@ -71,7 +75,6 @@ in
 
         configFile = {
           kdeglobals = {
-            General.AccentColor = "104,107,111";
             KDE.widgetStyle = "Breeze";
           };
           kwinrc = {
@@ -107,6 +110,7 @@ in
       programs.konsole = {
         enable = true;
         profiles.main = {
+          colorScheme = "Nordic";
           extraConfig = {
             General = {
               TerminalMargin = 20;
