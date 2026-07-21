@@ -20,10 +20,8 @@ in
 
         workspace = {
           lookAndFeel = "org.kde.breezedark.desktop";
-          colorScheme = "Nordic";
-          wallpaperPictureOfTheDay = {
-            provider = "apod";
-          };
+          colorScheme = "NordicDarker";
+          wallpaper = "${pkgs.kdePackages.plasma-workspace-wallpapers}/share/wallpapers/Mountain/";
         };
 
         # TODO: move this into its own module
