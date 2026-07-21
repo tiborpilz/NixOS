@@ -27,7 +27,7 @@ homemanager:
 
 # Automatically switch the local configuration based on the system type
 switch:
-  {{ if is_nixos == "true" { "nixos-rebuild switch --flake ." } else { "nh home switch ." } }}
+  {{ if is_nixos == "true" { "sudo nixos-rebuild switch --flake ." } else { "nh home switch ." } }}
 
 # Generate showcase screenshots
 screenshots:
