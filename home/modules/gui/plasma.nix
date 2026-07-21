@@ -38,10 +38,10 @@ in
             }) desktops);
           in
             desktopCommands // {
-              "konsole" = {
-                name = "Open Konsole";
+              "kitty" = {
+                name = "Open Kitty";
                 key = "Meta+Return";
-                command = "konsole";
+                command = "kitty";
               };
             };
 
