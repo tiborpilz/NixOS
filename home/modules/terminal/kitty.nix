@@ -7,6 +7,11 @@ with lib;
 {
   options.modules.terminal.kitty = {
     enable = mkEnableOption "Kitty terminal emulator";
+    fontSize = mkOption {
+      type = types.number;
+      default = 14;
+      description = "Font size for Kitty";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -14,7 +19,7 @@ with lib;
       enable = true;
       font = {
         package = pkgs.nerd-fonts.fira-code;
-        size = 14;
+        size = cfg.fontSize;
         name = "FiraCode Nerd Font Mono";
       };
       themeFile = "Nord";

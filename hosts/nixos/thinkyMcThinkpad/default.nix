@@ -10,30 +10,24 @@
   config = {
     # Bootloader.
     boot = {
-      loader.grub = {
+      loader.systemd-boot = {
         enable = true;
-        device = "nodev";
-        efiSupport = true;
+        configurationLimit = 20;
       };
 
       loader.efi.canTouchEfiVariables = true;
 
       plymouth = {
         enable = true;
-        theme = "rings";
-        themePackages = with pkgs; [
-          (adi1090x-plymouth-themes.override {
-            selected_themes = [ "rings" ];
-          })
-        ];
+        theme = "bgrt"; # firmware vendor logo + spinner, Windows-style
       };
 
       consoleLogLevel = 3;
       initrd.verbose = false;
       kernelParams = [
         "quiet"
-        "udev.logevel=3"
-        "sysemd.show_tatus=auth"
+        "udev.log_level=3"
+        "systemd.show_status=auto"
       ];
 
       loader.timeout = 0;
@@ -122,6 +116,12 @@
     # (./modules/nixos/home.nix)
     home.enable = true;
     home.graphical = true;
+
+    # Smaller terminal font on the laptop screen
+    home-manager.users.tibor.modules.terminal.kitty.fontSize = 12;
+
+    # Firmware updates via LVFS
+    services.fwupd.enable = true;
 
     services.fprintd.enable = true;
     services.fprintd.tod.enable = true;
