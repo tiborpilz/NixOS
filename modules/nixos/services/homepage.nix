@@ -38,6 +38,7 @@ let
       { enable = ms.media.komga.enable; name = "Komga"; sub = "komga"; icon = "komga"; description = "Comics & manga"; }
       { enable = ms.media.calibre.enable; name = "Calibre-Web"; sub = "calibre-web"; icon = "calibre-web"; description = "E-books"; }
       { enable = ms.media.pinchflat.enable; name = "Pinchflat"; sub = "pinchflat"; icon = "pinchflat"; description = "YouTube archiver"; }
+      { enable = ms.media.music-assistant.enable; name = "Music Assistant"; sub = "music-assistant"; icon = "music-assistant"; description = "Music library & players"; }
     ])
 
     (mkGroup "Downloads" [

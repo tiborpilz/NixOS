@@ -393,6 +393,7 @@ with lib;
           enable = true;
         };
         jellyfin.enable = true;
+        music-assistant.enable = true;
       };
     };
 

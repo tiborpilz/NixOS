@@ -98,6 +98,24 @@
       pulse.enable = true;
     };
 
+    # Snapcast client: makes this laptop a playback target for klaus's Music
+    # Assistant / snapserver (192.168.1.51). Runs as a user service and outputs
+    # via PipeWire's pulse server, so it mixes like any other app instead of
+    # grabbing the sound card exclusively. Only runs while tibor is logged in.
+    home-manager.users.tibor.systemd.user.services.snapclient = {
+      Unit = {
+        Description = "Snapcast client (-> klaus)";
+        After = [ "pipewire-pulse.service" ];
+        Wants = [ "pipewire-pulse.service" ];
+      };
+      Service = {
+        ExecStart = "${pkgs.snapcast}/bin/snapclient --host 192.168.1.51 --player pulse";
+        Restart = "always";
+        RestartSec = 5;
+      };
+      Install.WantedBy = [ "default.target" ];
+    };
+
     programs.zsh.enable = true;
 
     # Define a user account. Don't forget to set a password with ‘passwd’.
