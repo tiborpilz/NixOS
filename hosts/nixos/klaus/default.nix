@@ -71,6 +71,11 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
+    # Env file for the LiteLLM voice gateway: DEEPSEEK_API_KEY + LITELLM_MASTER_KEY.
+    sops.secrets.litellmEnv = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
     sops.secrets.woodpeckerEnv = {
       sopsFile = ./secrets/secrets.yaml;
       owner = "woodpecker";
@@ -157,12 +162,6 @@ with lib;
 
     services.openssh.enable = true;
     services.openssh.settings.PermitRootLogin = "yes";
-
-    services.wyoming.faster-whisper.servers.ha = {
-      enable = true;
-      language = "en";
-      uri = "tcp://0.0.0.0:10300";
-    };
 
     programs.zsh.enable = true;
 
@@ -317,6 +316,15 @@ with lib;
 
     modules.services = {
       homepage.enable = true;
+
+      # Fully-local voice assistant compute (Whisper/Piper/openWakeWord/Ollama).
+      # Home Assistant orchestrates these from 192.168.1.175 over the LAN.
+      voice.enable = true;
+      # Cloud conversation agent via LiteLLM (DeepSeek primary, Ollama fallback).
+      voice.gateway = {
+        enable = true;
+        environmentFile = config.sops.secrets.litellmEnv.path;
+      };
 
       linkwarden = {
         enable = true;
