@@ -150,6 +150,15 @@
 ;;         (":PROPERTIES:" . "p")))
 ;; Org-Modern:4 ends here
 
+;; [[file:config.org::*Mathpix.el][Mathpix.el:2]]
+(use-package mathpix.el
+  :straight (:host github :repo "jethrokuan/mathpix.el")
+  :custom ((mathpix-app-id "app-id")
+           (mathpix-app-key "app-key"))
+  :bind
+  ("C-x m" . mathpix-screenshot))
+;; Mathpix.el:2 ends here
+
 ;; [[file:config.org::*Show passed deadlines as error][Show passed deadlines as error:1]]
 (setq org-agenda-deadline-faces
       '((1.001 . error)

@@ -235,6 +235,22 @@ enabling it.
 #+end_src
 
 *** Miscellanious improvements
+**** Mathpix.el
+Convert clips into latex equations
+
+#+begin_src elisp :tangle packages.el
+(package! mathpix.el
+  :straight (:host github :repo "jethrokuan/mathpix.el"))
+#+end_src
+
+#+begin_src elisp
+(use-package mathpix.el
+  :straight (:host github :repo "jethrokuan/mathpix.el")
+  :custom ((mathpix-app-id "app-id")
+           (mathpix-app-key "app-key"))
+  :bind
+  ("C-x m" . mathpix-screenshot))
+#+end_src
 **** Show passed deadlines as error
 
 #+begin_src elisp

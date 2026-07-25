@@ -2,6 +2,11 @@
 (package! org-modern)
 ;; Org-Modern:1 ends here
 
+;; [[file:config.org::*Mathpix.el][Mathpix.el:1]]
+(package! mathpix.el
+  :straight (:host github :repo "jethrokuan/mathpix.el"))
+;; Mathpix.el:1 ends here
+
 ;; [[file:config.org::*Hide ~:PROPERTY:~ Drawers][Hide ~:PROPERTY:~ Drawers:1]]
 (package! org-tidy)
 ;; Hide ~:PROPERTY:~ Drawers:1 ends here
