@@ -43,6 +43,20 @@
     claude-code.url = "github:sadjow/claude-code-nix";
     claude-code.inputs.nixpkgs.follows = "nixpkgs";
 
+    # Claude Desktop (Electron GUI). Anthropic only ships macOS/Windows builds;
+    # this community flake repackages it for Linux. Provides `claude-desktop`
+    # and `claude-desktop-with-fhs` (the latter lets MCP servers shell out to
+    # npx/uvx/docker). Consumed in home/default.nix.
+    # NOTE: do NOT make nixpkgs follow ours. This flake hard-codes
+    # `nodePackages.asar` (pkgs/claude-desktop.nix), and nixpkgs removed the
+    # `nodePackages` set on 2026-03-03 (asar is now top-level). Both our
+    # nixos-26.05 and any current nixpkgs therefore break its eval. Pin its
+    # nixpkgs to the flake author's tested pre-removal rev so it builds against
+    # a tree that still has `nodePackages.asar`. It's an Electron app in an FHS
+    # bwrap sandbox, so a slightly older nixpkgs for it alone is harmless.
+    claude-desktop.url = "github:k3d3/claude-desktop-linux-flake";
+    claude-desktop.inputs.nixpkgs.url = "github:nixos/nixpkgs/6ad174a6dc07c7742fc64005265addf87ad08615";
+
     # Pie language source (from *The Little Typer*). `flake = false` — the hash
     # lives in flake.lock, no manual sha256. Built by packages/pie.
     pie-src = {

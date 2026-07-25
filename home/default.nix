@@ -18,7 +18,7 @@ with mylib;
       fontconfig.enable = true;
     };
 
-    home.packages = with pkgs; [
+    home.packages = (with pkgs; [
       # TODO: move fonts to own module
       nerd-fonts.fira-code
       nerd-fonts.hack
@@ -121,6 +121,10 @@ with mylib;
       ast-grep
 
       unstable.devenv
+    ]) ++ lib.optionals (pkgs.stdenv.isLinux && config.graphical) [
+      # Claude Desktop GUI. Linux-only (community repackage) and graphical-gated.
+      # FHS variant so MCP servers can call npx/uvx/docker.
+      inputs.claude-desktop.packages.${pkgs.stdenv.hostPlatform.system}.claude-desktop-with-fhs
     ];
 
     # Let Home Manager install and manage itself.
