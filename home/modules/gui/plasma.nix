@@ -11,7 +11,7 @@ in
   config = mkIf cfg.enable (mkMerge [
     # Hack because we can't be sure that the plasma exists (for instance on darwin)
     (if (hasAttr "plasma" options.programs) then {
-      home.packages = [ pkgs.nordic ];
+      home.packages = [ pkgs.nordic pkgs.nixos-icons ];
 
       programs.plasma = {
 
@@ -51,6 +51,8 @@ in
             number = 5;
           };
         };
+
+        krunner.position = "center";
 
         # Device entries only apply on machines with matching hardware
         input.touchpads = [
@@ -102,7 +104,9 @@ in
           {
             location = "top";
             widgets = [
-              "org.kde.plasma.kickoff"
+              {
+                kickoff.icon = "nix-snowflake-white";
+              }
               "org.kde.plasma.appmenu"
               "org.kde.plasma.panelspacer"
               "org.kde.plasma.pager"
