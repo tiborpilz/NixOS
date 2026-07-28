@@ -68,7 +68,7 @@ with mylib;
         };
 
         containers.netmaker-server.containerConfig = {
-          image = "docker.io/gravitl/netmaker:v0.26.0";
+          image = "docker.io/gravitl/netmaker:v0.99.0";
           pod = pods.netmaker-pod.ref;
           volumes = [
             "netmaker-data:/root/data"
