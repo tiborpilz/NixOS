@@ -101,12 +101,16 @@ I'm using ~~/org~ as my base directory for org files. (This is then synced acros
 (setq calendar-week-start-day 1) ;; start on monday
 (setq org-agenda-include-diary t)
 
+;; Drop Logseq's backup/recycle dirs - they hold timestamped copies of live
+;; notes (same :ID:) and only bloat the agenda / org-ql / org-id scans.
 (setq org-agenda-files
-      (append
-       (directory-files org-directory t "\\.org\\'")
-       (directory-files-recursively
-        (expand-file-name "roam" org-directory)
-        "\\.org\\'")))
+      (seq-remove
+       (lambda (f) (string-match-p "/logseq/" f))
+       (append
+        (directory-files org-directory t "\\.org\\'")
+        (directory-files-recursively
+         (expand-file-name "roam" org-directory)
+         "\\.org\\'"))))
 #+end_src
 
 ** Visual improvements
@@ -986,13 +990,34 @@ Settings to ensure the query system remains responsive even with large numbers o
 (setq org-roam-file-extensions '("org")
       org-roam-scan-timeout 30)
 
-;; Async refreshing to avoid blocking
-(defun my/async-refresh-org-databases ()
-  "Asynchronously refresh org databases."
-  (run-with-timer 0.5 nil #'my/refresh-org-databases))
+;; Keep Logseq's backup/recycle/version dirs out of the org-roam DB. Each backup
+;; carries the same :ID: as its live note, so indexing them creates stale
+;; duplicate nodes that can win the id and make links resolve to a backup copy.
+;; NB: org-roam matches this against the path *relative to* org-roam-directory,
+;; so the patterns must not start with a slash.
+(after! org-roam
+  (setq org-roam-file-exclude-regexp
+        (append (ensure-list org-roam-file-exclude-regexp)
+                '("logseq/bak/" "logseq/\\.recycle/" "logseq/version-files/"))))
 
-;; Hook into org-roam capture to refresh database
-(add-hook 'org-roam-capture-new-node-hook #'my/async-refresh-org-databases)
+;; Following an id: link whose target isn't already in `org-id-locations' makes
+;; org fall back to `org-id-update-id-locations', a synchronous scan of every
+;; agenda file (~600 here, 30s+ freeze). Populate the table straight from the
+;; org-roam DB instead (~20ms), so roam links always resolve without a scan.
+(defun my/org-id-locations-from-roam-db (&rest _)
+  "Populate `org-id-locations' from the org-roam DB."
+  (when (and (featurep 'org-roam)
+             (bound-and-true-p org-roam-db-location)
+             (file-exists-p org-roam-db-location))
+    (unless (hash-table-p org-id-locations)
+      (setq org-id-locations (make-hash-table :test 'equal)))
+    (dolist (row (org-roam-db-query [:select [id file] :from nodes]))
+      (puthash (car row) (cadr row) org-id-locations))))
+
+;; Refresh after a DB sync, after capturing a node, and once org-roam loads.
+(advice-add 'org-roam-db-sync :after #'my/org-id-locations-from-roam-db)
+(add-hook 'org-roam-capture-new-node-hook #'my/org-id-locations-from-roam-db)
+(with-eval-after-load 'org-roam (my/org-id-locations-from-roam-db))
 #+end_src
 
 
