@@ -151,8 +151,7 @@
 ;; Org-Modern:4 ends here
 
 ;; [[file:config.org::*Mathpix.el][Mathpix.el:2]]
-(use-package mathpix.el
-  :straight (:host github :repo "jethrokuan/mathpix.el")
+(use-package! mathpix
   :custom ((mathpix-app-id "app-id")
            (mathpix-app-key "app-key"))
   :bind

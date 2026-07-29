@@ -3,8 +3,9 @@
 ;; Org-Modern:1 ends here
 
 ;; [[file:config.org::*Mathpix.el][Mathpix.el:1]]
-(package! mathpix.el
-  :straight (:host github :repo "jethrokuan/mathpix.el"))
+(package! mathpix
+  :pin "1ce2d4aa7708271cf60ec929688c1ce420c3fc86"
+  :recipe (:host github :repo "jethrokuan/mathpix.el"))
 ;; Mathpix.el:1 ends here
 
 ;; [[file:config.org::*Hide ~:PROPERTY:~ Drawers][Hide ~:PROPERTY:~ Drawers:1]]
