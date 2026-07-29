@@ -1048,7 +1048,18 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; Keybindings:1 ends here
 
 ;; [[file:config.org::*Syntax Checking][Syntax Checking:1]]
-(setq flycheck-syntax-automatically '(save-mode-enable))
+(when (modulep! :checkers syntax +childframe)
+  (defun flycheck-posframe-monitor-post-command ()
+    (when (not (flycheck-posframe-check-position))
+      (posframe-hide flycheck-posframe-buffer)))
+
+  (defun fix-flycheck-posframe-not-hide-immediately ()
+    (cond (flycheck-posframe-mode
+           (add-hook 'post-command-hook 'flycheck-posframe-monitor-post-command nil t))
+          ((not flycheck-posframe-mode)
+           (remove-hook 'post-command-hook 'flycheck-posframe-monitor-post-command t))))
+  (add-hook! flycheck-posframe-mode #'fix-flycheck-posframe-not-hide-immediately))
+(setq flycheck-check-syntax-automatically '(save mode-enabled))
 ;; Syntax Checking:1 ends here
 
 ;; [[file:config.org::*Performance][Performance:1]]

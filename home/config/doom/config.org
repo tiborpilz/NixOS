@@ -1773,10 +1773,27 @@ session has been created and removing it when the session is terminated.
 #+end_src
 *** Syntax Checking
 For some reason, flycheck - especially when checking web files - is really slow.
-To alleviate, it should only check the syntax on file-save.
+To alleviate, it should only check the syntax on file-save (not on every idle
+keystroke). The previous ~flycheck-syntax-automatically~ setq was a no-op: the
+real variable is ~flycheck-check-syntax-automatically~.
+
+Additionally, the flycheck build ships a built-in ~org-lint~ checker that runs a
+full org-element parse on every check, which makes editing org files laggy - so
+disable it in org buffers.
 
 #+begin_src elisp
-(setq flycheck-syntax-automatically '(save-mode-enable))
+(when (modulep! :checkers syntax +childframe)
+  (defun flycheck-posframe-monitor-post-command ()
+    (when (not (flycheck-posframe-check-position))
+      (posframe-hide flycheck-posframe-buffer)))
+
+  (defun fix-flycheck-posframe-not-hide-immediately ()
+    (cond (flycheck-posframe-mode
+           (add-hook 'post-command-hook 'flycheck-posframe-monitor-post-command nil t))
+          ((not flycheck-posframe-mode)
+           (remove-hook 'post-command-hook 'flycheck-posframe-monitor-post-command t))))
+  (add-hook! flycheck-posframe-mode #'fix-flycheck-posframe-not-hide-immediately))
+(setq flycheck-check-syntax-automatically '(save mode-enabled))
 #+end_src
 
 *** LSP
