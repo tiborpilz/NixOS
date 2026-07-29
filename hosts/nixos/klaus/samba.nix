@@ -9,7 +9,6 @@ in
   services.samba = {
     enable = true;
     openFirewall = true;
-    securityType = "user";
     settings = {
       global = {
         "workgroup" = "WORKGROUP";
@@ -20,8 +19,6 @@ in
         "guest account" = "samba";
         "map to guest" = "bad user";
       };
-    };
-    shares = {
       "media" = {
         path = "/data/media";
         browseable = "yes";
@@ -40,6 +37,17 @@ in
         # "force user" = "smbnix";
         # "force group" = "smbnix";
       };
+      "backups" = {
+        path = "/data/backups/smb";
+        browseable = "yes";
+        "guest ok" = "no";
+        "read only" = "no";
+        "valid users" = "smbbackup";
+        "force user" = "smbbackup";
+        "force group" = "smbbackup";
+        "create mask" = "0660";
+        "directory mask" = "0770";
+      };
     };
   };
   users.users.samba = {
@@ -50,4 +58,38 @@ in
   };
 
   users.groups.samba = { };
+
+  users.users.smbbackup = {
+    uid = 1010;
+    isSystemUser = true;
+    group = "smbbackup";
+  };
+
+  users.groups.smbbackup = { };
+
+  systemd.tmpfiles.rules = [
+    "d /data/backups/smb 0770 smbbackup smbbackup -"
+  ];
+
+  sops.secrets.samba_backups_password = {
+    sopsFile = ./secrets/secrets.yaml;
+    mode = "0400";
+  };
+
+  # The samba module has no declarative passdb, so seed it from the secret.
+  systemd.services.samba-backups-passdb = {
+    description = "Seed samba passdb entry for the backups share";
+    wantedBy = [ "multi-user.target" ];
+    before = [ "samba-smbd.service" ];
+    after = [ "sops-nix.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      pw=$(cat ${config.sops.secrets.samba_backups_password.path})
+      printf '%s\n%s\n' "$pw" "$pw" \
+        | ${pkgs.samba}/bin/smbpasswd -s -a smbbackup
+    '';
+  };
 }
