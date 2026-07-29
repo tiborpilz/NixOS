@@ -4,6 +4,7 @@ with lib;
 let
   cfg = config.modules.gui.plasma;
   mylib = import ../../../lib { inherit inputs lib pkgs; };
+  desktops = [ 1 2 3 4 5 ];
 in
 {
   options.modules.gui.plasma.enable = mylib.mkBoolOpt true;
@@ -24,26 +25,17 @@ in
           wallpaper = "${pkgs.kdePackages.plasma-workspace-wallpapers}/share/wallpapers/Mountain/";
         };
 
-        # TODO: move this into its own module
-        hotkeys.commands =
-          let
-            desktops = [1 2 3 4 5];
-            desktopCommands = listToAttrs (map (d: {
-              name = "desktop-${toString d}";
-              value = {
-                name = "Switch to Desktop ${toString d}";
-                key = "Meta+${toString d}";
-                command = "qdbus org.kde.KWin /KWin setCurrentDesktop ${toString d}";
-              };
-            }) desktops);
-          in
-            desktopCommands // {
-              "kitty" = {
-                name = "Open Kitty";
-                key = "Meta+Return";
-                command = "kitty";
-              };
-            };
+        # Desktop switching (Meta+1..5) is bound to KWin's native action in
+        # shortcuts.kwin below. Command hotkeys launch a process, which makes
+        # KDE show app-startup feedback (spinning cursor + a launch entry), so
+        # they're reserved for actually launching programs.
+        hotkeys.commands = {
+          "kitty" = {
+            name = "Open Kitty";
+            key = "Meta+Return";
+            command = "kitty";
+          };
+        };
 
         kwin = {
           virtualDesktops = {
@@ -73,7 +65,12 @@ in
             "Show Desktop" = "Meta+D";
             "Edit Tiles" = "Meta+T";
             "Window Fullscreen" = "Meta+Ctrl+F";
-          };
+          } // listToAttrs (map
+            (d: {
+              name = "Switch to Desktop ${toString d}";
+              value = "Meta+${toString d}";
+            })
+            desktops);
           plasmashell = {
             "manage activities" = "Meta+Q";
             "next activity" = "Meta+A";
