@@ -85,6 +85,12 @@
       };
     };
 
+    # Enable Smartcard support (YubiKey as GPG/SSH key).
+    # gnupg's scdaemon.conf uses disable-ccid, so it talks to the card via
+    # PC/SC; pcscd must be running for `gpg --card-status` / ssh to work.
+    hardware.gpgSmartcards.enable = true;
+    services.pcscd.enable = true;
+
     # Enable CUPS to print documents.
     services.printing.enable = true;
 
