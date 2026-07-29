@@ -3,8 +3,8 @@ with lib;
 with lib.my;
 
 let
-  # Music Assistant's web UI / API listens on 8095 by default; the audio stream
-  # server (referenced by the upstream module's firewall rules) uses 8097.
+  # Music Assistant's web UI / API listens on 8095; the audio stream server uses
+  # 8097. Host networking means neither needs publishing.
   webPort = 8095;
   cfg = config.modules.services.media.music-assistant;
 in
@@ -12,25 +12,42 @@ in
   options.modules.services.media.music-assistant = {
     enable = mkBoolOpt false;
 
-    providers = mkOption {
-      type = types.listOf types.str;
-      default = [ "chromecast" "dlna" "sonos" "airplay" "snapcast" "spotify" "spotify_connect" "radiobrowser" "tunein" ];
+    image = mkOption {
+      type = types.str;
+      default = "ghcr.io/music-assistant/server:2.9.9";
       description = ''
-        Music Assistant providers to install system dependencies for. Playback
-        targets (Chromecast/DLNA/Sonos/AirPlay) and streaming sources are set up
-        here so they are selectable in the web UI. See
-        `nix eval nixpkgs#music-assistant.providerNames` for the full list.
+        Upstream container rather than nixpkgs' services.music-assistant, which
+        is stuck on 2.8.7. 2.9.x pins torch, torchaudio, librosa and
+        modern_colorthief, so packaging it is not a cheap bump. 2.8.7 also
+        crashes with KeyError 'refresh_token' when Spotify declines to rotate a
+        refresh token, fixed upstream in music-assistant/server#4494.
+      '';
+    };
+
+    dataDir = mkOption {
+      type = types.str;
+      default = "/var/lib/music-assistant";
+      description = ''
+        Bind-mounted at /data, which the image's entrypoint already passes as
+        --data-dir. Must be a real directory: the old native service used
+        DynamicUser, which makes this path a symlink into /var/lib/private.
       '';
     };
   };
 
   config = mkIf cfg.enable {
-    services.music-assistant = {
-      enable = true;
-      # klaus runs with the firewall disabled, but keep this correct so provider
-      # ports (AirPlay etc.) are opened on any host that does use the firewall.
-      openFirewall = true;
-      inherit (cfg) providers;
+    system.activationScripts.initMusicAssistant = stringAfter [ "var" ] ''
+      mkdir -p ${cfg.dataDir}
+    '';
+
+    virtualisation.quadlet.containers.music-assistant.containerConfig = {
+      image = cfg.image;
+      # Players are found over mDNS and the Chromecast/AirPlay providers need
+      # LAN multicast, neither of which crosses a bridge network.
+      networks = [ "host" ];
+      volumes = [
+        "${cfg.dataDir}:/data"
+      ];
     };
 
     modules.services.reverseProxy.proxies.music-assistant = {
