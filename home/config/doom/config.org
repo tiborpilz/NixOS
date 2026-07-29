@@ -239,13 +239,13 @@ enabling it.
 Convert clips into latex equations
 
 #+begin_src elisp :tangle packages.el
-(package! mathpix.el
-  :straight (:host github :repo "jethrokuan/mathpix.el"))
+(package! mathpix
+  :pin "1ce2d4aa7708271cf60ec929688c1ce420c3fc86"
+  :recipe (:host github :repo "jethrokuan/mathpix.el"))
 #+end_src
 
 #+begin_src elisp
-(use-package mathpix.el
-  :straight (:host github :repo "jethrokuan/mathpix.el")
+(use-package! mathpix
   :custom ((mathpix-app-id "app-id")
            (mathpix-app-key "app-key"))
   :bind
