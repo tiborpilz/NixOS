@@ -636,12 +636,9 @@ newline, etc.
 (package! org-autolist)
 #+end_src
 
-org-autolist.el (unmaintained since 2022) uses a quoted ~condition-case~ handler (~('error ...)~), which the byte compiler in Emacs 32 warns about whenever the file gets JIT native-compiled, i.e. on the first start after every rebuild. The same applies to evil-escape.el, which Doom's evil module pulls in and loads right at startup - that one is the warning that shows up on launch. Denying native compilation for both silences the warnings; the byte-compiled versions are plenty for packages this size. The deny-list entries have to be set before the packages are loaded, hence outside ~:config~.
+org-autolist.el (unmaintained since 2022) advises ~org-return~ with a quoted ~condition-case~ handler (~('error ...)~). Doom byte-compiles that advice when lsp-mode probes org at startup, so Emacs 32's byte-compiler prints a deprecation lint to the daemon's stderr. The lint is silenced in ~init.el~ by dropping that one ~byte-compile-warn-x~ message, since it fires during byte-compilation of the advice (not native compilation, so a deny-list does not help).
 
 #+begin_src elisp
-(add-to-list 'native-comp-jit-compilation-deny-list "org-autolist")
-(add-to-list 'native-comp-jit-compilation-deny-list "evil-escape")
-
 (use-package! org-autolist
   :config
   (add-hook 'org-mode-hook #'org-autolist-mode))

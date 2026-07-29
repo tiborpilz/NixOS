@@ -342,9 +342,6 @@
 ;; Faster insertion of org structures (i.e. source blocks):1 ends here
 
 ;; [[file:config.org::*Automatic list item insertion][Automatic list item insertion:2]]
-(add-to-list 'native-comp-jit-compilation-deny-list "org-autolist")
-(add-to-list 'native-comp-jit-compilation-deny-list "evil-escape")
-
 (use-package! org-autolist
   :config
   (add-hook 'org-mode-hook #'org-autolist-mode))

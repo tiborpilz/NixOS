@@ -19,6 +19,18 @@
 ;; (setq native-comp-deferred-compilation t
 ;;       native-comp-async-jobs-number 16)
 
+;; org-autolist (unmaintained) advises `org-return' with a quoted `condition-case'
+;; handler. Doom byte-compiles that advice when lsp-mode probes org at startup,
+;; so Emacs 32's byte-compiler prints the deprecation lint to the daemon's stderr.
+;; Drop just that one lint; every other byte-compiler warning is left intact.
+(advice-add 'byte-compile-warn-x :around
+            (lambda (fn &rest args)
+              (unless (seq-some (lambda (a)
+                                  (and (stringp a)
+                                       (string-match-p "should not be quoted" a)))
+                                args)
+                (apply fn args))))
+
 (doom! :input
        ;;chinese
        ;;japanese
