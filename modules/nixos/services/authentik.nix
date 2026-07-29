@@ -46,13 +46,46 @@ let
           provider: !KeyOf provider-${name}
   '';
 
+  sanitizeName = builtins.replaceStrings [ " " ] [ "-" ];
+
+  # Members are bound declaratively; the referenced users must already exist
+  # (Authentik creates them on first login). This M2M is authoritative, so
+  # members not listed here are removed from the group on the next run.
+  usersYaml = group: lib.optionalString (group.members != [ ]) (
+    "\n      users:\n"
+    + lib.concatMapStringsSep "\n"
+      (u: "        - !Find [authentik_core.user, [username, ${builtins.toJSON u}]]")
+      group.members
+  );
+
+  mkGroupBlueprint = name: group: ''
+    version: 1
+    metadata:
+      name: nixos-group-${sanitizeName name}
+      labels:
+        blueprints.goauthentik.io/instantiate: "true"
+    entries:
+      - id: group-${sanitizeName name}
+        model: authentik_core.group
+        identifiers:
+          name: ${builtins.toJSON name}
+        attrs:
+          is_superuser: ${lib.boolToString group.isSuperuser}${usersYaml group}
+  '';
+
   blueprintsDir = pkgs.runCommand "authentik-blueprints" { } (''
     mkdir -p $out
-  '' + lib.concatStringsSep "\n" (lib.mapAttrsToList (name: app:
-    "cp ${pkgs.writeText "authentik-blueprint-${name}.yaml" (mkBlueprint name app)} $out/${name}.yaml"
-  ) cfg.applications));
+  '' + lib.concatStringsSep "\n" (
+    (lib.mapAttrsToList (name: app:
+      "cp ${pkgs.writeText "authentik-blueprint-${name}.yaml" (mkBlueprint name app)} $out/${name}.yaml"
+    ) cfg.applications)
+    ++ (lib.mapAttrsToList (name: group:
+      "cp ${pkgs.writeText "authentik-group-${sanitizeName name}.yaml" (mkGroupBlueprint name group)} $out/group-${sanitizeName name}.yaml"
+    ) cfg.groups)
+  ));
 
   hasApps = cfg.applications != { };
+  hasBlueprints = cfg.applications != { } || cfg.groups != { };
 in
 with mylib;
 {
@@ -101,6 +134,29 @@ with mylib;
         };
       }));
     };
+    groups = mkOption {
+      default = { };
+      description = ''
+        Authentik groups to declare via blueprint. The attr name is the group
+        name verbatim (may contain spaces). Members are Authentik usernames and
+        must already exist (users are created on first login); on a wiped-DB
+        deploy the binding applies on the next blueprint run after first login.
+      '';
+      type = types.attrsOf (types.submodule {
+        options = {
+          isSuperuser = mkOption {
+            type = types.bool;
+            default = false;
+            description = "Whether members of this group are Authentik superusers.";
+          };
+          members = mkOption {
+            type = types.listOf types.str;
+            default = [ ];
+            description = "Authentik usernames to bind as members of this group.";
+          };
+        };
+      });
+    };
   };
 
   config = lib.mkIf cfg.enable (lib.mkMerge [
@@ -145,7 +201,7 @@ with mylib;
               volumes = [
                 "${cfg.dataDir}/media:/media"
                 "${cfg.dataDir}/custom-templates:/templates"
-              ] ++ lib.optional hasApps "${blueprintsDir}:/blueprints/nixos:ro";
+              ] ++ lib.optional hasBlueprints "${blueprintsDir}:/blueprints/nixos:ro";
               environments = {
                 AUTHENTIK_REDIS__HOST = "localhost";
                 AUTHENTIK_REDIS__PASSWORD = redis_password;
@@ -173,7 +229,7 @@ with mylib;
                 "${cfg.dataDir}/media:/media"
                 "${cfg.dataDir}/custom-templates:/templates"
                 # "${cfg.dataDir}/certs:/certs"
-              ] ++ lib.optional hasApps "${blueprintsDir}:/blueprints/nixos:ro";
+              ] ++ lib.optional hasBlueprints "${blueprintsDir}:/blueprints/nixos:ro";
               environments = {
                 AUTHENTIK_REDIS__HOST = "localhost";
                 AUTHENTIK_REDIS__PASSWORD = redis_password;

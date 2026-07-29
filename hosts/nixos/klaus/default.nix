@@ -369,6 +369,8 @@ with lib;
           "https://grafana.tiborpilz.xyz/login/generic_oauth"
         ];
       };
+      # Grants Grafana org Admin via role_attribute_path in the monitoring module.
+      authentik.groups."Grafana Admins".members = [ "Tibor" ];
 
       nextcloud = {
         enable = false;
