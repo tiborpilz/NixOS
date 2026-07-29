@@ -1017,6 +1017,34 @@ Settings to ensure the query system remains responsive even with large numbers o
 (with-eval-after-load 'org-roam (my/org-id-locations-from-roam-db))
 #+end_src
 
+*** Drop org-lint's invalid-id-link checker
+
+The table above only helps when *following* a link. Displaying a note is a
+separate story: flycheck lints every org buffer it shows, and org-lint's
+=invalid-id-link= checker force-rescans on the first =id:= link it sees, without
+first checking whether that id already resolves:
+
+#+begin_quote
+: (unless id-locations-updated
+:   (org-id-update-id-locations nil t)   ; force
+:   (setq id-locations-updated t))
+#+end_quote
+
+=org-id-update-id-locations= then walks every agenda file, its archives, and
+every org file open in Emacs, =file-truename='s and dedups the lot, and greps
+each one for IDs. Measured here: 43s, independent of the note's size, on the
+~half of my roam notes that contain an =id:= link. Warm switches between
+already-linted buffers are 3-8ms, so this is the entire perceived lag when
+moving between notes.
+
+Removing the checker costs only "Unknown ID" warnings and leaves every other
+org-lint check in place.
+
+#+begin_src elisp
+(after! org-lint
+  (org-lint-remove-checker 'invalid-id-link))
+#+end_src
+
 
 * Workspaces & Projects
 ** Projectile Project Search Path
