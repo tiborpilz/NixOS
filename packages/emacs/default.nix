@@ -211,6 +211,7 @@ let
 
   doomEmacs = pkgs.runCommand "doom-emacs"
     {
+      nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
       pname = "doom-emacs";
       version = doomEmacsRaw.version or "0";
       meta = (doomEmacsRaw.meta or { }) // {
@@ -220,21 +221,43 @@ let
         unwrapped = doomEmacsRaw;
       };
     } ''
-    mkdir -p $out/bin
+    mkdir -p $out/bin $out/share/applications $out/libexec/doom-emacs
     for entry in ${doomEmacsWithNativeComp}/bin/*; do
       name=$(basename "$entry")
       if [ "$name" = "emacs" ]; then
         ln -s "$entry" "$out/bin/doom-emacs"
+      elif [ "$name" = "emacsclient" ]; then
+        makeWrapper "$entry" "$out/bin/emacsclient" \
+          --prefix PATH : "$out/libexec/doom-emacs"
       else
         ln -s "$entry" "$out/bin/$name"
       fi
     done
+    ln -s "$out/bin/doom-emacs" "$out/libexec/doom-emacs/emacs"
     for entry in ${doomEmacsWithNativeComp}/*; do
       name=$(basename "$entry")
-      if [ "$name" != "bin" ]; then
+      if [ "$name" != "bin" ] && [ "$name" != "share" ]; then
         ln -s "$entry" "$out/$name"
       fi
     done
+    for entry in ${doomEmacsWithNativeComp}/share/*; do
+      name=$(basename "$entry")
+      if [ "$name" != "applications" ]; then
+        ln -s "$entry" "$out/share/$name"
+      fi
+    done
+
+    for entry in ${doomEmacsWithNativeComp}/share/applications/*; do
+      substitute "$entry" "$out/share/applications/$(basename "$entry")" \
+        --replace-quiet "Exec=emacs " "Exec=$out/bin/doom-emacs " \
+        --replace-quiet "TryExec=emacs" "TryExec=$out/bin/doom-emacs" \
+        --replace-quiet "${customEmacsPkg}/bin/emacsclient" "$out/bin/emacsclient"
+    done
+
+    if grep -q "${customEmacsPkg}/bin/emacsclient" $out/share/applications/*; then
+      echo "desktop entries still reference the unwrapped emacsclient" >&2
+      exit 1
+    fi
   '';
 in
 {
