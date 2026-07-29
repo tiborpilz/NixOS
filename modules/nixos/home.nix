@@ -20,6 +20,10 @@ in
   config = mkIf cfg.enable {
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
+    # Back up (rather than abort on) any pre-existing unmanaged file that HM
+    # wants to own — e.g. a stale real 10-hm-fonts.conf left by an older
+    # generation. Conflicting files are moved aside to <name>.backup.
+    home-manager.backupFileExtension = "backup";
     home-manager.sharedModules = [
       inputs.plasma-manager.homeModules.plasma-manager
       # inputs.nix-doom-emacs-unstraightened.homeModule
