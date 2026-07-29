@@ -56,6 +56,7 @@ let
       { enable = config.services.vikunja.enable; name = "Vikunja"; sub = "vikunja"; icon = "vikunja"; description = "Tasks & to-dos"; }
       { enable = ms.linkwarden.enable; name = "Linkwarden"; sub = "linkwarden"; icon = "linkwarden"; description = "Bookmarks & archive"; }
       { enable = ms.linkding.enable; name = "Linkding"; sub = "linkding"; icon = "linkding"; description = "Bookmarks"; }
+      { enable = ms.excalidraw.enable; name = "Excalidraw"; sub = "excalidraw"; icon = "excalidraw"; description = "Whiteboard & diagrams"; }
       { enable = ms.syncthing.enable; name = "Syncthing"; sub = "syncthing"; icon = "syncthing"; description = "File sync"; }
     ])
 

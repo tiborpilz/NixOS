@@ -337,6 +337,7 @@ with lib;
       monitoring.enable = true;
       monitoring.netdata.enable = false;
       linkding.enable = true;
+      excalidraw.enable = true;
       authentik.enable = true;
       authentik.envFile = config.sops.secrets.authentikEnv.path;
       authentik.applications.paperless = {
