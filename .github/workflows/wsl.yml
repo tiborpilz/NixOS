@@ -22,24 +22,22 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: write
-
 jobs:
   build-wsl:
     runs-on: ubuntu-latest
     name: build-wsl
+    # Publishes the rootfs to the wsl-latest release.
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
-
-      # A full NixOS closure + rootfs tarball needs more than the runner's
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       # default free space.
       - name: Free disk space
-        uses: jlumbroso/free-disk-space@main
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
           tool-cache: false
 
-      - uses: cachix/install-nix-action@v30
+      - uses: cachix/install-nix-action@08dcb3a5e62fa31e2da3d490afc4176ef55ecd72 # v30
         with:
           nix_path: nixpkgs=channel:nixos-unstable
           extra_nix_config: |
@@ -49,7 +47,7 @@ jobs:
             extra-substituters = https://tiborpilz.cachix.org https://nix-community.cachix.org https://cache.garnix.io
             extra-trusted-public-keys = tiborpilz.cachix.org-1:KyBjAXY8eblxntQ+OG13IjT+M222VxT+25yw1lqnQS4= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g=
 
-      - uses: cachix/cachix-action@v15
+      - uses: cachix/cachix-action@ad2ddac53f961de1989924296a1f236fcfbaa4fc # v15
         with:
           name: tiborpilz
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
@@ -66,7 +64,7 @@ jobs:
           ls -lh nixos.wsl
 
       - name: Upload workflow artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: nixos-wsl
           path: nixos.wsl
@@ -76,7 +74,7 @@ jobs:
         if: >-
           github.ref == 'refs/heads/main' &&
           (github.event_name != 'workflow_dispatch' || inputs.publish)
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
           tag_name: wsl-latest
           name: NixOS-WSL image (latest)

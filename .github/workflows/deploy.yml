@@ -34,10 +34,12 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      - uses: cachix/install-nix-action@v30
+      - uses: cachix/install-nix-action@08dcb3a5e62fa31e2da3d490afc4176ef55ecd72 # v30
         with:
           nix_path: nixpkgs=channel:nixos-unstable
           extra_nix_config: |
@@ -46,7 +48,7 @@ jobs:
             download-buffer-size = 524288000
 
       # Pull pre-built store paths so remote eval/copy stays cheap.
-      - uses: cachix/cachix-action@v15
+      - uses: cachix/cachix-action@ad2ddac53f961de1989924296a1f236fcfbaa4fc # v15
         with:
           name: tiborpilz
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
@@ -67,7 +69,7 @@ jobs:
       # already be on the tailnet (services.tailscale on Klaus). See docs/deploy-rs.md.
       - name: Connect to Tailscale
         if: inputs.transport == 'tailscale'
-        uses: tailscale/github-action@v3
+        uses: tailscale/github-action@6cae46e2d796f265265cfcf628b72a32b4d7cade # v3.3.0
         with:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
