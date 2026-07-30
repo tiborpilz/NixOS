@@ -463,8 +463,6 @@ emit plain ~<text>~/~<tspan>~ nodes instead. See [[https://github.com/mermaid-js
                         (or (getenv "XDG_CONFIG_HOME") "~/.config")))
 #+end_src
 
-**** TODO All mermaid diagrams have a white background
-
 ** Roam
 
 Org-Roam is a Zettelkasten implementation. In short, it allows for writing down multiple small notes and interlinking them,

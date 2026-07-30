@@ -122,9 +122,9 @@ with mylib;
 
       unstable.devenv
     ]) ++ lib.optionals (pkgs.stdenv.isLinux && config.graphical) [
-      # Claude Desktop GUI. Linux-only (community repackage) and graphical-gated.
-      # FHS variant so MCP servers can call npx/uvx/docker.
-      inputs.claude-desktop.packages.${pkgs.stdenv.hostPlatform.system}.claude-desktop-with-fhs
+      # Claude Desktop GUI. Linux-only and graphical-gated. Repackaged in-repo
+      # from Anthropic's official .deb; see packages/claude-desktop.
+      pkgs.my.claude-desktop
     ];
 
     # Let Home Manager install and manage itself.

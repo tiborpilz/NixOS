@@ -3,6 +3,21 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, ... }:
+let
+  mountainWallpaper =
+    "${pkgs.kdePackages.plasma-workspace-wallpapers}/share/wallpapers/Mountain/contents/images/5120x2880.png";
+
+  sddmMountainTheme = pkgs.runCommand "sddm-breeze-mountain" { } ''
+    mkdir -p $out/share/sddm/themes
+    cp -r ${pkgs.kdePackages.plasma-desktop}/share/sddm/themes/breeze \
+      $out/share/sddm/themes/breeze-mountain
+    chmod -R u+w $out/share/sddm/themes/breeze-mountain
+
+    conf=$out/share/sddm/themes/breeze-mountain/theme.conf
+    grep -q '^background=' $conf
+    sed -i "s|^background=.*|background=${mountainWallpaper}|" $conf
+  '';
+in
 {
   imports =
     [./hardware-configuration.nix];
@@ -52,7 +67,10 @@
     };
 
 
-    services.displayManager.sddm.enable = true;
+    services.displayManager.sddm = {
+      enable = true;
+      theme = "breeze-mountain";
+    };
     services.desktopManager.plasma6.enable = true;
 
     programs.hyprland.enable = true;
@@ -164,6 +182,7 @@
       hdparm
       python3
       fprintd
+      sddmMountainTheme
     ];
 
     virtualisation = {
