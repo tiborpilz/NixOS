@@ -47,6 +47,9 @@
 , libxrandr
 , libxscrnsaver
 , libxtst
+  # The Claude Code CLI the desktop's Code panel drives. See
+  # CLAUDE_CODE_LOCAL_BINARY in preFixup.
+, claude-code
   # Runtime helpers put on the app's PATH. Claude Code runs inside the desktop
   # app and shells out to these; MCP servers commonly need npx/uvx/docker.
 , bash
@@ -179,9 +182,20 @@ stdenv.mkDerivation {
     # "Could not dlopen native EGL" and falls back to software rendering.
     # libglvnd supplies the dispatch library; driverLink (/run/opengl-driver/lib)
     # supplies the actual vendor driver it dispatches to.
+    #
+    # CLAUDE_CODE_LOCAL_BINARY: the Code panel otherwise downloads its own
+    # pinned CLI to ~/.config/Claude/claude-code/<ver>/claude, which is a
+    # generic glibc ELF asking for /lib64/ld-linux-x86-64.so.2 and so cannot
+    # exec on NixOS - the panel just fails to start. Point it at our packaged
+    # CLI instead ("[CCD] LOCAL OVERRIDE" in ~/.config/Claude/logs/main.log).
+    # --set-default so it stays overridable from the environment. This does
+    # mean the app no longer manages its own CLI version: keep claude-code at
+    # or above the version the app pins, or newer desktop features that gate on
+    # a CLI capability will quietly stay off.
     makeWrapper $out/lib/claude-desktop/claude-desktop $out/bin/claude-desktop \
       "''${gappsWrapperArgs[@]}" \
       --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ libglvnd ]}:${addDriverRunpath.driverLink}/lib \
+      --set-default CLAUDE_CODE_LOCAL_BINARY ${lib.getExe claude-code} \
       --suffix PATH : ${lib.makeBinPath [ bash coreutils git nodejs ripgrep uv docker qemu xdg-utils ]}
   '';
 

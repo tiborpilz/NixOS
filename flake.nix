@@ -43,8 +43,6 @@
     claude-code.url = "github:sadjow/claude-code-nix";
     claude-code.inputs.nixpkgs.follows = "nixpkgs";
 
-    # Pie language source (from *The Little Typer*). `flake = false` — the hash
-    # lives in flake.lock, no manual sha256. Built by packages/pie.
     pie-src = {
       url = "github:the-little-typer/pie/2c89553a693ac6688b16d722f416914f2e9aa4c3";
       flake = false;
@@ -93,10 +91,7 @@
       rec {
         inherit lib self inputs supportedSystems;
 
-        # electron-39.8.10 is pulled in by `logseq` (home/default.nix), which is
-        # still on an EOL Electron upstream. Nothing else needs it - notably not
-        # claude-desktop, which bundles its own Electron rather than using the
-        # nixpkgs one - so this can go whenever logseq does.
+        # Necessary for logseq
         channels.nixpkgs-unstable.config = {
           allowUnfree = true;
           permittedInsecurePackages = [ "electron-39.8.10" ];

@@ -32,7 +32,7 @@ with mylib;
     '';
 
     virtualisation.quadlet =
-      let inherit (config.virtualisation.quadlet) network pods; in
+      let inherit (config.virtualisation.quadlet) pods; in
       {
         containers.frigate.containerConfig = {
           image = "ghcr.io/blakeblackshear/frigate:stable-tensorrt";
