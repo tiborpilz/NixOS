@@ -259,6 +259,12 @@
  '((mermaid . t)))
 ;; Mermaid Diagrams:3 ends here
 
+;; [[file:config.org::*Mermaid Diagrams][Mermaid Diagrams:4]]
+(setq ob-mermaid-default-config-file
+      (expand-file-name "mermaid/config.json"
+                        (or (getenv "XDG_CONFIG_HOME") "~/.config")))
+;; Mermaid Diagrams:4 ends here
+
 ;; [[file:config.org::*Use the same directory as org][Use the same directory as org:1]]
 (setq org-roam-directory (concat org-directory "roam"))
 ;; Use the same directory as org:1 ends here
@@ -650,6 +656,11 @@
 (add-hook 'org-roam-capture-new-node-hook #'my/org-id-locations-from-roam-db)
 (with-eval-after-load 'org-roam (my/org-id-locations-from-roam-db))
 ;; Performance Optimizations:1 ends here
+
+;; [[file:config.org::*Drop org-lint's invalid-id-link checker][Drop org-lint's invalid-id-link checker:1]]
+(after! org-lint
+  (org-lint-remove-checker 'invalid-id-link))
+;; Drop org-lint's invalid-id-link checker:1 ends here
 
 ;; [[file:config.org::*Projectile Project Search Path][Projectile Project Search Path:1]]
 (setq projectile-project-search-path '(("~/Code/" . 1)))
@@ -1180,7 +1191,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 ;; [[file:config.org::*Mermaid][Mermaid:2]]
 (setq org-babel-default-header-args:mermaid
-      '((:background-color. "transparent")
+      '((:background-color . "transparent")
         (:theme . "dark")
         (:results . "file")
         (:file . (lambda () (make-temp-file "mermaid" nil ".svg")))))

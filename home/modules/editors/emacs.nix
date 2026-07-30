@@ -70,8 +70,8 @@ in
       # Markdown conversion and live preview
       pandoc
 
-      # Mermaid diagramming
-      # nodePackages.mermaid-cli
+      # Mermaid diagramming (provides mmdc for ob-mermaid)
+      mermaid-cli
 
       # Copilot
       github-copilot-cli
@@ -84,6 +84,17 @@ in
     ];
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
+
+    # mermaid renders node labels into <foreignObject> by default, which librsvg
+    # (and therefore emacs' svg display) does not implement - the boxes come out
+    # empty. Turning off htmlLabels makes it emit plain <text>/<tspan> instead.
+    # See https://github.com/mermaid-js/mermaid-cli/issues/112
+    xdg.configFile."mermaid/config.json".text = builtins.toJSON {
+      htmlLabels = false;
+      flowchart.htmlLabels = false;
+      class.htmlLabels = false;
+      er.htmlLabels = false;
+    };
 
     xdg.configFile."doom" = {
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Code/nixos/home/config/doom";

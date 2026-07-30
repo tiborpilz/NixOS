@@ -452,6 +452,17 @@ Then, I'll need to add mermaid to the list of babel languages.
  '((mermaid . t)))
 #+end_src
 
+Mermaid renders node labels into an SVG ~<foreignObject>~ by default, which librsvg - and
+therefore emacs' svg rendering - doesn't implement, so the boxes come out empty. The config
+file (deployed by =home/modules/editors/emacs.nix=) sets ~htmlLabels: false~, which makes mmdc
+emit plain ~<text>~/~<tspan>~ nodes instead. See [[https://github.com/mermaid-js/mermaid-cli/issues/112][mermaid-cli#112]].
+
+#+begin_src elisp
+(setq ob-mermaid-default-config-file
+      (expand-file-name "mermaid/config.json"
+                        (or (getenv "XDG_CONFIG_HOME") "~/.config")))
+#+end_src
+
 **** TODO All mermaid diagrams have a white background
 
 ** Roam
@@ -2063,7 +2074,7 @@ I want to set a few default values for mermaid blocks so that they are prettier.
 
 #+begin_src elisp
 (setq org-babel-default-header-args:mermaid
-      '((:background-color. "transparent")
+      '((:background-color . "transparent")
         (:theme . "dark")
         (:results . "file")
         (:file . (lambda () (make-temp-file "mermaid" nil ".svg")))))
