@@ -209,12 +209,15 @@
         };
       };
 
+      isos = mapModules ./isos (path: lib.my.mkIso (import path));
+
       checks = {
         x86_64-linux = {
           home-tibor = self.homeConfigurations.tibor.activationPackage;
           edge = self.nixosConfigurations.edge.config.system.build.toplevel;
           klaus = self.nixosConfigurations.klaus.config.system.build.toplevel;
           thinkyMcThinkpad = self.nixosConfigurations.thinkyMcThinkpad.config.system.build.toplevel;
+          couchthink = self.nixosConfigurations.couchthink.config.system.build.toplevel;
           emacs = self.packages.x86_64-linux.emacsWrapped;
           doom-emacs = self.packages.x86_64-linux.doom-emacs;
           doom-emacs-standalone = self.packages.x86_64-linux.doom-emacs-standalone;
