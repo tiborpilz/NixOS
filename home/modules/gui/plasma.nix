@@ -100,15 +100,33 @@ in
         panels = [
           {
             location = "top";
+            # Clock is centred by the spacers on either side of it; launcher and
+            # app menu sit left, pager and tray right.
             widgets = [
               {
-                kickoff.icon = "nix-snowflake-white";
+                kicker.icon = "nix-snowflake-white";
               }
               "org.kde.plasma.appmenu"
               "org.kde.plasma.panelspacer"
-              "org.kde.plasma.pager"
+              {
+                digitalClock = {
+                  date.position = "belowTime";
+                  time.showSeconds = "always";
+                  calendar = {
+                    firstDayOfWeek = "monday";
+                    plugins = [ "holidaysevents" ];
+                  };
+                };
+              }
+              "org.kde.plasma.panelspacer"
+              {
+                pager.general = {
+                  displayedText = "desktopNumber";
+                  showOnlyCurrentScreen = true;
+                  showApplicationIconsOnWindowOutlines = true;
+                };
+              }
               "org.kde.plasma.systemtray"
-              "org.kde.plasma.digitalclock"
             ];
             height = 32;
             floating = true;
