@@ -162,6 +162,15 @@ in
     # Smaller terminal font on the laptop screen
     home-manager.users.tibor.modules.terminal.kitty.fontSize = 12;
 
+    # Waking up from hibernate is slow on X13
+    services.logind.settings.Login = {
+      HandleLidSwitch = "suspend";
+      HandleLidSwitchExternalPower = "ignore"; # plugged in: keep running with the lid shut
+      HandleLidSwitchDocked = "ignore";
+      HandlePowerKey = "suspend";
+      IdleAction = "ignore";
+    };
+
     # Firmware updates via LVFS
     services.fwupd.enable = true;
 
