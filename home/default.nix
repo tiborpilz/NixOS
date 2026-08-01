@@ -121,6 +121,9 @@ with mylib;
       ast-grep
 
       unstable.devenv
+
+      # Connect to private nix cache
+      attic-client
     ]) ++ lib.optionals (pkgs.stdenv.isLinux && config.graphical) [
       # Claude Desktop GUI. Linux-only and graphical-gated. Repackaged in-repo
       # from Anthropic's official .deb; see packages/claude-desktop.
@@ -238,18 +241,22 @@ with mylib;
         cores = 0;
         max-jobs = 16;
         trusted-users = [ "root" "tibor" "tibor.pilz" "tiborpilz" ];
+        # The attic cache on klaus is a plain binary cache for pulls — no attic
+        # client needed here. Uncomment once the cache exists; grab the key with
+        #   curl -s https://cache.tiborpilz.xyz/_api/v1/cache-config/nixos | jq -r .public_key
+        # (works unauthenticated after `attic cache configure nixos --public`).
         trusted-substituters = [ "https://cache.nixos.org/" "https://tiborpilz.cachix.org/" ];
         substituters = [
           "https://cache.nixos.org/"
           "https://nix-community.cachix.org/"
           "https://tiborpilz.cachix.org/"
-          "https://cache.garnix.io"
+          # "https://cache.tiborpilz.xyz/nixos"
         ];
         trusted-public-keys = [
           "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
           "tiborpilz.cachix.org-1:KyBjAXY8eblxntQ+OG13IjT+M222VxT+25yw1lqnQS4="
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-          "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
+          # "nixos:<public key from the curl above>"
         ];
         system-features = [ "big-parallel" "kvm" "recursive-nix" ];
       };
