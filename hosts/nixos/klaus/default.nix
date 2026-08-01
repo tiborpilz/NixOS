@@ -403,6 +403,11 @@ with lib;
       dataDir = "/data/penpot";
     };
 
+    modules.services.attic = {
+      enable = true;
+      dataDir = "/data/attic";
+    };
+
     modules.services.woodpecker = {
       enable = true;
       envFile = config.sops.secrets.woodpeckerEnv.path;
