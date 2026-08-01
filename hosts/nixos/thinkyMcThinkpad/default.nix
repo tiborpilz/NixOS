@@ -84,11 +84,13 @@ in
       xkb = {
         layout = "us";
         variant = "";
-        options = "caps:swapescape";
       };
     };
 
-    modules.desktop.keyd.enable = true;
+    modules.desktop.keyd = {
+      enable = true;
+      swapEscapeInternal = true;
+    };
 
     services.libinput = {
       enable = true;
