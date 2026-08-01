@@ -55,6 +55,7 @@ in
 
     hardware.graphics = {
       enable = true;
+      enable32Bit = true; # Steam
       extraPackages = with pkgs; [
         # iHD covers Gen8+ only, so Haswell needs i965.
         intel-vaapi-driver
@@ -118,7 +119,7 @@ in
 
 
     # USB keyboard/trackpad combos need nothing; these cover gamepad + phone.
-    hardware.steam-hardware.enable = true; # udev rules for Xbox/PS/8BitDo pads
+    # programs.steam pulls in hardware.steam-hardware (pad udev rules).
     hardware.xpadneo.enable = true; # Xbox controllers over Bluetooth
 
     hardware.bluetooth = {
@@ -131,7 +132,6 @@ in
 
     services.libinput.enable = true;
 
-
     services.pulseaudio.enable = false;
     security.rtkit.enable = true;
     services.pipewire = {
@@ -142,16 +142,21 @@ in
     };
 
     # mDNS, so Music Assistant on klaus can see this box and vice versa.
+    # nssmdns4 resolves .local names; publish announces couchthink.local so the
+    # box is reachable without hunting for its DHCP lease.
     services.avahi = {
       enable = true;
       nssmdns4 = true;
       openFirewall = true;
+      publish = {
+        enable = true;
+        addresses = true;
+        workstation = true;
+      };
     };
 
-    # Playback target for klaus's Music Assistant. A system-level user unit
-    # since there's no home-manager here; ConditionUser skips the SDDM greeter.
     systemd.user.services.snapclient = {
-      description = "Snapcast client (-> klaus)";
+      description = "Snapcast client";
       unitConfig.ConditionUser = "media";
       after = [ "pipewire-pulse.service" ];
       wants = [ "pipewire-pulse.service" ];
@@ -163,8 +168,6 @@ in
       wantedBy = [ "default.target" ];
     };
 
-    # Spotify Connect endpoint for casting from a phone. In the media user's
-    # session, not services.spotifyd, which has no route to this PipeWire.
     systemd.user.services.librespot = {
       description = "librespot (Spotify Connect endpoint)";
       unitConfig.ConditionUser = "media";
@@ -191,6 +194,29 @@ in
     # librespot discovers over mDNS but pairs over plain HTTP on this port.
     networking.firewall.allowedTCPPorts = [ 45301 ];
 
+
+    # Big Picture is the only couch-usable part; local gaming on HD 4400 isn't
+    # the point. remotePlay opens 27031-27036 for streaming from the gaming PC.
+    programs.steam = {
+      enable = true;
+      remotePlay.openFirewall = true;
+    };
+
+    services.flatpak.enable = true;
+
+    # Flatpak with no remote configured can't install anything, and `flatpak
+    # remote-add` is imperative state that wouldn't survive a reinstall.
+    systemd.services.flathub-remote = {
+      description = "Register the Flathub remote";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
+      serviceConfig.Type = "oneshot";
+      script = ''
+        ${pkgs.flatpak}/bin/flatpak remote-add --if-not-exists \
+          flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+      '';
+    };
 
     programs.zsh.enable = true;
 

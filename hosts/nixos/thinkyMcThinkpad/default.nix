@@ -1,11 +1,12 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
-{ config, pkgs, ... }:
+{ lib, pkgs, ... }:
 let
   mountainWallpaper =
     "${pkgs.kdePackages.plasma-workspace-wallpapers}/share/wallpapers/Mountain/contents/images/5120x2880.png";
+
+  # Exits 0 when the lid is shut
+  lidClosed = pkgs.writeShellScript "lid-closed" ''
+    grep -qs closed /proc/acpi/button/lid/*/state
+  '';
 
   sddmMountainTheme = pkgs.runCommand "sddm-breeze-mountain" { } ''
     mkdir -p $out/share/sddm/themes
@@ -92,6 +93,9 @@ in
       swapEscapeInternal = true;
     };
 
+    # Fix thunderbolt issues
+    modules.hardware.dpLinkGuard.enable = true;
+
     services.libinput = {
       enable = true;
 
@@ -105,9 +109,18 @@ in
       };
     };
 
+    services.avahi = {
+      enable = true;
+      nssmdns4 = true;
+      openFirewall = true;
+      publish = {
+        enable = true;
+        addresses = true;
+        workstation = true;
+      };
+    };
+
     # Enable Smartcard support (YubiKey as GPG/SSH key).
-    # gnupg's scdaemon.conf uses disable-ccid, so it talks to the card via
-    # PC/SC; pcscd must be running for `gpg --card-status` / ssh to work.
     hardware.gpgSmartcards.enable = true;
     services.pcscd.enable = true;
 
@@ -124,10 +137,7 @@ in
       pulse.enable = true;
     };
 
-    # Snapcast client: makes this laptop a playback target for klaus's Music
-    # Assistant / snapserver (192.168.1.51). Runs as a user service and outputs
-    # via PipeWire's pulse server, so it mixes like any other app instead of
-    # grabbing the sound card exclusively. Only runs while tibor is logged in.
+    # Snapcast client: makes this laptop a playback target
     home-manager.users.tibor.systemd.user.services.snapclient = {
       Unit = {
         Description = "Snapcast client (-> klaus)";
@@ -144,7 +154,6 @@ in
 
     programs.zsh.enable = true;
 
-    # Define a user account. Don't forget to set a password with ‘passwd’.
     users.users.tibor = {
       isNormalUser = true;
       description = "Tibor Pilz";
@@ -190,10 +199,21 @@ in
     services.fprintd.tod.enable = true;
     services.fprintd.tod.driver = pkgs.libfprint-2-tod1-goodix;
 
-    # modules.services.paperless.enable = true;
+    # Prevent locks from the fingeprint reader during login
+    security.pam.services = {
+      login.fprintAuth = false;
+      sddm.fprintAuth = false;
+    } // lib.genAttrs [ "sudo" "kde-fingerprint" ] (_: {
+      # Skip fingerprint auth if the lid is closed
+      rules.auth.lidClosed = {
+        order = 11399; # immediately before fprintd (11400)
+        control = "[success=1 default=ignore]";
+        modulePath = "${pkgs.linux-pam}/lib/security/pam_exec.so";
+        args = [ "quiet" "${lidClosed}" ];
+      };
+      rules.auth.fprintd.args = [ "timeout=10" "max-tries=1" ];
+    });
 
-    # List packages installed in system profile. To search, run:
-    # $ nix search wget
     environment.systemPackages = with pkgs; [
       git
       tmux

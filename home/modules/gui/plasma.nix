@@ -25,10 +25,6 @@ in
           wallpaper = "${pkgs.kdePackages.plasma-workspace-wallpapers}/share/wallpapers/Mountain/";
         };
 
-        # Desktop switching (Meta+1..5) is bound to KWin's native action in
-        # shortcuts.kwin below. Command hotkeys launch a process, which makes
-        # KDE show app-startup feedback (spinning cursor + a launch entry), so
-        # they're reserved for actually launching programs.
         hotkeys.commands = {
           "kitty" = {
             name = "Open Kitty";
@@ -89,10 +85,6 @@ in
           kwinrc = {
             Effect-overview.BorderActivate = 9; # Overview on screen-edge
             Plugins.slideEnabled = false; # no desktop-slide animation
-          };
-          ksplashrc.KSplash = {
-            Engine = "none";
-            Theme = "None";
           };
           kwalletrc.Wallet."First Use" = false;
         };

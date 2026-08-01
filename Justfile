@@ -17,6 +17,15 @@ deploy server mode="switch":
     --build-host root@{{env_var(uppercase(server))}} \
     --fast
 
+# Deploy, building locally and pushing the closure (for slow targets)
+deploy-push server address="" mode="switch":
+  NIX_SSHOPTS="-i ~/.ssh/id" \
+  nix run nixpkgs#nixos-rebuild -- \
+    {{ if mode == "dry" { "dry-run"} else if mode == "switch" { "switch" } else { error("Unknown Mode") } }} \
+    --flake .#{{server}} \
+    --target-host root@{{ if address == "" { env_var(uppercase(server)) } else { address } }} \
+    --fast
+
 # Deploy a host with deploy-rs (SSH transport from ~/.ssh/config)
 deploy-rs node="klaus" *ARGS:
   nix run github:serokell/deploy-rs -- .#{{node}} {{ARGS}}
