@@ -171,6 +171,16 @@ in
       IdleAction = "ignore";
     };
 
+    services.tailscale = {
+      enable = true;
+      useRoutingFeatures = "client"; # accept subnet routes / use an exit node
+      openFirewall = true;
+      extraSetFlags = [ "--operator=tibor" ];
+    };
+
+    # Tailscale tray icon (Qt, fits the Plasma panel)
+    home-manager.users.tibor.modules.tailTray.enable = true;
+
     # Firmware updates via LVFS
     services.fwupd.enable = true;
 
