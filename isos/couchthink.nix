@@ -1,3 +1,4 @@
 {
   host = "couchthink";
+  offline = true;
 }
