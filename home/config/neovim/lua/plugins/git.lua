@@ -99,6 +99,36 @@ return {
     build = 'make',
     opts = {},
   },
+  --- Review local diffs with inline comments, exports as markdown for agents
+  {
+    "georgeguimaraes/review.nvim",
+    version = "v*",
+    dependencies = {
+      "esmuellert/codediff.nvim",
+      "MunifTanjim/nui.nvim",
+    },
+    cmd = { "Review" },
+    keys = {
+      { "<leader>gr", "<cmd>Review<cr>", desc = "Review working tree" },
+      { "<leader>gR", "<cmd>Review commits<cr>", desc = "Review commit range" },
+    },
+    opts = {},
+  },
+  --- Review actual PRs/MRs, needs a GitHub or GitLab remote
+  {
+    "afewyards/codereview.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = {
+      "CodeReview", "CodeReviewAI", "CodeReviewAIFile",
+      "CodeReviewStart", "CodeReviewSubmit", "CodeReviewApprove",
+      "CodeReviewOpen", "CodeReviewPipeline", "CodeReviewComments",
+      "CodeReviewFiles", "CodeReviewToggleScroll", "CodeReviewCommits",
+    },
+    keys = {
+      { "<leader>gv", "<cmd>CodeReview<cr>", desc = "Review PR/MR" },
+    },
+    opts = {},
+  },
   --- Move backwards and forwards in Git history
   {
     'fredeeb/tardis.nvim',
