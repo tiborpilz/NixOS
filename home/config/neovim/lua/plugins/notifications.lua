@@ -145,7 +145,6 @@ return {
       },
     },
     config = function(_, opts)
-      vim.notify = require("snacks").notifier.notify
       require("noice").setup(opts)
 
       local group = vim.api.nvim_create_augroup("NoiceBackdrop", { clear = true })
