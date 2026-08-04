@@ -31,6 +31,13 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
+    # Immich shared-link keys (IPP_SHARE_<SLUG>=...). Kept out of the nix store
+    # so the keys don't end up in this repo, which is public -- a guessable
+    # vanity path is a smaller exposure than a key sitting in crawlable git.
+    sops.secrets.caddyEnv = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
     # Gluetun-only env file: it must NOT see the legacy PASSWORD variable from
     # the deluge secret, which gluetun treats as an alias for OPENVPN_PASSWORD.
     sops.secrets.gluetun = {
@@ -279,6 +286,9 @@ with lib;
 
     home.enable = false;
 
+    # Read by systemd as root before caddy drops privileges.
+    services.caddy.environmentFile = config.sops.secrets.caddyEnv.path;
+
     modules.services.reverseProxy = {
       enable = true;
       hostname = "tiborpilz.xyz";
@@ -392,6 +402,18 @@ with lib;
         immich = {
           immich-version = "v3.0.3";
           enable = true;
+        };
+
+        # Public album sharing on its own throwaway zone. Only /share/* is
+        # reachable; immich's own API is never exposed on tibor.pics.
+        immich-public-proxy = {
+          enable = true;
+          hostname = "tibor.pics";
+          shares.hochzeit = "share/{env.IPP_SHARE_HOCHZEIT}";
+
+          # 1 = follow the per-share download toggle in immich, so downloads
+          # stay controllable per album without a redeploy.
+          settings.allowDownload = 1;
         };
         jellyfin.enable = true;
         music-assistant.enable = true;
