@@ -6,6 +6,11 @@ vim.keymap.set({ 'n', 'x' }, '<Leader>cf', '<cmd>lua vim.lsp.buf.format({async =
   { desc = 'Format code' })
 -- Hide diagnostic float per default
 vim.diagnostic.config({ virtual_text = false })
+
+-- nvim-lspconfig dropped the :Lsp* commands on nvim 0.12, keep the muscle memory
+if vim.fn.exists(":LspInfo") == 0 then
+  vim.api.nvim_create_user_command("LspInfo", "checkhealth vim.lsp", { desc = "Alias for :checkhealth vim.lsp" })
+end
 -- Bind diagnostic to <Leader> c e
 -- vim.keymap.set('n', '<Leader>ce', '<cmd>lua vim.diagnostic.open_float(nil, {focus=false})<CR>',
 --   { desc = 'Open Diagnostic Float', noremap = true, silent = true })
