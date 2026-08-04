@@ -18,6 +18,11 @@ return {
     priority = 1000,
     lazy = false,
     opts = {
+      -- takes over vim.ui.select, which is what review.nvim's comment list uses
+      picker = {
+        enabled = true,
+        ui_select = true,
+      },
       dashboard = {
         enabled = true,
         preset = {
