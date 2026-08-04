@@ -211,7 +211,13 @@
         };
       };
 
-      isos = mapModules ./isos (path: lib.my.mkIso (import path));
+      # kind = "live" builds a self-contained live system (see lib/live.nix);
+      # everything else is an installer for one of the hosts above.
+      isos = mapModules ./isos (path:
+        let spec = import path; in
+        if (spec.kind or "installer") == "live"
+        then lib.my.mkLiveIso spec
+        else lib.my.mkIso spec);
 
       checks = {
         x86_64-linux = {
