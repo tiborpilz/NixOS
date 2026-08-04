@@ -39,6 +39,7 @@ let
       { enable = ms.media.calibre.enable; name = "Calibre-Web"; sub = "calibre-web"; icon = "calibre-web"; description = "E-books"; }
       { enable = ms.media.pinchflat.enable; name = "Pinchflat"; sub = "pinchflat"; icon = "pinchflat"; description = "YouTube archiver"; }
       { enable = ms.media.music-assistant.enable; name = "Music Assistant"; sub = "music-assistant"; icon = "music-assistant"; description = "Music library & players"; }
+      { enable = ms.media.navidrome.enable; name = "Navidrome"; sub = "navidrome"; icon = "navidrome"; description = "Music streaming"; }
     ])
 
     (mkGroup "Downloads" [
@@ -47,6 +48,11 @@ let
       { enable = ms.media.radarr.enable; name = "Radarr"; sub = "radarr"; icon = "radarr"; description = "Movies"; }
       { enable = ms.media.readarr.enable; name = "Readarr"; sub = "readarr"; icon = "readarr"; description = "Books"; }
       { enable = ms.media.jackett.enable; name = "Jackett"; sub = "jackett"; icon = "jackett"; description = "Indexer proxy"; }
+      { enable = ms.media.lidarr.enable; name = "Lidarr"; sub = "lidarr"; icon = "lidarr"; description = "Music"; }
+      { enable = ms.media.prowlarr.enable; name = "Prowlarr"; sub = "prowlarr"; icon = "prowlarr"; description = "Indexer manager"; }
+      { enable = ms.media.slskd.enable; name = "slskd"; sub = "slskd"; icon = "slskd"; description = "Soulseek client"; }
+      { enable = ms.media.soularr.enable; name = "Soularr"; sub = "soularr"; icon = "soularr"; description = "Lidarr → Soulseek bridge"; }
+      { enable = ms.media.aurral.enable; name = "Aurral"; sub = "aurral"; icon = "lidarr"; description = "Music requests & discovery"; }
     ])
 
     (mkGroup "Productivity" [
