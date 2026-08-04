@@ -1,4 +1,15 @@
 vim.cmd("autocmd FileType nerdtree map <buffer> <Tab> o")
+
+-- Reveal only when the current buffer is a real file on disk
+local function reveal_opts(opts)
+  local name = vim.api.nvim_buf_get_name(0)
+  if vim.bo.buftype == "" and name ~= "" and vim.fn.filereadable(name) == 1 then
+    opts.reveal_file = name
+    opts.reveal_force_cwd = true
+  end
+  return opts
+end
+
 return {
   {
     "nvim-neo-tree/neo-tree.nvim",
@@ -94,14 +105,17 @@ return {
       {
         "<leader>op",
         function()
-          require("neo-tree.command").execute({ toggle = true, dir = vim.loop.cwd() })
+          -- follow_current_file only tracks buffer switches, opening needs an explicit reveal
+          require("neo-tree.command").execute(reveal_opts({ toggle = true, dir = vim.loop.cwd() }))
         end,
         desc = "Toggle NeoTree",
       },
       {
         "<leader>oP",
         function()
-          require("neo-tree.command").execute({ toggle = true, dir = vim.loop.cwd(), source = "filesystem" })
+          require("neo-tree.command").execute(
+            reveal_opts({ toggle = true, dir = vim.loop.cwd(), source = "filesystem" })
+          )
         end,
         desc = "Toggle NeoTree Filesystem",
       },
