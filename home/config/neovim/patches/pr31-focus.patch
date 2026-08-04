@@ -1,0 +1,109 @@
+diff --git a/lua/review/hooks.lua b/lua/review/hooks.lua
+index a059507..0e42ba8 100644
+--- a/lua/review/hooks.lua
++++ b/lua/review/hooks.lua
+@@ -256,6 +256,26 @@ function M.on_file_changed(tabpage)
+     return
+   end
+ 
++  local orig_buf, mod_buf = lifecycle.get_buffers(tabpage)
++
++  -- Set syntax highlighting for the new file's buffers
++  local raw_orig_path, raw_mod_path = lifecycle.get_paths(tabpage)
++  set_buffer_filetype(orig_buf, raw_orig_path)
++  set_buffer_filetype(mod_buf, raw_mod_path)
++
++  -- Make buffers readonly if configured
++  local cfg = config.get()
++  if cfg.codediff.readonly then
++    if orig_buf and vim.api.nvim_buf_is_valid(orig_buf) then
++      vim.api.nvim_set_option_value("modifiable", false, { buf = orig_buf })
++      vim.api.nvim_set_option_value("readonly", true, { buf = orig_buf })
++    end
++    if mod_buf and vim.api.nvim_buf_is_valid(mod_buf) then
++      vim.api.nvim_set_option_value("modifiable", false, { buf = mod_buf })
++      vim.api.nvim_set_option_value("readonly", true, { buf = mod_buf })
++    end
++  end
++
+   -- Re-render comments
+   vim.defer_fn(function()
+     marks.refresh()
+diff --git a/lua/review/init.lua b/lua/review/init.lua
+index f74da8e..8268fe8 100644
+--- a/lua/review/init.lua
++++ b/lua/review/init.lua
+@@ -43,7 +43,7 @@ function M.setup(opts)
+   -- Re-setup hooks when codediff recreates buffers (e.g. layout toggle)
+   vim.api.nvim_create_autocmd("User", {
+     group = augroup,
+-    pattern = { "CodeDiffOpen", "CodeDiffFileSelect" },
++    pattern = "CodeDiffOpen",
+     callback = function()
+       vim.defer_fn(function()
+         M._check_codediff_session()
+@@ -51,9 +51,37 @@ function M.setup(opts)
+     end,
+   })
+ 
++  -- On file selection, only refresh marks and keymaps — don't refocus
++  vim.api.nvim_create_autocmd("User", {
++    group = augroup,
++    pattern = "CodeDiffFileSelect",
++    callback = function()
++      vim.defer_fn(function()
++        M._on_file_select()
++      end, 100)
++    end,
++  })
++
+   initialized = true
+ end
+ 
++-- Handle file selection: refresh hooks/keymaps without stealing focus
++function M._on_file_select()
++  local ok, lifecycle = pcall(require, "codediff.ui.lifecycle")
++  if not ok then
++    return
++  end
++
++  local tabpage = vim.api.nvim_get_current_tabpage()
++  local sess = lifecycle.get_session(tabpage)
++  if not sess then
++    return
++  end
++
++  hooks.on_file_changed(tabpage)
++  keymaps.setup_keymaps(tabpage)
++end
++
+ -- Check if current tab is a CodeDiff session and set up hooks/keymaps
+ function M._check_codediff_session()
+   local ok, lifecycle = pcall(require, "codediff.ui.lifecycle")
+diff --git a/lua/review/keymaps.lua b/lua/review/keymaps.lua
+index 6b58d18..a03a772 100644
+--- a/lua/review/keymaps.lua
++++ b/lua/review/keymaps.lua
+@@ -312,13 +312,20 @@ function M.setup_keymaps(tabpage)
+   -- Set keymaps on current buffer
+   set_buffer_keymaps(vim.api.nvim_get_current_buf())
+ 
+-  -- Set up autocmd to apply keymaps when entering any buffer in this tabpage
++  -- Set up autocmd to apply keymaps only on codediff diff buffers
+   vim.api.nvim_create_autocmd("BufEnter", {
+     group = augroup,
+     callback = function()
+       if vim.api.nvim_get_current_tabpage() ~= tabpage then return end
++      -- Skip floating windows (popups) to avoid overriding their keymaps
++      local win_config = vim.api.nvim_win_get_config(0)
++      if win_config.relative ~= "" then return end
+       if not lifecycle.get_session(tabpage) then return end
+-      set_buffer_keymaps(vim.api.nvim_get_current_buf())
++      -- Only apply review keymaps to codediff diff buffers, not the explorer
++      local bufnr = vim.api.nvim_get_current_buf()
++      local orig_buf, mod_buf = lifecycle.get_buffers(tabpage)
++      if bufnr ~= orig_buf and bufnr ~= mod_buf then return end
++      set_buffer_keymaps(bufnr)
+     end,
+   })
+ end
