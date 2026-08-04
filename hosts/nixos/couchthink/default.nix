@@ -272,8 +272,6 @@ in
       # negotiates HEVC and then software-decodes it.
       moonlight-qt
 
-      spotify
-
       libva-utils # vainfo: expect i965 with H264 and no HEVC entrypoints
 
       git

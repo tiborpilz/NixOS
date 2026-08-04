@@ -18,9 +18,12 @@ in
       description = ''
         Upstream container rather than nixpkgs' services.music-assistant, which
         is stuck on 2.8.7. 2.9.x pins torch, torchaudio, librosa and
-        modern_colorthief, so packaging it is not a cheap bump. 2.8.7 also
-        crashes with KeyError 'refresh_token' when Spotify declines to rotate a
-        refresh token, fixed upstream in music-assistant/server#4494.
+        modern_colorthief, so packaging it is not a cheap bump.
+
+        (The original trigger for the bump was a 2.8.7 crash with KeyError
+        'refresh_token' when Spotify declined to rotate a refresh token, fixed
+        in music-assistant/server#4494. That no longer applies now that the
+        Spotify providers are gone, but the packaging argument still holds.)
       '';
     };
 
