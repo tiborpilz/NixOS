@@ -44,6 +44,25 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
+    # Second PIA tunnel, independent of deluge's: PIA forwards exactly one port
+    # per connection, and Soulseek and BitTorrent both want one. Also carries
+    # HTTP_CONTROL_SERVER_AUTH_DEFAULT_ROLE, which deluge's gluetun must not see.
+    sops.secrets.gluetunSlskd = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
+    sops.secrets.slskdEnv = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
+    sops.secrets.lidarr_api_key = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
+    sops.secrets.slskd_api_key = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
     sops.secrets.nextcloud_admin_pass = mkIf config.modules.services.nextcloud.enable {
       owner = "nextcloud";
     };
@@ -417,6 +436,31 @@ with lib;
         };
         jellyfin.enable = true;
         music-assistant.enable = true;
+
+        # Music stack. Lidarr acquires, slskd fetches off Soulseek behind its
+        # own PIA tunnel, Soularr bridges the two, Navidrome serves.
+        lidarr.enable = true;
+        prowlarr.enable = true;
+
+        slskd = {
+          enable = true;
+          credentialsFile = config.sops.secrets.gluetunSlskd.path;
+          envFile = config.sops.secrets.slskdEnv.path;
+        };
+
+        soularr = {
+          enable = true;
+          lidarrApiKeyFile = config.sops.secrets.lidarr_api_key.path;
+          slskdApiKeyFile = config.sops.secrets.slskd_api_key.path;
+        };
+
+        navidrome.enable = true;
+
+        aurral = {
+          enable = true;
+          contactEmail = "tibor@pilz.berlin";
+        };
+
       };
     };
 
