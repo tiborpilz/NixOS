@@ -183,6 +183,8 @@
                   home.username = user;
                   home.homeDirectory = homeDirectory;
                   modules.syncthing.service = enableSyncthing;
+                  # snapcast client for Music Assistant's snapserver on klaus
+                  modules.snapclient.enable = isDarwin;
                 }
               ];
             };
