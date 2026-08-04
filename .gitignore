@@ -1,5 +1,7 @@
 *.qcow2
 result
+result-iso
+.vm
 home/config/doom/custom.el
 home/config/neovim/plugged
 .direnv
