@@ -40,6 +40,10 @@ in
       diff-so-fancy #nicer git diffs
       difftastic # nicer git diffs with treesitter
 
+      unstable.tuicr # TUI, vim keys, works with git/jj/hg
+      my.difit # serves a GitHub-ish diff UI in the browser
+      my.diffx # same idea, built around the agent loop
+
       act # GH actions at home
       lazygit # for noobs
       unstable.opencommit
