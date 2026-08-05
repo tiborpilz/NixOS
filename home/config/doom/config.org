@@ -452,10 +452,7 @@ Then, I'll need to add mermaid to the list of babel languages.
  '((mermaid . t)))
 #+end_src
 
-Mermaid renders node labels into an SVG ~<foreignObject>~ by default, which librsvg - and
-therefore emacs' svg rendering - doesn't implement, so the boxes come out empty. The config
-file (deployed by =home/modules/editors/emacs.nix=) sets ~htmlLabels: false~, which makes mmdc
-emit plain ~<text>~/~<tspan>~ nodes instead. See [[https://github.com/mermaid-js/mermaid-cli/issues/112][mermaid-cli#112]].
+Point it at the config file:
 
 #+begin_src elisp
 (setq ob-mermaid-default-config-file
@@ -2077,6 +2074,12 @@ I want to set a few default values for mermaid blocks so that they are prettier.
         (:results . "file")
         (:file . (lambda () (make-temp-file "mermaid" nil ".svg")))))
 #+end_src
+
+Nothing to do about puppeteer here: mmdc renders through it, and on macOS it looks for a
+pinned Chrome build that nix never downloads (nixpkgs has no chromium on darwin), so every
+block used to fail with "Could not find Chrome". The mmdc in =home/modules/tools/mermaid.nix=
+is wrapped with =PUPPETEER_EXECUTABLE_PATH= pointing at the system Chrome, which fixes it
+for every caller rather than just for org babel.
 
 *** Markdown / Org Preview
 There are multiple packages out there for previewing markdown, some of them not
