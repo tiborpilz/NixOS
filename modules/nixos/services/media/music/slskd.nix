@@ -11,6 +11,9 @@ let
 
   music = config.modules.services.media.music;
   cfg = music.slskd;
+
+  metricsEnabled = cfg.metricsPasswordFile != null;
+  metricsPath = "/metrics";
 in
 {
   options.modules.services.media.music.slskd = {
@@ -50,6 +53,27 @@ in
 
           SLSKD_API_KEY
             An administrator-role API key.
+
+          SLSKD_METRICS_PASSWORD
+            Only when metricsPasswordFile is set. Must hold the same password.
+      '';
+    };
+
+    metricsUsername = mkOption {
+      type = types.str;
+      default = "prometheus";
+    };
+
+    metricsPasswordFile = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = ''
+        Path to a file containing only the password for slskd's /metrics
+        endpoint, readable by prometheus. Setting it enables the endpoint and
+        the scrape job. Leaving it null keeps both off.
+
+        The endpoint is served on the published web port and exposes host OS,
+        architecture and drive layout, so it is never left unauthenticated.
       '';
     };
   };
@@ -110,11 +134,15 @@ in
               SLSKD_DOWNLOADS_DIR = "${downloadsDir}/complete";
               SLSKD_INCOMPLETE_DIR = "${downloadsDir}/incomplete";
 
-              # PIA's forwarded port is dynamic; slskd polls gluetun's control
+              # PIA's forwarded port is dynamic. slskd polls gluetun's control
               # server for it and will not connect to Soulseek without one.
               SLSKD_VPN = "true";
               SLSKD_VPN_PORT_FORWARDING = "true";
               SLSKD_VPN_GLUETUN_URL = "http://localhost:${toString controlServerPort}";
+            } // optionalAttrs metricsEnabled {
+              SLSKD_METRICS = "true";
+              SLSKD_METRICS_URL = metricsPath;
+              SLSKD_METRICS_USERNAME = cfg.metricsUsername;
             };
             environmentFiles = [ cfg.envFile ];
             pod = pods.slskd-pod.ref;
@@ -133,6 +161,24 @@ in
           ];
         };
       };
+
+    services.prometheus.scrapeConfigs = mkIf (metricsEnabled && config.services.prometheus.enable) [
+      {
+        job_name = "slskd";
+        metrics_path = metricsPath;
+        basic_auth = {
+          username = cfg.metricsUsername;
+          password_file = cfg.metricsPasswordFile;
+        };
+        static_configs = [{ targets = [ "127.0.0.1:${toString publicPort}" ]; }];
+      }
+    ];
+
+    environment.etc."grafana/dashboards/slskd.json" = mkIf (metricsEnabled && config.services.grafana.enable) {
+      source = ./slskd-dashboard.json;
+      user = "grafana";
+      group = "grafana";
+    };
 
     modules.services.reverseProxy.proxies.slskd = {
       publicPort = publicPort;

@@ -50,7 +50,7 @@ in
             TZ = "Europe/Berlin";
             ND_MUSICFOLDER = "/music";
             ND_DATAFOLDER = "/data";
-            # Lidarr moves files constantly; without this, deleted paths
+            # Lidarr moves files constantly. Without this, deleted paths
             # linger in the index forever.
             ND_SCANNER_PURGEMISSING = "always";
             ND_LOGLEVEL = "info";

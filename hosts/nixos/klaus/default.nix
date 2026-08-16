@@ -63,6 +63,11 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
+    sops.secrets.slskd_metrics_password = {
+      sopsFile = ./secrets/secrets.yaml;
+      owner = "prometheus";
+    };
+
     sops.secrets.nextcloud_admin_pass = mkIf config.modules.services.nextcloud.enable {
       owner = "nextcloud";
     };
@@ -448,6 +453,7 @@ with lib;
             enable = true;
             credentialsFile = config.sops.secrets.gluetunSlskd.path;
             envFile = config.sops.secrets.slskdEnv.path;
+            metricsPasswordFile = config.sops.secrets.slskd_metrics_password.path;
           };
 
           soularr = {

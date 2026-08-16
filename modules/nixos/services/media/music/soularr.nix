@@ -29,7 +29,7 @@ let
       } " = ";
   };
 
-  # Keys are injected at runtime; interpolating them here would put the
+  # Keys are injected at runtime. Interpolating them here would put the
   # rendered file in the world-readable nix store.
   configTemplate = pkgs.writeText "soularr-config.ini.in" (toIni cfg.settings);
 
@@ -78,7 +78,7 @@ in
       type = types.attrsOf (types.attrsOf (types.oneOf [ types.str types.int types.bool (types.listOf types.str) ]));
       description = ''
         Contents of Soularr's config.ini. The API key fields are placeholders
-        substituted at service start; do not put real keys here.
+        substituted at service start. Do not put real keys here.
       '';
       default = { };
     };
@@ -157,7 +157,7 @@ in
     virtualisation.quadlet.containers.soularr = {
       containerConfig = {
         image = cfg.image;
-        # Host networking so `localhost` reaches Lidarr and slskd; slskd is
+        # Host networking so `localhost` reaches Lidarr and slskd. slskd sits
         # behind its own VPN pod, so a shared pod is not an option.
         networks = [ "host" ];
         volumes = [
