@@ -7,14 +7,21 @@ is_nixos := shell('if [ -f /etc/os-release ] && grep -q "NixOS" /etc/os-release;
 help:
   just --list
 
-# Deploy a server
+# Deploy a server. Qualify the name to reach it by another route:
+# `klaus` uses KLAUS from servers.env, `klaus.tailscale` uses KLAUS_TAILSCALE.
 deploy server mode="switch":
-  NIX_SSHOPTS="-p {{env_var_or_default(uppercase(server) + "_PORT", "22")}}" \
+  #!/usr/bin/env bash
+  set -euo pipefail
+  name="{{server}}"
+  var="$(printf '%s' "${name//./_}" | tr '[:lower:]-' '[:upper:]_')"
+  addr="${!var:?$var is not set in servers.env}"
+  portvar="${var}_PORT"
+  NIX_SSHOPTS="-p ${!portvar:-22}" \
   nix run nixpkgs#nixos-rebuild -- \
     {{ if mode == "dry" { "dry-run"} else if mode == "switch" { "switch" } else { error("Unknown Mode") } }} \
-    --flake .#{{server}} \
-    --target-host root@{{env_var(uppercase(server))}} \
-    --build-host root@{{env_var(uppercase(server))}} \
+    --flake ".#${name%%.*}" \
+    --target-host "root@$addr" \
+    --build-host "root@$addr" \
     --fast
 
 # Deploy, building locally and pushing the closure (for slow targets)
