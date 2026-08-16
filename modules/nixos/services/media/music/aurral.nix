@@ -5,6 +5,8 @@ with lib.my;
 let
   configDir = "/var/lib/aurral/config";
   musicDir = music.libraryDir;
+  downloadsDir = "${music.downloadsDir}/aurral";
+  slskdDownloadsDir = "${music.downloadsDir}/slskd";
   publicPort = 3001;
 
   music = config.modules.services.media.music;
@@ -33,6 +35,7 @@ in
   config = mkIf cfg.enable {
     system.activationScripts.aurral = stringAfter [ "var" ] ''
       mkdir -p ${configDir}
+      mkdir -p ${downloadsDir}
     '';
 
     virtualisation.quadlet.containers.aurral = {
@@ -42,6 +45,8 @@ in
         volumes = [
           "${configDir}:/config:rw"
           "${musicDir}:${musicDir}:ro"
+          "${downloadsDir}:${downloadsDir}:rw"
+          "${slskdDownloadsDir}:${slskdDownloadsDir}:rw"
           "/etc/localtime:/etc/localtime:ro"
         ];
         environments = {
@@ -51,10 +56,11 @@ in
           PORT = toString publicPort;
           LIDARR_URL = "http://localhost:8686";
           CONTACT_EMAIL = cfg.contactEmail;
+          DOWNLOAD_FOLDER = downloadsDir;
         };
         environmentFiles = optional (cfg.envFile != null) cfg.envFile;
       };
-      unitConfig.After = [ "lidarr.service" ];
+      unitConfig.After = [ "lidarr.service" "slskd.service" ];
     };
 
     modules.services.reverseProxy.proxies.aurral = {
