@@ -6,7 +6,6 @@ let
   appDir = "/var/lib/slskd/app";
   gluetunDir = "/var/lib/gluetun-slskd";
   downloadsDir = "${music.downloadsDir}/slskd";
-  musicDir = music.libraryDir;
   publicPort = 5030;
   controlServerPort = 8000;
 
@@ -53,12 +52,6 @@ in
             An administrator-role API key.
       '';
     };
-
-    shareMusicLibrary = mkOption {
-      type = types.bool;
-      default = true;
-      description = "Share the music library back to the Soulseek network.";
-    };
   };
 
   config = mkIf cfg.enable {
@@ -67,7 +60,6 @@ in
       mkdir -p ${gluetunDir}
       mkdir -p ${downloadsDir}/complete
       mkdir -p ${downloadsDir}/incomplete
-      mkdir -p ${musicDir}
     '';
 
     virtualisation.quadlet =
@@ -112,7 +104,7 @@ in
               "${appDir}:/app:rw"
               "${downloadsDir}:${downloadsDir}:rw"
               "/etc/localtime:/etc/localtime:ro"
-            ] ++ optional cfg.shareMusicLibrary "${musicDir}:${musicDir}:ro";
+            ];
             environments = {
               TZ = "Europe/Berlin";
               SLSKD_DOWNLOADS_DIR = "${downloadsDir}/complete";
@@ -123,8 +115,6 @@ in
               SLSKD_VPN = "true";
               SLSKD_VPN_PORT_FORWARDING = "true";
               SLSKD_VPN_GLUETUN_URL = "http://localhost:${toString controlServerPort}";
-            } // optionalAttrs cfg.shareMusicLibrary {
-              SLSKD_SHARED_DIR = musicDir;
             };
             environmentFiles = [ cfg.envFile ];
             pod = pods.slskd-pod.ref;
