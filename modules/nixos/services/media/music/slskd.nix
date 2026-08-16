@@ -5,16 +5,16 @@ with lib.my;
 let
   appDir = "/var/lib/slskd/app";
   gluetunDir = "/var/lib/gluetun-slskd";
-  # Same in-container path as in lidarr.nix / soularr.nix -- see the comment there.
-  downloadsDir = "/data/downloads/slskd";
-  musicDir = "/data/media/music";
+  downloadsDir = "${music.downloadsDir}/slskd";
+  musicDir = music.libraryDir;
   publicPort = 5030;
   controlServerPort = 8000;
 
-  cfg = config.modules.services.media.slskd;
+  music = config.modules.services.media.music;
+  cfg = music.slskd;
 in
 {
-  options.modules.services.media.slskd = {
+  options.modules.services.media.music.slskd = {
     enable = mkBoolOpt false;
     image = mkOpt types.str "docker.io/slskd/slskd:0.26.0";
     gluetunImage = mkOpt types.str "docker.io/qmcgaw/gluetun:v3.41.1";
@@ -23,48 +23,41 @@ in
       type = types.str;
       default = "Netherlands";
       description = ''
-        Comma-separated list of PIA regions gluetun may connect to.
-        Must be regions that support port forwarding.
+        Comma-separated list of PIA regions gluetun may connect to. Must all
+        support port forwarding.
       '';
     };
 
     credentialsFile = mkOption {
       type = types.str;
       description = ''
-        Path to a sops-encrypted env file for this gluetun instance, containing
-        OPENVPN_USER and OPENVPN_PASSWORD (PIA account credentials).
-
-        Deliberately a different secret from the one deluge uses: gluetun treats
-        a bare PASSWORD as an alias for OPENVPN_PASSWORD.
+        Path to a sops-encrypted env file containing OPENVPN_USER and
+        OPENVPN_PASSWORD (PIA account credentials). Must be a separate secret
+        from deluge's -- gluetun reads a bare PASSWORD as OPENVPN_PASSWORD.
       '';
     };
 
     envFile = mkOption {
       type = types.str;
       description = ''
-        Path to a sops-encrypted env file for slskd. Must contain:
+        Path to a sops-encrypted env file. Must contain:
 
           SLSKD_SLSK_USERNAME, SLSKD_SLSK_PASSWORD
             Soulseek network credentials.
 
           SLSKD_USERNAME, SLSKD_PASSWORD
-            Web UI login. Not optional in practice: slskd falls back to
-            slskd/slskd, and the pod publishes 5030 on the LAN where the
-            Caddy basic-auth gate does not apply.
+            Web UI login. Required: slskd otherwise falls back to slskd/slskd
+            on a port published to the LAN.
 
           SLSKD_API_KEY
-            An administrator-role API key; Soularr authenticates with it.
+            An administrator-role API key.
       '';
     };
 
     shareMusicLibrary = mkOption {
       type = types.bool;
       default = true;
-      description = ''
-        Share ${musicDir} back to the Soulseek network read-only. Soulseek is a
-        ratio-aware community; sharing nothing gets you queued behind everyone
-        who does.
-      '';
+      description = "Share the music library back to the Soulseek network.";
     };
   };
 
@@ -82,7 +75,7 @@ in
         inherit (config.virtualisation.quadlet) pods;
       in
       {
-        # VPN sidecar. Everything in slskd-pod shares its network namespace,
+        # Everything in slskd-pod shares this container's network namespace,
         # so slskd has no route to the internet that bypasses the tunnel.
         containers.slskd-vpn = {
           containerConfig = {
@@ -98,18 +91,11 @@ in
               VPN_PORT_FORWARDING = "on";
               PORT_FORWARD_ONLY = "true";
               VPN_PORT_FORWARDING_STATUS_FILE = "/gluetun/forwarded_port";
-              # slskd reads the forwarded port from here rather than from a file,
-              # so it can react to a reconnect without a restart.
               GLUETUN_HTTP_CONTROL_SERVER_ENABLE = "on";
-              # Unauthenticated on purpose. The control server is bound inside
-              # slskd-pod's network namespace, :8000 is never published, and
-              # gluetun's firewall does not open it on the tunnel -- so slskd is
-              # the only thing that can reach it. An API key here would have to
-              # be duplicated into slskd's env file as SLSKD_VPN_GLUETUN_API_KEY
-              # and kept in sync, for no reachable attacker.
+              # Unauthenticated: the control server is only reachable from
+              # inside the pod, and slskd is the only other member.
               HTTP_CONTROL_SERVER_AUTH_DEFAULT_ROLE = ''{"auth":"none"}'';
-              # The published web UI port has to accept connections from the LAN.
-              # gluetun opens the forwarded port on the tunnel side itself.
+              # The published web UI port has to accept LAN connections.
               FIREWALL_INPUT_PORTS = toString publicPort;
             };
             environmentFiles = [ cfg.credentialsFile ];
@@ -132,10 +118,8 @@ in
               SLSKD_DOWNLOADS_DIR = "${downloadsDir}/complete";
               SLSKD_INCOMPLETE_DIR = "${downloadsDir}/incomplete";
 
-              # PIA's forwarded port is dynamic. slskd's gluetun integration
-              # polls the control server for it and refuses to connect to
-              # Soulseek until it has one, which is what we want: no port means
-              # no incoming peers and a badly degraded queue position.
+              # PIA's forwarded port is dynamic; slskd polls gluetun's control
+              # server for it and will not connect to Soulseek without one.
               SLSKD_VPN = "true";
               SLSKD_VPN_PORT_FORWARDING = "true";
               SLSKD_VPN_GLUETUN_URL = "http://localhost:${toString controlServerPort}";
@@ -145,8 +129,8 @@ in
             environmentFiles = [ cfg.envFile ];
             pod = pods.slskd-pod.ref;
           };
-          # The pod's netns exists before gluetun raises tun0, so slskd would
-          # otherwise briefly come up on a namespace with a working default route.
+          # The pod's netns exists before gluetun raises tun0, so without this
+          # slskd briefly comes up with a working default route.
           unitConfig = {
             Requires = [ "slskd-vpn.service" ];
             After = [ "slskd-vpn.service" ];
@@ -154,8 +138,6 @@ in
         };
 
         pods.slskd-pod.podConfig = {
-          # Note: gluetun's control server on ${toString controlServerPort} is
-          # deliberately not published -- only slskd, inside the pod, talks to it.
           publishPorts = [
             "${toString publicPort}:5030"
           ];

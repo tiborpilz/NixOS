@@ -437,30 +437,32 @@ with lib;
         jellyfin.enable = true;
         music-assistant.enable = true;
 
-        # Music stack. Lidarr acquires, slskd fetches off Soulseek behind its
-        # own PIA tunnel, Soularr bridges the two, Navidrome serves.
-        lidarr.enable = true;
         prowlarr.enable = true;
 
-        slskd = {
-          enable = true;
-          credentialsFile = config.sops.secrets.gluetunSlskd.path;
-          envFile = config.sops.secrets.slskdEnv.path;
+        # Music stack. Lidarr acquires, slskd fetches off Soulseek behind its
+        # own PIA tunnel, Soularr bridges the two, Navidrome serves.
+        music = {
+          lidarr.enable = true;
+
+          slskd = {
+            enable = true;
+            credentialsFile = config.sops.secrets.gluetunSlskd.path;
+            envFile = config.sops.secrets.slskdEnv.path;
+          };
+
+          soularr = {
+            enable = true;
+            lidarrApiKeyFile = config.sops.secrets.lidarr_api_key.path;
+            slskdApiKeyFile = config.sops.secrets.slskd_api_key.path;
+          };
+
+          navidrome.enable = true;
+
+          aurral = {
+            enable = true;
+            contactEmail = "tibor@pilz.berlin";
+          };
         };
-
-        soularr = {
-          enable = true;
-          lidarrApiKeyFile = config.sops.secrets.lidarr_api_key.path;
-          slskdApiKeyFile = config.sops.secrets.slskd_api_key.path;
-        };
-
-        navidrome.enable = true;
-
-        aurral = {
-          enable = true;
-          contactEmail = "tibor@pilz.berlin";
-        };
-
       };
     };
 

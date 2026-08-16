@@ -4,24 +4,21 @@ with lib.my;
 
 let
   dataDir = "/var/lib/navidrome";
-  musicDir = "/data/media/music";
+  musicDir = music.libraryDir;
   publicPort = 4533;
 
-  cfg = config.modules.services.media.navidrome;
+  music = config.modules.services.media.music;
+  cfg = music.navidrome;
 in
 {
-  options.modules.services.media.navidrome = {
+  options.modules.services.media.music.navidrome = {
     enable = mkBoolOpt false;
     image = mkOpt types.str "docker.io/deluan/navidrome:0.63.2";
 
     lastfmApiKey = mkOption {
       type = types.nullOr types.str;
       default = null;
-      description = ''
-        Optional Last.fm API key. Navidrome uses it for artist images, bios and
-        similar-artist data, which is what backs the Instant Mix / radio
-        feature -- without it, suggestions are limited to your own play counts.
-      '';
+      description = "Optional Last.fm API key.";
     };
 
     lastfmSecret = mkOption {
@@ -46,7 +43,6 @@ in
           image = cfg.image;
           volumes = [
             "${dataDir}:/data:rw"
-            # Read-only: Lidarr owns this tree, Navidrome only indexes it.
             "${musicDir}:/music:ro"
             "/etc/localtime:/etc/localtime:ro"
           ];
@@ -54,8 +50,8 @@ in
             TZ = "Europe/Berlin";
             ND_MUSICFOLDER = "/music";
             ND_DATAFOLDER = "/data";
-            # Lidarr moves and renames files constantly; without this, deleted
-            # paths linger in the index forever.
+            # Lidarr moves files constantly; without this, deleted paths
+            # linger in the index forever.
             ND_SCANNER_PURGEMISSING = "always";
             ND_LOGLEVEL = "info";
           } // optionalAttrs (cfg.lastfmApiKey != null) {
@@ -76,8 +72,7 @@ in
 
     modules.services.reverseProxy.proxies.navidrome = {
       publicPort = publicPort;
-      # Navidrome has its own accounts, and the Subsonic clients that talk to it
-      # cannot answer a basic-auth challenge.
+      # Subsonic clients cannot answer a basic-auth challenge.
       auth = false;
     };
   };

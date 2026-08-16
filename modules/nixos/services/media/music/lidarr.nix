@@ -4,18 +4,15 @@ with lib.my;
 
 let
   configDir = "/var/lib/lidarr/config";
-  musicDir = "/data/media/music";
-  # Mounted at the same path inside every container of the music stack so that
-  # the paths Lidarr, slskd and Soularr exchange are literally identical --
-  # Lidarr imports by path, and a rewrite rule between them is the usual way
-  # this stack breaks.
-  downloadsDir = "/data/downloads/slskd";
+  musicDir = music.libraryDir;
+  downloadsDir = "${music.downloadsDir}/slskd";
   publicPort = 8686;
 
-  cfg = config.modules.services.media.lidarr;
+  music = config.modules.services.media.music;
+  cfg = music.lidarr;
 in
 {
-  options.modules.services.media.lidarr = {
+  options.modules.services.media.music.lidarr = {
     enable = mkBoolOpt false;
     image = mkOpt types.str "lscr.io/linuxserver/lidarr:3.1.0.4875-ls37";
   };

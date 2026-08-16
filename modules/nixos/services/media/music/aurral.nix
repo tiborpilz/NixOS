@@ -4,32 +4,28 @@ with lib.my;
 
 let
   configDir = "/var/lib/aurral/config";
-  musicDir = "/data/media/music";
+  musicDir = music.libraryDir;
   publicPort = 3001;
 
-  cfg = config.modules.services.media.aurral;
+  music = config.modules.services.media.music;
+  cfg = music.aurral;
 in
 {
-  options.modules.services.media.aurral = {
+  options.modules.services.media.music.aurral = {
     enable = mkBoolOpt false;
     image = mkOpt types.str "ghcr.io/lklynet/aurral:2.0.3";
 
     contactEmail = mkOption {
       type = types.str;
-      description = ''
-        Address sent in the MusicBrainz API User-Agent header. MusicBrainz
-        rate-limits (and eventually blocks) anonymous clients, so this is not
-        optional in practice.
-      '';
+      description = "Address sent in the MusicBrainz API User-Agent header.";
     };
 
     envFile = mkOption {
       type = types.nullOr types.str;
       default = null;
       description = ''
-        Optional sops-encrypted env file for LIDARR_API_KEY and, if you want
-        artist artwork, LASTFM_API_KEY. Aurral 2.x can also be configured
-        entirely from its web UI, in which case this can stay null.
+        Optional sops-encrypted env file. Recognised keys: LIDARR_API_KEY,
+        LASTFM_API_KEY.
       '';
     };
   };
@@ -42,7 +38,6 @@ in
     virtualisation.quadlet.containers.aurral = {
       containerConfig = {
         image = cfg.image;
-        # Host networking so Aurral can reach Lidarr on its published port.
         networks = [ "host" ];
         volumes = [
           "${configDir}:/config:rw"

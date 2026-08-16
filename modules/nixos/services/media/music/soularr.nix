@@ -4,18 +4,17 @@ with lib.my;
 
 let
   dataDir = "/var/lib/soularr";
-  # Soularr insists on reading config.ini from /data, so unlike Lidarr and slskd
-  # it cannot mount the downloads at their host path -- /data/downloads/... would
-  # nest inside the config mount. Its config file distinguishes the two views
-  # anyway: [Slskd] download_dir is Soularr's, [Lidarr] download_dir is Lidarr's.
-  completeDir = "/data/downloads/slskd/complete";
+  # Soularr reads config.ini from /data, so unlike the rest of the stack it
+  # cannot mount the downloads at their host path -- they would nest inside the
+  # config mount. Its config file distinguishes the two views anyway.
+  completeDir = "${music.downloadsDir}/slskd/complete";
   containerCompleteDir = "/downloads";
   publicPort = 8265;
 
-  cfg = config.modules.services.media.soularr;
+  music = config.modules.services.media.music;
+  cfg = music.soularr;
 
-  # Soularr's config.ini is read by Python's configparser, which wants
-  # Python-style booleans rather than nix's `true`/`false`.
+  # configparser wants Python-style booleans, not nix's `true`/`false`.
   toIni = generators.toINI {
     mkKeyValue = generators.mkKeyValueDefault
       {
@@ -30,8 +29,8 @@ let
       } " = ";
   };
 
-  # API keys are injected at runtime instead of being interpolated here: the
-  # rendered file would otherwise land in the world-readable nix store.
+  # Keys are injected at runtime; interpolating them here would put the
+  # rendered file in the world-readable nix store.
   configTemplate = pkgs.writeText "soularr-config.ini.in" (toIni cfg.settings);
 
   renderConfig = pkgs.writeShellScript "soularr-render-config" ''
@@ -48,7 +47,7 @@ let
   '';
 in
 {
-  options.modules.services.media.soularr = {
+  options.modules.services.media.music.soularr = {
     enable = mkBoolOpt false;
     image = mkOpt types.str "docker.io/mrusse08/soularr:v1.2.2";
 
@@ -70,8 +69,8 @@ in
       type = types.str;
       description = ''
         Path to a file containing only slskd's API key. Must be the same value
-        as SLSKD_API_KEY in `modules.services.media.slskd.envFile`, and that key
-        needs the administrator role.
+        as SLSKD_API_KEY in `modules.services.media.music.slskd.envFile`, and
+        that key needs the administrator role.
       '';
     };
 
@@ -86,11 +85,11 @@ in
   };
 
   config = mkIf cfg.enable {
-    modules.services.media.soularr.settings = {
+    modules.services.media.music.soularr.settings = {
       Lidarr = mkDefault {
         api_key = "@LIDARR_API_KEY@";
         host_url = "http://localhost:8686";
-        # The path as *Lidarr* sees it -- lidarr.nix mounts it at its host path.
+        # As Lidarr sees it.
         download_dir = completeDir;
         disable_sync = false;
       };
@@ -99,7 +98,7 @@ in
         api_key = "@SLSKD_API_KEY@";
         host_url = "http://localhost:5030";
         url_base = "/";
-        # The path as *Soularr* sees it.
+        # As Soularr sees it.
         download_dir = containerCompleteDir;
         delete_searches = false;
         stalled_timeout = 3600;
@@ -121,7 +120,6 @@ in
         minimum_peer_upload_speed = 0;
         minimum_filename_match_ratio = "0.8";
         minimum_search_interval = 5;
-        # Ordered best-first; Soularr takes the first match it can get.
         allowed_filetypes = "flac 24/192,flac 16/44.1,flac,mp3 320,mp3";
         album_prepend_artist = false;
         search_type = "incrementing_page";
@@ -159,9 +157,8 @@ in
     virtualisation.quadlet.containers.soularr = {
       containerConfig = {
         image = cfg.image;
-        # Host networking so `localhost` reaches both Lidarr's and slskd's
-        # published ports -- slskd lives behind its own VPN pod and is only
-        # reachable via the host, so a shared pod is not an option.
+        # Host networking so `localhost` reaches Lidarr and slskd; slskd is
+        # behind its own VPN pod, so a shared pod is not an option.
         networks = [ "host" ];
         volumes = [
           "${dataDir}:/data:rw"
