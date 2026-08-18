@@ -1,0 +1,125 @@
+[
+  {
+    "context": "VimControl && !menu",
+    "bindings": {
+      "space space": "command_palette::Toggle",
+
+      "space p f": "file_finder::Toggle",
+      "space f h": "zed::OpenDocs",
+
+      "space s p": "pane::DeploySearch",
+      "space s r": "editor::SpawnNearestTask",
+      "space s c": "terminal_panel::Toggle",
+
+      "space b b": "tab_switcher::ToggleAll",
+      "space b p": "pane::ActivatePreviousItem",
+      "space b n": "pane::ActivateNextItem",
+      "space b k": "pane::CloseActiveItem",
+
+      "space c r": "editor::Rename",
+      "space c a": "editor::ToggleCodeActions",
+      "space c d": "editor::GoToDefinition",
+      "space c shift-d": "editor::GoToDeclaration",
+      "space c g": "editor::Hover",
+      "space c e": "editor::GoToDiagnostic",
+      "space c s": "outline_panel::ToggleFocus",
+      "space c shift-x": "diagnostics::Deploy",
+      "space c shift-g shift-d": "editor::GoToDefinition",
+      "space c shift-g shift-r": "editor::FindAllReferences",
+      "space c shift-g shift-t": "editor::GoToTypeDefinition",
+      "space c shift-g shift-i": "editor::GoToImplementation",
+
+      "space x x": "diagnostics::Deploy",
+      "space x shift-x": "diagnostics::DeployCurrentFile",
+      "space c l": "editor::FindAllReferences",
+
+      "space o p": "project_panel::ToggleFocus",
+      "space o shift-p": "pane::RevealInProjectPanel",
+
+      "space w v": "pane::SplitRight",
+      "space w h": "pane::SplitDown",
+      "space shift-t z": "workspace::ToggleCenteredLayout",
+      "space z z": "workspace::ToggleCenteredLayout",
+
+      "space p h a": "editor::ToggleBookmark",
+      "space p h h": "editor::ViewBookmarks",
+      "space p t": "task::Spawn",
+      "space p r": "task::Spawn",
+
+      "space t r": "editor::SpawnNearestTask",
+      "space t d": "debugger::Start",
+      "space t shift-r": "task::Spawn",
+      "space t l": "task::Rerun",
+      "space t o": "terminal_panel::ToggleFocus",
+      "space t shift-o": "terminal_panel::Toggle",
+      "space t f": "pane::AlternateFile",
+
+      "space d b": "editor::ToggleBreakpoint",
+      "space d c": "debugger::Continue",
+      "space d i": "debugger::StepInto",
+      "space d o": "debugger::StepOut",
+      "space d r": "debugger::FocusConsole",
+      "space d t": "debug_panel::Toggle",
+      "space d g": "debugger::EvaluateSelectedText",
+      "space d w": "console::WatchExpression",
+      "space d s": "debugger::FocusFrames",
+      "space d v": "debug_panel::ToggleFocus",
+
+      "space g g": "git_panel::ToggleFocus",
+      "space g l": "git::FileHistory",
+      "space g b": "git::Branch",
+      "space g shift-b": "editor::BlameHover",
+      "space g t shift-b": "editor::ToggleGitBlameInline",
+      "space g r": "git::ReviewDiff",
+      "space g shift-r": "git::CompareWithBranch",
+      "space g d": "git::DiffBranch",
+      "space g shift-d": "git::CompareWithBranch",
+      "space g shift-t": "git::FileHistory",
+      "space g shift-n": "editor::ViewBookmarks",
+      "space g n": "editor::ToggleBookmarkWithLabel",
+      "space g c c": "editor::SubmitDiffReviewComment",
+      "space g c e": "editor::EditReviewComment",
+      "space g c d": "editor::DeleteReviewComment",
+      "space g c k": "editor::SendReviewToAgent",
+
+      "space a c": "agent::ToggleFocus",
+      "space a f": "agent::ToggleFocus",
+      "space a r": "agents_sidebar::ToggleThreadHistory",
+      "space a shift-c": "agents_sidebar::ToggleThreadHistory",
+      "space a m": "agent::ToggleModelSelector",
+      "space a b": "agent::OpenAddContextMenu",
+      "space a a": "agent::KeepAll",
+      "space a d": "agent::RejectAll",
+
+      "space k k": "terminal_panel::ToggleFocus",
+      "space k c": "agent::ToggleFocus",
+      "space k s": "agent::ToggleProfileSelector",
+      "space k f": "agent::OpenAddContextMenu",
+      "space k p": "assistant::InlineAssist",
+
+      "space o c": "workspace::ToggleEditPrediction",
+      "space shift-a o": "agent::ToggleFocus",
+      "space shift-a m": "agent::OpenAddContextMenu"
+    }
+  },
+  {
+    "context": "vim_mode == normal && !menu",
+    "bindings": {
+      "space c f": "editor::Format"
+    }
+  },
+  {
+    "context": "vim_mode == visual && !menu",
+    "bindings": {
+      "space c f": "editor::FormatSelections",
+      "space a s": "agent::AddSelectionToThread",
+      "space k v": "agent::AddSelectionToThread"
+    }
+  },
+  {
+    "context": "vim_mode == insert",
+    "bindings": {
+      "ctrl-space": "editor::AcceptEditPrediction"
+    }
+  }
+]

@@ -170,6 +170,7 @@ with mylib;
 
     modules.editors.neovim.enable = true;
     modules.editors.emacs.enable = true;
+    modules.editors.zed.enable = true;
 
     modules.dev.rust.enable = true;
     modules.dev.web.enable = true;
