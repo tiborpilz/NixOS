@@ -1,0 +1,76 @@
+{
+  "$schema": "zed://schemas/settings",
+  "vim_mode": true,
+  "base_keymap": "Emacs",
+  "ui_font_size": 16,
+  "buffer_font_size": 15,
+  "relative_line_numbers": "enabled",
+  "theme": {
+    "mode": "system",
+    "light": "Nord Light",
+    "dark": "Nord Dark"
+  },
+  "auto_install_extensions": {
+    "nord": true
+  },
+  "file_finder": {
+    "file_icons": true,
+    "modal_max_width": "medium"
+  },
+  "tab_bar": {
+    "show": false
+  },
+  "status_bar": {
+    "experimental.show": true,
+    "show_active_file": true,
+    "active_language_button": true,
+    "cursor_position_button": true,
+    "line_endings_button": false,
+    "active_encoding_button": "non_utf8"
+  },
+  "scrollbar": {
+    "show": "never"
+  },
+  "minimap": {
+    "show": "never"
+  },
+  "gutter": {
+    "line_numbers": true,
+    "runnables": false,
+    "bookmarks": true,
+    "breakpoints": true,
+    "folds": true,
+    "min_line_number_digits": 4
+  },
+  "project_panel": {
+    "button": false,
+    "dock": "right",
+    "entry_spacing": "standard",
+    "file_icons": true,
+    "folder_icons": true,
+    "git_status": true,
+    "auto_reveal_entries": true,
+    "starts_open": false,
+    "auto_fold_dirs": false,
+    "sticky_scroll": false,
+    "hide_gitignore": false,
+    "hide_hidden": false,
+    "scrollbar": {
+      "show": "never",
+      "horizontal_scroll": true
+    }
+  },
+  "outline_panel": {
+    "button": false,
+    "dock": "right",
+    "file_icons": true,
+    "folder_icons": true,
+    "auto_reveal_entries": true,
+    "scrollbar": {
+      "show": "never"
+    }
+  },
+  "terminal": {
+    "dock": "bottom"
+  }
+}
