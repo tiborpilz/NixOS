@@ -100,13 +100,9 @@ return {
             { icon = " ", key = "g", desc = "Grep Project", action = ":Telescope live_grep" },
             { icon = " ", key = "r", desc = "Recent Files", action = ":Telescope oldfiles" },
             { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
-            { icon = " ", key = "s", desc = "Scratch Buffer", action = function() require("snacks").scratch() end },
-            { icon = "󰎚 ", key = "o", desc = "Find Note", action = pick_note },
-            { icon = " ", key = "j", desc = "Today's Journal", action = function() require("org-roam").ext.dailies.goto_today() end },
-            { icon = " ", key = "t", desc = "Run Task", action = ":OverseerRun" },
+            { icon = " ", key = "x", desc = "Scratch Buffer", action = ":enew | setlocal buftype=nofile bufhidden=hide noswapfile" },
             { icon = " ", key = "c", desc = "Config", action = ":Telescope find_files cwd=" .. vim.fn.stdpath("config") },
-            { icon = "󰒲 ", key = "l", desc = "Lazy", action = ":Lazy" },
-            { icon = " ", key = "q", desc = "Quit", action = ":qa" },
+            { icon = " ", key = "l", desc = "Lazy", action = ":Lazy" },
           },
         },
         sections = {
@@ -118,12 +114,10 @@ return {
             title = "Recent Files",
             section = "recent_files",
             limit = 6,
-            -- git scratch buffers aren't files you want to reopen
             filter = function(file) return not file:match("/%.git/") end,
             indent = 2,
             padding = 1,
           },
-          { pane = 2, icon = "󰠮 ", title = "Recent Notes", indent = 2, padding = 1, recent_notes(5) },
           {
             pane = 2,
             icon = " ",
