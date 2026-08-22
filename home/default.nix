@@ -121,8 +121,6 @@ with mylib;
       # AST-aware code search
       ast-grep
 
-      unstable.devenv
-
       # Connect to private nix cache
       attic-client
     ]) ++ lib.optionals (pkgs.stdenv.isLinux && config.graphical) [
@@ -165,6 +163,7 @@ with mylib;
 
     modules.shell.git.enable = true;
     modules.shell.direnv.enable = true;
+    modules.shell.devenv.enable = true;
     modules.shell.mise.enable = true;
     modules.shell.zk.enable = true;
 
