@@ -102,6 +102,10 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
+    sops.secrets.karakeepEnv = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
     sops.secrets.woodpeckerEnv = {
       sopsFile = ./secrets/secrets.yaml;
       owner = "woodpecker";
@@ -354,6 +358,10 @@ with lib;
         enable = true;
         envFile = config.sops.secrets.linkwardenEnv.path;
       };
+      karakeep = {
+        enable = true;
+        envFile = config.sops.secrets.karakeepEnv.path;
+      };
       syncthing.enable = true;
       tandoor.enable = true;
       paperless.enable = true;
@@ -392,6 +400,12 @@ with lib;
         displayName = "Grafana";
         redirectUris = [
           "https://grafana.tiborpilz.xyz/login/generic_oauth"
+        ];
+      };
+      authentik.applications.karakeep = {
+        displayName = "Karakeep";
+        redirectUris = [
+          "https://karakeep.tiborpilz.xyz/api/auth/callback/custom"
         ];
       };
       # Grants Grafana org Admin via role_attribute_path in the monitoring module.

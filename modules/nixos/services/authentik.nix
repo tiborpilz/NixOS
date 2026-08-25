@@ -84,6 +84,10 @@ let
     ) cfg.groups)
   ));
 
+  blueprintFiles =
+    (lib.mapAttrsToList (name: _: "${name}.yaml") cfg.applications)
+    ++ (lib.mapAttrsToList (name: _: "group-${sanitizeName name}.yaml") cfg.groups);
+
   hasApps = cfg.applications != { };
   hasBlueprints = cfg.applications != { } || cfg.groups != { };
 in
@@ -261,6 +265,37 @@ with mylib;
       };
     }
 
+    (lib.mkIf hasBlueprints {
+      # Authentik re-applies a blueprint only when the file's hash changes, and the
+      # files name secrets as !Env, so a rotated secret never reaches the database.
+      # sops restarts this unit when the rendered env changes.
+      systemd.services.authentik-blueprints = {
+        description = "Re-apply Authentik blueprints against the current secrets";
+        after = [ "authentik-server.service" "authentik-worker.service" ];
+        wantedBy = [ "multi-user.target" ];
+        path = [ pkgs.podman pkgs.curl ];
+        serviceConfig = {
+          Type = "oneshot";
+          # sops uses try-restart, which skips units that are not active.
+          RemainAfterExit = true;
+        };
+        script = ''
+          for _ in $(seq 1 60); do
+            if curl -sf -o /dev/null http://localhost:${toString cfg.publicPort}/-/health/ready/ \
+              && podman exec authentik-worker true 2>/dev/null; then
+              break
+            fi
+            sleep 5
+          done
+
+          ${lib.concatMapStringsSep "\n" (f: ''
+            podman exec authentik-worker ak apply_blueprint /blueprints/nixos/${f} \
+              || echo "failed to apply ${f}" >&2
+          '') blueprintFiles}
+        '';
+      };
+    })
+
     (lib.mkIf hasApps {
       sops.secrets = lib.listToAttrs (lib.concatLists (lib.mapAttrsToList (name: _: [
         { name = "authentik_${name}_client_id"; value = { }; }
@@ -268,6 +303,12 @@ with mylib;
       ]) cfg.applications));
 
       sops.templates."authentik-blueprints.env" = {
+        # The containers read this file once, at start.
+        restartUnits = [
+          "authentik-server.service"
+          "authentik-worker.service"
+          "authentik-blueprints.service"
+        ];
         content = lib.concatStringsSep "\n" (lib.mapAttrsToList (name: _: ''
           ${envVarPrefix name}_CLIENT_ID=${config.sops.placeholder."authentik_${name}_client_id"}
           ${envVarPrefix name}_CLIENT_SECRET=${config.sops.placeholder."authentik_${name}_client_secret"}
