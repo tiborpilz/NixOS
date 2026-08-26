@@ -38,6 +38,11 @@ in
   options.modules.shell.devenv = with types; {
     enable = mylib.mkBoolOpt false;
 
+    useHook = mylib.mkOpt' bool false ''
+      Activate devenv projects from a zsh hook. Recommended approach, but will change the behavior
+      of the shell prompt. If false, use either `devenv shell` or `.envrc`.
+    '';
+
     package = mylib.mkOpt package pkgs.unstable.devenv;
 
     shell = mylib.mkOpt' (enum [ "bash" "zsh" "fish" "nu" ]) "zsh" ''
@@ -50,7 +55,7 @@ in
 
     home.sessionVariables.DEVENV_SHELL_TYPE = cfg.shell;
 
-    modules.shell.zsh.rcInit = ''
+    modules.shell.zsh.rcInit = mkIf cfg.useHook ''
       source ${hookZsh}
       ${hookGuard}
     '';

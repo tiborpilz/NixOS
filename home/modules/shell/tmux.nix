@@ -61,9 +61,19 @@ in
         # Actually copy to clipboard
         bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'pbcopy'
 
-        # Switch to (another) workspace, broken for now
-        # TODO: fix
-        # bind g gotoworkspace
+        # Jump to a worktree: live sessions plus this repo's dormant worktrees.
+        # prefix + G widens it to every repo under ~/Code.
+        bind-key g display-popup -E -w 80% -h 60% "wtmux pick"
+        bind-key G display-popup -E -w 80% -h 60% "wtmux pick -a"
+
+        # Create a worktree and its session. A window rather than a popup, because
+        # a repo's own wt hooks prompt for approval on first use.
+        bind-key C command-prompt -p "new worktree:" \
+          "new-window -c '#{pane_current_path}' \"wt switch --create '%%'\""
+
+        # Pull the "claude <id>" sessions Claude Code spawns into the session
+        # their directory belongs to.
+        bind-key A run-shell -b "wtmux adopt"
 
         # Attach current directory to session
         bind a attach -c "#{pane_current_path}"
@@ -116,12 +126,15 @@ in
         set-hook -g window-layout-changed 'if-shell "$is_many" "set-option -w pane-active-border-style fg=colour4" "set-option -w pane-active-border-style fg=colour0'
         set-hook -g session-window-changed 'if-shell "$is_many" "set-option -w pane-active-border-style fg=colour4" "set-option -w pane-active-border-style fg=colour0'
 
-        set -g status-left-length 40
-        set -g status-left '#[fg=colour4]  #S #[default]'
+        # Worktree sessions are named <repo>/<branch>. Split them so the repo
+        # stays dim and the branch, the part that actually distinguishes two
+        # windows sitting in different worktrees, reads first.
+        set -g status-left-length 64
+        set -g status-left '#[fg=colour4]  #{?#{m:*/*,#{session_name}},#{=/18/…:#{s|/.*||:session_name}}#[fg=colour6] ⑂ #[fg=colour7]#{=/30/…:#{s|^[^/]*/||:session_name}},#{session_name}}#[default] '
 
         set -g status-right-length 512
 
-        set -g status-right '#(cat #{socket_path}-\#{session_id}-vimbridge-R)'
+        set -g status-right '#(${pkgs.gitmux}/bin/gitmux -cfg $XDG_CONFIG_HOME/gitmux/gitmux.conf "#{pane_current_path}") #(cat #{socket_path}-\#{session_id}-vimbridge-R)'
       '';
     };
 
@@ -141,7 +154,7 @@ in
           clean: '#[fg=colour4]'
           insertions: '#[fg=colour4]'
           deletions: '#[fg=colour4]'
-        layout: [branch, ' ', divergence, '- ', flags]
+        layout: [divergence, ' ', flags]
     '';
 
     # I'm only using starship as a panel for tmux, hence the config is here

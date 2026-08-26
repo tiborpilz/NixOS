@@ -3,12 +3,9 @@
 # Keeps tmux sessions in sync with git worktrees.
 #
 # A worktree is one tmux session. The primary worktree gets the repo name,
-# every other worktree gets <repo>/<branch>. Windows inside a session are
-# free to mean whatever the running command says they mean.
+# every other worktree gets <repo>/<branch>.
 #
-# wt (worktrunk) drives ensure and kill from its hooks, see
-# home/config/worktrunk/config.toml. The rest is for use by hand or from
-# tmux keybindings.
+# Uses wt (worktree) under the hood with hooks.
 
 set -euo pipefail
 

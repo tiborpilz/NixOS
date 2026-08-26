@@ -48,8 +48,8 @@ in
       lazygit # for noobs
       unstable.opencommit
 
-      unstable.worktrunk
       # Worktree Management
+      unstable.worktrunk
       my.wtp
     ];
 
@@ -60,6 +60,10 @@ in
       "git/attributes".source = ../../config/git/attributes;
       "git/gitk".source = ../../config/git/gitk;
       "git/ignore_global".source = ../../config/git/ignore_global;
+
+      # Out of store so the tmux hooks can be edited without a rebuild
+      "worktrunk/config.toml".source = config.lib.file.mkOutOfStoreSymlink
+        "${config.home.homeDirectory}/Code/nixos/home/config/worktrunk/config.toml";
     };
 
     modules.shell.zsh.rcInit = ''

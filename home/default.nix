@@ -70,7 +70,6 @@ with mylib;
 
       # htop and btop are system dashboards for the terminal
       htop
-      btop
 
       # Pandoc is a document converter
       pandoc
