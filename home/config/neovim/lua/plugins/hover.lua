@@ -27,11 +27,15 @@ return {
               'Diagnostics',
               require('hovercraft.provider.diagnostics').new(),
             },
+            {
+              'TS Type',
+              require('hovercraft-ts-type').new(),
+            },
           }
         },
 
         window = {
-          -- border = 'single',
+          border = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' },
 
           -- enable this if you are a user of the MeanderingProgrammer/render-markdown.nvim plugin
           render_markdown_compat_mode = false,
@@ -42,8 +46,25 @@ return {
           { '<C-d>',   function() require('hovercraft').scroll({ delta = 4 }) end },
           { '<TAB>',   function() require('hovercraft').hover_next() end },
           { '<S-TAB>', function() require('hovercraft').hover_next({ step = -1 }) end },
+          { '+',       function() require('hovercraft-ts-type').expand() end },
+          { '-',       function() require('hovercraft-ts-type').collapse() end },
         }
       }
+    end,
+
+    config = function(_, opts)
+      local hovercraft = require('hovercraft')
+      hovercraft.setup(opts)
+
+      -- hovercraft has no winhighlight option, so blend the blank border into
+      -- the float the way noice and telescope do. window_config is populated
+      -- before onshow fires.
+      hovercraft.ui:register_onshow(function()
+        local winnr = hovercraft.ui.window_config and hovercraft.ui.window_config.winnr
+        if winnr and vim.api.nvim_win_is_valid(winnr) then
+          vim.wo[winnr].winhighlight = 'FloatBorder:NormalFloat,NormalFloat:NormalFloat'
+        end
+      end)
     end,
 
     keys = {
@@ -53,7 +74,11 @@ return {
         if hovercraft.is_visible() then
           hovercraft.enter_popup()
         else
-          hovercraft.hover({ current_provider = 'LSP' })
+          -- TS Type carries the same quickinfo the LSP hover is built from and
+          -- can expand it, so lead with it where vtsls is attached. <TAB> still
+          -- reaches LSP, which renders JSDoc tags far better.
+          local vtsls = #vim.lsp.get_clients({ bufnr = 0, name = 'vtsls' }) > 0
+          hovercraft.hover({ current_provider = vtsls and 'TS Type' or 'LSP' })
         end
       end },
       { "<leader>ce", function()
@@ -65,6 +90,15 @@ return {
           hovercraft.hover({ current_provider = 'Diagnostics' })
         end
       end }
+    },
+  },
+  {
+    'nemanjamalesija/ts-expand-hover.nvim',
+    ft = { 'typescript', 'typescriptreact' },
+    opts = {
+      keymaps = {
+        hover = '<leader>ct',
+      },
     },
   },
   {

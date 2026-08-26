@@ -8,6 +8,12 @@ return {
           backend = "tmux",
           enabled = true,
         },
+        win = {
+          keys = {
+            -- <c-w> as the window prefix, at the cost of the CLI's own delete-word
+            wincmd = { "<c-w>", "<c-\\><c-n><c-w>", mode = "t", desc = "window commands" },
+          },
+        },
       },
     },
     -- <leader>a is claudecode.nvim's, so sideKick gets <leader>k
