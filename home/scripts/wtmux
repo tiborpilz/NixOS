@@ -1,0 +1,262 @@
+#!/usr/bin/env bash
+
+# Keeps tmux sessions in sync with git worktrees.
+#
+# A worktree is one tmux session. The primary worktree gets the repo name,
+# every other worktree gets <repo>/<branch>. Windows inside a session are
+# free to mean whatever the running command says they mean.
+#
+# wt (worktrunk) drives ensure and kill from its hooks, see
+# home/config/worktrunk/config.toml. The rest is for use by hand or from
+# tmux keybindings.
+
+set -euo pipefail
+
+PROJECTS_DIR=${PROJECTS_DIR:-$HOME/Code}
+
+# tmux rejects . and : in session names, wt's own sanitize filter only maps slashes
+sanitize() {
+  printf '%s' "${1//[.\/\\:]/-}"
+}
+
+session_name() {
+  local repo=$1 branch=$2 primary=${3:-0}
+  if [[ $primary == 1 ]]; then
+    printf '%s' "$repo"
+  else
+    printf '%s/%s' "$repo" "$(sanitize "$branch")"
+  fi
+}
+
+# repo, branch, primary-ness, worktree root and primary root for the path in $1
+derive() {
+  local path=$1 common primary_top top repo branch primary
+  common=$(git -C "$path" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
+  primary_top=$(dirname "$common")
+  top=$(git -C "$path" rev-parse --show-toplevel 2>/dev/null) || return 1
+  repo=$(basename "$primary_top")
+  branch=$(git -C "$path" symbolic-ref --quiet --short HEAD 2>/dev/null) \
+    || branch="detached-$(git -C "$path" rev-parse --short HEAD)"
+  [[ $top == "$primary_top" ]] && primary=1 || primary=0
+  printf '%s\t%s\t%s\t%s\t%s\n' "$repo" "$branch" "$primary" "$top" "$primary_top"
+}
+
+repo_roots() {
+  find "$PROJECTS_DIR" -mindepth 2 -maxdepth 3 \
+    \( -name node_modules -o -name .direnv -o -name .devenv \) -prune -o \
+    -name .git -type d -prune -exec dirname {} \; 2>/dev/null | sort
+}
+
+# every worktree of the given repo roots (or all of them), as "session-name<tab>path"
+scan_worktrees() {
+  local roots
+  if [[ $# -gt 0 ]]; then roots=$(printf '%s\n' "$@"); else roots=$(repo_roots); fi
+  printf '%s\n' "$roots" | while read -r root; do
+    [[ -n $root ]] || continue
+    git -C "$root" worktree list --porcelain 2>/dev/null \
+      | awk -v repo="$(basename "$root")" '
+          BEGIN { RS = ""; FS = "\n" }
+          {
+            path = ""; branch = ""; head = ""
+            for (i = 1; i <= NF; i++) {
+              if ($i ~ /^worktree /)     path = substr($i, 10)
+              else if ($i ~ /^HEAD /)    head = substr($i, 6, 7)
+              else if ($i ~ /^branch /)  { branch = substr($i, 8); sub(/^refs\/heads\//, "", branch) }
+              else if ($i == "detached") branch = ""
+            }
+            if (path == "") next
+            if (NR == 1) { print repo "\t" path; next }
+            if (branch == "") branch = "detached-" head
+            gsub(/[.\/\\:]/, "-", branch)
+            print repo "/" branch "\t" path
+          }'
+  done
+}
+
+# Live session names, read once. 104 worktrees means 104 has-session calls otherwise.
+declare -A LIVE=()
+load_live() {
+  local s path
+  while IFS=$'\t' read -r s path; do [[ -n $s ]] && LIVE[$s]=$path; done \
+    < <(tmux list-sessions -F $'#{session_name}\t#{session_path}' 2>/dev/null || true)
+}
+
+exact() { printf '=%s' "$1"; }
+
+# Create the session for the worktree containing $1, then go there.
+cmd_ensure() {
+  local path name repo branch primary top primary_top existing_path existing_root
+  path=${1:-$PWD}
+  IFS=$'\t' read -r repo branch primary top primary_top < <(derive "$path") || {
+    echo "wtmux: $path is not inside a git worktree" >&2; return 1; }
+  name=$(session_name "$repo" "$branch" "$primary")
+
+  if tmux has-session -t="$name" 2>/dev/null; then
+    # two clones sharing a directory name would both want this name, say so
+    # rather than silently drop the caller into the wrong tree
+    # display-message -t <session> does not resolve #{session_path}, list-sessions does
+    existing_path=$(tmux list-sessions -F '#{session_path}' -f "#{==:#{session_name},$name}")
+    existing_root=$(git -C "$existing_path" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)
+    if [[ -n $existing_root && $(dirname "$existing_root") != "$primary_top" ]]; then
+      echo "wtmux: session $name already belongs to $(dirname "$existing_root")" >&2
+      return 1
+    fi
+  else
+    tmux new-session -d -s "$name" -c "$top"
+  fi
+
+  if [[ -n ${TMUX:-} ]]; then
+    tmux switch-client -t "$(exact "$name")"
+  else
+    echo "$name ready, attach with: tmux attach -t '$name'"
+  fi
+}
+
+cmd_kill() {
+  local name
+  if [[ $# -ge 2 ]]; then name=$(session_name "$1" "$2" "${3:-0}"); else name=$1; fi
+  if tmux kill-session -t="$name" 2>/dev/null; then echo "killed $name"; fi
+}
+
+cmd_name() {
+  local path=${1:-$PWD} repo branch primary
+  IFS=$'\t' read -r repo branch primary _ _ < <(derive "$path") || {
+    echo "wtmux: $path is not inside a git worktree" >&2; return 1; }
+  session_name "$repo" "$branch" "$primary"
+  echo
+}
+
+# Rename or absorb the "claude <id>" sessions Claude Code spawns for itself.
+cmd_adopt() {
+  local orphan path target repo branch primary win
+  load_live
+  while read -r orphan; do
+    path=$(tmux list-panes -t="$orphan" -F '#{pane_current_path}' | head -1)
+    if ! IFS=$'\t' read -r repo branch primary _ _ < <(derive "$path"); then
+      echo "skipped $orphan, $path is not a worktree"
+      continue
+    fi
+    target=$(session_name "$repo" "$branch" "$primary")
+    [[ $target == "$orphan" ]] && continue
+
+    if [[ -n ${LIVE[$target]+x} ]]; then
+      # move the windows across, the emptied session dies on its own
+      while read -r win; do
+        tmux move-window -s "$(exact "$orphan"):$win" -t "$(exact "$target"):"
+      done < <(tmux list-windows -t="$orphan" -F '#{window_index}' | sort -rn)
+      echo "moved $orphan into $target"
+    else
+      tmux rename-session -t="$orphan" "$target"
+      LIVE[$target]=1
+      echo "renamed $orphan to $target"
+    fi
+  done < <(tmux list-sessions -F '#{session_name}' 2>/dev/null | grep -E '^claude [0-9a-f]+$' || true)
+}
+
+# Rename hand-made sessions to the canonical name for their directory.
+# Reports only, unless -y. Name sessions to limit it to those.
+# The "claude <id>" sessions are left to adopt, which runs after this.
+cmd_migrate() {
+  local apply=0 s path target repo branch primary
+  [[ ${1:-} == -y ]] && { apply=1; shift; }
+  load_live
+  while read -r s; do
+    [[ $s =~ ^claude\ [0-9a-f]+$ ]] && continue
+    if [[ $# -gt 0 ]] && ! printf '%s\n' "$@" | grep -qxF "$s"; then continue; fi
+    path=${LIVE[$s]}
+    IFS=$'\t' read -r repo branch primary _ _ < <(derive "$path") || continue
+    target=$(session_name "$repo" "$branch" "$primary")
+    [[ $target == "$s" ]] && continue
+    if [[ -n ${LIVE[$target]+x} ]]; then
+      echo "collision  $s -> $target already exists, left alone"
+    elif (( apply )); then
+      tmux rename-session -t="$s" "$target"
+      LIVE[$target]=1
+      unset "LIVE[$s]"
+      echo "renamed    $s -> $target"
+    else
+      echo "would be   $s -> $target"
+    fi
+  done < <(printf '%s\n' "${!LIVE[@]}" | sort)
+  (( apply )) || echo $'\nrun `wtmux migrate -y` to apply'
+}
+
+# Migrate then adopt, in that order. Adopt first would let a "claude <id>"
+# session claim the canonical name before the hand-named one can take it.
+cmd_tidy() {
+  cmd_migrate -y "$@"
+  cmd_adopt
+}
+
+# Live sessions always, plus the worktrees of this repo. -a widens to every repo.
+candidates() {
+  local all=${1:-0} name path here
+  load_live
+  for name in "${!LIVE[@]}"; do
+    printf '●\t%s\t%s\n' "$name" "${LIVE[$name]}"
+  done | sort -t$'\t' -k2,2
+
+  if (( all )); then
+    scan_worktrees
+  else
+    here=$(git -C "$PWD" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 0
+    scan_worktrees "$(dirname "$here")"
+  fi | while IFS=$'\t' read -r name path; do
+    [[ -n ${LIVE[$name]+x} ]] || printf '○\t%s\t%s\n' "$name" "$path"
+  done
+}
+
+cmd_pick() {
+  local all=0 sel marker name path
+  [[ ${1:-} == -a ]] && all=1
+  # plain fzf, not --tmux, because the tmux binding already wraps this in display-popup
+  sel=$(candidates "$all" | fzf --delimiter='\t' --with-nth=1,2 --nth=2 \
+        --highlight-line --no-scrollbar --inline-info --pointer='' --border=horizontal \
+        --header="● live  ○ dormant$( ((all)) || echo '  (-a for every repo)')" \
+        --preview 'git -C {3} log --oneline --color=always -12 2>/dev/null || ls {3}' \
+        --preview-window='right,55%') || return 0
+  [[ -z $sel ]] && return 0
+
+  IFS=$'\t' read -r marker name path <<<"$sel"
+  if [[ $marker == '●' ]]; then
+    tmux switch-client -t "$(exact "$name")"
+  else
+    cmd_ensure "$path"
+  fi
+}
+
+cmd_list() {
+  local all=0 name path
+  [[ ${1:-} == -a ]] && all=1
+  candidates "$all" | while IFS=$'\t' read -r marker name path; do
+    printf '%s %-56s %s\n' "$marker" "$name" "$path"
+  done
+}
+
+usage() {
+  cat <<'USAGE'
+wtmux - one tmux session per git worktree
+
+  wtmux pick [-a]                     fzf over live sessions and this repo's worktrees
+  wtmux list [-a]                     the same set, printed
+  wtmux ensure [path]                 create the session for a worktree, go there
+  wtmux kill <name> | <repo> <branch> [primary]
+  wtmux name [path]                   canonical session name for a worktree
+  wtmux adopt                         rehome the "claude <id>" sessions
+  wtmux migrate [-y] [session...]     rename hand-made sessions to canonical names
+  wtmux tidy                          migrate -y, then adopt
+USAGE
+}
+
+case ${1:-pick} in
+  pick)    shift || true; cmd_pick "$@" ;;
+  list)    shift; cmd_list "$@" ;;
+  ensure)  shift; cmd_ensure "$@" ;;
+  kill)    shift; cmd_kill "$@" ;;
+  name)    shift; cmd_name "$@" ;;
+  adopt)   shift; cmd_adopt "$@" ;;
+  migrate) shift; cmd_migrate "$@" ;;
+  tidy)    shift; cmd_tidy "$@" ;;
+  -h|--help|help) usage ;;
+  *) usage; exit 1 ;;
+esac

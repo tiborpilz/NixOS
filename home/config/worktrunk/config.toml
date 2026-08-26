@@ -1,0 +1,22 @@
+# wt (worktrunk) user config. Symlinked out of the store by
+# home/modules/shell/git.nix, so edits here apply without a rebuild.
+
+# Where wtp used to put worktrees. Keeping the layout means the ~100 worktrees
+# that already exist stay where they are.
+worktree-path = "{{ repo_path }}/../worktrees/{{ branch }}"
+
+[switch]
+# wtmux moves the tmux client, so the shell we came from should stay where it
+# is. `wt switch --cd` overrides this for a one-off.
+cd = false
+
+# post-switch fires on every switch result, new worktree or existing one, so it
+# is the only place tmux needs hooking. wtmux derives the session name from the
+# path, which keeps one implementation of the naming rule.
+[post-switch]
+tmux = "wtmux ensure '{{ worktree_path }}'"
+
+# The path is gone by now, so pass the parts. A removed worktree is never the
+# primary one, so the name is always <repo>/<branch>.
+[post-remove]
+tmux = "wtmux kill '{{ repo }}' '{{ branch }}'"
