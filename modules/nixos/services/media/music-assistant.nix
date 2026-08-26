@@ -14,27 +14,12 @@ in
 
     image = mkOption {
       type = types.str;
-      default = "ghcr.io/music-assistant/server:2.9.9";
-      description = ''
-        Upstream container rather than nixpkgs' services.music-assistant, which
-        is stuck on 2.8.7. 2.9.x pins torch, torchaudio, librosa and
-        modern_colorthief, so packaging it is not a cheap bump.
-
-        (The original trigger for the bump was a 2.8.7 crash with KeyError
-        'refresh_token' when Spotify declined to rotate a refresh token, fixed
-        in music-assistant/server#4494. That no longer applies now that the
-        Spotify providers are gone, but the packaging argument still holds.)
-      '';
+      default = "ghcr.io/music-assistant/server:2.9.13";
     };
 
     dataDir = mkOption {
       type = types.str;
       default = "/var/lib/music-assistant";
-      description = ''
-        Bind-mounted at /data, which the image's entrypoint already passes as
-        --data-dir. Must be a real directory: the old native service used
-        DynamicUser, which makes this path a symlink into /var/lib/private.
-      '';
     };
   };
 
