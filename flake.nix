@@ -39,6 +39,7 @@
 
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3.16.0";
     determinate.inputs.nix.follows = "determinate-nix";
+    determinate.inputs.nixpkgs.follows = "nixpkgs";
 
     claude-code.url = "github:sadjow/claude-code-nix";
     claude-code.inputs.nixpkgs.follows = "nixpkgs";
@@ -120,12 +121,6 @@
               overlays = [ inputs.emacs-overlay.overlays.default ];
             };
             my = self.packages."${prev.system}";
-            # Temporary fix as I can't switch to 24.11 yet
-            ghostscript = nixpkgs-unstable.legacyPackages.${prev.system}.ghostscript;
-            # Backport of upstream nixpkgs alias (Feb 2026): drop the FHS-env
-            # wrapper. On Darwin its container-init build fails (`-static` needs
-            # crt0). epkgs.copilot.postPatch refers to this attribute, so even
-            # eval-only graphs fail without the override.
             copilot-language-server-fhs = final.copilot-language-server;
           })
           inputs.devshell.overlays.default
