@@ -11,6 +11,9 @@ return {
       vim.g.mkdp_filetypes = { "markdown" }
     end,
     ft = { "markdown" },
+    keys = {
+      { "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", ft = "markdown", desc = "Preview" },
+    },
   },
   ---- Folding/Concealing
   {
