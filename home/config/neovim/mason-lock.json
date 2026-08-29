@@ -4,5 +4,6 @@
   "markdownlint": "0.49.1",
   "mpls": "v0.22.0",
   "nil": "2025-06-13",
-  "rnix-lsp": "0.2.5"
+  "rnix-lsp": "0.2.5",
+  "typescript-language-server": "6.0.0"
 }

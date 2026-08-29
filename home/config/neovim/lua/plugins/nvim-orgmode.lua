@@ -50,7 +50,6 @@ return {
   --   opts = {}
   -- },
   -- Org roam in vim
-  -- TODO: this slows down startup, investigate
   {
     "chipsenkbeil/org-roam.nvim",
     dependencies = {
@@ -58,7 +57,9 @@ return {
         "nvim-orgmode/orgmode",
       },
     },
-    lazy = true,
+    -- Nothing requires this module, so without a load trigger lazy.nvim never
+    -- runs config and none of the roam keymaps get created.
+    event = "VeryLazy",
     config = function()
       local org_directory = "~/org"
       local org_roam_directory = org_directory .. "/roam"
@@ -67,12 +68,42 @@ return {
         bindings = {
           prefix = "<leader>nr",
         },
+        extensions = {
+          dailies = {
+            directory = "daily",
+            bindings = {
+              goto_prev_date = "<prefix>db",
+              goto_date = "<prefix>dd",
+              capture_date = "<prefix>dD",
+              goto_next_date = "<prefix>df",
+              goto_tomorrow = "<prefix>dm",
+              capture_tomorrow = "<prefix>dM",
+              capture_today = "<prefix>dn",
+              goto_today = "<prefix>dt",
+              goto_yesterday = "<prefix>dy",
+              capture_yesterday = "<prefix>dY",
+              find_directory = "<prefix>d-",
+            },
+            templates = {
+              d = {
+                description = "default",
+                template = "* %?",
+                target = "%<%Y-%m-%d>.org",
+              },
+            },
+          },
+        },
         directory = org_roam_directory,
         -- optional
         org_files = { org_roam_directory },
         org_agenda_files = org_directory .. "/**/*",
         org_default_notes_file = org_roam_directory .. "/refile.org",
       })
+
+      -- Doom binds capture-today twice; the plugin's config takes one lhs per action.
+      vim.keymap.set("n", "<leader>nrdT", function()
+        require("org-roam").ext.dailies.capture_today()
+      end, { desc = "Capture today's note" })
     end
   },
   -- Telescope integration for finding headlines etc.
