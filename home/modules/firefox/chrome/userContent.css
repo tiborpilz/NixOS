@@ -30,13 +30,13 @@ pre, code, samp, var {
 @-moz-document url-prefix(moz-extension://) {
   :root {
     scrollbar-width: none !important;
-    --tridactyl-bg: #101010;
+    --tridactyl-bg: #1c1c1c;
     --tridactyl-fg: #b9b9b9;
     font-family: "FiraCode Nerd Font";
   }
 }
 
-/* ── NEWTAB / HOMEPAGE — minimal, matches the grayscale-dark theme ─── */
+/* ── NEWTAB / HOMEPAGE — minimal, matches the tridactyl colourscheme ── */
 @-moz-document url("about:home"), url("about:newtab") {
   .search-wrapper,
   .top-site-outer .title {

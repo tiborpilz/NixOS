@@ -11,57 +11,8 @@ with lib;
 let
   cfg = config.modules.firefox;
   mylib = import ../../../lib { inherit inputs lib pkgs; };
-  # plasma-manager is only in home-manager.sharedModules on NixOS hosts, so the
-  # options probe doubles as the Darwin guard — same trick as gui/plasma.nix.
   plasmaActive = config.modules.gui.plasma.enable && hasAttr "plasma" options.programs;
-
-  # Firefox application extension path — where profile-scoped add-ons live.
-  appExtensionPath = "extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}";
-
-  # Minimal add-on package consumable by home-manager's
-  # programs.firefox.profiles.<name>.extensions.packages: an xpi placed at
-  # share/mozilla/<appExtensionPath>/<addonId>.xpi. Pinned to specific AMO
-  # versions for reproducibility (no NUR input needed).
-  mkFirefoxAddon =
-    {
-      addonId,
-      version,
-      url,
-      hash,
-    }:
-    pkgs.runCommand "firefox-addon-${version}-${removeSuffix ".xpi" (baseNameOf url)}"
-      {
-        passthru = {
-          inherit addonId version;
-        };
-      }
-      ''
-        mkdir -p "$out/share/mozilla/${appExtensionPath}"
-        cp "${pkgs.fetchurl { inherit url hash; }}" \
-          "$out/share/mozilla/${appExtensionPath}/${addonId}.xpi"
-      '';
-
-  # scifox profile add-ons (github.com/scientiac/scifox)
-  firefoxAddons = {
-    tridactyl = mkFirefoxAddon {
-      addonId = "tridactyl.vim@cmcaine.co.uk";
-      version = "1.25.0";
-      url = "https://addons.mozilla.org/firefox/downloads/file/4988638/tridactyl_vim-1.25.0.xpi";
-      hash = "sha256-RvTexbgcCKaIxwShsup7RfRLOkocQpX5kcq/+2cPGBY=";
-    };
-    sidebery = mkFirefoxAddon {
-      addonId = "{3c078156-979c-498b-8990-85f7987dd929}";
-      version = "5.6.1";
-      url = "https://addons.mozilla.org/firefox/downloads/file/4903712/sidebery-5.6.1.xpi";
-      hash = "sha256-6KCktVarfdU2iXwYFq+dCRgDAiMGjqZoOgQ3YQOmyvI=";
-    };
-    adaptive-tab-bar-colour = mkFirefoxAddon {
-      addonId = "ATBC@EasonWong";
-      version = "4.1.0";
-      url = "https://addons.mozilla.org/firefox/downloads/file/4933754/adaptive_tab_bar_colour-4.1.0.xpi";
-      hash = "sha256-gA/htClqWym3Ik5Yd5W84VDlt5dFwVn+nJj/cdiIPJ8=";
-    };
-  };
+  firefoxAddons = inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system};
 in
 {
   options.modules.firefox = {
@@ -77,8 +28,6 @@ in
       ] ++ optional plasmaActive pkgs.kdePackages.plasma-browser-integration;
 
       profiles = {
-        # The existing everyday profile — left alone (no prefs, no chrome),
-        # only registered so it stays the browser default.
         default = {
           id = 1;
           name = "default";
@@ -86,7 +35,6 @@ in
           isDefault = true;
         };
 
-        # Minimalist scifox profile — launch with `firefox -P main`
         main = {
           id = 0;
           isDefault = false;
@@ -94,10 +42,11 @@ in
             firefoxAddons.tridactyl
             firefoxAddons.sidebery
             firefoxAddons.adaptive-tab-bar-colour
+            firefoxAddons.ublock-origin
+            firefoxAddons.bitwarden
+            firefoxAddons.reddit-enhancement-suite
           ];
 
-          # scifox user.js (github.com/scientiac/scifox) — prefs required for
-          # userChrome/userContent, plus its UI/perf tweaks.
           settings = {
             "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
             "svg.context-properties.content.enabled" = true;
@@ -117,29 +66,98 @@ in
     };
 
     xdg = {
-      desktopEntries.firefox-minimal = {
-        name = "Firefox (minimal)";
-        genericName = "Web Browser";
-        comment = "Minimalist scifox profile with tridactyl";
-        # --no-remote so it runs alongside a normal Firefox instance;
-        # no mimeType so the default browser stays the regular profile.
-        exec = "firefox -P main --no-remote %U";
-        icon = "firefox";
-        type = "Application";
-        categories = [
-          "Network"
-          "WebBrowser"
-        ];
+      # home-manager asserts xdg.desktopEntries is linux-only, so on Darwin
+      # this is an eval error rather than a no-op. There is no .desktop
+      # equivalent there anyway — the profile is launched by its own means.
+      desktopEntries = mkIf pkgs.stdenv.isLinux {
+        firefox-minimal = {
+          name = "Firefox (minimal)";
+          genericName = "Web Browser";
+          comment = "Minimalist scifox profile with tridactyl";
+          # --no-remote so it runs alongside a normal Firefox instance;
+          # no mimeType so the default browser stays the regular profile.
+          exec = "firefox -P main --no-remote %U";
+          icon = "firefox";
+          type = "Application";
+          categories = [
+            "Network"
+            "WebBrowser"
+          ];
+        };
       };
 
       configFile = {
         "tridactyl/tridactylrc".text = ''
-          " Minimalist grayscale theme matching the scifox userChrome.
+          " Theme matching the scifox-derived userChrome.
           " Loaded from ~/.config/tridactyl/themes/ via the native messenger.
-          colourscheme grayscale-scifox
+          colourscheme hush
+
+          " The theme reserves a favicon column on tab rows, and draws a
+          " glyph in it for sources the API gives no icon for.
+          set completions.Tab.showFavicons true
+
+          " Let Ctrl+E reach Sidebery's sidebar toggle (tridactyl normally
+          " binds <C-e> to scrollline 10 and swallows it).
+          unbind --mode=normal <C-e>
         '';
 
-        "tridactyl/themes/grayscale-scifox.css".source = ./tridactyl/grayscale-scifox.css;
+        # Out of store so the theme can be iterated on without a rebuild.
+        # `:source` re-runs this rc, and `colourscheme` re-reads the file from
+        # disk every time — but it then sets `theme` to the value it already
+        # had, so nothing re-applies the new CSS until the page reloads.
+        # The loop is therefore: edit, `:source`, reload the page.
+        # Changes to the rc itself still need a switch.
+        "tridactyl/themes/hush.css".source =
+          config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Code/nixos/home/config/tridactyl/hush.css";
+      };
+    };
+
+    # Adaptive Tab Bar Colour declares http/https as *optional* host
+    # permissions, and installing an add-on by dropping its xpi in the profile
+    # never runs the grant flow — so it starts with no host access and
+    # silently never reads a page's colour. extensions.originControls.
+    # grantByDefault is already true and does not cover this path.
+    #
+    # The grant lives in extension-preferences.json, which Firefox also writes
+    # at runtime (it holds Sidebery's <all_urls> and the built-ins' internal
+    # flags), so merge the one key rather than declaring the whole file.
+    # Applies on the next Firefox start.
+    home.activation.grantAdaptiveTabBarHostAccess =
+      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        prefs="${config.home.homeDirectory}/.config/mozilla/firefox/main/extension-preferences.json"
+        grant='{"permissions":[],"origins":["http://*/*","https://*/*"],"data_collection":[]}'
+        jq="${pkgs.jq}/bin/jq"
+        id="${firefoxAddons.adaptive-tab-bar-colour.addonId}"
+        if [ ! -e "$prefs" ]; then
+          mkdir -p "$(dirname "$prefs")"
+          "$jq" -n --arg id "$id" --argjson g "$grant" '{($id): $g}' > "$prefs"
+        elif ! "$jq" -e --arg id "$id" '.[$id].origins // [] | index("https://*/*")' "$prefs" >/dev/null; then
+          tmp="$(mktemp)"
+          "$jq" --arg id "$id" --argjson g "$grant" '.[$id] = $g' "$prefs" > "$tmp" \
+            && mv "$tmp" "$prefs"
+        fi
+      '';
+
+    # Declarative extension shortcut overrides. Firefox keeps these in the
+    # profile's extension-settings.json (ExtensionSettingsStore, type
+    # "commands" — see ExtensionShortcuts.sys.mjs). KDE grabs Alt+Space
+    # (KRunner), so Sidebery's "activate" is rebound to Alt+A.
+    # force=true makes this file authoritative: shortcuts changed in the
+    # about:addons GUI are reverted on switch — change them here instead.
+    home.file.".config/mozilla/firefox/main/extension-settings.json" = {
+      force = true;
+      text = builtins.toJSON {
+        version = 3;
+        commands = {
+          activate.precedenceList = [
+            {
+              id = firefoxAddons.sidebery.addonId;
+              installDate = 1000;
+              value.shortcut = "Alt+A";
+              enabled = true;
+            }
+          ];
+        };
       };
     };
   };

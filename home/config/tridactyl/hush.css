@@ -1,0 +1,432 @@
+/* ─────────────────────────────────────────────────────────────────────
+ * hush — a tridactyl theme
+ * Translucent centred pill, glyph accents, favicons, page-derived tint.
+ * Greys lifted from the .urlbarView rules in chrome/userChrome.css, so
+ * tridactyl's surfaces read as the same widget family as the browser
+ * chrome around them.
+ *
+ * Loaded by tridactyl via `:colourscheme hush`, which reads
+ * ~/.config/tridactyl/themes/hush.css through the native messenger.
+ *
+ * Selectors are written against tridactyl 1.25.0's actual DOM
+ * (static/commandline.html, static/css/{commandline,content,hint}.css).
+ * ───────────────────────────────────────────────────────────────────── */
+
+:root {
+  --hush-bg:        #1c1c1c;
+  --hush-bg-alt:    #252525;
+  --hush-sel:       #464646;
+  --hush-fg:        #b9b9b9;
+  --hush-fg-bright: #e3e3e3;
+  --hush-fg-dim:    #6f6f6f;
+  --hush-accent:    #b9b9b9;
+
+  /* Pages that declare a dark color-scheme keep their background on the
+     canvas, which backdrop-filter does not sample — the glass then falls
+     back to compositing over white. Alpha is set so that fallback stays
+     dark enough to read on (0.70 gave rgb(96,96,96)). */
+  --hush-glass:     rgba(28, 28, 28, 0.85);
+  --hush-hairline:  rgba(185, 185, 185, 0.24);
+  --hush-blur:      blur(18px) saturate(140%);
+
+  --hush-radius:    10px;
+  --hush-radius-sm: 3px;
+  --hush-width:     580px;
+  --hush-row:       32px;
+  --hush-gap:       1rem;
+  --hush-pad:       14px;
+  /* Distance from the viewport bottom to the input row's baseline edge. */
+  --hush-anchor:    40%;
+  --hush-input:     38px;
+  /* Favicon cell plus its gutter; the history/bookmark glyph reserves the
+     same box so both row types start their title on one edge. */
+  --hush-glyph:     14px;
+  --hush-glyph-gap: 8px;
+
+  --hush-font:      "FiraCode Nerd Font", "Fira Code", monospace;
+  --hush-size:      14px;
+  --hush-size-sm:   12.5px;
+
+  --tridactyl-font-family: var(--hush-font);
+  --tridactyl-font-family-sans: var(--hush-font);
+  --tridactyl-bg: var(--hush-bg);
+  --tridactyl-fg: var(--hush-fg);
+  /* Defaults to --tridactyl-bg, which is opaque and would punch a solid
+     block through the pill's glass behind every url cell. */
+  --tridactyl-url-bg: transparent;
+}
+
+/* ── COMMAND LINE — centred floating pill ───────────────────────────── */
+
+/* Frame lives on the iframe, page-side: tridactyl sizes the iframe from its
+   body's offsetHeight, which excludes shadows, so one drawn inside would be
+   clipped at the iframe edge. The radius here also clips the glass within. */
+#cmdline_iframe {
+  position: fixed !important;
+  /* Anchored by its bottom edge rather than centred: the pill is only as tall
+     as its results, so centring moved the input row every time the result
+     count changed. Growing upward from a fixed edge keeps it still. */
+  bottom: var(--hush-anchor) !important;
+  top: unset !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: min(var(--hush-width), calc(100vw - 2 * var(--hush-gap))) !important;
+  max-height: calc(100vh - 2 * var(--hush-gap)) !important;
+  background: transparent !important;
+  border: 1px solid var(--hush-hairline) !important;
+  border-radius: var(--hush-radius) !important;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45) !important;
+  z-index: 2147483647 !important;
+}
+
+/* Tridactyl hides the command line by collapsing the iframe to height 0
+   rather than unmounting it, so the frame above would keep painting as a
+   hairline across the page. Only the paint is dropped, never the layout:
+   tridactyl sizes the iframe from its content document's body.offsetHeight,
+   and an unrendered iframe measures 0, which would latch it shut forever.
+   The style attribute is absent until the command line is first opened. */
+#cmdline_iframe:not([style*="height"]),
+#cmdline_iframe[style*="height: 0px"] {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* commandline.html carries <meta name="color-scheme" content="light dark">.
+   When that resolves dark, Firefox paints the iframe an opaque canvas and no
+   transparent background below it can show the page through — the whole pill
+   goes flat. Forcing light restores a transparent canvas; `normal` does not. */
+html.TridactylCommandline {
+  color-scheme: light !important;
+  background: transparent !important;
+}
+
+/* #completions and #command-line-holder are siblings under body, not nested,
+   and body's background would propagate to that canvas rather than composite
+   over the page — so the glass goes on the two blocks themselves. DOM order
+   already puts completions above the input. */
+html.TridactylCommandline body {
+  top: 0;
+  box-sizing: border-box;
+  background: transparent !important;
+  color: var(--hush-fg);
+  font-family: var(--hush-font);
+  font-size: var(--hush-size);
+}
+
+#command-line-holder {
+  display: flex;
+  align-items: center;
+  height: var(--hush-input);
+  padding: 0 var(--hush-pad);
+  background: var(--hush-glass);
+  backdrop-filter: var(--hush-blur);
+  -webkit-backdrop-filter: var(--hush-blur);
+  color: var(--hush-fg);
+  font-family: var(--hush-font);
+  font-size: var(--hush-size);
+}
+
+/* Tridactyl ships its own sigil element, so retarget it rather than
+   drawing a second one. */
+#tridactyl-colon::before {
+  content: "\25B8";
+  color: var(--hush-accent);
+}
+
+#tridactyl-colon {
+  flex: none;
+  margin-inline-end: var(--hush-glyph-gap);
+  line-height: var(--hush-input);
+  pointer-events: none;
+}
+
+#tridactyl-input {
+  flex: 1;
+  width: auto;
+  height: 100%;
+  padding: 0;
+  background: transparent;
+  color: var(--hush-fg-bright);
+  font-family: var(--hush-font);
+  font-size: var(--hush-size);
+  line-height: var(--hush-input);
+  border: none;
+  outline: none !important;
+  caret-color: var(--hush-accent);
+}
+
+#tridactyl-input::placeholder {
+  color: var(--hush-fg-dim);
+}
+
+::selection {
+  background: var(--hush-sel);
+  color: var(--hush-fg-bright);
+}
+
+/* ── COMPLETIONS ────────────────────────────────────────────────────── */
+
+#completions {
+  --tridactyl-cmplt-option-height: var(--hush-row);
+  --option-height: var(--hush-row);
+  background: var(--hush-glass);
+  backdrop-filter: var(--hush-blur);
+  -webkit-backdrop-filter: var(--hush-blur);
+  color: var(--hush-fg);
+  font-family: var(--hush-font);
+  font-size: var(--hush-size);
+  border-top: none;
+  border-bottom: 1px solid var(--hush-hairline);
+  max-height: calc(11 * var(--hush-row));
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+/* commandline.css floors each source at ten rows; without this the pill is
+   always ten rows tall no matter how few results there are. */
+#completions > div {
+  min-height: unset;
+  max-height: unset;
+  background: transparent;
+  border: none;
+}
+
+#completions .sectionHeader {
+  height: auto;
+  line-height: normal;
+  padding: 8px var(--hush-pad) 4px !important;
+  background: none;
+  border-bottom: none;
+  color: var(--hush-fg-dim);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+}
+
+#completions table {
+  width: 100%;
+  box-sizing: border-box;
+  /* The gutter lives here rather than on the cells: which cell renders first
+     varies by completion source, and the leading ones are hidden. */
+  padding-inline: var(--hush-pad);
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+#completions tr.option {
+  height: var(--hush-row);
+  line-height: var(--hush-row);
+  background: transparent;
+  color: var(--hush-fg);
+}
+
+#completions tr.option:hover {
+  background: rgba(185, 185, 185, 0.07);
+}
+
+#completions .focused {
+  background: color-mix(in oklch, var(--hush-accent) 16%, transparent) !important;
+  color: var(--hush-fg-bright) !important;
+}
+
+/* commandline.css fills the url anchor itself; left alone it would stack a
+   second copy of the focused row's wash on just that cell. */
+#completions .url {
+  background: transparent !important;
+}
+
+#completions td {
+  padding: 0 var(--hush-pad) 0 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+#completions td:last-child {
+  padding-inline-end: 0;
+}
+
+#completions .content,
+#completions .url {
+  color: var(--hush-fg-dim);
+  font-size: var(--hush-size-sm);
+}
+
+#completions .focused .content,
+#completions .focused .url {
+  color: color-mix(in oklch, var(--hush-fg-bright) 70%, transparent) !important;
+}
+
+/* Ranking prefixes, container stripes and private-window badges: chrome
+   this profile prunes everywhere else. */
+#completions td.prefix,
+#completions td.prefixplain,
+#completions td.container,
+#completions td.privatewindow {
+  display: none;
+}
+
+/* Favicons on tab rows (completions.Tab.showFavicons). */
+#completions td.icon {
+  width: calc(var(--hush-glyph) + var(--hush-glyph-gap));
+  padding: 0;
+}
+
+#completions td.icon img,
+#completions img {
+  width: var(--hush-glyph);
+  height: var(--hush-glyph);
+  border-radius: var(--hush-radius-sm);
+  opacity: 0.9;
+  vertical-align: -2px;
+}
+
+/* History and bookmark rows get no favicon from the API, so a glyph holds
+   the column instead. These sources have no .icon cell at all, hence the
+   marker rides on the title. */
+#completions .HistoryCompletionSource td.title::before,
+#completions .BmarkCompletionSource td.title::before {
+  content: "\25C7";
+  display: inline-block;
+  width: var(--hush-glyph);
+  margin-inline-end: var(--hush-glyph-gap);
+  color: var(--hush-fg-dim);
+}
+
+#completions .HistoryCompletionSource .focused td.title::before,
+#completions .BmarkCompletionSource .focused td.title::before {
+  content: "\25C6";
+  color: var(--hush-fg-bright);
+}
+
+/* Text-only variant: drop every icon and glyph.
+#completions td.icon { display: none; }
+#completions td.title::before { content: none !important; }
+*/
+
+/* ── MODE / STATUS INDICATOR ────────────────────────────────────────── */
+
+.TridactylStatusIndicator {
+  bottom: var(--hush-gap) !important;
+  right: var(--hush-gap) !important;
+  padding: 3px 9px !important;
+  background: var(--hush-glass) !important;
+  backdrop-filter: var(--hush-blur) !important;
+  -webkit-backdrop-filter: var(--hush-blur) !important;
+  color: var(--hush-fg) !important;
+  border: 1px solid var(--hush-hairline) !important;
+  border-radius: var(--hush-radius) !important;
+  font-family: var(--hush-font) !important;
+  font-size: 12px !important;
+  opacity: 1 !important;
+}
+
+.TridactylModeignore { color: var(--hush-fg-dim) !important; }
+.TridactylModeinsert { color: var(--hush-fg-bright) !important; }
+.TridactylModehint,
+.TridactylModevisual { color: var(--hush-accent) !important; }
+
+/* ── HINTS ──────────────────────────────────────────────────────────── */
+
+:root {
+  --tridactyl-hintspan-font-family: var(--hush-font);
+  --tridactyl-hintspan-font-size: 11px;
+  --tridactyl-hintspan-font-weight: 400;
+  --tridactyl-hintspan-fg: var(--hush-fg-bright);
+  --tridactyl-hintspan-bg: var(--hush-bg);
+  --tridactyl-hintspan-border-color: color-mix(in oklch, var(--hush-accent) 55%, transparent);
+  --tridactyl-hintspan-border-width: 1px;
+  --tridactyl-hintspan-border-style: solid;
+  --tridactyl-hintspan-js-background: var(--hush-bg-alt);
+
+  --tridactyl-hintspan-active-fg: var(--hush-bg);
+  --tridactyl-hintspan-active-bg: var(--hush-accent);
+  --tridactyl-hintspan-active-border-color: var(--hush-accent);
+  --tridactyl-hintspan-pressed-fg: var(--hush-fg-dim);
+
+  /* Read by tridactyl's JS to generate .TridactylHintElem/.TridactylHintActive. */
+  --tridactyl-hint-bg: color-mix(in oklch, var(--hush-accent) 12%, transparent);
+  --tridactyl-hint-active-bg: color-mix(in oklch, var(--hush-accent) 24%, transparent);
+  --tridactyl-hint-outline: none;
+  --tridactyl-hint-active-outline: none;
+  --tridactyl-hint-highlight-opacity: 1;
+}
+
+/* Flat and opaque, never glass: there is one of these per hintable element,
+   and a backdrop-filter on each measured ~6ms per 1200 hints against ~13ms
+   to build them at all. The pill can afford blur because there is one of it. */
+span.TridactylHint {
+  padding: 1px 5px !important;
+  border-radius: var(--hush-radius-sm) !important;
+  text-transform: lowercase !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}
+
+/* ── EXTENSION PAGES (newtab, :help, :viewsource) ───────────────────── */
+
+/* Full pages rather than overlays, so opaque — there is nothing behind
+   these to sample. */
+html.TridactylOwnNamespace:not(.TridactylCommandline) body {
+  background: var(--hush-bg);
+  color: var(--hush-fg);
+  font-family: var(--hush-font);
+}
+
+html.TridactylOwnNamespace:not(.TridactylCommandline) a {
+  color: var(--hush-fg-bright);
+  text-decoration: none;
+}
+
+html.TridactylOwnNamespace:not(.TridactylCommandline) a:hover {
+  color: var(--hush-accent);
+}
+
+/* ── ADAPTIVE TINT ─────────────────────────────────────────────────────
+ * (a) Automatic, already on: the pill's backdrop-filter genuinely samples
+ *     the page — Firefox does not treat an iframe as a backdrop root — so
+ *     the glass picks up whatever is behind it. Lowering --hush-glass alpha
+ *     buys more page bleed, but only on pages that paint their background
+ *     with elements; where it comes from the canvas (any page declaring a
+ *     dark color-scheme, e.g. google.com) there is nothing to sample and
+ *     the alpha alone decides how dark the pill reads.
+ *
+ * (b) A named accent per site, since CSS cannot read a page's palette.
+ *     From tridactylrc:
+ *       autocmd DocStart scientiac.space js document.documentElement.dataset.hushTint="teal"
+ *     This reaches the hints and the mode indicator, which are page-side.
+ *     It does not reach the pill: the attribute lands on the page's <html>,
+ *     and the command line is a separate document. To tint the pill, edit
+ *     --hush-glass and --hush-accent on :root above.
+ * ─────────────────────────────────────────────────────────────────── */
+
+html[data-hush-tint="teal"] {
+  --hush-accent: #7fbbb3;
+  --hush-glass:  rgba(35, 42, 46, 0.68);
+}
+
+html[data-hush-tint="ember"] {
+  --hush-accent: #e0a066;
+  --hush-glass:  rgba(38, 31, 29, 0.7);
+}
+
+/* Opaque variant, matching the awesomebar exactly.
+:root { --hush-glass: #1c1c1c; --hush-hairline: #464646; --hush-blur: none; }
+*/
+
+/* Light variant.
+@media (prefers-color-scheme: light) {
+  :root {
+    --hush-bg: #efeeec;
+    --hush-bg-alt: #e6e4e0;
+    --hush-sel: #d8d5cf;
+    --hush-fg: #4a4a48;
+    --hush-fg-bright: #1f1f1e;
+    --hush-fg-dim: #8b8985;
+    --hush-glass: rgba(239, 238, 236, 0.78);
+    --hush-hairline: rgba(31, 31, 30, 0.18);
+  }
+}
+*/

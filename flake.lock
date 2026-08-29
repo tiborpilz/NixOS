@@ -248,6 +248,28 @@
         "type": "github"
       }
     },
+    "firefox-addons": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "dir": "pkgs/firefox-addons",
+        "lastModified": 1787976477,
+        "narHash": "sha256-N4ljMPGSikj3Yl4EZv7xa6KSGkmm+G5wFZBhnOCwqZw=",
+        "owner": "rycee",
+        "repo": "nur-expressions",
+        "rev": "2e2c50de599df9787f6aa735ceea0a7aabcfae2a",
+        "type": "gitlab"
+      },
+      "original": {
+        "dir": "pkgs/firefox-addons",
+        "owner": "rycee",
+        "repo": "nur-expressions",
+        "type": "gitlab"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -583,6 +605,7 @@
         "devshell": "devshell",
         "disko": "disko",
         "emacs-overlay": "emacs-overlay",
+        "firefox-addons": "firefox-addons",
         "flake-utils-plus": "flake-utils-plus",
         "home-manager": "home-manager",
         "nix-doom-emacs-unstraightened": "nix-doom-emacs-unstraightened",
