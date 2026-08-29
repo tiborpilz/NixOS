@@ -1,0 +1,74 @@
+/* Minimalist userContent based on scifox (github.com/scientiac/scifox)
+ * Adapted for tridactyl: hidden scrollbars (j/k/d/u scroll the page),
+ * monospace-friendly fonts, cleaned-up newtab, quiet extension pages.
+ */
+
+:root {
+  --main-font: "FiraCode Nerd Font";
+}
+
+pre, code, samp, var {
+  font-family: var(--main-font) !important;
+}
+
+/* ── SCROLLBARS — hidden everywhere; tridactyl handles scrolling ───── */
+:root {
+  scrollbar-width: none !important;
+}
+
+@-moz-document url(about:privatebrowsing) {
+  :root {
+    scrollbar-width: none !important;
+  }
+}
+
+/* ── TRIDACTYL — extension pages (incl. the tridactyl newtab) ────────
+ * userContent.css applies before tridactyl's colourscheme loads, so set
+ * the palette vars here too to avoid a white flash on page load.
+ * See tridactyl's :colourscheme docs.
+ */
+@-moz-document url-prefix(moz-extension://) {
+  :root {
+    scrollbar-width: none !important;
+    --tridactyl-bg: #101010;
+    --tridactyl-fg: #b9b9b9;
+    font-family: "FiraCode Nerd Font";
+  }
+}
+
+/* ── NEWTAB / HOMEPAGE — minimal, matches the grayscale-dark theme ─── */
+@-moz-document url("about:home"), url("about:newtab") {
+  .search-wrapper,
+  .top-site-outer .title {
+    font-family: var(--main-font) !important;
+  }
+
+  .top-site-outer .title {
+    font-size: 1rem !important;
+  }
+
+  .top-site-outer .top-site-inner > a {
+    padding: 10px 10px 4px !important;
+  }
+
+  .search-handoff-button, .search-wrapper input {
+    background: #d8d8d81f !important;
+    border-radius: 5px !important;
+  }
+
+  #newtab-search-text::placeholder {
+    opacity: 0 !important;
+  }
+
+  :root[lwt-newtab-brighttext] {
+    --newtab-primary-action-background: transparent !important;
+  }
+
+  .search-wrapper .search-button,
+  .search-wrapper .logo-and-wordmark .logo,
+  .fake-textbox,
+  .top-site-outer .tile,
+  .icon.icon-pin-small {
+    display: none !important;
+  }
+}
