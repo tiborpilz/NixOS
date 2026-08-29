@@ -124,6 +124,9 @@ with mylib;
 
       # Connect to private nix cache
       attic-client
+
+      # AI Harness
+      unstable.pi-coding-agent
     ]) ++ lib.optionals (pkgs.stdenv.isLinux && config.graphical) [
       # Claude Desktop GUI. Linux-only and graphical-gated. Repackaged in-repo
       # from Anthropic's official .deb; see packages/claude-desktop.
