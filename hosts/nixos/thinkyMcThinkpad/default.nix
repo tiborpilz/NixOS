@@ -127,9 +127,15 @@ in
     # Enable CUPS to print documents.
     services.printing.enable = true;
 
+    # Phone pairing for the Plasma applet. The module opens 1714-1764 TCP/UDP itself.
+    programs.kdeconnect.enable = true;
+
+    # Remote input from the phone needs /dev/uinput, owned by the uinput group.
+    hardware.uinput.enable = true;
+
     # Enable sound with pipewire.
-    hardware.pulseaudio.enable = false;
     security.rtkit.enable = true;
+    services.pulseaudio.enable = false;
     services.pipewire = {
       enable = true;
       alsa.enable = true;
@@ -157,7 +163,7 @@ in
     users.users.tibor = {
       isNormalUser = true;
       description = "Tibor Pilz";
-      extraGroups = [ "networkmanager" "wheel" ];
+      extraGroups = [ "networkmanager" "wheel" "input" "uinput" ];
       shell = pkgs.zsh;
       packages = with pkgs; [
         firefox

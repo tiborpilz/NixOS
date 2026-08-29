@@ -15,6 +15,7 @@ in
 
       # backup management
       velero
+
       # plugins
       krew
 

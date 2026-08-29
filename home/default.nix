@@ -1,4 +1,4 @@
-{ inputs, pkgs, lib, config, osConfig, system, ... }:
+{ inputs, pkgs, lib, config, osConfig, ... }:
 
 with lib;
 
@@ -23,7 +23,7 @@ with mylib;
       nerd-fonts.fira-code
       nerd-fonts.hack
       nerd-fonts.symbols-only # "Symbols Nerd Font Mono", used by nerd-icons in Emacs
-      etBook
+      et-book
       dejavu_fonts
 
       # Need later version of bash for nix-shell to work correctly on macos
@@ -114,7 +114,9 @@ with mylib;
 
       _1password-cli
 
-      claude-code
+      # AI stuff
+      unstable.claude-code
+      unstable.pi-coding-agent
       copilot-language-server
 
       # AST-aware code search

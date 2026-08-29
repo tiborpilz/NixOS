@@ -116,11 +116,11 @@
         sharedOverlays = [
           (final: prev: {
             unstable = import nixpkgs-unstable {
-              system = prev.system;
+              system = prev.stdenv.hostPlatform.system;
               config.allowUnfree = true;
               overlays = [ inputs.emacs-overlay.overlays.default ];
             };
-            my = self.packages."${prev.system}";
+            my = self.packages."${prev.stdenv.hostPlatform.system}";
             copilot-language-server-fhs = final.copilot-language-server;
           })
           inputs.devshell.overlays.default

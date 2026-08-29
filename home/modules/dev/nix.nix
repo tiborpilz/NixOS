@@ -9,7 +9,6 @@ in
     enable = mylib.mkBoolOpt false;
   };
   config = lib.mkIf cfg.enable {
-    # modules.shell.zsh.fpathDirs = "${nhPackage}/share/zsh/site-functions";
     programs.nh.enable = true;
     programs.nh.package = nhPackage;
 

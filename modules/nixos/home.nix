@@ -42,6 +42,7 @@ in
     systemd.services.home-manager-tibor = {
       # Need to wait for network since home-manager will get stuff from git
       after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
     };
   };
 }

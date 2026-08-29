@@ -4,7 +4,6 @@ with lib;
 let
   cfg = config.modules.shell.zsh;
   mylib = import ../../../lib { inherit inputs lib pkgs; };
-  configDir = ../../config;
   envVars = config.home.sessionVariables;
 
   mkFpathEntries = paths: ''
@@ -56,9 +55,6 @@ in
       ripgrep
       gron
       tldr
-      kubectl
-      krew
-      nodejs
       coreutils
 
       #Markdown View
@@ -85,12 +81,7 @@ in
 
       # speeds up non-scoped npm installs
       nci = "npm_config_registry=https://registry.npmjs.org/ npm ci";
-
-      # Tools that can be used as drop-in replacements
-      # ls = "eza";
     };
-
-    # xdg.configFile."zsh" = { source = "${configDir}/zsh"; recursive = true; };
 
     xdg.configFile."zsh/.zshrc" = {
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Code/nixos/home/config/zsh/.zshrc";
