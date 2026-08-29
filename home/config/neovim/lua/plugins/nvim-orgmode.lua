@@ -103,7 +103,7 @@ return {
       -- Doom binds capture-today twice; the plugin's config takes one lhs per action.
       vim.keymap.set("n", "<leader>nrdT", function()
         require("org-roam").ext.dailies.capture_today()
-      end, { desc = "Capture today's note" })
+      end, { desc = "Capture today" })
     end
   },
   -- Telescope integration for finding headlines etc.
