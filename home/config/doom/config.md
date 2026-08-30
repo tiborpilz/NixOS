@@ -85,7 +85,6 @@
             1.  [Handling](#orge8d072a)
             2.  [UI](#org7410cbe)
         2.  [Copilot](#org09e36c0)
-        3.  [Aider](#org314f851)
         4.  [Debugging](#orge92c547)
             1.  [Language-Specific Debugger settings](#orgfd092b2)
                 1.  [Python](#org480828c)
@@ -1357,22 +1356,6 @@ to insert the suggestion for use in normal mode, and `t p` to toggle Copilot.
             :desc "Insert Copilot Completion" "c" #'copilot-accept-completion))
           (:prefix ("t" . "toggle")
            :desc "Toggle Copilot" "p" #'copilot-mode))
-
-
-<a id="org314f851"></a>
-
-### Aider
-
-Aider is a CLI tool for modifying codebases using LLMs. Aidermacs is a package that integrates Aider with Emacs.
-
-    (package! aidermacs)
-
-    (use-package! aidermacs
-      :defer t
-      :hook (aidermacs-minor-mode . (lambda () (setenv "OPENAI_API_KEY" (password-store-get "bitwarden/openai-gpt-key"))))
-      :custom
-      (aidermacs-use-architect-mode t)
-      (aidermacs-default-model "4o"))
 
 
 <a id="orge92c547"></a>

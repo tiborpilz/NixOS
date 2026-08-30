@@ -19,8 +19,9 @@ in
 
     modules.shell.zsh.rcInit = ''
       function pi() {
+        # pass entries may carry metadata lines after the secret; use only the first line
         if [ -z "$OPENROUTER_API_KEY" ]; then
-          export OPENROUTER_API_KEY=$(pass ${cfg.apiKeyPassPath})
+          export OPENROUTER_API_KEY=$(pass ${cfg.apiKeyPassPath} | head -n1)
         fi
         command pi "$@"
       }

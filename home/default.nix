@@ -202,6 +202,7 @@ with mylib;
 
     modules.bitwarden.enable = false;
     modules.password-store.enable = true;
+    modules.password-store.extra-gpg-ids = [ "F3845C9C037695E21465F32783E35D34467220C7" ];
 
     modules.tools.container.enable = true;
     modules.tools.aws.enable = true;
@@ -214,15 +215,13 @@ with mylib;
     modules.gui.plasma.enable = config.graphical;
     modules.gui.hyprland.enable = config.graphical;
 
-    modules.gui.kmail.enable = false; # I'm currently using terminal-based mail clients
+    modules.gui.kmail.enable = config.graphical && pkgs.stdenv.isLinux;
 
     modules.mail.enable = true;
 
     # modules.firefox.enable = !pkgs.stdenv.isDarwin; # Firefox packdge doesn't work on Darwin :(
 
     modules.firefox.enable = true;
-
-    modules.tools.aider.enable = false; # it has sooo many dependencies
 
     modules.tools.pi.enable = true;
 

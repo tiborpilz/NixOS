@@ -226,7 +226,6 @@
 
 ;; [[file:config.org::*Kubernetes][Kubernetes:1]]
 (package! k8s-mode)
-(package! k8s-mode)
 ;; Kubernetes:1 ends here
 
 ;; [[file:config.org::*Babel evaluation via ob-gptel][Babel evaluation via ob-gptel:1]]

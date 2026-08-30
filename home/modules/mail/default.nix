@@ -33,6 +33,7 @@ let
     msmtp.enable = true;
     mu.enable = true;
     aerc.enable = true;
+    neomutt.enable = true;
   };
 in
 {
@@ -60,6 +61,16 @@ in
         passwordCommand = passwordCommand cfg.ionos.passEntry;
         maildir.path = "pilz.berlin";
         imapnotify = imapnotifyFor "ionos";
+        neomutt = common.neomutt // {
+          extraMailboxes = [
+            { mailbox = "Gesendete Objekte"; name = "Sent"; }
+            { mailbox = "Entwürfe"; name = "Drafts"; }
+            { mailbox = "Papierkorb"; name = "Trash"; }
+            "Archives"
+            "LinkedIn"
+            "Spam"
+          ];
+        };
         # The mailbox is German-localised; the English folders exist but are
         # empty, so sending against them would hide mail from IONOS webmail.
         folders = {
@@ -95,6 +106,20 @@ in
         # name is load-bearing.
         maildir.path = "gmail";
         imapnotify = imapnotifyFor "gmail";
+        neomutt = common.neomutt // {
+          extraMailboxes = [
+            { mailbox = "[Google Mail]/Sent Mail"; name = "Sent"; }
+            { mailbox = "[Google Mail]/Drafts"; name = "Drafts"; }
+            { mailbox = "[Google Mail]/Trash"; name = "Trash"; }
+            "Github"
+            "Mensa"
+            "Personal"
+            "Receipts"
+            "Unwanted"
+            "Wohnungen"
+            "Work"
+          ];
+        };
         # googlemail.com addresses get the localised "[Google Mail]" special
         # folder namespace rather than "[Gmail]".
         folders = {
@@ -121,6 +146,13 @@ in
     programs.mbsync.enable = true;
     programs.msmtp.enable = true;
     programs.mu.enable = true;
+    programs.neomutt = {
+      enable = true;
+      vimKeys = true;
+      sidebar.enable = true;
+      sort = "reverse-date";
+    };
+
     programs.aerc = {
       enable = true;
       extraConfig.general.unsafe-accounts-conf = true;

@@ -1335,13 +1335,6 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
   (add-hook! flycheck-posframe-mode #'fix-flycheck-posframe-not-hide-immediately))
 ;; Better Error Display:1 ends here
 
-;; [[file:config.org::*Treemacs Modeline][Treemacs Modeline:1]]
-(add-hook 'treemacs-mode-hook
-          (lambda ()
-            (when (fboundp 'hide-mode-line-mode)
-              (hide-mode-line-mode))))
-;; Treemacs Modeline:1 ends here
-
 ;; [[file:config.org::*Vertico][Vertico:1]]
 (defun minibuffer-format-candidate (orig cand prefix suffix index _start)
   (let ((prefix (if (= vertico--index index)
