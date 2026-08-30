@@ -2700,6 +2700,48 @@ Falls back to (OUTPUT . nil) when OUTPUT is not valid JSON."
               ("C-c m" . gptel-mcp-dispatch)))
 #+end_src
 
+* Mail
+
+Sync, credentials and the account definitions live in =home/modules/mail=. This
+section only wires mu4e to the maildir that mbsync writes to.
+
+The ~+gmail~ flag decides per message whether Gmail semantics apply by matching
+~gmail~ against the root maildir, but it picks the /Sent/ behaviour from the
+envelope address, which never matches ~googlemail.com~. Listing the account
+restores the second half.
+
+#+begin_src elisp
+(after! mu4e
+  (setq mu4e-root-maildir "~/Mail"
+        mu4e-attachment-dir "~/Downloads")
+
+  (setq +mu4e-gmail-accounts '(("tbrpilz@googlemail.com" . "gmail"))))
+#+end_src
+
+One context per account, switched automatically by the maildir a message lives
+in. ~[Gmail]/All Mail~ is deliberately not synced - it holds a copy of every
+message under every label - so archiving a Gmail message only drops its INBOX
+label rather than fetching it back.
+
+#+begin_src elisp
+(set-email-account! "pilz.berlin"
+                    '((user-mail-address  . "tibor@pilz.berlin")
+                      (smtpmail-smtp-user . "tibor@pilz.berlin")
+                      (mu4e-sent-folder   . "/pilz.berlin/Sent")
+                      (mu4e-drafts-folder . "/pilz.berlin/Drafts")
+                      (mu4e-trash-folder  . "/pilz.berlin/Trash")
+                      (mu4e-refile-folder . "/pilz.berlin/Archive"))
+                    t)
+
+(set-email-account! "gmail"
+                    '((user-mail-address  . "tbrpilz@googlemail.com")
+                      (smtpmail-smtp-user . "tbrpilz@googlemail.com")
+                      (mu4e-sent-folder   . "/gmail/[Gmail]/Sent Mail")
+                      (mu4e-drafts-folder . "/gmail/[Gmail]/Drafts")
+                      (mu4e-trash-folder  . "/gmail/[Gmail]/Trash")
+                      (mu4e-refile-folder . "/gmail/[Gmail]/All Mail")))
+#+end_src
+
 * Unsorted Packages
 ** pcre2el
 

@@ -214,6 +214,10 @@ with mylib;
     modules.gui.plasma.enable = config.graphical;
     modules.gui.hyprland.enable = config.graphical;
 
+    modules.gui.kmail.enable = false; # I'm currently using terminal-based mail clients
+
+    modules.mail.enable = true;
+
     # modules.firefox.enable = !pkgs.stdenv.isDarwin; # Firefox packdge doesn't work on Darwin :(
 
     modules.firefox.enable = true;
