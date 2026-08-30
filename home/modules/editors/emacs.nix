@@ -82,6 +82,20 @@ in
 
     home.sessionPath = [ "$XDG_CONFIG_HOME/emacs/bin" ];
 
+    # Keep Doom warm so graphical launches only need to create a client frame.
+    systemd.user.services.doom-emacs = mkIf pkgs.stdenv.hostPlatform.isLinux {
+      Unit = {
+        Description = "Doom Emacs daemon";
+        PartOf = [ "graphical-session.target" ];
+        After = [ "graphical-session-pre.target" ];
+      };
+      Service = {
+        ExecStart = "${pkgs.my.doom-emacs}/bin/doom-emacs --fg-daemon";
+        Restart = "on-failure";
+      };
+      Install.WantedBy = [ "graphical-session.target" ];
+    };
+
     # provides mmdc for ob-mermaid
     modules.tools.mermaid.enable = true;
 

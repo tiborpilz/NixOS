@@ -231,9 +231,10 @@
 ;; Auto-Tangling:1 ends here
 
 ;; [[file:config.org::*Typescript][Typescript:2]]
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((typescript . t)))
+(after! org
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((typescript . t))))
 
 (with-eval-after-load 'org
   (add-to-list 'org-src-lang-modes '("typescript" . typescript-ts))
@@ -249,13 +250,14 @@
 ;; Latex fragments:1 ends here
 
 ;; [[file:config.org::*Mermaid Diagrams][Mermaid Diagrams:2]]
-(setq ob-mermaid-cli-path (shell-command-to-string "printf %s \"$(readlink -f $(which mmdc))\""))
+(setq ob-mermaid-cli-path "mmdc")
 ;; Mermaid Diagrams:2 ends here
 
 ;; [[file:config.org::*Mermaid Diagrams][Mermaid Diagrams:3]]
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((mermaid . t)))
+(after! org
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((mermaid . t))))
 ;; Mermaid Diagrams:3 ends here
 
 ;; [[file:config.org::*Mermaid Diagrams][Mermaid Diagrams:4]]
@@ -338,10 +340,6 @@
 (after! org
   (add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t))))
 ;; Prevent org-block face for latex fragments, since they look weird:1 ends here
-
-;; [[file:config.org::*Nix-Doom-Emacs messes with dashboard][Nix-Doom-Emacs messes with dashboard:1]]
-(add-hook! 'emacs-startup-hook #'doom-init-ui-h)
-;; Nix-Doom-Emacs messes with dashboard:1 ends here
 
 ;; [[file:config.org::*Faster insertion of org structures (i.e. source blocks)][Faster insertion of org structures (i.e. source blocks):1]]
 (use-package! org-tempo
@@ -427,7 +425,7 @@
   :config
   (khalel-add-capture-template))
 
-(setq khalel-khal-command (shell-command-to-string "printf %s \"$(readlink -f $(which khal))\""))
+(setq khalel-khal-command "khal")
 (setq khalel-vdirsyncer-command "vdirsyncer")
 
 (setq khalel-capture-key "e")
@@ -1525,7 +1523,8 @@ Falls back to (OUTPUT . nil) when OUTPUT is not valid JSON."
                                "--env-file"
                                "/tmp/atlassian"
                                "ghcr.io/sooperset/mcp-atlassian:latest")))))
-(use-package! mcp)
+(use-package! mcp
+  :defer t)
 ;; MCP:3 ends here
 
 ;; [[file:config.org::*MCP][MCP:5]]
@@ -1536,6 +1535,7 @@ Falls back to (OUTPUT . nil) when OUTPUT is not valid JSON."
 
 ;; [[file:config.org::*Discord Presence][Discord Presence:2]]
 (use-package! elcord
+  :defer t
   :config
   (setq elcord-editor-icon "emacs_icon"))
 ;; Discord Presence:2 ends here

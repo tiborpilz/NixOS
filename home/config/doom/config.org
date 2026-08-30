@@ -408,9 +408,10 @@ To execute typescript code blocks, I'm using the ~ob-typescript~ package.
 #+end_src
 
 #+begin_src elisp
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((typescript . t)))
+(after! org
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((typescript . t))))
 
 (with-eval-after-load 'org
   (add-to-list 'org-src-lang-modes '("typescript" . typescript-ts))
@@ -440,15 +441,16 @@ Using ob-mermaid, I can generate diagrams using the mermaid syntax.
 Since mmdc is handled via nix, I'll need to get the binary's path during runtime via a shell call.
 
 #+begin_src elisp
-(setq ob-mermaid-cli-path (shell-command-to-string "printf %s \"$(readlink -f $(which mmdc))\""))
+(setq ob-mermaid-cli-path "mmdc")
 #+end_src
 
 Then, I'll need to add mermaid to the list of babel languages.
 
 #+begin_src elisp
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((mermaid . t)))
+(after! org
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((mermaid . t))))
 #+end_src
 
 Point it at the config file:
@@ -613,16 +615,6 @@ Additionally, org-node-fakeroam can speed up org-roam itself, as well as allow f
   (add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t))))
 #+end_src
 
-*** Nix-Doom-Emacs messes with dashboard
-
-I'm using the nix-doom-emacs package to install emacs & dependencies, and for
-some reason, using that binary, the Dashboard is disabled. [[https://github.com/nix-community/nix-doom-emacs/issues/88#issuecomment-1115500602][This comment]] in a
-corresponding GH issue has a fix.
-
-#+begin_src elisp
-(add-hook! 'emacs-startup-hook #'doom-init-ui-h)
-#+end_src
-
 *** Faster insertion of org structures (i.e. source blocks)
 
 Org-Tempo provides shortcuts like ~"<s" - <TAB>~ for generating code blocks.
@@ -751,7 +743,7 @@ easy integration of Khal with Org.
   :config
   (khalel-add-capture-template))
 
-(setq khalel-khal-command (shell-command-to-string "printf %s \"$(readlink -f $(which khal))\""))
+(setq khalel-khal-command "khal")
 (setq khalel-vdirsyncer-command "vdirsyncer")
 
 (setq khalel-capture-key "e")
@@ -2696,7 +2688,8 @@ Falls back to (OUTPUT . nil) when OUTPUT is not valid JSON."
                                "--env-file"
                                "/tmp/atlassian"
                                "ghcr.io/sooperset/mcp-atlassian:latest")))))
-(use-package! mcp)
+(use-package! mcp
+  :defer t)
 #+end_src
 
 #+begin_src elisp :tangle packages.el
@@ -2772,6 +2765,7 @@ obsolete variable.
 
 #+begin_src elisp
 (use-package! elcord
+  :defer t
   :config
   (setq elcord-editor-icon "emacs_icon"))
 #+end_src
