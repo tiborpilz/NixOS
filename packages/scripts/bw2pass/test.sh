@@ -28,7 +28,7 @@ if [[ -n "${PASS_FAIL_MATCH:-}" && "$path" == *"$PASS_FAIL_MATCH"* ]]; then
 fi
 destination=$PASSWORD_STORE_DIR/$path.gpg
 mkdir -p "${destination%/*}"
-cp /dev/stdin "$destination"
+cat > "$destination"
 EOF
 chmod +x "$test_root/bin/bw" "$test_root/bin/pass"
 
