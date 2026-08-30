@@ -51,6 +51,18 @@ in
         userName = "tibor@pilz.berlin";
         passwordCommand = passwordCommand cfg.ionos.passEntry;
         maildir.path = "pilz.berlin";
+        # The mailbox is German-localised; the English folders exist but are
+        # empty, so sending against them would hide mail from IONOS webmail.
+        folders = {
+          sent = "Gesendete Objekte";
+          drafts = "Entwürfe";
+          trash = "Papierkorb";
+        };
+        mbsync = common.mbsync // {
+          # IONOS also advertises English Sent and Trash, but they are not
+          # selectable - opening them is an error, so keep them out of the run.
+          patterns = [ "*" "!Sent" "!Trash" ];
+        };
         imap = {
           host = "imap.ionos.de";
           port = 993;
@@ -69,9 +81,27 @@ in
         address = "tbrpilz@googlemail.com";
         userName = "tbrpilz@googlemail.com";
         passwordCommand = passwordCommand cfg.gmail.passEntry;
+        # Doom's mu4e +gmail flag decides per message whether Gmail semantics
+        # apply by matching "gmail" against the root maildir, so the directory
+        # name is load-bearing.
         maildir.path = "gmail";
+        # googlemail.com addresses get the localised "[Google Mail]" special
+        # folder namespace rather than "[Gmail]".
+        folders = {
+          sent = "[Google Mail]/Sent Mail";
+          drafts = "[Google Mail]/Drafts";
+          trash = "[Google Mail]/Trash";
+        };
         mbsync = common.mbsync // {
-          patterns = [ "*" "![Gmail]/All Mail" "![Gmail]/Important" "![Gmail]/Starred" ];
+          # Every message also appears under All Mail once per label, which
+          # otherwise lands in the maildir two or three times over.
+          patterns = [
+            "*"
+            "![Google Mail]/All Mail"
+            "![Google Mail]/Important"
+            "![Google Mail]/Starred"
+            "![Google Mail]/Spam"
+          ];
         };
       };
     };

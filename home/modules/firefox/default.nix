@@ -101,10 +101,19 @@ in
           " completion API gives no icon for. `-r` resolves relative to this
           " file and re-reads on every call, so the scripts can be edited
           " without a rebuild.
-          " autocmds are keyed by event and pattern, so everything that runs
-          " on DocStart has to share one script — a second one on the same
-          " pattern replaces this rather than adding to it.
-          autocmd TriStart .* jsb -r favicons-seed.js
+          " autocmds are keyed by event *and* pattern: a second entry on the
+          " same pair replaces the first rather than adding to it. Tridactyl's
+          " own default is `TriStart .* source_quiet`, which is what re-reads
+          " this file at browser start — claiming that pair for anything else
+          " silently stops the rc from ever being sourced again. So it is
+          " re-declared here, and startup work runs as a plain command.
+          autocmd TriStart .* source_quiet
+
+          " Seeds the favicon cache; runs each time this file is sourced.
+          jsb -r favicons-seed.js
+
+          " Everything that runs per page shares one script, for the same
+          " event+pattern reason.
           autocmd DocStart .* js -r hush.js
 
           " Let Ctrl+E reach Sidebery's sidebar toggle (tridactyl normally

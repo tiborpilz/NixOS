@@ -2719,7 +2719,7 @@ restores the second half.
 #+end_src
 
 One context per account, switched automatically by the maildir a message lives
-in. ~[Gmail]/All Mail~ is deliberately not synced - it holds a copy of every
+in. ~[Google Mail]/All Mail~ is deliberately not synced - it holds a copy of every
 message under every label - so archiving a Gmail message only drops its INBOX
 label rather than fetching it back.
 
@@ -2727,19 +2727,19 @@ label rather than fetching it back.
 (set-email-account! "pilz.berlin"
                     '((user-mail-address  . "tibor@pilz.berlin")
                       (smtpmail-smtp-user . "tibor@pilz.berlin")
-                      (mu4e-sent-folder   . "/pilz.berlin/Sent")
-                      (mu4e-drafts-folder . "/pilz.berlin/Drafts")
-                      (mu4e-trash-folder  . "/pilz.berlin/Trash")
-                      (mu4e-refile-folder . "/pilz.berlin/Archive"))
+                      (mu4e-sent-folder   . "/pilz.berlin/Gesendete Objekte")
+                      (mu4e-drafts-folder . "/pilz.berlin/Entwürfe")
+                      (mu4e-trash-folder  . "/pilz.berlin/Papierkorb")
+                      (mu4e-refile-folder . "/pilz.berlin/Archives"))
                     t)
 
 (set-email-account! "gmail"
                     '((user-mail-address  . "tbrpilz@googlemail.com")
                       (smtpmail-smtp-user . "tbrpilz@googlemail.com")
-                      (mu4e-sent-folder   . "/gmail/[Gmail]/Sent Mail")
-                      (mu4e-drafts-folder . "/gmail/[Gmail]/Drafts")
-                      (mu4e-trash-folder  . "/gmail/[Gmail]/Trash")
-                      (mu4e-refile-folder . "/gmail/[Gmail]/All Mail")))
+                      (mu4e-sent-folder   . "/gmail/[Google Mail]/Sent Mail")
+                      (mu4e-drafts-folder . "/gmail/[Google Mail]/Drafts")
+                      (mu4e-trash-folder  . "/gmail/[Google Mail]/Trash")
+                      (mu4e-refile-folder . "/gmail/[Google Mail]/All Mail")))
 #+end_src
 
 * Unsorted Packages
