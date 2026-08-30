@@ -220,7 +220,6 @@ Set up org-modern
 (custom-set-faces!
   '(org-modern-label :height 1.1))
 
-(global-org-modern-mode)
 #+end_src
 
 (It's pretty bare-bones for now, though the author has more examples for theming in their README.)
@@ -525,6 +524,7 @@ The closest comparison to org-roam-ui is Obsidian.
 
 (use-package! org-roam-ui
   :after org-roam
+  :defer t
   :config
   (setq org-roam-ui-synch-theme t
         org-roam-ui-follow t
@@ -609,8 +609,8 @@ Additionally, org-node-fakeroam can speed up org-roam itself, as well as allow f
 *** Prevent org-block face for latex fragments, since they look weird
 
 #+begin_src elisp
-(require 'org-src)
-(add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t)))
+(after! org
+  (add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t))))
 #+end_src
 
 *** Nix-Doom-Emacs messes with dashboard
@@ -629,7 +629,8 @@ Org-Tempo provides shortcuts like ~"<s" - <TAB>~ for generating code blocks.
 For some reason, it does not start at launch, so I'm  loading it here.
 
 #+begin_src elisp
-(use-package! org-tempo)
+(use-package! org-tempo
+  :after org)
 #+end_src
 
 *** Automatic list item insertion
@@ -646,8 +647,7 @@ org-autolist.el (unmaintained since 2022) advises ~org-return~ with a quoted ~co
 
 #+begin_src elisp
 (use-package! org-autolist
-  :config
-  (add-hook 'org-mode-hook #'org-autolist-mode))
+  :hook (org-mode . org-autolist-mode))
 #+end_src
 
 *** Use org-cycle instead of +fold/toggle for TAB
@@ -761,7 +761,6 @@ easy integration of Khal with Org.
 
 (setq khalel-import-end-date "+30d")
 
-(khalel-add-capture-template)
 #+end_src
 
 ** Querying & Combined Views
@@ -779,7 +778,8 @@ Additionally, ~org-roam-ql~ provides similar functionality for org-roam files.
 #+end_src
 
 #+begin_src elisp
-(use-package! org-ql)
+(use-package! org-ql
+  :defer t)
 #+end_src
 
 **** Org Similarity
@@ -1014,7 +1014,9 @@ Settings to ensure the query system remains responsive even with large numbers o
              (file-exists-p org-roam-db-location))
     (unless (hash-table-p org-id-locations)
       (setq org-id-locations (make-hash-table :test 'equal)))
-    (dolist (row (org-roam-db-query [:select [id file] :from nodes]))
+    ;; Bypass Doom's first-query advice here: that advice performs a full
+    ;; synchronous DB sync, which should wait for an actual roam operation.
+    (dolist (row (emacsql (org-roam-db) [:select [id file] :from nodes]))
       (puthash (car row) (cadr row) org-id-locations))))
 
 ;; Refresh after a DB sync, after capturing a node, and once org-roam loads.
@@ -1084,7 +1086,8 @@ Features for the Prisma ORM configuration language
 #+end_src
 
 #+begin_src elisp
-(use-package! prisma-mode)
+(use-package! prisma-mode
+  :defer t)
 #+end_src
 **** Testing
 
@@ -1969,6 +1972,7 @@ like pipeline status, and MR interaction.
 Set up the package with the default instance and the token from my password manager.
 #+begin_src elisp
 (use-package! lab
+  :defer t
   :config
   (setq lab-host "https://gitlab.com")
   (setq lab-token (password-store-get "bitwarden/gitlab-token")))
@@ -2044,6 +2048,7 @@ I want to bind ~just-exec-recipe~ to ~e~ in normal mode.
 
 #+begin_src elisp
 (use-package! justl
+  :defer t
   :config
 
   (map! :leader
@@ -2473,6 +2478,13 @@ Add fringe to vertico-posframea
 
 * Performance
 Various tweaks to improve the overall performance.
+
+Keep Doom's incrementally deferred packages lazy.  Daemon sessions otherwise
+load the whole queue synchronously before becoming ready, which adds roughly
+five seconds here.
+#+begin_src elisp
+(setq doom-incremental-first-idle-timer nil)
+#+end_src
 
 Raise the GC-Cons threshold
 #+begin_example elisp

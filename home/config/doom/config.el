@@ -143,7 +143,6 @@
 (custom-set-faces!
   '(org-modern-label :height 1.1))
 
-(global-org-modern-mode)
 ;; Org-Modern:3 ends here
 
 ;; [[file:config.org::*Org-Modern][Org-Modern:4]]
@@ -303,6 +302,7 @@
 
 (use-package! org-roam-ui
   :after org-roam
+  :defer t
   :config
   (setq org-roam-ui-synch-theme t
         org-roam-ui-follow t
@@ -335,8 +335,8 @@
 ;; Turn Logseq Nodes into Org-Roam Nodes:5 ends here
 
 ;; [[file:config.org::*Prevent org-block face for latex fragments, since they look weird][Prevent org-block face for latex fragments, since they look weird:1]]
-(require 'org-src)
-(add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t)))
+(after! org
+  (add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t))))
 ;; Prevent org-block face for latex fragments, since they look weird:1 ends here
 
 ;; [[file:config.org::*Nix-Doom-Emacs messes with dashboard][Nix-Doom-Emacs messes with dashboard:1]]
@@ -344,13 +344,13 @@
 ;; Nix-Doom-Emacs messes with dashboard:1 ends here
 
 ;; [[file:config.org::*Faster insertion of org structures (i.e. source blocks)][Faster insertion of org structures (i.e. source blocks):1]]
-(use-package! org-tempo)
+(use-package! org-tempo
+  :after org)
 ;; Faster insertion of org structures (i.e. source blocks):1 ends here
 
 ;; [[file:config.org::*Automatic list item insertion][Automatic list item insertion:2]]
 (use-package! org-autolist
-  :config
-  (add-hook 'org-mode-hook #'org-autolist-mode))
+  :hook (org-mode . org-autolist-mode))
 ;; Automatic list item insertion:2 ends here
 
 ;; [[file:config.org::*Use org-cycle instead of +fold/toggle for TAB][Use org-cycle instead of +fold/toggle for TAB:1]]
@@ -437,11 +437,11 @@
 
 (setq khalel-import-end-date "+30d")
 
-(khalel-add-capture-template)
 ;; Khal / Khalel:2 ends here
 
 ;; [[file:config.org::*Querying & Combined Views][Querying & Combined Views:3]]
-(use-package! org-ql)
+(use-package! org-ql
+  :defer t)
 ;; Querying & Combined Views:3 ends here
 
 ;; [[file:config.org::*Org Similarity][Org Similarity:2]]
@@ -648,7 +648,9 @@
              (file-exists-p org-roam-db-location))
     (unless (hash-table-p org-id-locations)
       (setq org-id-locations (make-hash-table :test 'equal)))
-    (dolist (row (org-roam-db-query [:select [id file] :from nodes]))
+    ;; Bypass Doom's first-query advice here: that advice performs a full
+    ;; synchronous DB sync, which should wait for an actual roam operation.
+    (dolist (row (emacsql (org-roam-db) [:select [id file] :from nodes]))
       (puthash (car row) (cadr row) org-id-locations))))
 
 ;; Refresh after a DB sync, after capturing a node, and once org-roam loads.
@@ -671,7 +673,8 @@
 ;; Disable Automatic Workspace Creation:1 ends here
 
 ;; [[file:config.org::*Prisma][Prisma:2]]
-(use-package! prisma-mode)
+(use-package! prisma-mode
+  :defer t)
 ;; Prisma:2 ends here
 
 ;; [[file:config.org::*Testing][Testing:2]]
@@ -1157,6 +1160,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 ;; [[file:config.org::*Gitlab Integration][Gitlab Integration:2]]
 (use-package! lab
+  :defer t
   :config
   (setq lab-host "https://gitlab.com")
   (setq lab-token (password-store-get "bitwarden/gitlab-token")))
@@ -1182,6 +1186,7 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 
 ;; [[file:config.org::*Task Runners][Task Runners:2]]
 (use-package! justl
+  :defer t
   :config
 
   (map! :leader
@@ -1365,8 +1370,12 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 ;; Vertico:4 ends here
 
 ;; [[file:config.org::*Performance][Performance:1]]
-(setq read-process-output-max (* 4 1024 1024)) ;; 4mb
+(setq doom-incremental-first-idle-timer nil)
 ;; Performance:1 ends here
+
+;; [[file:config.org::*Performance][Performance:2]]
+(setq read-process-output-max (* 4 1024 1024)) ;; 4mb
+;; Performance:2 ends here
 
 ;; [[file:config.org::*Performance][Performance:2]]
 (fset #'jsonrpc--log-event #'ignore)
