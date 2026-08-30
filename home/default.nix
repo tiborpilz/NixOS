@@ -117,6 +117,7 @@ with mylib;
       # AI stuff
       unstable.claude-code
       unstable.pi-coding-agent
+      codex
       copilot-language-server
 
       # AST-aware code search
@@ -257,12 +258,14 @@ with mylib;
           "https://cache.nixos.org/"
           "https://nix-community.cachix.org/"
           "https://tiborpilz.cachix.org/"
+          "https://codex-cli.cachix.org/"
           # "https://cache.tiborpilz.xyz/nixos"
         ];
         trusted-public-keys = [
           "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
           "tiborpilz.cachix.org-1:KyBjAXY8eblxntQ+OG13IjT+M222VxT+25yw1lqnQS4="
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+          "codex-cli.cachix.org-1:1Br3H1hHoRYG22n//cGKJOk3cQXgYobUel6O8DgSing="
           # "nixos:<public key from the curl above>"
         ];
         system-features = [ "big-parallel" "kvm" "recursive-nix" ];

@@ -44,6 +44,10 @@
     claude-code.url = "github:sadjow/claude-code-nix";
     claude-code.inputs.nixpkgs.follows = "nixpkgs";
 
+    # No nixpkgs follows: codex-cli.cachix.org only has builds made against the
+    # flake's own nixpkgs pin, so overriding it means building codex from source.
+    codex-cli.url = "github:sadjow/codex-cli-nix";
+
     pie-src = {
       url = "github:the-little-typer/pie/2c89553a693ac6688b16d722f416914f2e9aa4c3";
       flake = false;
@@ -126,6 +130,9 @@
               overlays = [ inputs.emacs-overlay.overlays.default ];
             };
             my = self.packages."${prev.stdenv.hostPlatform.system}";
+            # The flake output rather than codex-cli's overlay: the overlay
+            # rebuilds against our nixpkgs, which is not what the cache holds.
+            codex = inputs.codex-cli.packages."${prev.stdenv.hostPlatform.system}".default;
             copilot-language-server-fhs = final.copilot-language-server;
           })
           inputs.devshell.overlays.default
