@@ -8,10 +8,19 @@
 
 /* ── COMMAND LINE COLOUR SCHEME ─────────────────────────────────────── */
 /*
- * The iframe's canvas is transparent only while its used color-scheme matches
- * the embedding page's; mismatched, Firefox paints it opaque and the pill's
- * backdrop-filter has nothing left to sample. Nothing inside the iframe can
- * read the page's scheme, so it is marked from here and hush.css keys off it.
+ * Two independent signals, marked separately because they answer different
+ * questions:
+ *
+ *   data-hush-scheme  the page's *declared* colour scheme. The iframe canvas
+ *                     is transparent only while its used color-scheme matches
+ *                     the page's; mismatched, Firefox paints it opaque and the
+ *                     backdrop-filter has nothing left to sample.
+ *   data-hush-tone    how the page actually *looks*, measured from its
+ *                     background. Drives the palette, because a page can be
+ *                     dark while declaring nothing — lobste.rs paints
+ *                     rgb(12,12,12) with no color-scheme at all.
+ *
+ * Keying both off the declaration put a light popup on such pages.
  */
 (function () {
   "use strict";
@@ -29,21 +38,53 @@
     return matchMedia("(prefers-color-scheme: dark)").matches;
   }
 
-  function mark(root, scheme) {
-    if (root && root.dataset.hushScheme !== scheme) {
-      root.dataset.hushScheme = scheme;
+  /* First background actually painted; the canvas itself is not readable. */
+  function pageBackground() {
+    var els = [document.body, document.documentElement];
+    for (var i = 0; i < els.length; i++) {
+      if (!els[i]) continue;
+      var m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/.exec(
+        getComputedStyle(els[i]).backgroundColor
+      );
+      if (m && (m[4] === undefined || parseFloat(m[4]) > 0.5)) {
+        return [+m[1], +m[2], +m[3]];
+      }
     }
+    return null;
+  }
+
+  function luminance(rgb) {
+    var f = function (v) {
+      v /= 255;
+      return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * f(rgb[0]) + 0.7152 * f(rgb[1]) + 0.0722 * f(rgb[2]);
+  }
+
+  function pageIsDarkTone(declaredDark) {
+    var bg = pageBackground();
+    /* Nothing painted: the canvas is whatever the declaration asked for. */
+    if (!bg) return declaredDark;
+    return luminance(bg) < 0.18;
+  }
+
+  function mark(root, scheme, tone) {
+    if (!root) return;
+    if (root.dataset.hushScheme !== scheme) root.dataset.hushScheme = scheme;
+    if (root.dataset.hushTone !== tone) root.dataset.hushTone = tone;
   }
 
   function apply() {
-    var scheme = pageIsDark() ? "dark" : "light";
-    /* The page root carries it too: the mode indicator is a page-side element
-       and shares --hush-blur, so it has to dim on light pages as well. */
-    mark(document.documentElement, scheme);
+    var declaredDark = pageIsDark();
+    var scheme = declaredDark ? "dark" : "light";
+    var tone = pageIsDarkTone(declaredDark) ? "dark" : "light";
+    /* The page root carries them too: the mode indicator and hint chips are
+       page-side and read the same tokens. */
+    mark(document.documentElement, scheme, tone);
     var frame = document.getElementById("cmdline_iframe");
     if (!frame) return;
     var doc = frame.contentDocument;
-    if (doc) mark(doc.documentElement, scheme);
+    if (doc) mark(doc.documentElement, scheme, tone);
     if (frame.hushScheme) return;
     frame.hushScheme = true;
     frame.addEventListener("load", apply);

@@ -109,11 +109,10 @@ html.TridactylCommandline[data-hush-scheme="light"] {
   color-scheme: light !important;
 }
 
-/* On a light page the pill goes light too, rather than staying a dark slab
-   over bright content. The greys are the design's light set. The backdrop
-   filter stops darkening here — it only has to keep the page's hue, because
-   the glass itself now supplies the light ground. */
-:root[data-hush-scheme="light"] {
+/* Keyed on tone, not on the declared scheme: a page can be dark while
+   declaring nothing. The backdrop filter stops darkening here — it only has
+   to keep the page's hue, because the glass supplies the light ground. */
+:root[data-hush-tone="light"] {
   --hush-bg:        #efeeec;
   --hush-bg-alt:    #e6e4e0;
   --hush-sel:       #d8d5cf;
