@@ -116,7 +116,6 @@ with mylib;
 
       # AI stuff
       unstable.claude-code
-      unstable.pi-coding-agent
       codex
       copilot-language-server
 
@@ -224,6 +223,8 @@ with mylib;
     modules.firefox.enable = true;
 
     modules.tools.aider.enable = false; # it has sooo many dependencies
+
+    modules.tools.pi.enable = true;
 
     modules.shell.jujutsu.enable = true;
 

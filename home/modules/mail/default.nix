@@ -16,6 +16,13 @@ let
     in
     [ "${script}" ];
 
+  imapnotifyFor = channel: {
+    enable = true;
+    boxes = [ "INBOX" ];
+    onNotify = "${config.programs.mbsync.package}/bin/mbsync ${channel}";
+    onNotifyPost = "${config.programs.mu.package}/bin/mu index";
+  };
+
   common = {
     realName = "Tibor Pilz";
     mbsync = {
@@ -35,6 +42,7 @@ in
     maildir = mylib.mkOpt types.str "${config.home.homeDirectory}/Mail";
 
     autoSync = mylib.mkBoolOpt false;
+    pushSync = mylib.mkBoolOpt true;
     syncInterval = mylib.mkOpt types.str "*:0/5";
 
     ionos.passEntry = mylib.mkOpt types.str "bitwarden/mail.ionos.de";
@@ -51,6 +59,7 @@ in
         userName = "tibor@pilz.berlin";
         passwordCommand = passwordCommand cfg.ionos.passEntry;
         maildir.path = "pilz.berlin";
+        imapnotify = imapnotifyFor "ionos";
         # The mailbox is German-localised; the English folders exist but are
         # empty, so sending against them would hide mail from IONOS webmail.
         folders = {
@@ -85,6 +94,7 @@ in
         # apply by matching "gmail" against the root maildir, so the directory
         # name is load-bearing.
         maildir.path = "gmail";
+        imapnotify = imapnotifyFor "gmail";
         # googlemail.com addresses get the localised "[Google Mail]" special
         # folder namespace rather than "[Gmail]".
         folders = {
@@ -105,6 +115,8 @@ in
         };
       };
     };
+
+    services.imapnotify.enable = cfg.pushSync;
 
     programs.mbsync.enable = true;
     programs.msmtp.enable = true;
