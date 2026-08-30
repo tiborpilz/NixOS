@@ -110,6 +110,11 @@ while IFS= read -r item_json; do
     ((index += 1))
 done < <(jq -c '.[]' "$items_file")
 
+for ((index = 0; index < item_count; index += 1)); do
+    path=$(<"$workdir/items/$index.path")
+    printf '%s' "${path_counts["$path"]}" > "$workdir/items/$index.count"
+done
+
 stage_store=$(mktemp -d "$store_dir/.bw2pass-stage.XXXXXX")
 chmod 700 "$stage_store"
 cp -- "$store_dir/.gpg-id" "$stage_store/.gpg-id"
@@ -122,8 +127,9 @@ set -euo pipefail
 
 item_file=$1
 path_file=${item_file%.json}.path
+count_file=${item_file%.json}.count
 path=$(<"$path_file")
-if (( BW2PASS_PATH_COUNT > 1 )); then
+if (( $(<"$count_file") > 1 )); then
     id=$(jq -er '.id' "$item_file")
     path="$path--${id:0:8}"
 fi
@@ -152,11 +158,9 @@ export BW2PASS_WORKDIR=$workdir
 export BW2PASS_STAGE_STORE=$stage_store
 
 echo "Encrypting $item_count Bitwarden item(s)..." >&2
-for ((index = 0; index < item_count; index += 1)); do
-    path=$(<"$workdir/items/$index.path")
-    export BW2PASS_PATH_COUNT=${path_counts["$path"]}
-    bash "$worker" "$workdir/items/$index.json"
-done
+seq 0 $((item_count - 1)) \
+    | parallel --will-cite --halt now,fail=1 -j "${BW2PASS_JOBS:-100%}" \
+        bash "$worker" "$workdir/items/{}.json"
 
 # Both directories are on the password-store filesystem. The live mirror is
 # moved aside before the staged mirror is installed, and cleanup restores it if

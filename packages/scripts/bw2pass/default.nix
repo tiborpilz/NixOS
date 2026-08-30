@@ -12,6 +12,7 @@ pkgs.stdenvNoCC.mkDerivation {
     pkgs.findutils
     pkgs.gnugrep
     pkgs.jq
+    pkgs.parallel
   ];
   doCheck = true;
 
@@ -31,6 +32,7 @@ pkgs.stdenvNoCC.mkDerivation {
         pkgs.bitwarden-cli
         pkgs.coreutils
         pkgs.jq
+        pkgs.parallel
         pkgs.pass
       ]}
 

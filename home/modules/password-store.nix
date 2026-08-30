@@ -11,6 +11,8 @@ in
     enable = mylib.mkBoolOpt false;
     enable-sync = mylib.mkBoolOpt false;
     gpg-id = mylib.mkOpt types.str config.modules.shell.gnupg.public_key;
+    # Additional recipients the store is encrypted to.
+    extra-gpg-ids = mylib.mkOpt (types.listOf types.str) [ ];
   };
 
   config.home.packages = mkIf cfg.enable [
@@ -33,7 +35,7 @@ in
       if [ ! -e "${storeDir}/.gpg-id" ]; then
         if ${pkgs.gnupg}/bin/gpg --list-keys ${cfg.gpg-id} > /dev/null 2>&1; then
           $DRY_RUN_CMD env PASSWORD_STORE_DIR="${storeDir}" \
-            ${config.programs.password-store.package}/bin/pass init ${cfg.gpg-id}
+            ${config.programs.password-store.package}/bin/pass init ${concatStringsSep " " ([ cfg.gpg-id ] ++ cfg.extra-gpg-ids)}
         else
           echo "password-store: skipping init, public key ${cfg.gpg-id} is not in the keyring"
         fi

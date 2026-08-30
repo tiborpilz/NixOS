@@ -212,8 +212,8 @@ let
 
     for entry in ${doomEmacsRaw}/share/applications/*; do
       substitute "$entry" "$out/share/applications/$(basename "$entry")" \
-        --replace-quiet "Exec=emacs " "Exec=$out/bin/emacsclient --create-frame --alternate-editor= " \
-        --replace-quiet "TryExec=emacs" "TryExec=$out/bin/emacsclient" \
+        --replace-quiet "Exec=emacs " "Exec=$out/bin/doom-emacs " \
+        --replace-quiet "TryExec=emacs" "TryExec=$out/bin/doom-emacs" \
         --replace-quiet "${customEmacsPkg}/bin/emacsclient" "$out/bin/emacsclient"
     done
 
