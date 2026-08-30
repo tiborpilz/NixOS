@@ -185,18 +185,10 @@ findbar {
 .titlebar-buttonbox-container { display: none; }
 
 /* Url bar chrome */
-#urlbar-input-container {
-  border: 1px solid rgba(0, 0, 0, 0) !important;
-}
-
 #urlbar-container {
   margin: 0 !important;
   padding-block: 2px !important;
   min-height: var(--urlbar-height) !important;
-}
-
-#urlbar[focused='true'] > #urlbar-background {
-  box-shadow: none !important;
 }
 
 #navigator-toolbox {

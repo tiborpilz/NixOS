@@ -59,23 +59,24 @@ in
             # (the urlbar is faded out by userChrome).
             "browser.newtabpage.activity-stream.improvesearch.handoffToAwesomebar" = false;
           };
-          userChrome = builtins.readFile ./chrome/userChrome.css;
-          userContent = builtins.readFile ./chrome/userContent.css;
+          # Paths rather than strings: home-manager writes a non-string as
+          # `source`, so these land as symlinks to the working tree. Firefox
+          # reads them once at startup, so iterating is edit + restart.
+          userChrome = config.lib.file.mkOutOfStoreSymlink
+            "${config.home.homeDirectory}/Code/nixos/home/config/firefox/chrome/userChrome.css";
+          userContent = config.lib.file.mkOutOfStoreSymlink
+            "${config.home.homeDirectory}/Code/nixos/home/config/firefox/chrome/userContent.css";
         };
       };
     };
 
     xdg = {
-      # home-manager asserts xdg.desktopEntries is linux-only, so on Darwin
-      # this is an eval error rather than a no-op. There is no .desktop
-      # equivalent there anyway — the profile is launched by its own means.
       desktopEntries = mkIf pkgs.stdenv.isLinux {
         firefox-minimal = {
           name = "Firefox (minimal)";
           genericName = "Web Browser";
           comment = "Minimalist scifox profile with tridactyl";
           # --no-remote so it runs alongside a normal Firefox instance;
-          # no mimeType so the default browser stays the regular profile.
           exec = "firefox -P main --no-remote %U";
           icon = "firefox";
           type = "Application";
@@ -96,32 +97,33 @@ in
           " glyph in it for sources the API gives no icon for.
           set completions.Tab.showFavicons true
 
+          " Favicons on history and bookmark completion rows, which the
+          " completion API gives no icon for. `-r` resolves relative to this
+          " file and re-reads on every call, so the scripts can be edited
+          " without a rebuild.
+          " autocmds are keyed by event and pattern, so everything that runs
+          " on DocStart has to share one script — a second one on the same
+          " pattern replaces this rather than adding to it.
+          autocmd TriStart .* jsb -r favicons-seed.js
+          autocmd DocStart .* js -r hush.js
+
           " Let Ctrl+E reach Sidebery's sidebar toggle (tridactyl normally
           " binds <C-e> to scrollline 10 and swallows it).
           unbind --mode=normal <C-e>
         '';
 
-        # Out of store so the theme can be iterated on without a rebuild.
-        # `:source` re-runs this rc, and `colourscheme` re-reads the file from
-        # disk every time — but it then sets `theme` to the value it already
-        # had, so nothing re-applies the new CSS until the page reloads.
-        # The loop is therefore: edit, `:source`, reload the page.
-        # Changes to the rc itself still need a switch.
         "tridactyl/themes/hush.css".source =
           config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Code/nixos/home/config/tridactyl/hush.css";
+        "tridactyl/hush.js".source =
+          config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Code/nixos/home/config/tridactyl/hush.js";
+        "tridactyl/favicons-seed.js".source =
+          config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Code/nixos/home/config/tridactyl/favicons-seed.js";
       };
     };
 
-    # Adaptive Tab Bar Colour declares http/https as *optional* host
+    # Adaptive Tab Bar Colour declares http/https as optional host
     # permissions, and installing an add-on by dropping its xpi in the profile
-    # never runs the grant flow — so it starts with no host access and
-    # silently never reads a page's colour. extensions.originControls.
-    # grantByDefault is already true and does not cover this path.
-    #
-    # The grant lives in extension-preferences.json, which Firefox also writes
-    # at runtime (it holds Sidebery's <all_urls> and the built-ins' internal
-    # flags), so merge the one key rather than declaring the whole file.
-    # Applies on the next Firefox start.
+    # never runs the grant flow.
     home.activation.grantAdaptiveTabBarHostAccess =
       lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         prefs="${config.home.homeDirectory}/.config/mozilla/firefox/main/extension-preferences.json"
@@ -138,12 +140,6 @@ in
         fi
       '';
 
-    # Declarative extension shortcut overrides. Firefox keeps these in the
-    # profile's extension-settings.json (ExtensionSettingsStore, type
-    # "commands" — see ExtensionShortcuts.sys.mjs). KDE grabs Alt+Space
-    # (KRunner), so Sidebery's "activate" is rebound to Alt+A.
-    # force=true makes this file authoritative: shortcuts changed in the
-    # about:addons GUI are reverted on switch — change them here instead.
     home.file.".config/mozilla/firefox/main/extension-settings.json" = {
       force = true;
       text = builtins.toJSON {

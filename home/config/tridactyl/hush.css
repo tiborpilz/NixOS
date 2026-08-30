@@ -21,13 +21,14 @@
   --hush-fg-dim:    #6f6f6f;
   --hush-accent:    #b9b9b9;
 
-  /* Pages that declare a dark color-scheme keep their background on the
-     canvas, which backdrop-filter does not sample — the glass then falls
-     back to compositing over white. Alpha is set so that fallback stays
-     dark enough to read on (0.70 gave rgb(96,96,96)). */
-  --hush-glass:     rgba(28, 28, 28, 0.85);
+  /* Kept low: the filter above does the darkening, so this only has to tint.
+     Anything heavier neutralises the hue the blur just picked up. */
+  --hush-glass:     rgba(28, 28, 28, 0.22);
   --hush-hairline:  rgba(185, 185, 185, 0.24);
-  --hush-blur:      blur(18px) saturate(140%);
+  --hush-blur:      blur(18px) saturate(260%) brightness(0.68);
+  /* Sampling a light page and then dimming it hard is what keeps the pill
+     dark enough for the light text while still carrying the page's hue. */
+  --hush-shadow:    0 18px 48px rgba(0, 0, 0, 0.45);
 
   --hush-radius:    10px;
   --hush-radius-sm: 3px;
@@ -75,7 +76,7 @@
   background: transparent !important;
   border: 1px solid var(--hush-hairline) !important;
   border-radius: var(--hush-radius) !important;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45) !important;
+  box-shadow: var(--hush-shadow) !important;
   z-index: 2147483647 !important;
 }
 
@@ -91,13 +92,40 @@
   box-shadow: none !important;
 }
 
-/* commandline.html carries <meta name="color-scheme" content="light dark">.
-   When that resolves dark, Firefox paints the iframe an opaque canvas and no
-   transparent background below it can show the page through — the whole pill
-   goes flat. Forcing light restores a transparent canvas; `normal` does not. */
+/* The iframe's canvas is only transparent when its used color-scheme matches
+   the embedding page's; otherwise Firefox paints it opaque and backdrop-filter
+   has nothing to sample. No static value matches every page, so this picks the
+   one whose failure mode is survivable: against a light page the canvas goes
+   opaque dark (a solid, readable pill), where `light` against a dark page went
+   opaque white and washed the whole thing out. */
 html.TridactylCommandline {
-  color-scheme: light !important;
+  color-scheme: dark !important;
   background: transparent !important;
+}
+
+/* scheme.js marks both roots with the page's scheme; without it the dark
+   default above is right for dark pages and merely opaque elsewhere. */
+html.TridactylCommandline[data-hush-scheme="light"] {
+  color-scheme: light !important;
+}
+
+/* On a light page the pill goes light too, rather than staying a dark slab
+   over bright content. The greys are the design's light set. The backdrop
+   filter stops darkening here — it only has to keep the page's hue, because
+   the glass itself now supplies the light ground. */
+:root[data-hush-scheme="light"] {
+  --hush-bg:        #efeeec;
+  --hush-bg-alt:    #e6e4e0;
+  --hush-sel:       #d8d5cf;
+  --hush-fg:        #4a4a48;
+  --hush-fg-bright: #1f1f1e;
+  --hush-fg-dim:    #8b8985;
+  --hush-accent:    #4a4a48;
+
+  --hush-glass:     rgba(239, 238, 236, 0.78);
+  --hush-hairline:  rgba(31, 31, 30, 0.18);
+  --hush-blur:      blur(18px) saturate(200%);
+  --hush-shadow:    0 18px 48px rgba(0, 0, 0, 0.18);
 }
 
 /* #completions and #command-line-holder are siblings under body, not nested,
@@ -283,6 +311,20 @@ html.TridactylCommandline body {
   vertical-align: -2px;
 }
 
+/* Injected by favicons.js when it has a cached icon for the row's origin. */
+#completions .hush-favicon {
+  width: var(--hush-glyph);
+  height: var(--hush-glyph);
+  margin-inline-end: var(--hush-glyph-gap);
+  border-radius: var(--hush-radius-sm);
+  opacity: 0.9;
+  vertical-align: -2px;
+}
+
+#completions tr[data-hush-icon] td.title::before {
+  content: none;
+}
+
 /* History and bookmark rows get no favicon from the API, so a glyph holds
    the column instead. These sources have no .icon cell at all, hence the
    marker rides on the title. */
@@ -387,11 +429,10 @@ html.TridactylOwnNamespace:not(.TridactylCommandline) a:hover {
 /* ── ADAPTIVE TINT ─────────────────────────────────────────────────────
  * (a) Automatic, already on: the pill's backdrop-filter genuinely samples
  *     the page — Firefox does not treat an iframe as a backdrop root — so
- *     the glass picks up whatever is behind it. Lowering --hush-glass alpha
- *     buys more page bleed, but only on pages that paint their background
- *     with elements; where it comes from the canvas (any page declaring a
- *     dark color-scheme, e.g. google.com) there is nothing to sample and
- *     the alpha alone decides how dark the pill reads.
+ *     the glass picks up whatever is behind it. brightness() in --hush-blur
+ *     does the darkening rather than --hush-glass alpha, which is what keeps
+ *     the page's hue: dimming the sampled backdrop preserves its chroma,
+ *     covering it with neutral paint does not.
  *
  * (b) A named accent per site, since CSS cannot read a page's palette.
  *     From tridactylrc:
@@ -414,19 +455,4 @@ html[data-hush-tint="ember"] {
 
 /* Opaque variant, matching the awesomebar exactly.
 :root { --hush-glass: #1c1c1c; --hush-hairline: #464646; --hush-blur: none; }
-*/
-
-/* Light variant.
-@media (prefers-color-scheme: light) {
-  :root {
-    --hush-bg: #efeeec;
-    --hush-bg-alt: #e6e4e0;
-    --hush-sel: #d8d5cf;
-    --hush-fg: #4a4a48;
-    --hush-fg-bright: #1f1f1e;
-    --hush-fg-dim: #8b8985;
-    --hush-glass: rgba(239, 238, 236, 0.78);
-    --hush-hairline: rgba(31, 31, 30, 0.18);
-  }
-}
 */
