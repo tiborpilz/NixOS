@@ -1,92 +1,180 @@
 #!/usr/bin/env bash
-set -eo pipefail
-# Requires: bw, jq, pass, GNU parallel, flock (util-linux)
-# Exports Bitwarden items into pass, with parallel processing but serialized pass inserts.
+set -euo pipefail
 
-check_bw_login() {
-    local status
-    status=$(bw status | jq -r '.status')
-    local interactive
-    interactive=$(tty -s && echo true || echo false)
+# Maintain bitwarden/ in pass as a generated, one-way mirror. Bitwarden is the
+# source of truth; entries outside bitwarden/ are never touched.
 
-    if [[ "$status" == "unauthenticated" ]]; then
-        if [[ "$interactive" == "true" ]]; then
-            result=$(bw login)
-            key=$(echo "$result" | grep '^\$ export' | cut -d'=' -f2 | tr -d '"')
-            echo "$key"
-        else
-            echo "You're not logged in to Bitwarden, please run 'bw login' first" >&2
-            exit 1
-        fi
+ensure_bw_session() {
+    local status session
+
+    if ! status=$(bw status | jq -er '.status'); then
+        echo "Unable to determine Bitwarden status." >&2
+        exit 1
     fi
+
+    case "$status" in
+        unlocked)
+            return
+            ;;
+        locked)
+            if [[ ! -t 0 ]]; then
+                echo "Bitwarden is locked. Run 'bw unlock' and export BW_SESSION first." >&2
+                exit 1
+            fi
+            session=$(bw unlock --raw)
+            ;;
+        unauthenticated)
+            if [[ ! -t 0 ]]; then
+                echo "You're not logged in to Bitwarden. Run 'bw login' first." >&2
+                exit 1
+            fi
+            session=$(bw login --raw)
+            ;;
+        *)
+            echo "Unknown Bitwarden status: $status" >&2
+            exit 1
+            ;;
+    esac
+
+    if [[ -z "$session" ]]; then
+        echo "Bitwarden did not return a session key." >&2
+        exit 1
+    fi
+    export BW_SESSION="$session"
 }
 
-# Worker script: gets a single JSON line (a full item) as $1
-# Writes formatted pass value to a temp file, then uses flock to serialize pass insert.
-cat > /tmp/bw-pass-worker.sh <<'WORKER'
+workdir=
+stage_store=
+backup_dir=
+store_dir=${PASSWORD_STORE_DIR:-${HOME:?HOME is not set}/.password-store}
+mirror_dir=$store_dir/bitwarden
+
+cleanup() {
+    local status=$?
+    trap - EXIT HUP INT TERM
+
+    # If replacement failed between the two renames, put the old mirror back.
+    if [[ -n "$backup_dir" && -d "$backup_dir" && ! -e "$mirror_dir" ]]; then
+        mv -- "$backup_dir" "$mirror_dir"
+    fi
+    if [[ -n "$workdir" && -d "$workdir" ]]; then
+        rm -rf -- "$workdir"
+    fi
+    if [[ -n "$stage_store" && -d "$stage_store" ]]; then
+        rm -rf -- "$stage_store"
+    fi
+    exit "$status"
+}
+trap cleanup EXIT HUP INT TERM
+
+ensure_bw_session
+
+if [[ ! -f "$store_dir/.gpg-id" ]]; then
+    echo "Password store is not initialized: $store_dir/.gpg-id is missing." >&2
+    exit 1
+fi
+
+# bw list reads the CLI's local cache, so refresh it before constructing the
+# mirror. Nothing in the current mirror is changed if sync or import fails.
+echo "Synchronizing Bitwarden..." >&2
+bw sync >/dev/null
+
+workdir=$(mktemp -d "${TMPDIR:-/tmp}/bw2pass.XXXXXX")
+chmod 700 "$workdir"
+mkdir "$workdir/items"
+
+items_file=$workdir/items.json
+bw list items > "$items_file"
+item_count=$(jq -er 'length' "$items_file")
+
+# Split items into private files so secrets never appear in argv. Calculate all
+# destination names before writing, allowing duplicate (or sanitized-colliding)
+# names to receive stable Bitwarden-ID suffixes.
+declare -A path_counts=()
+index=0
+while IFS= read -r item_json; do
+    item_file=$workdir/items/$index.json
+    printf '%s\n' "$item_json" > "$item_file"
+    chmod 600 "$item_file"
+
+    path=$(jq -er '
+        (.name // "")
+        | gsub("/"; "_")
+        | gsub("\\\\"; "_")
+        | gsub("[[:cntrl:]]"; "_")
+        | gsub("^[[:space:]]+|[[:space:]]+$"; "")
+        | if . == "" or . == "." or . == ".." then "unnamed" else . end
+    ' "$item_file")
+    printf '%s' "$path" > "$workdir/items/$index.path"
+    path_counts["$path"]=$(( ${path_counts["$path"]:-0} + 1 ))
+    ((index += 1))
+done < <(jq -c '.[]' "$items_file")
+
+stage_store=$(mktemp -d "$store_dir/.bw2pass-stage.XXXXXX")
+chmod 700 "$stage_store"
+cp -- "$store_dir/.gpg-id" "$stage_store/.gpg-id"
+mkdir "$stage_store/bitwarden"
+
+worker=$workdir/worker.sh
+cat > "$worker" <<'WORKER'
 #!/usr/bin/env bash
 set -euo pipefail
-item_json="$1"
 
-# parse fields (guard against missing fields)
-name=$(jq -r '.name // empty' <<<"$item_json")
-username=$(jq -r '.login.username // empty' <<<"$item_json")
-password=$(jq -r '.login.password // empty' <<<"$item_json")
-url=$(jq -r '.login.uris[0].uri // empty' <<<"$item_json")
-notes=$(jq -r '.notes // empty' <<<"$item_json")
-
-# build pass content (first line = secret)
-pass_value="$password"
-if [[ -n "$username" ]]; then
-    pass_value+=$'\n'"Username: $username"
-fi
-if [[ -n "$url" ]]; then
-    pass_value+=$'\n'"Url: $url"
-fi
-if [[ -n "$notes" ]]; then
-    pass_value+=$'\n'"Notes: $notes"
+item_file=$1
+path_file=${item_file%.json}.path
+path=$(<"$path_file")
+if (( BW2PASS_PATH_COUNT > 1 )); then
+    id=$(jq -er '.id' "$item_file")
+    path="$path--${id:0:8}"
 fi
 
-# temp file and a global lockfile for serializing pass inserts
-tmpfile=$(mktemp)
-trap 'rm -f "$tmpfile"' EXIT
-printf '%s\n' "$pass_value" > "$tmpfile"
+value_file=$(mktemp "$BW2PASS_WORKDIR/value.XXXXXX")
+trap 'rm -f -- "$value_file"' EXIT
 
-lockfile="/tmp/bitwarden-pass.lock"
-# ensure lockfile exists
-: > "$lockfile"
+# Keep the password on line one for pass(1), followed by useful metadata. jq
+# performs the formatting so embedded newlines and absent item types are safe.
+jq -r '
+    (.login.password // ""),
+    (if (.login.username // "") != "" then "Username: \(.login.username)" else empty end),
+    (.login.uris[]? | select((.uri // "") != "") | "Url: \(.uri)"),
+    (if (.login.totp // "") != "" then "Totp: \(.login.totp)" else empty end),
+    (.fields[]? | select((.name // "") != "") | "Field-\(.name): \(.value // "")"),
+    (if (.notes // "") != "" then "Notes: \(.notes)" else empty end),
+    "Bitwarden-Id: \(.id)"
+' "$item_file" > "$value_file"
 
-# Use flock to serialize the actual pass insert (so gpg won't be invoked concurrently)
-flock -x "$lockfile" -- bash -c "pass insert -m \"bitwarden/$name\" < \"$tmpfile\""
-
-# remove tempfile and exit
-rm -f "$tmpfile"
-exit 0
+PASSWORD_STORE_DIR=$BW2PASS_STAGE_STORE \
+    pass insert -f -m "bitwarden/$path" < "$value_file"
 WORKER
+chmod 600 "$worker"
 
-chmod +x /tmp/bw-pass-worker.sh
+export BW2PASS_WORKDIR=$workdir
+export BW2PASS_STAGE_STORE=$stage_store
 
-# Ensure user is logged in (and get session if script produced one)
-check_bw_login
+echo "Encrypting $item_count Bitwarden item(s)..." >&2
+for ((index = 0; index < item_count; index += 1)); do
+    path=$(<"$workdir/items/$index.path")
+    export BW2PASS_PATH_COUNT=${path_counts["$path"]}
+    bash "$worker" "$workdir/items/$index.json"
+done
 
-# Fetch items once
-items_json=$(bw list items)
-
-# If there are no items, exit quietly
-if [[ -z "$items_json" || "$(echo "$items_json" | jq length)" -eq 0 ]]; then
-    echo "No Bitwarden items found." >&2
-    exit 0
+# Both directories are on the password-store filesystem. The live mirror is
+# moved aside before the staged mirror is installed, and cleanup restores it if
+# the second rename fails.
+backup_dir=$(mktemp -d "$store_dir/.bw2pass-old.XXXXXX")
+rmdir -- "$backup_dir"
+if [[ -e "$mirror_dir" ]]; then
+    mv -- "$mirror_dir" "$backup_dir"
+else
+    backup_dir=
 fi
+mv -- "$stage_store/bitwarden" "$mirror_dir"
 
-# Create a newline-delimited stream of compact JSON objects
-echo "$items_json" | jq -c '.[]' > /tmp/bw_items.jsonl
+if [[ -n "$backup_dir" ]]; then
+    rm -rf -- "$backup_dir"
+    backup_dir=
+fi
+rm -rf -- "$stage_store"
+stage_store=
 
-# Run the worker in parallel. Adjust -j N to control concurrency.
-# Using -j+0 lets GNU parallel choose number of jobs (number of CPU cores),
-# but you can set -j 4 or other number if you prefer.
-cat /tmp/bw_items.jsonl | parallel -j+0 --halt soon,fail=1 --line-buffer /tmp/bw-pass-worker.sh {}
-
-# clean up worker and tmp list
-rm -f /tmp/bw-pass-worker.sh /tmp/bw_items.jsonl
-
-echo "Done."
+echo "Mirrored $item_count Bitwarden item(s) to $mirror_dir."
