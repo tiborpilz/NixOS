@@ -91,6 +91,9 @@ in
         # Fix duplicated Characters in zsh
         # (https://stackoverflow.com/questions/45931164/duplicated-characters-and-non-updating-input-using-tmux-in-zsh)
 
+        # Extended keys so modified Enter (e.g. Shift+Enter) reaches apps
+        set -g extended-keys on
+
         # Misc Settings
         set -g monitor-activity off
         set -g visual-activity on
