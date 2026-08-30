@@ -36,6 +36,10 @@ let
         platforms = customEmacsPkg.meta.platforms;
         mainProgram = customEmacsPkg.meta.mainProgram;
       };
+      # Preserve this capability flag so ELisp package builders emit their own
+      # package-scoped .eln outputs instead of leaving everything for JIT.
+      withNativeCompilation = customEmacsPkg.withNativeCompilation or false;
+      inherit (customEmacsPkg) LIBRARY_PATH;
       src = customEmacsPkg.src;
       postBuild = ''
         wrapProgram $out/bin/emacs \
@@ -168,47 +172,6 @@ let
 
   doomEmacsRaw = pkgs.emacsWithDoom doomArgs;
 
-  # Pre-compile Doom's packages to native code at build time, so they aren't
-  # JIT-compiled on the first Emacs start after every rebuild. That runtime
-  # compilation prints byte-compiler warnings (e.g. deprecated quoted
-  # `condition-case` handlers in lsp-mode, evil-escape, etc.) to the daemon's
-  # stderr, which `native-comp-async-report-warnings-errors' cannot suppress
-  # (it only governs in-Emacs display, not the async child process's stderr).
-  #
-  # We discover the files to compile from the Doom Emacs load-path (the packages
-  # live in a separate propagated store path, so `find ${doomEmacsRaw}` sees
-  # nothing) and skip Emacs's own built-in lisp, which already ships .eln files.
-  # Results go to share/emacs/native-lisp/, which Emacs adds to
-  # native-comp-eln-load-path via NIX_PROFILES on startup. Byte-compiler
-  # warnings stay in the build log instead of surfacing at runtime.
-  doomEmacsElnFiles = pkgs.runCommand "doom-emacs-eln" { } ''
-    export HOME=$TMPDIR
-    mkdir -p $out/share/emacs/native-lisp
-    ${doomEmacsRaw}/bin/emacs --batch \
-      --eval "(let ((builtin (file-truename (file-name-directory (directory-file-name (file-name-directory (locate-library \"subr\")))))))
-                (dolist (dir (copy-sequence load-path))
-                  (when (and (file-directory-p dir)
-                             (not (string-prefix-p builtin (file-truename dir))))
-                    (dolist (f (directory-files dir t))
-                      (when (and (string-suffix-p \".el\" f)
-                                 (not (string-suffix-p \"-autoloads.el\" f))
-                                 (not (string-suffix-p \"-pkg.el\" f)))
-                        (princ f) (terpri))))))" \
-      > $TMPDIR/doom-el-files.txt
-    < $TMPDIR/doom-el-files.txt xargs -r -d '\n' -n 20 -P $NIX_BUILD_CORES \
-      ${doomEmacsRaw}/bin/emacs --batch \
-        --eval "(push \"$out/share/emacs/native-lisp\" native-comp-eln-load-path)" \
-        --eval "(setq native-comp-async-report-warnings-errors 'silent)" \
-        --eval "(progn (dolist (f command-line-args-left) (ignore-errors (native-compile f))) (setq command-line-args-left nil))" \
-      || true
-  '';
-
-  # Merge the pre-compiled .eln files into the doom output tree.
-  doomEmacsWithNativeComp = pkgs.symlinkJoin {
-    name = "doom-emacs-native";
-    paths = [ doomEmacsElnFiles doomEmacsRaw ];
-  };
-
   doomEmacs = pkgs.runCommand "doom-emacs"
     {
       nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
@@ -222,7 +185,7 @@ let
       };
     } ''
     mkdir -p $out/bin $out/share/applications $out/libexec/doom-emacs
-    for entry in ${doomEmacsWithNativeComp}/bin/*; do
+    for entry in ${doomEmacsRaw}/bin/*; do
       name=$(basename "$entry")
       if [ "$name" = "emacs" ]; then
         ln -s "$entry" "$out/bin/doom-emacs"
@@ -234,20 +197,20 @@ let
       fi
     done
     ln -s "$out/bin/doom-emacs" "$out/libexec/doom-emacs/emacs"
-    for entry in ${doomEmacsWithNativeComp}/*; do
+    for entry in ${doomEmacsRaw}/*; do
       name=$(basename "$entry")
       if [ "$name" != "bin" ] && [ "$name" != "share" ]; then
         ln -s "$entry" "$out/$name"
       fi
     done
-    for entry in ${doomEmacsWithNativeComp}/share/*; do
+    for entry in ${doomEmacsRaw}/share/*; do
       name=$(basename "$entry")
       if [ "$name" != "applications" ]; then
         ln -s "$entry" "$out/share/$name"
       fi
     done
 
-    for entry in ${doomEmacsWithNativeComp}/share/applications/*; do
+    for entry in ${doomEmacsRaw}/share/applications/*; do
       substitute "$entry" "$out/share/applications/$(basename "$entry")" \
         --replace-quiet "Exec=emacs " "Exec=$out/bin/doom-emacs " \
         --replace-quiet "TryExec=emacs" "TryExec=$out/bin/doom-emacs" \
