@@ -143,6 +143,7 @@
 (custom-set-faces!
   '(org-modern-label :height 1.1))
 
+(global-org-modern-mode)
 ;; Org-Modern:3 ends here
 
 ;; [[file:config.org::*Org-Modern][Org-Modern:4]]
@@ -250,7 +251,7 @@
 ;; Latex fragments:1 ends here
 
 ;; [[file:config.org::*Mermaid Diagrams][Mermaid Diagrams:2]]
-(setq ob-mermaid-cli-path "mmdc")
+(setq ob-mermaid-cli-path (or (executable-find "mmdc") "mmdc"))
 ;; Mermaid Diagrams:2 ends here
 
 ;; [[file:config.org::*Mermaid Diagrams][Mermaid Diagrams:3]]
@@ -341,6 +342,10 @@
   (add-to-list 'org-src-block-faces '("latex" (:inherit default :extend t))))
 ;; Prevent org-block face for latex fragments, since they look weird:1 ends here
 
+;; [[file:config.org::*Nix-Doom-Emacs messes with dashboard][Nix-Doom-Emacs messes with dashboard:1]]
+(add-hook! 'emacs-startup-hook #'doom-init-ui-h)
+;; Nix-Doom-Emacs messes with dashboard:1 ends here
+
 ;; [[file:config.org::*Faster insertion of org structures (i.e. source blocks)][Faster insertion of org structures (i.e. source blocks):1]]
 (use-package! org-tempo
   :after org)
@@ -425,7 +430,7 @@
   :config
   (khalel-add-capture-template))
 
-(setq khalel-khal-command "khal")
+(setq khalel-khal-command (or (executable-find "khal") "khal"))
 (setq khalel-vdirsyncer-command "vdirsyncer")
 
 (setq khalel-capture-key "e")
@@ -434,7 +439,6 @@
 (setq khalel-import-org-file-confirm-overwrite nil)
 
 (setq khalel-import-end-date "+30d")
-
 ;; Khal / Khalel:2 ends here
 
 ;; [[file:config.org::*Querying & Combined Views][Querying & Combined Views:3]]
@@ -1335,6 +1339,13 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
   (add-hook! flycheck-posframe-mode #'fix-flycheck-posframe-not-hide-immediately))
 ;; Better Error Display:1 ends here
 
+;; [[file:config.org::*Treemacs Modeline][Treemacs Modeline:1]]
+(add-hook 'treemacs-mode-hook
+          (lambda ()
+            (when (fboundp 'hide-mode-line-mode)
+              (hide-mode-line-mode))))
+;; Treemacs Modeline:1 ends here
+
 ;; [[file:config.org::*Vertico][Vertico:1]]
 (defun minibuffer-format-candidate (orig cand prefix suffix index _start)
   (let ((prefix (if (= vertico--index index)
@@ -1368,9 +1379,9 @@ for what debugger to use. If the prefix ARG is set, prompt anyway."
 (setq read-process-output-max (* 4 1024 1024)) ;; 4mb
 ;; Performance:2 ends here
 
-;; [[file:config.org::*Performance][Performance:2]]
+;; [[file:config.org::*Performance][Performance:3]]
 (fset #'jsonrpc--log-event #'ignore)
-;; Performance:2 ends here
+;; Performance:3 ends here
 
 ;; [[file:config.org::*AI Model Backends][AI Model Backends:1]]
 (after! gptel
@@ -1525,6 +1536,33 @@ Falls back to (OUTPUT . nil) when OUTPUT is not valid JSON."
   :bind (:map gptel-mode-map
               ("C-c m" . gptel-mcp-dispatch)))
 ;; MCP:5 ends here
+
+;; [[file:config.org::*Mail][Mail:1]]
+(after! mu4e
+  (setq mu4e-root-maildir "~/Mail"
+        mu4e-attachment-dir "~/Downloads")
+
+  (setq +mu4e-gmail-accounts '(("tbrpilz@googlemail.com" . "gmail"))))
+;; Mail:1 ends here
+
+;; [[file:config.org::*Mail][Mail:2]]
+(set-email-account! "pilz.berlin"
+                    '((user-mail-address  . "tibor@pilz.berlin")
+                      (smtpmail-smtp-user . "tibor@pilz.berlin")
+                      (mu4e-sent-folder   . "/pilz.berlin/Gesendete Objekte")
+                      (mu4e-drafts-folder . "/pilz.berlin/Entwürfe")
+                      (mu4e-trash-folder  . "/pilz.berlin/Papierkorb")
+                      (mu4e-refile-folder . "/pilz.berlin/Archives"))
+                    t)
+
+(set-email-account! "gmail"
+                    '((user-mail-address  . "tbrpilz@googlemail.com")
+                      (smtpmail-smtp-user . "tbrpilz@googlemail.com")
+                      (mu4e-sent-folder   . "/gmail/[Google Mail]/Sent Mail")
+                      (mu4e-drafts-folder . "/gmail/[Google Mail]/Drafts")
+                      (mu4e-trash-folder  . "/gmail/[Google Mail]/Trash")
+                      (mu4e-refile-folder . "/gmail/[Google Mail]/All Mail")))
+;; Mail:2 ends here
 
 ;; [[file:config.org::*Discord Presence][Discord Presence:2]]
 (use-package! elcord
