@@ -22,7 +22,14 @@ in
   config = mkIf cfg.enable {
     programs.firefox = {
       enable = true;
-      configPath = ".config/mozilla/firefox";
+      # macOS Firefox only ever reads Library/Application Support/Firefox;
+      # there is no env var to redirect it. Pointing this at the Linux
+      # XDG path on darwin hides every profile declared here.
+      configPath =
+        if pkgs.stdenv.isDarwin then
+          "Library/Application Support/Firefox"
+        else
+          ".config/mozilla/firefox";
       nativeMessagingHosts = [
         pkgs.tridactyl-native
       ] ++ optional plasmaActive pkgs.kdePackages.plasma-browser-integration;
@@ -32,7 +39,7 @@ in
           id = 1;
           name = "default";
           path = "t9o0f0h6.default";
-          isDefault = true;
+          isDefault = !pkgs.stdenv.isDarwin;
         };
 
         main = {
@@ -66,6 +73,16 @@ in
             "${config.home.homeDirectory}/Code/nixos/home/config/firefox/chrome/userChrome.css";
           userContent = config.lib.file.mkOutOfStoreSymlink
             "${config.home.homeDirectory}/Code/nixos/home/config/firefox/chrome/userContent.css";
+        };
+      }
+      // optionalAttrs pkgs.stdenv.isDarwin {
+        # Pre-existing profile this Mac's Firefox has always used. Declared so
+        # home-manager's generated profiles.ini keeps listing it.
+        default-release = {
+          id = 2;
+          name = "default-release";
+          path = "yn3nwp84.default-release";
+          isDefault = true;
         };
       };
     };
@@ -135,7 +152,7 @@ in
     # never runs the grant flow.
     home.activation.grantAdaptiveTabBarHostAccess =
       lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        prefs="${config.home.homeDirectory}/.config/mozilla/firefox/main/extension-preferences.json"
+        prefs="${config.home.homeDirectory}/${config.programs.firefox.profilesPath}/main/extension-preferences.json"
         grant='{"permissions":[],"origins":["http://*/*","https://*/*"],"data_collection":[]}'
         jq="${pkgs.jq}/bin/jq"
         id="${firefoxAddons.adaptive-tab-bar-colour.addonId}"
@@ -149,7 +166,7 @@ in
         fi
       '';
 
-    home.file.".config/mozilla/firefox/main/extension-settings.json" = {
+    home.file."${config.programs.firefox.profilesPath}/main/extension-settings.json" = {
       force = true;
       text = builtins.toJSON {
         version = 3;
