@@ -59,6 +59,22 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
+    # Plaintext passwords for the mosquitto users "frigate" and
+    # "homeassistant" (systemd-credentialed, never in the store), plus the
+    # same frigate password as FRIGATE_MQTT_PASSWORD for the Frigate
+    # container.
+    sops.secrets.mosquitto_frigate = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
+    sops.secrets.mosquitto_homeassistant = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
+    sops.secrets.frigateEnv = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
     sops.secrets.slskd_api_key = {
       sopsFile = ./secrets/secrets.yaml;
     };
@@ -487,7 +503,7 @@ with lib;
     };
 
     modules.services.penpot = {
-      enable = false;
+      enable = true;
       dataDir = "/data/penpot";
     };
 
@@ -510,7 +526,27 @@ with lib;
       projects = [ ];
     };
 
+    # Espresso shot profiler for the Gaggiuino machine (podman container).
+    modules.services.gaggiuino-local-profiler = {
+      enable = true;
+      machineUrl = "http://192.168.1.81";
+    };
+
     modules.services.frigate.enable = true;
+    modules.services.frigate.envFile = config.sops.secrets.frigateEnv.path;
+
+    # MQTT broker shared by Frigate (on klaus) and Home Assistant (on the
+    # Pi) for camera event discovery. WebSockets listener serves the MQTTX
+    # Web UI.
+    modules.services.mosquitto = {
+      enable = true;
+      websocketsPort = 9003;
+      users = {
+        frigate = config.sops.secrets.mosquitto_frigate.path;
+        homeassistant = config.sops.secrets.mosquitto_homeassistant.path;
+      };
+      webUi.enable = true;
+    };
 
     modules.services.forgejo = {
       enable = true;

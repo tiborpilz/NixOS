@@ -12,11 +12,16 @@ let
   url = sub: "https://${sub}.${hostname}";
 
   # A single homepage service tile. Homepage expects each tile to be a
-  # single-key attrset keyed by the display name.
+  # single-key attrset keyed by the display name. Icons default to the
+  # dashboard-icons pack ("<name>.png"); a "mdi-<icon>" name or a full URL
+  # is passed through untouched.
   mkTile = spec: {
     ${spec.name} = {
       href = url spec.sub;
-      icon = "${spec.icon}.png";
+      icon =
+        if hasInfix "://" spec.icon || hasPrefix "mdi-" spec.icon
+        then spec.icon
+        else "${spec.icon}.png";
       description = spec.description;
     } // optionalAttrs cfg.siteMonitors {
       siteMonitor = url spec.sub;
@@ -72,6 +77,8 @@ let
       { enable = ms.authentik.enable; name = "Authentik"; sub = "auth"; icon = "authentik"; description = "Identity provider"; }
       { enable = rp.proxies ? homeassistant; name = "Home Assistant"; sub = "homeassistant"; icon = "home-assistant"; description = "Home automation"; }
       { enable = ms.frigate.enable; name = "Frigate"; sub = "frigate"; icon = "frigate"; description = "NVR & camera AI"; }
+      { enable = ms.mosquitto.webUi.enable; name = "MQTTX"; sub = "mqttx"; icon = "mdi-transit-connection"; description = "MQTT dashboard"; }
+      { enable = ms."gaggiuino-local-profiler".enable; name = "GLP"; sub = "coffee"; icon = "mdi-coffee"; description = "Espresso shot profiler"; }
     ])
 
     (mkGroup "Monitoring" [

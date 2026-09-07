@@ -23,6 +23,10 @@ with mylib;
       default = "/data/frigate";
     };
     enableGPU = mkBoolOpt true;
+    envFile = mkOption {
+      type = types.nullOr types.path;
+      default = null;
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -44,10 +48,12 @@ with mylib;
           environments = {
             FRIGATE_RTSP_PASSWORD = "password";
           };
+          environmentFiles = optional (cfg.envFile != null) cfg.envFile;
           pod = pods.frigate-pod.ref;
         };
 
         pods.frigate-pod.podConfig = {
+          addHosts = [ "host.containers.internal:host-gateway" ];
           publishPorts = [
             "${toString cfg.publicPort}:8971"
           ];
