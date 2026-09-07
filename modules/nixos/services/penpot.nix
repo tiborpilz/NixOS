@@ -77,7 +77,7 @@ in
         };
 
         penpot-exporter.containerConfig = {
-          image = "penpotapp/exporter:2.7.1";
+          image = "penpotapp/exporter:2.17.2";
           environments = penpotEnv;
           pod = pods.${podName}.ref;
         };
