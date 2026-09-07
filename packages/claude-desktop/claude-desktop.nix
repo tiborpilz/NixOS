@@ -65,7 +65,7 @@
 
 let
   pname = "claude-desktop";
-  version = "1.24012.9";
+  version = "1.40609.0";
 
   # Anthropic's apt repo. The pool URL is stable and every published version
   # keeps its own file, so this is a proper immutable source. The hashes below
@@ -75,11 +75,11 @@ let
   sources = {
     x86_64-linux = {
       debArch = "amd64";
-      hash = "sha256-MC5tII3YyOnlIGfaoo7zsRcaFhNYb9DhC+3GQiJbbuE=";
+      hash = "sha256-qW6W/4601Nf/p4Wrp/wj+GhLEqyD7S70Bg8PCfQXepg=";
     };
     aarch64-linux = {
       debArch = "arm64";
-      hash = "sha256-Gpvhd7BjNluS5SL+3RnIfa9uvJKp9xEhvf9ynifeQIw=";
+      hash = "sha256-yX4aoM1JQ3BUsWG87R/qLr+uYEU+YW1bc1JKkUZCF3M=";
     };
   };
 

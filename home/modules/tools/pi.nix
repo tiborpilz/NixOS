@@ -15,6 +15,7 @@ in
   config = lib.mkIf cfg.enable {
     home.packages = [
       pkgs.unstable.pi-coding-agent
+      pkgs.qemu_kvm
     ];
 
     modules.shell.zsh.rcInit = ''
