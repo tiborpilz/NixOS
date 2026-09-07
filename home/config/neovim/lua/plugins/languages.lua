@@ -129,6 +129,7 @@ return {
           "volar",
           "eslint",
           "eslint_d",
+          "sonarlint-language-server",
         },
         auto_update = true,  -- Default: false
         run_on_start = true, -- Default: true
