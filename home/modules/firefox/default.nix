@@ -13,6 +13,49 @@ let
   mylib = import ../../../lib { inherit inputs lib pkgs; };
   plasmaActive = config.modules.gui.plasma.enable && hasAttr "plasma" options.programs;
   firefoxAddons = inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system};
+
+  # macOS has no .desktop files. The equivalent of the firefox-minimal entry
+  # below is an app bundle, and home-manager links every .app it finds under a
+  # home.packages output into ~/Applications/Home Manager Apps.
+  #
+  # The launcher execs Mozilla's build in /Applications rather than the nix
+  # one, so a single Firefox version opens every profile under the shared
+  # profile root. Tridactyl still works either way, because native messaging
+  # manifests go to ~/Library/Application Support/Mozilla/NativeMessagingHosts
+  # rather than into a browser package.
+  firefoxBin = "/Applications/Firefox.app/Contents/MacOS/firefox";
+
+  # Only for the icon, which has to exist at build time.
+  firefoxApp = "${config.programs.firefox.finalPackage}/Applications/Firefox.app";
+
+  firefoxMinimalLauncher = pkgs.writeShellScript "firefox-minimal" ''
+    exec "${firefoxBin}" -P main --no-remote "$@"
+  '';
+
+  firefoxMinimalPlist = pkgs.writeText "firefox-minimal-Info.plist" ''
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+      <key>CFBundleExecutable</key><string>firefox-minimal</string>
+      <key>CFBundleIconFile</key><string>firefox.icns</string>
+      <key>CFBundleIdentifier</key><string>org.nixos.firefox-minimal</string>
+      <key>CFBundleName</key><string>Firefox Minimal</string>
+      <key>CFBundlePackageType</key><string>APPL</string>
+      <key>LSMinimumSystemVersion</key><string>10.15.0</string>
+      <key>NSHighResolutionCapable</key><true/>
+    </dict>
+    </plist>
+  '';
+
+  firefoxMinimalApp = pkgs.runCommandLocal "firefox-minimal-app" { } ''
+    contents="$out/Applications/Firefox Minimal.app/Contents"
+    mkdir -p "$contents/MacOS" "$contents/Resources"
+    cp ${firefoxMinimalPlist} "$contents/Info.plist"
+    cp ${firefoxMinimalLauncher} "$contents/MacOS/firefox-minimal"
+    chmod +x "$contents/MacOS/firefox-minimal"
+    ln -s ${firefoxApp}/Contents/Resources/firefox.icns "$contents/Resources/firefox.icns"
+  '';
 in
 {
   options.modules.firefox = {
@@ -87,6 +130,25 @@ in
       };
     };
 
+    home.packages = optional pkgs.stdenv.isDarwin firefoxMinimalApp;
+
+    # Spotlight indexes /Applications but not the home directory on this
+    # machine, so ~/Applications/Home Manager Apps is never searchable. Copy
+    # the bundle where Spotlight already looks. /Applications is group-writable
+    # by admin, so this needs no sudo.
+    home.activation.installFirefoxMinimalApp = mkIf pkgs.stdenv.isDarwin (
+      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        target="/Applications/Firefox Minimal.app"
+        if [ -e "$target" ] && ! grep -q org.nixos.firefox-minimal "$target/Contents/Info.plist" 2>/dev/null; then
+          echo "skipping $target: exists and is not the bundle built here" >&2
+        else
+          $DRY_RUN_CMD rm -rf "$target"
+          $DRY_RUN_CMD cp -fHRL "${firefoxMinimalApp}/Applications/Firefox Minimal.app" /Applications/
+          $DRY_RUN_CMD chmod -R +w "$target"
+        fi
+      ''
+    );
+
     xdg = {
       desktopEntries = mkIf pkgs.stdenv.isLinux {
         firefox-minimal = {
@@ -106,8 +168,7 @@ in
 
       configFile = {
         "tridactyl/tridactylrc".text = ''
-          " Theme matching the scifox-derived userChrome.
-          " Loaded from ~/.config/tridactyl/themes/ via the native messenger.
+          " load custom hush colorscheme
           colourscheme hush
 
           " The theme reserves a favicon column on tab rows, and draws a
