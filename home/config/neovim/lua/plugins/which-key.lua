@@ -87,6 +87,7 @@ return {
         { "<leader>nror", desc = "Remove origin" },
         { "<leader>nrp", desc = "Prev node" },
         { "<leader>nrq", desc = "Backlinks quickfix" },
+        { "<leader>nrs", desc = "Search notes" },
 
         { "<leader>nrd-", desc = "Find directory" },
         { "<leader>nrdb", desc = "Goto previous note" },

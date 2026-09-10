@@ -1,6 +1,7 @@
 {
   "bash-language-server": "5.6.0",
   "buf": "v1.71.0",
+  "css-lsp": "4.10.0",
   "dockerfile-language-server": "0.15.0",
   "helm-ls": "v0.5.4",
   "json-lsp": "4.10.0",

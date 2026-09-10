@@ -4,11 +4,8 @@ local function apply_dashboard_hl()
   vim.api.nvim_set_hl(0, "SnacksDashboardHeader",  { fg = "#5e81ac" })
   vim.api.nvim_set_hl(0, "SnacksDashboardFooter",  { fg = "#4c566a", italic = true })
   vim.api.nvim_set_hl(0, "SnacksDashboardSpecial", { fg = "#4c566a", italic = true })
-  vim.api.nvim_set_hl(0, "SnacksDashboardTitle",   { fg = "#88c0d0", bold = true })
   vim.api.nvim_set_hl(0, "SnacksDashboardKey",     { fg = "#88c0d0" })
   vim.api.nvim_set_hl(0, "SnacksDashboardDesc",    { fg = "#d8dee9" })
-  vim.api.nvim_set_hl(0, "SnacksDashboardFile",    { fg = "#d8dee9" })
-  vim.api.nvim_set_hl(0, "SnacksDashboardDir",     { fg = "#616e88" })
   vim.api.nvim_set_hl(0, "SnacksDashboardIcon",    { fg = "#81a1c1" })
 end
 
@@ -28,11 +25,6 @@ local function roam_title(path)
   return title
 end
 
-local function truncate(str, width)
-  if vim.fn.strchars(str) <= width then return str end
-  return vim.fn.strcharpart(str, 0, width - 1) .. "…"
-end
-
 -- roam notes, newest first. logseq/ is an imported mirror, not notes edited here
 local function roam_notes()
   local notes = {}
@@ -47,23 +39,6 @@ end
 
 local function note_title(file)
   return roam_title(file) or vim.fn.fnamemodify(file, ":t:r")
-end
-
-local function recent_notes(limit)
-  return function()
-    local notes = roam_notes()
-    local items = {}
-    for i = 1, math.min(limit, #notes) do
-      local file = notes[i].file
-      items[#items + 1] = {
-        icon = "󰎚 ",
-        desc = truncate(note_title(file), 44),
-        action = ":edit " .. vim.fn.fnameescape(file),
-        autokey = true,
-      }
-    end
-    return items
-  end
 end
 
 -- own picker rather than org-roam's: its db load trips over duplicate ids in logseq/bak
@@ -85,6 +60,9 @@ return {
     "folke/snacks.nvim",
     priority = 1000,
     lazy = false,
+    keys = {
+      { "<leader>nrs", pick_note, desc = "Search notes" },
+    },
     opts = {
       -- takes over vim.ui.select, which is what review.nvim's comment list uses
       picker = {
@@ -93,6 +71,7 @@ return {
       },
       dashboard = {
         enabled = true,
+        width = 34,
         preset = {
           header = "n  e  o  v  i  m",
           keys = {
@@ -100,36 +79,13 @@ return {
             { icon = " ", key = "g", desc = "Grep Project", action = ":Telescope live_grep" },
             { icon = " ", key = "r", desc = "Recent Files", action = ":Telescope oldfiles" },
             { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
-            { icon = " ", key = "x", desc = "Scratch Buffer", action = ":enew | setlocal buftype=nofile bufhidden=hide noswapfile" },
             { icon = " ", key = "c", desc = "Config", action = ":Telescope find_files cwd=" .. vim.fn.stdpath("config") },
             { icon = " ", key = "l", desc = "Lazy", action = ":Lazy" },
           },
         },
         sections = {
           { section = "header", padding = 2 },
-          { pane = 1, icon = " ", title = "Actions", section = "keys", indent = 2, padding = 1 },
-          {
-            pane = 2,
-            icon = " ",
-            title = "Recent Files",
-            section = "recent_files",
-            limit = 6,
-            filter = function(file) return not file:match("/%.git/") end,
-            indent = 2,
-            padding = 1,
-          },
-          {
-            pane = 2,
-            icon = " ",
-            title = "Git Status",
-            section = "terminal",
-            enabled = function() return require("snacks").git.get_root() ~= nil end,
-            cmd = "git status --short --branch --renames",
-            height = 6,
-            indent = 2,
-            padding = 1,
-            ttl = 60,
-          },
+          { section = "keys", padding = 2 },
           { section = "startup" },
         },
       },

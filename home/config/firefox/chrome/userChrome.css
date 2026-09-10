@@ -172,6 +172,19 @@ findbar {
   color: #e3e3e3 !important;
 }
 
+/* ── STATUSPANEL — link preview pill, bottom left ──────────────────── */
+#statuspanel-label {
+  /* Same hardcoded grays as .urlbarView, for the same reason.
+     The shorthands are load-bearing: they undo the default
+     one-sided border and single rounded corner. */
+  background-color: #1c1c1c !important;
+  color: #b9b9b9 !important;
+  border: 1px solid #464646 !important;
+  border-radius: 5px !important;
+  padding: 2px 6px !important;
+  margin: 0 4px 4px !important;
+}
+
 /* ── CHROME PRUNING ────────────────────────────────────────────────── */
 
 /* Tabs: tridactyl owns tab management */

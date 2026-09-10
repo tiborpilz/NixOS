@@ -42,10 +42,6 @@
     determinate.inputs.nixpkgs.follows = "nixpkgs";
 
     claude-code.url = "github:sadjow/claude-code-nix";
-    claude-code.inputs.nixpkgs.follows = "nixpkgs";
-
-    # No nixpkgs follows: codex-cli.cachix.org only has builds made against the
-    # flake's own nixpkgs pin, so overriding it means building codex from source.
     codex-cli.url = "github:sadjow/codex-cli-nix";
 
     pie-src = {
