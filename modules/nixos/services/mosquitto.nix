@@ -54,7 +54,7 @@ with mylib;
           {
             inherit (cfg) port acl;
             settings = {
-             allow_anonymous = false;
+              allow_anonymous = false;
             };
             inherit users;
           }
@@ -90,11 +90,7 @@ with mylib;
       })
     ];
 
-    # MQTTX Web: browser-based MQTT client/dashboard. A pure client-side
-    # app -- it keeps connections/settings in browser localStorage and needs
-    # no volumes. The browser reaches the broker over WebSockets (see
-    # websocketsPort above): ws://<host>:<websocketsPort> on the LAN, or
-    # wss://mqtt-ws.<hostname> through the tunnel.
+    # MQTTX Web: browser-based MQTT client/dashboard.
     virtualisation.oci-containers.containers.mqttx-web = mkIf cfg.webUi.enable {
       image = cfg.webUi.image;
       ports = [ "${toString cfg.webUi.publicPort}:80" ];

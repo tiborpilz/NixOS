@@ -32,6 +32,10 @@
     devshell.url = "github:numtide/devshell";
     devshell.inputs.nixpkgs.follows = "nixpkgs";
 
+    # Use devenv's own package rather than the version from either nixpkgs
+    # channel. Keeping its nixpkgs pin also lets us use devenv's binary cache.
+    devenv.url = "github:cachix/devenv";
+
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
 
     determinate-nix.url = "github:DeterminateSystems/nix-src";
@@ -147,6 +151,8 @@
               inherit lib inputs;
               pkgs = channels.nixpkgs;
             }))) // {
+            devenv =
+              inputs.devenv.packages.${channels.nixpkgs.stdenv.hostPlatform.system}.default;
             testTandoorUpgrade = channels.nixpkgs.testers.runNixOSTest (import ./tests/upgrade/tandoor.nix {
               inherit inputs lib; pkgs = channels.nixpkgs;
             });

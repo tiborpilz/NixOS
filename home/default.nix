@@ -168,6 +168,7 @@ with mylib;
     modules.shell.git.enable = true;
     modules.shell.direnv.enable = true;
     modules.shell.devenv.enable = true;
+    modules.shell.devenv.useHook = true;
     modules.shell.mise.enable = true;
     modules.shell.zk.enable = true;
 
