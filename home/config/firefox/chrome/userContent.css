@@ -36,6 +36,43 @@ pre, code, samp, var {
   }
 }
 
+/* ── NEWTAB — tridactyl's own page, emptied to a caret ──────────────
+ * Tridactyl has to override the newtab page: about:newtab is privileged,
+ * so no content script runs there and no binding works. Its page pulls in
+ * content.js by hand, which is why the override exists at all, and why
+ * `set newtab` to anywhere else (a file:// page included) gives a tab
+ * where tridactyl is dead and focus lands in the urlbar.
+ *
+ * So the page stays, and only its contents go. #trinewtab is already
+ * hidden until tridactyl has a changelog to show; hiding it outright
+ * trades those release notes for a tab that never changes shape.
+ */
+@-moz-document regexp("moz-extension://.*/static/newtab\\.html.*") {
+  :root {
+    color-scheme: light dark;
+  }
+
+  body {
+    display: grid;
+    place-items: center;
+    height: 100vh;
+    margin: 0;
+    background: light-dark(#efeeec, #1c1c1c);
+    color: light-dark(#8b8985, #6f6f6f);
+    font-family: "FiraCode Nerd Font", "Fira Code", monospace;
+    font-size: 16px;
+    user-select: none;
+  }
+
+  #trinewtab {
+    display: none !important;
+  }
+
+  body::after {
+    content: "\25B8";
+  }
+}
+
 /* ── NEWTAB / HOMEPAGE — minimal, matches the tridactyl colourscheme ── */
 @-moz-document url("about:home"), url("about:newtab") {
   .search-wrapper,

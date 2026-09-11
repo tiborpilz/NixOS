@@ -2,7 +2,7 @@
  * Adapted for keyboard-driven use with tridactyl:
  *   - no tab bar (tridactyl owns tabs: gt/T/d/u/…)
  *   - no nav buttons, no window buttons, pruned context menus
- *   - urlbar fades out unless focused (Ctrl+L, or :fillcmdline)
+ *   - urlbar shows only the URL unless hovered or focused (Ctrl+L)
  *   - sidebery lives in an auto-hiding sidebar (optional addon)
  */
 
@@ -10,6 +10,12 @@
 * {
   font-family: "FiraCode Nerd Font" !important;
   font-size: 14px !important;
+}
+
+/* Firefox hides some spacer text with font-size: 0, which the rule above
+   would otherwise reveal (the stray "a" in the search-mode button). */
+.urlbar-visually-hidden {
+  font-size: 0 !important;
 }
 
 /* ── SIDEBAR (sidebery) — auto-hiding 38px strip ───────────────────── */
@@ -128,17 +134,69 @@ findbar {
   border-radius: var(--rounding) !important;
 }
 
-/* ── URLBAR — hidden until hovered / focused ───────────────────────── */
-#urlbar:not([customizing]) {
-  opacity: 0;
-  transition: max-height 1s linear 3s, opacity 600ms ease 3s !important;
+/* ── URLBAR — bare URL text, field chrome fades in on hover / focus ── */
+#urlbar {
+  /* Opacity rather than colors, so the theme still drives the palette. */
+  --uc-urlbar-url-rest: 0.45;   /* URL text, untouched bar */
+  --uc-urlbar-url-active: 0.9;  /* URL text, hovered or focused */
+  --uc-urlbar-field: 0.5;       /* field fill + border */
+  --uc-urlbar-icons: 0.65;      /* icons + placeholder */
 }
 
-#urlbar:hover,
-#urlbar:focus-within {
-  opacity: 1;
+/* Dark text fades into a light bar much faster than light text fades into a
+   dark one, so a light toolbar needs more of the text left standing. The
+   attribute tracks the active theme; the media query covers having none. */
+@media (prefers-color-scheme: light) {
+  #urlbar {
+    --uc-urlbar-url-rest: 0.75;
+    --uc-urlbar-url-active: 1;
+    --uc-urlbar-icons: 0.8;
+  }
+}
+
+:root[lwt-toolbar="light"] #urlbar {
+  --uc-urlbar-url-rest: 0.75;
+  --uc-urlbar-url-active: 1;
+  --uc-urlbar-icons: 0.8;
+}
+
+:root[lwt-toolbar="dark"] #urlbar {
+  --uc-urlbar-url-rest: 0.45;
+  --uc-urlbar-url-active: 0.9;
+  --uc-urlbar-icons: 0.65;
+}
+
+#urlbar:not([customizing]) .urlbar-input-box {
+  opacity: var(--uc-urlbar-url-rest);
+  transition: opacity 600ms ease 3s !important;
+}
+
+#urlbar:not([customizing]) .urlbar-background,
+#urlbar:not([customizing]) .urlbar-input-container > :not(.urlbar-input-box, panel, panel-list),
+#urlbar:not([customizing]) .urlbar-input::placeholder {
+  opacity: 0;
+  transition: opacity 600ms ease 3s !important;
+}
+
+#urlbar:is(:hover, :focus-within) .urlbar-input-box {
+  opacity: var(--uc-urlbar-url-active);
+}
+
+#urlbar:is(:hover, :focus-within) .urlbar-background {
+  opacity: var(--uc-urlbar-field);
+}
+
+#urlbar:is(:hover, :focus-within) .urlbar-input-container > :not(.urlbar-input-box, panel, panel-list),
+#urlbar:is(:hover, :focus-within) .urlbar-input::placeholder {
+  opacity: var(--uc-urlbar-icons);
+}
+
+#urlbar:is(:hover, :focus-within) .urlbar-input-box,
+#urlbar:is(:hover, :focus-within) .urlbar-background,
+#urlbar:is(:hover, :focus-within) .urlbar-input-container > :not(.urlbar-input-box, panel, panel-list),
+#urlbar:is(:hover, :focus-within) .urlbar-input::placeholder {
   transition-duration: 200ms !important;
-  transition-delay: 0s, 200ms !important;
+  transition-delay: 200ms !important;
 }
 
 #urlbar:focus-within {
@@ -149,13 +207,59 @@ findbar {
   height: 100% !important;
 }
 
+/* Explicit colors, because with no theme vars backing --arrowpanel-background
+   the results popup and the status pill can render transparent. Both tones are
+   hush's (config/tridactyl/hush.css) so the urlbar results and tridactyl's
+   completions read as one widget. light-dark() follows the element's
+   color-scheme, which the theme sets. */
+:root {
+  --uc-popup-bg:           light-dark(#efeeec, #1c1c1c);
+  --uc-popup-fg:           light-dark(#4a4a48, #b9b9b9);
+  --uc-popup-fg-bright:    light-dark(#1f1f1e, #e3e3e3);
+  --uc-popup-fg-dim:       light-dark(#8b8985, #6f6f6f);
+  --uc-popup-border:       light-dark(rgba(31, 31, 30, 0.18), rgba(185, 185, 185, 0.24));
+  --uc-popup-row-hover:    light-dark(rgba(31, 31, 30, 0.05), rgba(185, 185, 185, 0.07));
+  --uc-popup-row-selected: color-mix(in oklch, var(--uc-popup-fg) 16%, transparent);
+
+  /* hush's metrics: 32px rows, 14px glyph + 8px gutter, 14px edge padding. */
+  --uc-popup-row: 32px;
+  --uc-popup-pad: 14px;
+  --uc-popup-glyph: 14px;
+  --uc-popup-glyph-gap: 8px;
+  --uc-popup-radius: 10px;
+  --uc-popup-size-sm: 12.5px;
+}
+
+/* Firefox's own row metrics, retuned to hush's. */
+#urlbar {
+  --urlbarview-row-min-height: var(--uc-popup-row);
+  --urlbarView-row-padding-inline: var(--uc-popup-pad);
+  --urlbarview-favicon-size: var(--uc-popup-glyph);
+  --urlbarView-favicon-margin-start: 0px;
+  --urlbarView-favicon-margin-end: var(--uc-popup-glyph-gap);
+  --urlbarView-icon-margin-end: var(--uc-popup-glyph-gap);
+  --urlbarview-border-radius: var(--uc-popup-radius);
+}
+
 .urlbarView {
-  /* Explicitly opaque + grayscale: with no theme vars backing
-     --arrowpanel-background the results popup can render transparent. */
-  background-color: #1c1c1c !important;
-  color: #b9b9b9 !important;
-  border: 1px solid #464646 !important;
-  border-radius: 5px;
+  background-color: var(--uc-popup-bg) !important;
+  color: var(--uc-popup-fg) !important;
+  border: 1px solid var(--uc-popup-border) !important;
+  border-radius: var(--uc-popup-radius);
+  /* Float clear of the field, like hush's pill. */
+  margin-block-start: 6px !important;
+  box-shadow: 0 18px 48px light-dark(rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.45));
+}
+
+/* The field's fill is inset: 0 on #urlbar, so when the panel opens it stretches
+   down behind the results and fills the gap above. Pin it to the field. */
+#urlbar[open] .urlbar-background {
+  height: var(--urlbar-height) !important;
+}
+
+/* Separator between field and results, redundant once they are apart. */
+.urlbarView-body-inner {
+  border-top: none !important;
 }
 
 .urlbarView-row {
@@ -163,23 +267,65 @@ findbar {
 }
 
 .urlbarView-row:hover {
-  background-color: #252525 !important;
+  background-color: var(--uc-popup-row-hover) !important;
 }
 
 .urlbarView-row[selected],
 .urlbarView-row:active {
-  background-color: #464646 !important;
-  color: #e3e3e3 !important;
+  background-color: var(--uc-popup-row-selected) !important;
+  color: var(--uc-popup-fg-bright) !important;
+}
+
+/* hush puts the url in its own dim right column instead of inline after a
+   dash, so drop the separator and push the url to the row's far edge. */
+.urlbarView-title-separator {
+  display: none !important;
+}
+
+.urlbarView-url {
+  color: var(--uc-popup-fg-dim) !important;
+  font-size: var(--uc-popup-size-sm) !important;
+  text-align: right !important;
+}
+
+.urlbarView-row[selected] .urlbarView-url {
+  color: color-mix(in oklch, var(--uc-popup-fg-bright) 70%, transparent) !important;
+}
+
+.urlbarView-favicon {
+  border-radius: 3px;
+  opacity: 0.9;
+}
+
+/* Group label ("Recent Searches") as hush's section header. */
+.urlbarView-row[label]::before {
+  color: var(--uc-popup-fg-dim) !important;
+  opacity: 1 !important;
+  font-size: 11px !important;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  margin-inline-start: var(--uc-popup-pad) !important;
 }
 
 /* ── STATUSPANEL — link preview pill, bottom left ──────────────────── */
+
+/* The pill sits outside the toolbar, so its light-dark() would otherwise
+   resolve against the OS scheme. Firefox sets lwt-toolbar whenever a theme
+   is active, which for adaptive-tab-bar-colour means every page. */
+:root[lwt-toolbar="light"] #statuspanel-label {
+  color-scheme: light;
+}
+
+:root[lwt-toolbar="dark"] #statuspanel-label {
+  color-scheme: dark;
+}
+
 #statuspanel-label {
-  /* Same hardcoded grays as .urlbarView, for the same reason.
-     The shorthands are load-bearing: they undo the default
+  /* The shorthands are load-bearing: they undo the default
      one-sided border and single rounded corner. */
-  background-color: #1c1c1c !important;
-  color: #b9b9b9 !important;
-  border: 1px solid #464646 !important;
+  background-color: var(--uc-popup-bg) !important;
+  color: var(--uc-popup-fg) !important;
+  border: 1px solid var(--uc-popup-border) !important;
   border-radius: 5px !important;
   padding: 2px 6px !important;
   margin: 0 4px 4px !important;
@@ -197,11 +343,18 @@ findbar {
 /* Window control buttons */
 .titlebar-buttonbox-container { display: none; }
 
-/* Url bar chrome */
+/* Url bar chrome. Inline margin only: block margin would make the bar taller. */
 #urlbar-container {
-  margin: 0 !important;
+  margin-block: 0 !important;
+  margin-inline: 8px !important;
   padding-block: 2px !important;
   min-height: var(--urlbar-height) !important;
+}
+
+/* Inset the text and icons from the field's own edge. */
+#urlbar {
+  --urlbar-input-gap: 8px;
+  --urlbar-input-container-padding: 4px;
 }
 
 #navigator-toolbox {
@@ -228,6 +381,21 @@ toolbarbutton.bookmark-item:not(.subviewbutton) {
 #forward-button,
 .tab-secondary-label {
   display: none !important;
+}
+
+/* Search-mode switcher: a colour favicon and a dropmarker for something
+   tridactyl already binds. Kept only while a search mode is engaged, where
+   it names the engine, and monochrome to match the rest of the chrome. */
+#urlbar:not([searchmode]) .searchmode-switcher {
+  display: none !important;
+}
+
+.searchmode-switcher-dropmarker {
+  display: none !important;
+}
+
+.searchmode-switcher {
+  filter: grayscale(1);
 }
 
 /* Context menu cruft (redundant with tridactyl bindings) */
