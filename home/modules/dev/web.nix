@@ -41,5 +41,9 @@ with mylib;
       # API testing GUI
       bruno
     ];
+
+    home.file.".npmrc".text = ''
+      prefix=${config.home.homeDirectory}/.npm-global
+    '';
   };
 }

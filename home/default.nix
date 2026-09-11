@@ -115,7 +115,7 @@ with mylib;
       _1password-cli
 
       # AI stuff
-      unstable.claude-code
+      claude-code
       codex
       copilot-language-server
 
