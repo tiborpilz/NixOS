@@ -523,6 +523,12 @@ return {
   --- Nix
   { "LnL7/vim-nix" },
 
+  --- LikeC4
+  {
+    "gjveld/likec4.nvim",
+    build = "npm install -g likec4",
+  },
+
   --- Lua
   {
     "folke/lazydev.nvim",
