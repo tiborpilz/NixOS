@@ -36,14 +36,6 @@ in
       type = types.str;
       default = "127.0.0.1";
       description = ''
-        Address atticd binds to. Defaults to localhost, so all traffic goes
-        through Caddy and the Cloudflare Tunnel.
-
-        Set to "0.0.0.0" if you need to push large store paths: Cloudflare
-        caps request bodies at 100 MB, and the attic client uploads a NAR in a
-        single request, so pushing anything bigger than that fails through the
-        tunnel. Binding to the LAN/tailnet lets you push direct and keep the
-        tunnel for pulls.
       '';
     };
 
@@ -51,8 +43,6 @@ in
       type = types.str;
       default = "/data/attic";
       description = ''
-        Directory holding the chunk store and the SQLite database. Defaults to
-        the ZFS pool rather than /var/lib, since a binary cache grows without
         much warning.
       '';
     };
@@ -62,10 +52,6 @@ in
       default = null;
       description = ''
         EnvironmentFile providing ATTIC_SERVER_TOKEN_RS256_SECRET_BASE64.
-
-        When null (the default) the key is generated on first start and kept
-        at ${generatedKeyFile}. It is not in the repo, so back it up — losing
-        it invalidates every token ever issued (the caches themselves survive).
       '';
     };
 
@@ -80,11 +66,7 @@ in
         type = types.nullOr types.str;
         default = null;
         example = "3 months";
-        description = ''
-          Retention period for caches that don't set their own. Null keeps
-          objects forever, which is what you want until the pool gets
-          uncomfortable.
-        '';
+        description = "Retention period for caches that don't set their own.";
       };
     };
   };
@@ -98,14 +80,7 @@ in
       settings = {
         listen = "${cfg.listenAddress}:${toString cfg.publicPort}";
 
-        # Clients derive substituter and upload URLs from this, so it has to be
-        # the public URL rather than what atticd sees behind Caddy.
         api-endpoint = "https://${cfg.subdomain}.${rp.hostname}/";
-
-        # allowed-hosts is left empty (= allow any Host header) on purpose:
-        # requests arrive both as cache.<hostname> via the tunnel and as
-        # localhost from this host, and auth is JWT-based either way.
-
         database.url = "sqlite://${cfg.dataDir}/server.db?mode=rwc";
 
         storage = {

@@ -122,6 +122,10 @@ with lib;
       sopsFile = ./secrets/secrets.yaml;
     };
 
+    sops.secrets.bookorbitEnv = {
+      sopsFile = ./secrets/secrets.yaml;
+    };
+
     sops.secrets.woodpeckerEnv = {
       sopsFile = ./secrets/secrets.yaml;
       owner = "woodpecker";
@@ -424,6 +428,18 @@ with lib;
           "https://karakeep.tiborpilz.xyz/api/auth/callback/custom"
         ];
       };
+      authentik.applications.bookorbit = {
+        displayName = "BookOrbit";
+        redirectUris = [
+          "https://bookorbit.tiborpilz.xyz/oauth2-callback"
+        ];
+      };
+      authentik.applications.shelfarr = {
+        displayName = "Shelfarr";
+        redirectUris = [
+          "https://shelfarr.tiborpilz.xyz/auth/oidc/callback"
+        ];
+      };
       # Grants Grafana org Admin via role_attribute_path in the monitoring module.
       authentik.groups."Grafana Admins".members = [ "Tibor" ];
 
@@ -441,13 +457,25 @@ with lib;
         };
         sonarr.enable = true; # search & download tv shows
         radarr.enable = true; # search & download movies
-        readarr.enable = true; # search & download books
+        shelfmark.enable = true; # search & download books
+        shelfarr = {
+          enable = true; # book requests & automated acquisition
+          proxyAuth = true;
+        };
         jackett.enable = true; # indexer for media
         flaresolverr.enable = true;
         pinchflat.enable = true;
 
         komga.enable = true; # comic reader
         calibre.enable = true; # book reader
+
+        # Reading platform over the existing book and comic trees, mounted
+        # read-only so calibre and komga stay the owners of those files.
+        bookorbit = {
+          enable = true;
+          envFile = config.sops.secrets.bookorbitEnv.path;
+          delugeDir = "/data/downloads/deluge/completed/";
+        };
 
         audiobookshelf = {
           enable = true;

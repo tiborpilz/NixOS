@@ -42,6 +42,7 @@ let
       { enable = ms.media.audiobookshelf.enable; name = "Audiobookshelf"; sub = "audiobookshelf"; icon = "audiobookshelf"; description = "Audiobooks & podcasts"; }
       { enable = ms.media.komga.enable; name = "Komga"; sub = "komga"; icon = "komga"; description = "Comics & manga"; }
       { enable = ms.media.calibre.enable; name = "Calibre-Web"; sub = "calibre-web"; icon = "calibre-web"; description = "E-books"; }
+      { enable = ms.media.bookorbit.enable; name = "BookOrbit"; sub = "bookorbit"; icon = "bookorbit"; description = "Reading platform"; }
       { enable = ms.media.pinchflat.enable; name = "Pinchflat"; sub = "pinchflat"; icon = "pinchflat"; description = "YouTube archiver"; }
       { enable = ms.media.music-assistant.enable; name = "Music Assistant"; sub = "music-assistant"; icon = "music-assistant"; description = "Music library & players"; }
       { enable = ms.media.music.navidrome.enable; name = "Navidrome"; sub = "navidrome"; icon = "navidrome"; description = "Music streaming"; }
@@ -51,7 +52,8 @@ let
       { enable = ms.media.deluge.enable; name = "Deluge"; sub = "deluge"; icon = "deluge"; description = "Torrent client"; }
       { enable = ms.media.sonarr.enable; name = "Sonarr"; sub = "sonarr"; icon = "sonarr"; description = "TV shows"; }
       { enable = ms.media.radarr.enable; name = "Radarr"; sub = "radarr"; icon = "radarr"; description = "Movies"; }
-      { enable = ms.media.readarr.enable; name = "Readarr"; sub = "readarr"; icon = "readarr"; description = "Books"; }
+      { enable = ms.media.shelfmark.enable; name = "Shelfmark"; sub = "shelfmark"; icon = "mdi-bookshelf"; description = "Book acquisition"; }
+      { enable = ms.media.shelfarr.enable; name = "Shelfarr"; sub = "shelfarr"; icon = "mdi-book-search-outline"; description = "Book requests & automation"; }
       { enable = ms.media.jackett.enable; name = "Jackett"; sub = "jackett"; icon = "jackett"; description = "Indexer proxy"; }
       { enable = ms.media.music.lidarr.enable; name = "Lidarr"; sub = "lidarr"; icon = "lidarr"; description = "Music"; }
       { enable = ms.media.prowlarr.enable; name = "Prowlarr"; sub = "prowlarr"; icon = "prowlarr"; description = "Indexer manager"; }

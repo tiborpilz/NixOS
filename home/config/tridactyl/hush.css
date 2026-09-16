@@ -32,7 +32,9 @@
 
   --hush-radius:    10px;
   --hush-radius-sm: 3px;
-  --hush-width:     580px;
+  /* Capped rather than fixed: 80vw keeps the pill proportional on a laptop,
+     the ceiling stops it spanning an external display. */
+  --hush-width:     min(1100px, 80vw);
   --hush-row:       32px;
   --hush-gap:       1rem;
   --hush-pad:       14px;

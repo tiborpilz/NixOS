@@ -72,12 +72,23 @@ with mylib;
         ];
     };
 
-    modules.services.reverseProxy.proxies = mkIf (cfg.websocketsPort != null) {
-      "mqtt-ws" = {
-        publicPort = cfg.websocketsPort;
-        auth = false;
-      };
-    };
+    modules.services.reverseProxy.proxies = mkMerge [
+      (mkIf (cfg.websocketsPort != null) {
+        "mqtt-ws" = {
+          publicPort = cfg.websocketsPort;
+          auth = false;
+        };
+      })
+
+      # MQTTX is gated by Cloudflare Access rather than the instance-wide
+      # basic auth, like the other LAN services.
+      (mkIf cfg.webUi.enable {
+        mqttx = {
+          publicPort = cfg.webUi.publicPort;
+          auth = false;
+        };
+      })
+    ];
 
     # MQTTX Web: browser-based MQTT client/dashboard. A pure client-side
     # app -- it keeps connections/settings in browser localStorage and needs
@@ -87,15 +98,6 @@ with mylib;
     virtualisation.oci-containers.containers.mqttx-web = mkIf cfg.webUi.enable {
       image = cfg.webUi.image;
       ports = [ "${toString cfg.webUi.publicPort}:80" ];
-    };
-
-    # Gated by Cloudflare Access rather than the instance-wide basic auth,
-    # like the other LAN services.
-    modules.services.reverseProxy.proxies = mkIf cfg.webUi.enable {
-      mqttx = {
-        publicPort = cfg.webUi.publicPort;
-        auth = false;
-      };
     };
   };
 }
