@@ -11,10 +11,6 @@ let
 
   url = sub: "https://${sub}.${hostname}";
 
-  # A single homepage service tile. Homepage expects each tile to be a
-  # single-key attrset keyed by the display name. Icons default to the
-  # dashboard-icons pack ("<name>.png"); a "mdi-<icon>" name or a full URL
-  # is passed through untouched.
   mkTile = spec: {
     ${spec.name} = {
       href = url spec.sub;
@@ -28,9 +24,7 @@ let
     };
   };
 
-  # Build a homepage group from a list of tile specs, keeping only the ones
-  # whose backing service is enabled. Returns a single-key attrset
-  # { <group> = [ tiles ]; } so it can be filtered/merged as a unit.
+  # Build a homepage group from a list of tile specs
   mkGroup = groupName: specs: {
     ${groupName} = map mkTile (filter (s: s.enable) specs);
   };
@@ -80,7 +74,7 @@ let
       { enable = rp.proxies ? homeassistant; name = "Home Assistant"; sub = "homeassistant"; icon = "home-assistant"; description = "Home automation"; }
       { enable = ms.frigate.enable; name = "Frigate"; sub = "frigate"; icon = "frigate"; description = "NVR & camera AI"; }
       { enable = ms.mosquitto.webUi.enable; name = "MQTTX"; sub = "mqttx"; icon = "mdi-transit-connection"; description = "MQTT dashboard"; }
-      { enable = ms."gaggiuino-local-profiler".enable; name = "GLP"; sub = "coffee"; icon = "mdi-coffee"; description = "Espresso shot profiler"; }
+      { enable = ms.gaggiuino-local-profiler.enable; name = "GLP"; sub = "coffee"; icon = "mdi-coffee"; description = "Espresso shot profiler"; }
     ])
 
     (mkGroup "Monitoring" [
@@ -100,12 +94,6 @@ in
 {
   options.modules.services.homepage = {
     enable = mkBoolOpt false;
-
-    subdomain = mkOption {
-      type = types.str;
-      default = "dashboard";
-      description = "Subdomain the dashboard is exposed on via the reverse proxy.";
-    };
 
     publicPort = mkOption {
       type = types.int;
@@ -170,7 +158,7 @@ in
       services = nonEmptyGroups;
     };
 
-    modules.services.reverseProxy.proxies.${cfg.subdomain} = {
+    modules.services.reverseProxy.proxies.dashboard = {
       publicPort = cfg.publicPort;
       auth = false;
     };
