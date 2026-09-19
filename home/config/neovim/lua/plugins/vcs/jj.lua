@@ -14,6 +14,13 @@ return {
       on_attach = function(bufnr) return vim.fs.root(bufnr, ".jj") == nil end,
     },
   },
+  --- Hunk and line selection for jj split, squash -i, commit -i and diffedit
+  {
+    "julienvincent/hunk.nvim",
+    cmd = { "DiffEditor" },
+    dependencies = { "MunifTanjim/nui.nvim" },
+    opts = {},
+  },
   --- jj log/status with rebase, squash, split, abandon and bookmarks from the log buffer
   {
     "NicolasGB/jj.nvim",

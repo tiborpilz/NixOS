@@ -37,6 +37,12 @@ in
         };
         git.sign-on-push = true;
 
+        ui = {
+          diff-editor = [ "nvim" "-c" "DiffEditor $left $right $output" ];
+          # hunk.nvim would list JJ-INSTRUCTIONS as a changed file
+          diff-instructions = false;
+        };
+
         "--scope" = [
           {
             "--when".repositories = [ "~/Code/liqid" ];
