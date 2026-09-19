@@ -52,6 +52,10 @@ in
         set -g default-terminal "tmux-256color"
         set -sa terminal-overrides ",xterm-256color:RGB"
 
+        # Let OSC 8 links (jj commit ids) and kitty graphics (jj dag) through
+        set -as terminal-features ",*:hyperlinks"
+        set -g allow-passthrough on
+
         # Vim-ish key bindings
         bind P paste-buffer
         bind-key -T copy-mode-vi v send-keys -X begin-selection
