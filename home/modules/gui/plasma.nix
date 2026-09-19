@@ -5,6 +5,8 @@ let
   cfg = config.modules.gui.plasma;
   mylib = import ../../../lib { inherit inputs lib pkgs; };
   desktops = [ 1 2 3 4 5 ];
+  # Keep in sync with the SDDM theme in hosts/nixos/thinkyMcThinkpad
+  wallpaper = "${pkgs.kdePackages.plasma-workspace-wallpapers}/share/wallpapers/Mountain/";
 in
 {
   options.modules.gui.plasma.enable = mylib.mkBoolOpt true;
@@ -22,8 +24,10 @@ in
         workspace = {
           lookAndFeel = "org.kde.breezedark.desktop";
           colorScheme = "NordicDarker";
-          wallpaper = "${pkgs.kdePackages.plasma-workspace-wallpapers}/share/wallpapers/Mountain/";
+          inherit wallpaper;
         };
+
+        kscreenlocker.appearance.wallpaper = wallpaper;
 
         hotkeys.commands = {
           "kitty" = {
