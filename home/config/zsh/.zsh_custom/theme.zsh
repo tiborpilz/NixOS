@@ -4,6 +4,7 @@ local ret_status="%(?:%{$fg_bold[green]%}▸:%{$fg_bold[red]%}▸%s)"
 
 _vcs_branch_icon=$''
 _vcs_bookmark_icon=$''
+_vcs_commit_icon=$'\uf417'
 
 function _vcs_label() {
   local name=$1
@@ -28,7 +29,7 @@ function _jj_prompt_read() {
   out=$(jj --ignore-working-copy log --no-graph --color=never \
     -r '@ | (latest(heads(::@ & bookmarks()))::@)' \
     -T 'local_bookmarks.map(|b| b.name()).join(" ") ++ "\t" ++ if(current_working_copy,
-          if(conflict, "c") ++ if(divergent, "d") ++ "\t"
+          if(conflict, "c") ++ if(divergent, "d") ++ if(empty, "e") ++ "\t"
           ++ parents.map(|c| c.commit_id()).join(" ") ++ "\t"
           ++ change_id.shortest(4).prefix() ++ "\t" ++ change_id.shortest(4).rest() ++ "\t"
           ++ description.first_line()) ++ "\n"' 2>/dev/null) || return
@@ -37,19 +38,29 @@ function _jj_prompt_read() {
   local -a head=("${(@ps:\t:)lines[1]}")
   local -a parents=(${(s: :)head[3]})
   local git_head=$(git rev-parse -q --verify HEAD 2>/dev/null)
-  jj_bookmarks=(${(s: :)${(@ps:\t:)lines[-1]}[1]})
+  local -a tail=("${(@ps:\t:)lines[-1]}")
+  jj_bookmarks=(${(s: :)tail[1]})
   jj_distance=$(( ${#lines} - 1 ))
   jj_id="%B%F{magenta}$head[4]%f%b%F{8}$head[5]%f"
   jj_desc=${(pj:\t:)head[6,-1]}
   jj_markers=()
-  [[ $head[2] == *c* ]] && jj_markers+=("%F{red}⚠%f")
-  [[ $head[2] == *d* ]] && jj_markers+=("%F{red}⇅%f")
+  # Markers and colors follow jj's builtin log templates rather than git's ✗/✓.
+  if [[ $head[2] == *e* ]]; then
+    jj_markers+=("%F{green}(empty)%f")
+    jj_placeholder="%F{green}∅%f"
+  else
+    jj_placeholder="%F{yellow}∅%f"
+  fi
+  [[ $head[2] == *c* ]] && jj_markers+=("%F{red}conflicted%f")
+  [[ $head[2] == *d* ]] && jj_markers+=("%F{red}(divergent)%f")
   # jj hasn't imported a git checkout or commit yet; its next command will.
   [[ -n $git_head ]] && (( ! ${parents[(Ie)$git_head]} )) && jj_markers+=("↻")
   return 0
 }
 
-# Runs in the worker, whose cwd is fixed at spawn time. $2 is the view: git or jj first.
+# Runs in the worker, whose cwd is fixed at spawn time. $2 is the view: git, jj, or auto, which
+# picks jj in repos named *-jj and on a detached HEAD, since git has no branch to show there.
+# Prints the view it took, a tab, then the segment.
 function _vcs_prompt_job() {
   builtin cd -q -- $1 2>/dev/null || return
   local view=$2 dir=$PWD
@@ -58,21 +69,26 @@ function _vcs_prompt_job() {
   done
   local ref=$(git symbolic-ref -q --short HEAD 2>/dev/null)
   local -a jj_bookmarks jj_markers parts
-  local jj_distance jj_id jj_desc bookmark
+  local jj_distance jj_id jj_desc jj_placeholder bookmark
+
+  if [[ $view == auto && ( -z $ref || $dir:t == *-jj ) ]]; then
+    view=jj
+  fi
 
   if [[ $view == jj && -d $dir/.jj ]] && _jj_prompt_read; then
     bookmark=$(_vcs_pick $jj_bookmarks)
     [[ -n $bookmark ]] && parts+=("%F{white}$_vcs_bookmark_icon $(_vcs_label $bookmark)%f")
     (( jj_distance )) && parts+=("%F{cyan}+$jj_distance%f")
     parts+=("$jj_id")
-    [[ -n $jj_desc ]] && parts+=("%F{white}$(_vcs_label $jj_desc)%f")
     parts+=($jj_markers)
+    [[ -n $jj_desc ]] && parts+=("%F{white}$(_vcs_label $jj_desc)%f") || parts+=("$jj_placeholder")
     [[ -n $ref && $ref != $bookmark ]] && parts+=("%F{8}($_vcs_branch_icon $(_vcs_label $ref))%f")
+    echo "jj\t ${(j: :)parts}"
   elif [[ -n $ref ]]; then
-    parts+=("%F{white}$_vcs_branch_icon $(_vcs_label $ref)%f")
+    echo "git\t %F{white}$_vcs_branch_icon $(_vcs_label $ref)%f$(parse_git_dirty)"
+  elif ref=$(git rev-parse -q --short HEAD 2>/dev/null); then
+    echo "git\t %F{white}$_vcs_commit_icon $ref%f$(parse_git_dirty)"
   fi
-  (( ${#parts} )) || return
-  echo " ${(j: :)parts}$(parse_git_dirty)"
 }
 
 function get_pwd(){
@@ -111,12 +127,12 @@ function venv_prompt() {
   echo $venv_indicator
 }
 
-typeset -g _vcs_segment= _vcs_segment_dir=
-typeset -g _vcs_view=${_vcs_view:-git}
+typeset -g _vcs_segment= _vcs_segment_dir= _vcs_shown=
+typeset -g _vcs_view=${_vcs_view:-auto}
 
 function _vcs_prompt_precmd() {
   if [[ $PWD != $_vcs_segment_dir ]]; then
-    _vcs_segment=
+    _vcs_segment= _vcs_shown=
     _vcs_segment_dir=$PWD
   fi
   async_flush_jobs _vcs_prompt_worker
@@ -124,7 +140,8 @@ function _vcs_prompt_precmd() {
 }
 
 function vcs-prompt-toggle-view() {
-  [[ $_vcs_view == jj ]] && _vcs_view=git || _vcs_view=jj
+  # Flips what is on screen, so leaving auto's jj fallback takes one press.
+  [[ ${_vcs_shown:-$_vcs_view} == jj ]] && _vcs_view=git || _vcs_view=jj
   _vcs_prompt_precmd
 }
 zle -N vcs-prompt-toggle-view
@@ -142,7 +159,8 @@ function _vcs_prompt_done() {
     async_register_callback _vcs_prompt_worker _vcs_prompt_done
     return
   fi
-  _vcs_segment=$output
+  _vcs_shown=${output%%$'\t'*}
+  _vcs_segment=${output#*$'\t'}
   (( has_next )) || { zle && zle reset-prompt }
 }
 
