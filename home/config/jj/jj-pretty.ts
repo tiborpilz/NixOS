@@ -444,7 +444,12 @@ async function main() {
   if (!color) text = vis(text);
   const data = new TextEncoder().encode(text);
   if (tty && lines.length > size.rows) {
-    const less = new Deno.Command("less", { args: ["-RFXS"], stdin: "piped" }).spawn();
+    const less = new Deno.Command("less", {
+      args: ["-RFXS"],
+      // Same as ui.pager in jujutsu.nix, so the Nerd Font glyphs aren't shown as <U+XXXX>.
+      env: { LESSUTFCHARDEF: "E000-F8FF:p,F0000-FFFFD:p" },
+      stdin: "piped",
+    }).spawn();
     const w = less.stdin.getWriter();
     await w.write(data).catch(() => {}); // the pager may quit before reading everything
     await w.close().catch(() => {});

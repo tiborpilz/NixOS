@@ -60,6 +60,15 @@ in
             diff-instructions = false;
             # Syntax-aware diffs for show/diff/log -p; `--git` still gives a plain patch.
             diff-formatter = "difft";
+            # less shows Private Use Area characters, like the Nerd Font glyphs in the log
+            # templates, as <U+XXXX> unless they are marked printable.
+            pager = {
+              command = [ "less" "-FRXK" ];
+              env = {
+                LESSCHARSET = "utf-8";
+                LESSUTFCHARDEF = "E000-F8FF:p,F0000-FFFFD:p";
+              };
+            };
           };
 
           "--scope" = [
