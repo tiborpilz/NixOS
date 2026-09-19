@@ -52,6 +52,7 @@ return {
         { "<leader>d", group = "Debug", icon = "" },
         { "<leader>f", group = "File" },
         { "<leader>g", group = "Git", icon = "" },
+        { "<leader>gj", group = "Jujutsu" },
         { "<leader>n", group = "Notes" },
         { "<leader>nr", group = "Roam" },
         { "<leader>nra", group = "Alias" },
