@@ -13,6 +13,7 @@ in
   config = mkIf cfg.enable {
     home.packages = with pkgs; [
       unstable.jjui
+      unstable.gg-jj # desktop GUI
       unstable.radicle-node
       radicle-explorer
     ];
