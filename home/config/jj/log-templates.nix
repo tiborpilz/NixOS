@@ -33,14 +33,23 @@
     # mutable ones are mostly unpushed and would 404.
     "commit_link(c)" = ''
       if(git_web_url() && c.immutable(),
-        hyperlink(git_web_url() ++ "/commit/" ++ c.commit_id(), c.commit_id().shortest(7)),
-        c.commit_id().shortest(7))
+        hyperlink(git_web_url() ++ "/commit/" ++ c.commit_id(), c.commit_id().shortest(8)),
+        c.commit_id().shortest(8))
     '';
 
     "id(c)" = ''
       label(
         separate(" ", if(c.divergent(), "divergent"), if(c.hidden(), "hidden")),
         c.change_id().shortest(4),
+      )
+    '';
+
+    # Fixed-width columns, so ids and times line up next to the graph.
+    "head(c)" = ''
+      separate(" ",
+        pad_end(5, id(c)),
+        label("meta commit_id", commit_link(c)),
+        label("meta timestamp", pad_start(3, ago(c.committer().timestamp()))),
       )
     '';
 
@@ -65,17 +74,14 @@
     '';
 
     # Verifying runs ssh-keygen per commit (~15ms each), so only when
-    # ui.show-cryptographic-signatures is on; otherwise just mark signed commits.
+    # ui.show-cryptographic-signatures is on.
     "sig(c)" = ''
-      if(c.signature(),
-        if(config("ui.show-cryptographic-signatures").as_boolean(),
-          label("signature status " ++ c.signature().status(), coalesce(
-            if(c.signature().status() == "good", "󰄬"),
-            if(c.signature().status() == "unknown", "󰌆"),
-            "󰅖",
-          )),
-          label("signature", "󰌆"),
-        ))
+      if(c.signature() && config("ui.show-cryptographic-signatures").as_boolean(),
+        label("signature status " ++ c.signature().status(), coalesce(
+          if(c.signature().status() == "good", "󰄬"),
+          if(c.signature().status() == "unknown", "󰌆"),
+          "󰅖",
+        )))
     '';
 
     "flags(c)" = ''
@@ -107,14 +113,7 @@
     pretty = ''
       if(root, format_root_commit(self),
         label(state(self), concat(
-          separate("  ",
-            separate(" ", id(self), refs(self), flags(self)),
-            label("meta", separate(" · ",
-              who(self), label("timestamp", ago(committer.timestamp())),
-              label("commit_id", commit_link(self)),
-            )),
-            sig(self),
-          ) ++ "\n",
+          separate(" ", head(self), refs(self), flags(self), label("meta", who(self)), sig(self)) ++ "\n",
           separate("  ", subject(self), stat(self)) ++ "\n",
         ))
       )
@@ -122,25 +121,18 @@
 
     oneline = ''
       if(root, format_root_commit(self),
-        label(state(self), separate(" ",
-          id(self),
-          refs(self),
-          flags(self),
-          subject(self),
-          label("meta", ago(committer.timestamp())),
-        ) ++ "\n")
+        label(state(self), separate(" ", head(self), refs(self), flags(self), subject(self)) ++ "\n")
       )
     '';
 
     detailed = ''
       if(root, format_root_commit(self),
         label(state(self), concat(
-          separate("  ",
-            separate(" ", id(self), refs(self), flags(self)),
+          separate(" ",
+            head(self), refs(self), flags(self),
             label("meta", separate(" · ",
               label("author", author.name()),
-              label("timestamp", ago(committer.timestamp()) ++ " (" ++ committer.timestamp().local().format("%a %d %b %H:%M") ++ ")"),
-              label("commit_id", commit_link(self)),
+              label("timestamp", committer.timestamp().local().format("%a %d %b %H:%M")),
             )),
             sig(self),
           ) ++ "\n",
@@ -221,37 +213,30 @@
     "working_copy change_id" = { fg = "bright magenta"; bold = true; underline = true; };
     "meta" = "bright black";
     "meta author" = "yellow";
-    "meta timestamp" = "cyan";
+    "meta timestamp" = "bright black";
     "meta commit_id" = "bright black";
+    "meta commit_id prefix" = "bright black";
     "working_copy meta commit_id" = "blue";
+    "working_copy meta commit_id prefix" = "blue";
     bookmarks = { fg = "green"; bold = true; };
     tags = { fg = "yellow"; bold = true; };
     working_copies = { fg = "cyan"; italic = true; };
     "description placeholder" = { fg = "yellow"; italic = true; };
     "empty description placeholder" = { fg = "bright black"; italic = true; };
     empty = "bright black";
-    "immutable description" = "bright black";
     "description body" = { fg = "default"; italic = true; };
     elided = { fg = "bright black"; italic = true; };
 
-    "conv feat" = { fg = "green"; bold = true; };
-    "conv fix" = { fg = "red"; bold = true; };
-    "conv chore" = "bright black";
-    "conv docs" = "blue";
-    "conv refactor" = "magenta";
-    "conv perf" = "yellow";
-    "conv test" = "cyan";
-    "conv ci" = "cyan";
-    "conv build" = "cyan";
-    "conv style" = "blue";
-    "conv wip" = { fg = "yellow"; italic = true; };
-    conv_scope = { fg = "default"; italic = true; };
+    # Only feat and fix get a color; the other types stay out of the way of the subject.
+    conv = "bright black";
+    "conv feat" = "green";
+    "conv fix" = "yellow";
+    conv_scope = { fg = "bright black"; italic = true; };
     conv_breaking = { fg = "red"; bold = true; };
 
     "diffstat added" = "green";
     "diffstat removed" = "red";
     "diffstat files" = "bright black";
-    "signature" = "bright black";
 
     "node working_copy mutable" = { fg = "green"; bold = true; };
     "node mutable" = "blue";
