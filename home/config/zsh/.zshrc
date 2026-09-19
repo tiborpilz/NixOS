@@ -39,6 +39,9 @@ antigen bundle zsh-users/zsh-syntax-highlighting
 
 antigen apply
 
+# 100ms: Alt+key arrives in one burst and still matches, a typed Esc then key doesn't.
+KEYTIMEOUT=10
+
 # Custom theme
 source $ZDOTDIR/.zsh_custom/theme.zsh
 

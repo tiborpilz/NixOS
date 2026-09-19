@@ -20,49 +20,57 @@ function _vcs_pick() {
   [[ -n $1 ]] && echo $1
 }
 
-# Distance to the nearest bookmark below @ and that bookmark, unless it is the git ref $1.
+# Sets the caller's jj_* locals from @ and the nearest bookmark below it.
 # --ignore-working-copy keeps this read-only: otherwise jj snapshots and imports git refs as
 # operations of its own, and `jj undo` later walks back into them.
-function jj_prompt_info() {
+function _jj_prompt_read() {
   local out
   out=$(jj --ignore-working-copy log --no-graph --color=never \
     -r '@ | (latest(heads(::@ & bookmarks()))::@)' \
     -T 'local_bookmarks.map(|b| b.name()).join(" ") ++ "\t" ++ if(current_working_copy,
           if(conflict, "c") ++ if(divergent, "d") ++ "\t"
-          ++ parents.map(|c| c.commit_id()).join(" ")) ++ "\n"' 2>/dev/null) || return
+          ++ parents.map(|c| c.commit_id()).join(" ") ++ "\t"
+          ++ change_id.shortest(4).prefix() ++ "\t" ++ change_id.shortest(4).rest() ++ "\t"
+          ++ description.first_line()) ++ "\n"' 2>/dev/null) || return
 
   local -a lines=("${(@f)out}")
   local -a head=("${(@ps:\t:)lines[1]}")
-  local -a bookmarks=(${(s: :)${(@ps:\t:)lines[-1]}[1]})
   local -a parents=(${(s: :)head[3]})
-  local distance=$(( ${#lines} - 1 ))
-  local flags=$head[2]
-  local bookmark=$(_vcs_pick ${bookmarks:#${(b)1}})
   local git_head=$(git rev-parse -q --verify HEAD 2>/dev/null)
-
-  local -a parts=()
-  (( distance )) && parts+=("+$distance")
-  [[ -n $bookmark ]] && parts+=("$_vcs_bookmark_icon $(_vcs_label $bookmark)")
-  [[ $flags == *c* ]] && parts+=("%F{red}⚠%F{8}")
-  [[ $flags == *d* ]] && parts+=("%F{red}⇅%F{8}")
+  jj_bookmarks=(${(s: :)${(@ps:\t:)lines[-1]}[1]})
+  jj_distance=$(( ${#lines} - 1 ))
+  jj_id="%B%F{magenta}$head[4]%f%b%F{8}$head[5]%f"
+  jj_desc=${(pj:\t:)head[6,-1]}
+  jj_markers=()
+  [[ $head[2] == *c* ]] && jj_markers+=("%F{red}⚠%f")
+  [[ $head[2] == *d* ]] && jj_markers+=("%F{red}⇅%f")
   # jj hasn't imported a git checkout or commit yet; its next command will.
-  [[ -n $git_head ]] && (( ! ${parents[(Ie)$git_head]} )) && parts+=("↻")
-  (( ${#parts} )) && echo "%F{8}(${(j: :)parts})%f"
+  [[ -n $git_head ]] && (( ! ${parents[(Ie)$git_head]} )) && jj_markers+=("↻")
+  return 0
 }
 
-# Runs in the worker, whose cwd is fixed at spawn time.
+# Runs in the worker, whose cwd is fixed at spawn time. $2 is the view: git or jj first.
 function _vcs_prompt_job() {
   builtin cd -q -- $1 2>/dev/null || return
-  local dir=$PWD
+  local view=$2 dir=$PWD
   while [[ $dir != / && ! -d $dir/.jj ]]; do
     dir=$dir:h
   done
   local ref=$(git symbolic-ref -q --short HEAD 2>/dev/null)
-  local -a parts=()
-  [[ -n $ref ]] && parts+=("%F{white}$_vcs_branch_icon $(_vcs_label $ref)%f")
-  local jj=
-  [[ -d $dir/.jj ]] && jj=$(jj_prompt_info $ref)
-  [[ -n $jj ]] && parts+=("$jj")
+  local -a jj_bookmarks jj_markers parts
+  local jj_distance jj_id jj_desc bookmark
+
+  if [[ $view == jj && -d $dir/.jj ]] && _jj_prompt_read; then
+    bookmark=$(_vcs_pick $jj_bookmarks)
+    [[ -n $bookmark ]] && parts+=("%F{white}$_vcs_bookmark_icon $(_vcs_label $bookmark)%f")
+    (( jj_distance )) && parts+=("%F{cyan}+$jj_distance%f")
+    parts+=("$jj_id")
+    [[ -n $jj_desc ]] && parts+=("%F{white}$(_vcs_label $jj_desc)%f")
+    parts+=($jj_markers)
+    [[ -n $ref && $ref != $bookmark ]] && parts+=("%F{8}($_vcs_branch_icon $(_vcs_label $ref))%f")
+  elif [[ -n $ref ]]; then
+    parts+=("%F{white}$_vcs_branch_icon $(_vcs_label $ref)%f")
+  fi
   (( ${#parts} )) || return
   echo " ${(j: :)parts}$(parse_git_dirty)"
 }
@@ -104,6 +112,7 @@ function venv_prompt() {
 }
 
 typeset -g _vcs_segment= _vcs_segment_dir=
+typeset -g _vcs_view=${_vcs_view:-git}
 
 function _vcs_prompt_precmd() {
   if [[ $PWD != $_vcs_segment_dir ]]; then
@@ -111,8 +120,18 @@ function _vcs_prompt_precmd() {
     _vcs_segment_dir=$PWD
   fi
   async_flush_jobs _vcs_prompt_worker
-  async_job _vcs_prompt_worker _vcs_prompt_job $PWD
+  async_job _vcs_prompt_worker _vcs_prompt_job $PWD $_vcs_view
 }
+
+function vcs-prompt-toggle-view() {
+  [[ $_vcs_view == jj ]] && _vcs_view=git || _vcs_view=jj
+  _vcs_prompt_precmd
+}
+zle -N vcs-prompt-toggle-view
+for keymap in viins vicmd emacs; do
+  bindkey -M $keymap '^[j' vcs-prompt-toggle-view
+done
+unset keymap
 
 function _vcs_prompt_done() {
   local job=$1 code=$2 output=$3 has_next=$6
@@ -127,10 +146,6 @@ function _vcs_prompt_done() {
   (( has_next )) || { zle && zle reset-prompt }
 }
 
-# Re-sourcing must replace the worker, which holds the function definitions from its spawn.
-async_stop_worker _vcs_prompt_worker 2>/dev/null
-async_start_worker _vcs_prompt_worker
-async_register_callback _vcs_prompt_worker _vcs_prompt_done
 autoload -Uz add-zsh-hook
 add-zsh-hook precmd _vcs_prompt_precmd
 
@@ -146,3 +161,9 @@ ZSH_THEME_GIT_PROMPT_CLEAN=" %{$fg[green]%}✓%{$reset_color%}"
 #ZSH_THEME_GIT_PROMPT_SUFFIX="]%{$reset_color%}"
 #ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[red]%}+%{$reset_color%}"
 #ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[green]%}"
+
+# Last, because the worker is a fork of this shell: it only sees functions and variables defined
+# before it starts, and re-sourcing must replace it.
+async_stop_worker _vcs_prompt_worker 2>/dev/null
+async_start_worker _vcs_prompt_worker
+async_register_callback _vcs_prompt_worker _vcs_prompt_done
