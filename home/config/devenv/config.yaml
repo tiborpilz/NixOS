@@ -2,7 +2,6 @@
 version: 1
 
 shell:
-  prompt_prefix: false
   keybindings:
     reload: []
     toggle_pause: []

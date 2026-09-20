@@ -76,21 +76,36 @@ in
 
     programs.hyprland.enable = true;
 
-    # Configure keymap in X11
-    services.xserver = {
-      enable = true;
-
-      windowManager.bspwm.enable = true;
-
-      xkb = {
-        layout = "us";
-        variant = "";
-      };
-    };
-
     modules.desktop.keyd = {
       enable = true;
       swapEscapeInternal = true;
+    };
+
+    programs.nix-ld.enable = true;
+
+    systemd.services.mem-snapshot = {
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig.Restart = "always";
+      script = ''
+        while :; do
+          { date -Is; free -m; ps -eo rss,comm --sort=-rss | head -15; } \
+            >> /var/log/mem-snapshot.log
+          sleep 10
+        done
+      '';
+    };
+
+
+    systemd.services.mem-snapshot = {
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig.Restart = "always";
+      script = ''
+        while :; do
+          { date -Is; free -m; ps -eo rss,comm --sort=-rss | head -15; } \
+            >> /var/log/mem-snapshot.log
+          sleep 10
+        done
+      '';
     };
 
     # Fix thunderbolt issues
