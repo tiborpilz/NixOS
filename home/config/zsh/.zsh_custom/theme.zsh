@@ -189,6 +189,19 @@ function _prompt_transient_finish() {
 autoload -Uz add-zle-hook-widget
 add-zle-hook-widget zle-line-finish _prompt_transient_finish
 
+# Ctrl-C aborts the line without running zle-line-finish. Defined in precmd because direnv's
+# hook runs `trap - SIGINT` before every prompt, which deletes TRAPINT.
+function _prompt_transient_trap() {
+  function TRAPINT() {
+    if zle; then
+      (( $+widgets[autosuggest-clear] )) && zle autosuggest-clear
+      _prompt_transient_finish
+    fi
+    return $(( 128 + $1 ))
+  }
+}
+add-zsh-hook precmd _prompt_transient_trap
+
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[white]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_DIRTY=" %{$fg[yellow]%}✗%{$reset_color%}"

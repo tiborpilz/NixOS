@@ -28,8 +28,16 @@ python-init() {
   # pip install jupyter
 }
 
-# Select Git Branch interactively
+# Select Git Branch interactively; jj bookmarks in a jj repo
 fzf-git-branch() {
+  if jj root > /dev/null 2>&1; then
+    jj bookmark list --all-remotes --sort committer-date- \
+      -T 'if(remote != "git", name ++ if(remote, "@" ++ remote) ++ "\n")' |
+      fzf-tmux --no-multi --preview-window right:65% \
+        --preview 'jj log --color=always -r "::{}" -n 50'
+    return
+  fi
+
   git rev-parse HEAD > /dev/null 2>&1 || return # not a git repo
 
   git branch --color=always --all --sort=-committerdate |
@@ -41,7 +49,23 @@ fzf-git-branch() {
 
 # Interactive git checkout
 gch() {
-  git checkout $(fzf-git-branch)
+  local branch=$(fzf-git-branch)
+  [[ -n $branch ]] || return
+  # checkout would move git's HEAD behind jj's back
+  if jj root > /dev/null 2>&1; then
+    jj new "$branch"
+  else
+    git checkout "$branch"
+  fi
+}
+
+# In a jj repo git's HEAD is detached, so the branch is the nearest bookmark
+vcs_current_branch() {
+  if jj root > /dev/null 2>&1; then
+    jj log --no-graph -r 'closest_bookmark(@)' -T 'local_bookmarks.map(|b| b.name()).join("\n") ++ "\n"' | head -1
+  else
+    git rev-parse --abbrev-ref HEAD
+  fi
 }
 
 # Urlencode
@@ -61,7 +85,7 @@ urlencode () {
 
 # Format branch name for MRs etc.
 format_branch_name() {
-  branch_name=$(git rev-parse --abbrev-ref HEAD)
+  branch_name=${1:-$(vcs_current_branch)}
   ticket=$(echo "$branch_name" | cut -d'/' -f2 | sed -E 's/^([A-Z0-9]+-[0-9]+).*/\1/')
   rest=$(echo "$branch_name" | cut -d'/' -f2 | sed -E "s/^$ticket-//" | sed 's/-/ /g')
 
@@ -70,8 +94,9 @@ format_branch_name() {
 
 # Create MR with formatted branch name
 mr() {
-  title=$(format_branch_name)
-  glab mr create --web --title "$title" "$@"
+  local branch=$(vcs_current_branch)
+  title=$(format_branch_name "$branch")
+  glab mr create --web --source-branch "$branch" --title "$title" "$@"
 }
 
 # Show the Nth most recent zprof entry from the profiling log (default: latest).

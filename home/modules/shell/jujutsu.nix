@@ -149,6 +149,7 @@ in
             ];
             # Trunk is excluded so a feature bookmark sharing a commit with main doesn't drag main along.
             tug = [ "bookmark" "move" "--from" "closest_bookmark(@)" "--to" "closest_pushable(@)" ''~regex:"^(main|master)$"'' ];
+            ship = [ "util" "exec" "--" "bash" "-c" ''jj bookmark set main -r "closest_pushable(@)" && jj git push -b main'' "" ];
             # Script views from home/config/jj
             pretty = [ "util" "exec" "--" "jj-pretty" ];
             cards = [ "util" "exec" "--" "jj-pretty" "stack" ];
