@@ -65,6 +65,16 @@ in
         # Actually copy to clipboard
         bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel 'pbcopy'
 
+        # Jump between shell prompts; needs the OSC 133 marks zsh emits
+        bind-key -T copy-mode-vi [ send-keys -X previous-prompt
+        bind-key -T copy-mode-vi ] send-keys -X next-prompt
+
+        # Copy the last command's output: from its first output line to the line above the prompt
+        bind-key O copy-mode \; \
+          send-keys -X previous-prompt -o \; send-keys -X begin-selection \; \
+          send-keys -X next-prompt \; send-keys -X cursor-up \; send-keys -X end-of-line \; \
+          send-keys -X copy-pipe-and-cancel 'pbcopy'
+
         # Jump to a worktree: live sessions plus this repo's dormant worktrees.
         # prefix + G widens it to every repo under ~/Code.
         bind-key g display-popup -E -w 80% -h 60% "wtmux pick"

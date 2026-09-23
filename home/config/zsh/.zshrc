@@ -30,6 +30,8 @@ antigen use oh-my-zsh
 antigen bundle vi-mode
 
 antigen bundle git
+antigen bundle zsh-users/zsh-autosuggestions
+# Last, so it wraps the widgets the other plugins define.
 antigen bundle zsh-users/zsh-syntax-highlighting
 # antigen bundle docker
 # antigen bundle docker-compose

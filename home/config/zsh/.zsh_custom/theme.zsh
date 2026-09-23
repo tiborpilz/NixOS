@@ -167,8 +167,27 @@ function _vcs_prompt_done() {
 autoload -Uz add-zsh-hook
 add-zsh-hook precmd _vcs_prompt_precmd
 
-PROMPT='%{$fg_bold[white]%}$(get_pwd)%{$reset_color%} $ret_status '
+# OSC 133 marks the prompt and output start, which tmux's next-prompt/previous-prompt jump to.
+# Outside tmux, kitty's shell integration already emits them.
+typeset -g _prompt_mark=
+if [[ -n $TMUX ]]; then
+  _prompt_mark=$'%{\e]133;A\e\\%}'
+  function _prompt_mark_output() { print -n $'\e]133;C\e\\' }
+  add-zsh-hook preexec _prompt_mark_output
+fi
+
+PROMPT=$_prompt_mark'%{$fg_bold[white]%}$(get_pwd)%{$reset_color%} $ret_status '
 RPS1='$(nix_shell_prompt)$(venv_prompt) ${_vcs_segment}'
+
+# Transient prompt: once a line is accepted, redraw its prompt dimmed and without RPS1 so the
+# scrollback holds only the directory and the command.
+typeset -g _prompt_transient=$_prompt_mark'%F{8}$(get_pwd)%f $ret_status '
+function _prompt_transient_finish() {
+  PROMPT=$_prompt_transient RPS1= zle .reset-prompt
+  zle -R
+}
+autoload -Uz add-zle-hook-widget
+add-zle-hook-widget zle-line-finish _prompt_transient_finish
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[white]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
