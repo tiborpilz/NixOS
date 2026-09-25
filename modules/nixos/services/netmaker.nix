@@ -86,7 +86,7 @@ with mylib;
         };
 
         containers.netmaker-ui.containerConfig = {
-          image = "docker.io/gravitl/netmaker-ui:v0.26.0";
+          image = "docker.io/gravitl/netmaker-ui:v0.99.0";
           pod = pods.netmaker-pod.ref;
           environments = {
             BACKEND_URL = "https://${cfg.domain}";
