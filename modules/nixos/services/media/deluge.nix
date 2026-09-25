@@ -48,7 +48,7 @@ in
 
     # VPN sidecar.
     virtualisation.oci-containers.containers.deluge-vpn = {
-      image = "qmcgaw/gluetun:v3.41.1";
+      image = "qmcgaw/gluetun:v3.41.3";
       # All ports for the shared network namespace are published here,
       # not on the deluge container.
       ports = [
