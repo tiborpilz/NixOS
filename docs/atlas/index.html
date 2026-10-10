@@ -1,0 +1,1368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NixOS Flake Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Fira+Code:wght@400;500&family=Fira+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: a long technical field guide. A sticky index rail on wide screens; every section opens with
+   the one diagram that explains its mechanism, followed by reference panels you can scan or filter. */
+:root {
+  --bg: #f2f5f9;
+  --surface: #ffffff;
+  --sunken: #e8edf4;
+  --ink: #122034;
+  --muted: #55637a;
+  --line: #d2dae5;
+  --nix: #3a5fa8;          /* NixOS dark blue, deepened for contrast on light paper */
+  --nix-soft: #e1e9f7;
+  --sky: #2f86b8;          /* NixOS light blue, used for overlay networks */
+  --amber: #9a5800;        /* things you run: commands, the active path */
+  --amber-soft: #fbeedb;
+  --on: #2c7a4b;
+  --on-soft: #e0f1e6;
+  --off: #8a95a6;
+
+  --font-display: "Bricolage Grotesque", "Fira Sans", system-ui, sans-serif;
+  --font-body: "Fira Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Fira Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.75rem;
+  --step-3: clamp(2.1rem, 1.4rem + 2.6vw, 3.25rem);
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b121d; --surface: #121b2a; --sunken: #0f1724; --ink: #e2e9f3; --muted: #95a3b8; --line: #243149;
+    --nix: #8fb1ee; --nix-soft: #1a2945; --sky: #7ebae4; --amber: #f0a440; --amber-soft: #3a2a14;
+    --on: #62c48f; --on-soft: #143524; --off: #66738a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b121d; --surface: #121b2a; --sunken: #0f1724; --ink: #e2e9f3; --muted: #95a3b8; --line: #243149;
+  --nix: #8fb1ee; --nix-soft: #1a2945; --sky: #7ebae4; --amber: #f0a440; --amber-soft: #3a2a14;
+  --on: #62c48f; --on-soft: #143524; --off: #66738a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--nix); text-underline-offset: 2px; }
+code, kbd, .mono { font-family: var(--font-mono); font-size: 0.875em; }
+p code, li code, td code, dd code { background: var(--sunken); padding: 0.08em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: var(--step-2); font-weight: 800; letter-spacing: -0.01em; }
+h3 { font-size: var(--step-1); font-weight: 600; }
+:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; border-radius: 4px; }
+
+/* ---------- shell ---------- */
+.shell {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 56px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-inline: 28px;
+  padding-block: 0 96px;
+}
+.rail {
+  position: sticky;
+  top: calc(env(safe-area-inset-top, 0px) + 28px);
+  align-self: start;
+  padding-block: 32px 0;
+  font-size: var(--step--1);
+}
+.rail .brand { font-family: var(--font-mono); color: var(--muted); display: block; margin-bottom: 18px; text-decoration: none; }
+.rail ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; border-left: 1px solid var(--line); }
+.rail a {
+  display: block; padding: 5px 0 5px 14px; margin-left: -1px; border-left: 2px solid transparent;
+  color: var(--muted); text-decoration: none;
+}
+.rail a:hover { color: var(--ink); }
+.rail a.active { color: var(--ink); border-left-color: var(--amber); font-weight: 500; }
+.topnav { display: none; }
+main { min-width: 0; }
+
+@media (max-width: 960px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 0; padding-inline: 16px; }
+  .rail { display: none; }
+  .topnav {
+    display: flex; gap: 6px; overflow-x: auto; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    margin-inline: -16px; padding: 10px 16px; background: var(--bg); border-bottom: 1px solid var(--line);
+    scrollbar-width: none;
+  }
+  .topnav a {
+    flex: none; font-size: var(--step--1); color: var(--muted); text-decoration: none; padding: 4px 10px;
+    border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+  }
+}
+
+/* ---------- hero ---------- */
+.hero { padding-block: 56px 8px; display: grid; gap: 20px; }
+.hero .path { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); }
+.hero .path b { color: var(--amber); font-weight: 500; }
+.hero h1 { font-size: var(--step-3); font-weight: 800; letter-spacing: -0.025em; max-width: 18ch; }
+.hero .lede { font-size: 1.125rem; max-width: 64ch; color: var(--ink); margin: 0; }
+.ledger {
+  display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 6px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line);
+  font-size: var(--step--1); color: var(--muted);
+}
+.ledger div { display: flex; align-items: baseline; gap: 6px; }
+.ledger b { font-family: var(--font-display); font-weight: 800; font-size: 1.35rem; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* ---------- sections ---------- */
+.sec { padding-block: 72px 0; display: grid; gap: 22px; scroll-margin-top: 56px; }
+.sec-head { display: grid; gap: 10px; max-width: 70ch; }
+.eyebrow { font-family: var(--font-mono); font-size: var(--step--1); color: var(--amber); margin: 0; }
+.lede { margin: 0; color: var(--muted); font-size: 1.0625rem; }
+.prose { max-width: 68ch; display: grid; gap: 12px; }
+.prose p { margin: 0; }
+.sub { padding-top: 14px; display: grid; gap: 14px; }
+.sub > h3 { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.sub > h3 small { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); font-weight: 400; }
+
+/* ---------- diagrams ---------- */
+figure { margin: 0; }
+.diagram {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 18px 18px 14px; display: grid; gap: 10px;
+}
+.diagram .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.diagram svg { display: block; width: 100%; height: auto; min-width: 860px; }
+.diagram.narrow svg { min-width: 680px; }
+.diagram figcaption { font-size: var(--step--1); color: var(--muted); max-width: 90ch; }
+.diagram figcaption b { color: var(--ink); font-weight: 600; }
+.scroll-hint { display: none; font-size: 0.75rem; color: var(--muted); }
+@media (max-width: 900px) { .scroll-hint { display: block; } }
+
+.dg text { fill: var(--ink); font-family: var(--font-body); font-size: 13px; }
+.dg .mono { font-family: var(--font-mono); font-size: 12px; }
+.dg .sm { font-size: 11.5px; fill: var(--muted); }
+.dg .xs { font-size: 11px; fill: var(--muted); }
+.dg .hd { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; fill: var(--muted); }
+.dg .b { font-weight: 600; }
+.dg .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.2; }
+.dg .box.dash { stroke-dasharray: 5 4; }
+.dg .box.acc { fill: var(--nix-soft); stroke: var(--nix); stroke-width: 1.5; }
+.dg .box.amb { fill: var(--amber-soft); stroke: var(--amber); stroke-width: 1.5; }
+.dg .box.ghost { fill: var(--sunken); }
+.dg .zone { fill: var(--sunken); stroke: var(--line); stroke-dasharray: 3 5; }
+.dg .edge { stroke: var(--muted); stroke-width: 1.4; fill: none; }
+.dg .edge.acc { stroke: var(--nix); stroke-width: 2; }
+.dg .edge.amb { stroke: var(--amber); stroke-width: 2; }
+.dg .edge.sky { stroke: var(--sky); stroke-width: 1.6; stroke-dasharray: 6 4; }
+.dg .edge.dash { stroke-dasharray: 5 4; }
+.dg .ah { fill: var(--muted); }
+.dg .ah.acc { fill: var(--nix); }
+.dg .ah.amb { fill: var(--amber); }
+.dg .ah.sky { fill: var(--sky); }
+.dg .pill { fill: var(--surface); stroke: var(--sky); }
+.dg .pill-t { font-family: var(--font-mono); font-size: 10px; fill: var(--sky); }
+.dg .lbl-bg { fill: var(--surface); }
+.dg .t-acc { fill: var(--nix); }
+.dg .t-amb { fill: var(--amber); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: var(--step--1); color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.legend i { display: inline-block; width: 26px; height: 0; border-top: 2px solid var(--muted); }
+.legend i.acc { border-top-color: var(--nix); }
+.legend i.amb { border-top-color: var(--amber); }
+.legend i.sky { border-top: 2px dashed var(--sky); }
+.legend i.dash { border-top: 2px dashed var(--muted); }
+
+/* ---------- repo map ---------- */
+.explorer {
+  display: grid; grid-template-columns: minmax(230px, 300px) minmax(0, 1fr);
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); overflow: hidden;
+}
+.tree { margin: 0; padding: 10px 0; list-style: none; background: var(--sunken); border-right: 1px solid var(--line); font-family: var(--font-mono); font-size: 0.8125rem; }
+.tree button {
+  all: unset; box-sizing: border-box; display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+  width: 100%; padding: 5px 14px; cursor: pointer; color: var(--ink);
+}
+.tree button .n { color: var(--muted); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+.tree button[data-depth="1"] { padding-left: 32px; }
+.tree button:hover { background: var(--surface); }
+.tree button[aria-selected="true"] { background: var(--surface); color: var(--nix); box-shadow: inset 3px 0 0 var(--amber); }
+.tree button:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
+.tree .dir::before { content: "▸ "; color: var(--muted); }
+.tree .file::before { content: "· "; color: var(--muted); }
+.detail { padding: 22px 26px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.detail .crumb { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); }
+.detail h3 { font-family: var(--font-mono); font-size: 1.125rem; font-weight: 500; color: var(--nix); }
+.detail p { margin: 0; max-width: 64ch; }
+.rule {
+  display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 0.9rem; align-items: baseline;
+  padding: 12px 14px; border-radius: 8px; background: var(--sunken);
+}
+.rule dt { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.rule dd { margin: 0; min-width: 0; }
+.keyfiles { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 0.9rem; }
+.keyfiles li { display: grid; grid-template-columns: minmax(150px, max-content) 1fr; gap: 12px; }
+.keyfiles code { background: none; padding: 0; color: var(--ink); }
+.keyfiles span { color: var(--muted); }
+@media (max-width: 760px) {
+  .explorer { grid-template-columns: minmax(0, 1fr); }
+  .tree { border-right: 0; border-bottom: 1px solid var(--line); max-height: 280px; overflow-y: auto; }
+  .keyfiles li { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}
+
+/* ---------- code ---------- */
+.code {
+  position: relative; margin: 0; background: var(--sunken); border: 1px solid var(--line); border-radius: 8px;
+  padding: 14px 16px; overflow-x: auto; font-family: var(--font-mono); font-size: 0.8125rem; line-height: 1.55;
+}
+.code .c { color: var(--muted); }
+.code .k { color: var(--nix); }
+.code .s { color: var(--amber); }
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.pair > * { min-width: 0; }
+.pair .cap { font-size: var(--step--1); color: var(--muted); margin: 0 0 6px; }
+@media (max-width: 860px) { .pair { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- switchboard ---------- */
+.switchboard { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 18px; display: grid; gap: 14px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tabs button {
+  font: inherit; font-family: var(--font-mono); font-size: 0.8125rem; cursor: pointer;
+  padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+}
+.tabs button:hover { border-color: var(--nix); }
+.tabs button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.layer { border-radius: 8px; padding: 12px 14px; display: grid; gap: 10px; background: var(--sunken); }
+.layer header { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+.layer header b { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; }
+.layer header span { font-size: var(--step--1); color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip {
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 3px 8px; border-radius: 5px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--off);
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.chip.always { color: var(--ink); border-color: var(--nix); background: var(--nix-soft); }
+.chip.on { color: var(--on); border-color: var(--on); background: var(--on-soft); font-weight: 500; }
+.chip.on::before { content: "● "; }
+.layer .group { font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; width: 100%; margin-top: 4px; }
+.result {
+  display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-family: var(--font-mono); font-size: 0.8125rem;
+  padding: 12px 14px; border-radius: 8px; border: 1px dashed var(--nix); color: var(--ink);
+}
+.result .arrow { color: var(--muted); }
+.result .store { color: var(--nix); overflow-wrap: anywhere; }
+.down { text-align: center; color: var(--muted); font-size: 0.8rem; line-height: 1; }
+
+/* ---------- host cards ---------- */
+.hosts { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+.host { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 16px 18px; display: grid; gap: 10px; align-content: start; }
+.host.dormant { background: transparent; border-style: dashed; }
+.host header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.host h3 { font-family: var(--font-mono); font-size: 1.05rem; font-weight: 500; }
+.host .role { margin: 0; font-size: 0.95rem; }
+.tag { font-family: var(--font-mono); font-size: 0.6875rem; padding: 2px 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.tag.server { color: var(--amber); border-color: var(--amber); }
+.tag.desk { color: var(--nix); border-color: var(--nix); }
+.facts { margin: 0; display: grid; grid-template-columns: 76px 1fr; gap: 4px 10px; font-size: 0.85rem; }
+.facts dt { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; padding-top: 2px; }
+.facts dd { margin: 0; min-width: 0; }
+
+/* ---------- services ---------- */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.filters input {
+  font: inherit; font-size: 0.9rem; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink); min-width: 0; flex: 1 1 200px; max-width: 280px;
+}
+.filters .tabs button .n { color: var(--muted); margin-left: 4px; }
+.filters .tabs button[aria-pressed="true"] .n { color: inherit; opacity: 0.7; }
+.svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+.svc { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 12px 14px; display: grid; gap: 6px; align-content: start; }
+.svc.idle { background: transparent; border-style: dashed; }
+.svc header { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.svc h4 { margin: 0; font-family: var(--font-mono); font-size: 0.875rem; font-weight: 500; }
+.svc p { margin: 0; font-size: 0.875rem; }
+.svc .meta { display: flex; flex-wrap: wrap; gap: 4px 10px; font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); }
+.svc .meta .url { color: var(--nix); }
+.state { font-family: var(--font-mono); font-size: 0.6875rem; white-space: nowrap; }
+.state.on { color: var(--on); }
+.state.off { color: var(--off); }
+.count-line { font-size: var(--step--1); color: var(--muted); margin: 0; }
+
+/* ---------- home modules ---------- */
+.hm-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.hm-group { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 12px 14px; display: grid; gap: 8px; align-content: start; }
+.hm-group h4 { margin: 0; font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; color: var(--muted); }
+.hm-group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+.hm-group li { display: grid; grid-template-columns: 12px 1fr; gap: 8px; font-size: 0.85rem; align-items: baseline; }
+.hm-group li .dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--off); align-self: center; }
+.hm-group li.on .dot { background: var(--on); border-color: var(--on); }
+.hm-group li.cond .dot { background: linear-gradient(90deg, var(--on) 50%, transparent 50%); border-color: var(--on); }
+.hm-group li b { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 500; }
+.hm-group li span { color: var(--muted); }
+
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0; }
+.flow .st { flex: 1 1 150px; min-width: 0; padding: 12px 14px; border: 1px solid var(--line); background: var(--surface); display: grid; gap: 4px; align-content: start; position: relative; }
+.flow .st + .st { border-left: 0; }
+.flow .st:first-child { border-radius: 8px 0 0 8px; }
+.flow .st:last-child { border-radius: 0 8px 8px 0; background: var(--nix-soft); border-color: var(--nix); }
+.flow .st b { font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; }
+.flow .st span { font-size: 0.8125rem; color: var(--muted); }
+.flow .st + .st::before {
+  content: "→"; position: absolute; left: -9px; top: 50%; transform: translateY(-50%);
+  background: var(--bg); color: var(--muted); font-size: 0.8rem; line-height: 1; padding: 2px 0;
+}
+@media (max-width: 760px) {
+  .flow { flex-direction: column; }
+  .flow .st + .st { border-left: 1px solid var(--line); border-top: 0; }
+  .flow .st:first-child { border-radius: 8px 8px 0 0; }
+  .flow .st:last-child { border-radius: 0 0 8px 8px; border-top: 1px solid var(--nix); }
+  .flow .st + .st::before { content: "↓"; left: 50%; top: -9px; transform: translateX(-50%); }
+}
+
+.cards3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.card { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 14px 16px; display: grid; gap: 8px; align-content: start; }
+.card h4 { margin: 0; font-size: 0.95rem; font-weight: 600; }
+.card p { margin: 0; font-size: 0.875rem; color: var(--muted); }
+.card p code { color: var(--ink); }
+
+/* ---------- deploy routes ---------- */
+.routes { display: grid; gap: 10px; }
+.route {
+  display: grid; grid-template-columns: minmax(200px, 260px) repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 14px 16px;
+}
+.route .cmd { font-family: var(--font-mono); font-size: 0.85rem; color: var(--amber); overflow-wrap: anywhere; }
+.route .cell { display: grid; gap: 2px; font-size: 0.85rem; min-width: 0; }
+.route .cell small { font-size: 0.6875rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+@media (max-width: 860px) { .route { grid-template-columns: minmax(0, 1fr); gap: 8px; } }
+
+/* ---------- comparison ---------- */
+.compare { display: grid; grid-template-columns: 130px repeat(2, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+.compare > div { padding: 12px 16px; border-top: 1px solid var(--line); font-size: 0.9rem; min-width: 0; }
+.compare > .h { border-top: 0; font-family: var(--font-mono); font-size: 0.85rem; background: var(--sunken); }
+.compare > .h.a { color: var(--nix); }
+.compare > .h.b { color: var(--amber); }
+.compare > .rl { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+@media (max-width: 760px) {
+  .compare { grid-template-columns: minmax(0, 1fr); }
+  .compare > .rl { background: var(--sunken); padding-block: 6px; }
+  .compare > .h:first-child { display: none; }
+}
+ol.steps { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 10px; }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 28px 1fr; gap: 10px; font-size: 0.9rem; align-items: baseline; }
+ol.steps li::before { content: counter(s); font-family: var(--font-mono); font-size: 0.75rem; color: var(--amber); border: 1px solid var(--amber); border-radius: 50%; width: 22px; height: 22px; display: grid; place-items: center; }
+
+/* ---------- cheat sheet ---------- */
+.cheats { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 14px; }
+.cheat { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 14px 16px; display: grid; gap: 4px; align-content: start; }
+.cheat h4 { margin: 0 0 6px; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.cmdrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 7px 0; border-top: 1px solid var(--line); align-items: center; }
+.cmdrow:first-of-type { border-top: 0; }
+.cmdrow code { font-size: 0.8125rem; color: var(--amber); overflow-wrap: anywhere; }
+.cmdrow span { grid-column: 1; font-size: 0.8125rem; color: var(--muted); }
+.cmdrow button {
+  grid-row: 1 / span 2; grid-column: 2; font: inherit; font-size: 0.75rem; cursor: pointer; color: var(--muted);
+  background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 3px 9px;
+}
+.cmdrow button:hover { color: var(--ink); border-color: var(--ink); }
+
+/* ---------- loose ends ---------- */
+.loose { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.loose li { display: grid; grid-template-columns: minmax(180px, 290px) 1fr; gap: 16px; padding: 12px 16px; border-top: 1px solid var(--line); font-size: 0.9rem; }
+.loose li:first-child { border-top: 0; }
+.loose li code:first-child { background: none; padding: 0; color: var(--ink); font-size: 0.8125rem; }
+.loose li span { color: var(--muted); }
+@media (max-width: 760px) { .loose li { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+
+footer.end { margin-top: 80px; padding-top: 18px; border-top: 1px solid var(--line); font-size: var(--step--1); color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="rail" aria-label="Sections">
+  <a class="brand" href="#top">tiborpilz/NixOS</a>
+  <ol>
+    <li><a href="#flow">Folders to machines</a></li>
+    <li><a href="#map">Repo map</a></li>
+    <li><a href="#assembly">How a host is built</a></li>
+    <li><a href="#machines">The machines</a></li>
+    <li><a href="#services">Services on klaus</a></li>
+    <li><a href="#home">Home environment</a></li>
+    <li><a href="#ship">Build, cache, deploy</a></li>
+    <li><a href="#secrets">Secrets</a></li>
+    <li><a href="#isos">ISOs and tests</a></li>
+    <li><a href="#cheats">Cheat sheet</a></li>
+    <li><a href="#loose">Dormant code</a></li>
+  </ol>
+</nav>
+
+<main id="top">
+<nav class="topnav" aria-label="Sections">
+  <a href="#flow">Overview</a><a href="#map">Repo map</a><a href="#assembly">Host build</a><a href="#machines">Machines</a>
+  <a href="#services">Services</a><a href="#home">Home</a><a href="#ship">Deploy</a><a href="#secrets">Secrets</a>
+  <a href="#isos">ISOs</a><a href="#cheats">Commands</a><a href="#loose">Dormant</a>
+</nav>
+
+<header class="hero">
+  <p class="path">github.com/tiborpilz/NixOS &nbsp;›&nbsp; <b>flake.nix</b></p>
+  <h1>One flake, six machines, one home directory</h1>
+  <p class="lede">This repository is a single Nix flake that describes every computer Tibor runs: a home server, a public VPS, a laptop, a TV box, an old laptop and a WSL install. It also describes a user environment that can be installed on any Linux or macOS machine. The trick that holds it together is simple: <strong>you drop a file into the right folder and the flake finds it.</strong> Nothing is registered by hand.</p>
+  <div class="ledger" aria-label="Repository at a glance">
+    <div><b>20</b> pinned inputs</div>
+    <div><b>6</b> NixOS hosts</div>
+    <div><b>51</b> service modules</div>
+    <div><b>53</b> Home Manager modules</div>
+    <div><b>2,781</b> lines of literate Emacs config</div>
+    <div><b>26.05</b> nixpkgs release</div>
+  </div>
+</header>
+
+<!-- ============ 1. FLOW ============ -->
+<section class="sec" id="flow">
+  <div class="sec-head">
+    <p class="eyebrow">flake.nix › lib/modules.nix › outputs</p>
+    <h2>From folders to machines</h2>
+    <p class="lede">Read left to right. Pinned inputs supply packages and modules. Helper functions in <code>lib/</code> scan six folders. Each folder turns into one kind of flake output, and each output has one place it ends up.</p>
+  </div>
+  <figure class="diagram">
+    <div class="scroll">
+    <svg class="dg" viewBox="0 0 1120 456" role="img" aria-label="Diagram: 20 pinned inputs feed lib.my, which scans hosts, modules, home, packages, isos and tests folders. These become nixosConfigurations, nixosModules, homeConfigurations, packages, isos, checks and a deploy node, which end up on six machines, a home directory, GitHub Pages, a USB stick, the Cachix cache and klaus via deploy-rs.">
+      <defs>
+        <marker id="f-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="f-ah-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah acc" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <text class="hd" x="16" y="24">PINNED INPUTS</text>
+      <text class="hd" x="266" y="24">FOLDERS lib.my SCANS</text>
+      <text class="hd" x="586" y="24">FLAKE OUTPUTS</text>
+      <text class="hd" x="896" y="24">WHERE THEY LAND</text>
+
+      <!-- inputs -->
+      <g>
+        <rect class="box" x="16" y="44" width="190" height="36" rx="6"/><text x="28" y="67">nixpkgs 26.05 · unstable</text>
+        <rect class="box" x="16" y="90" width="190" height="36" rx="6"/><text x="28" y="113">home-manager · plasma</text>
+        <rect class="box" x="16" y="136" width="190" height="36" rx="6"/><text x="28" y="159">sops-nix · disko</text>
+        <rect class="box" x="16" y="182" width="190" height="36" rx="6"/><text x="28" y="205">quadlet-nix · determinate</text>
+        <rect class="box" x="16" y="228" width="190" height="36" rx="6"/><text x="28" y="251">emacs-overlay · doom</text>
+        <rect class="box" x="16" y="274" width="190" height="36" rx="6"/><text x="28" y="297">claude-code · codex-cli</text>
+        <rect class="box" x="16" y="320" width="190" height="36" rx="6"/><text x="28" y="343">deploy-rs · nixos-wsl · …</text>
+        <text class="sm" x="16" y="380">20 inputs, locked in flake.lock</text>
+      </g>
+      <path class="edge" d="M212,44 H218 V356 H212"/>
+      <path class="edge" d="M218,200 H262" marker-end="url(#f-ah)"/>
+      <text class="xs" x="240" y="192" text-anchor="middle">feeds</text>
+
+      <!-- folders -->
+      <rect class="box acc" x="266" y="44" width="230" height="48" rx="6"/>
+      <text class="mono" x="278" y="64">hosts/nixos/&lt;name&gt;/</text><text class="sm" x="278" y="82">one folder = one machine</text>
+      <rect class="box" x="266" y="102" width="230" height="48" rx="6"/>
+      <text class="mono" x="278" y="122">modules/{shared,nixos}/**</text><text class="sm" x="278" y="140">on every host, switched off</text>
+      <rect class="box" x="266" y="160" width="230" height="48" rx="6"/>
+      <text class="mono" x="278" y="180">home/modules/**</text><text class="sm" x="278" y="198">imported into Home Manager</text>
+      <rect class="box" x="266" y="218" width="230" height="48" rx="6"/>
+      <text class="mono" x="278" y="238">packages/&lt;group&gt;/</text><text class="sm" x="278" y="256">merged into one package set</text>
+      <rect class="box" x="266" y="276" width="230" height="48" rx="6"/>
+      <text class="mono" x="278" y="296">isos/&lt;name&gt;</text><text class="sm" x="278" y="314">installer, or a live system</text>
+      <rect class="box dash" x="266" y="334" width="230" height="48" rx="6"/>
+      <text class="mono" x="278" y="354">tests/upgrade/*.nix</text><text class="sm" x="278" y="372">listed by hand in flake.nix</text>
+
+      <!-- folder -> output edges -->
+      <path class="edge acc" d="M496,68 H582" marker-end="url(#f-ah-acc)"/><text class="xs" x="541" y="61" text-anchor="middle">mkHostAttrs</text>
+      <path class="edge" d="M496,118 C536,118 540,84 582,84" marker-end="url(#f-ah)"/><text class="xs" x="550" y="118" text-anchor="middle">imported</text>
+      <path class="edge" d="M496,132 H582" marker-end="url(#f-ah)"/><text class="xs" x="541" y="146" text-anchor="middle">exported</text>
+      <path class="edge" d="M496,184 H582" marker-end="url(#f-ah)"/><text class="xs" x="541" y="177" text-anchor="middle">standalone</text>
+      <path class="edge" d="M496,242 H582" marker-end="url(#f-ah)"/><text class="xs" x="541" y="235" text-anchor="middle">mapModules</text>
+      <path class="edge" d="M496,300 H582" marker-end="url(#f-ah)"/><text class="xs" x="541" y="293" text-anchor="middle">mkIso</text>
+      <path class="edge" d="M496,358 H582" marker-end="url(#f-ah)"/><text class="xs" x="541" y="351" text-anchor="middle">runNixOSTest</text>
+
+      <!-- outputs -->
+      <rect class="box acc" x="586" y="44" width="200" height="48" rx="6"/>
+      <text class="mono b" x="598" y="64">nixosConfigurations</text><text class="sm" x="598" y="82">6 hosts</text>
+      <rect class="box" x="586" y="108" width="200" height="48" rx="6"/>
+      <text class="mono" x="598" y="128">nixosModules</text><text class="sm" x="598" y="146">same modules, for reuse</text>
+      <rect class="box" x="586" y="160" width="200" height="48" rx="6"/>
+      <text class="mono" x="598" y="180">homeConfigurations</text><text class="sm" x="598" y="198">tibor, tiborpilz, tibor@host</text>
+      <rect class="box" x="586" y="218" width="200" height="48" rx="6"/>
+      <text class="mono" x="598" y="238">packages.&lt;system&gt;</text><text class="sm" x="598" y="256">doom-emacs, pie, site, …</text>
+      <rect class="box" x="586" y="276" width="200" height="48" rx="6"/>
+      <text class="mono" x="598" y="296">isos.&lt;name&gt;</text><text class="sm" x="598" y="314">couchthink, amnesiac</text>
+      <rect class="box" x="586" y="334" width="200" height="48" rx="6"/>
+      <text class="mono" x="598" y="354">checks.&lt;system&gt;</text><text class="sm" x="598" y="372">what CI is meant to build</text>
+      <rect class="box" x="586" y="392" width="200" height="48" rx="6"/>
+      <text class="mono" x="598" y="412">deploy.nodes.klaus</text><text class="sm" x="598" y="430">deploy-rs target</text>
+
+      <!-- output -> destination edges -->
+      <path class="edge acc" d="M786,68 H892" marker-end="url(#f-ah-acc)"/><text class="xs" x="841" y="61" text-anchor="middle">nixos-rebuild</text>
+      <path class="edge" d="M786,184 H892" marker-end="url(#f-ah)"/><text class="xs" x="841" y="177" text-anchor="middle">nh home switch</text>
+      <path class="edge" d="M786,242 H892" marker-end="url(#f-ah)"/><text class="xs" x="841" y="235" text-anchor="middle">pages.yml</text>
+      <path class="edge" d="M786,300 H892" marker-end="url(#f-ah)"/><text class="xs" x="841" y="293" text-anchor="middle">dd · qemu</text>
+      <path class="edge" d="M786,358 H892" marker-end="url(#f-ah)"/><text class="xs" x="841" y="351" text-anchor="middle">CI builds</text>
+      <path class="edge" d="M786,416 H892" marker-end="url(#f-ah)"/><text class="xs" x="841" y="409" text-anchor="middle">deploy-rs</text>
+
+      <!-- destinations -->
+      <rect class="box acc" x="896" y="44" width="208" height="48" rx="6"/>
+      <text class="b" x="908" y="64">Six NixOS machines</text><text class="sm" x="908" y="82">klaus, edge, couchthink, …</text>
+      <rect class="box" x="896" y="160" width="208" height="48" rx="6"/>
+      <text class="b" x="908" y="180">Your $HOME</text><text class="sm" x="908" y="198">any Linux, and macOS</text>
+      <rect class="box" x="896" y="218" width="208" height="48" rx="6"/>
+      <text class="b" x="908" y="238">GitHub Pages</text><text class="sm" x="908" y="256">README + screenshots</text>
+      <rect class="box" x="896" y="276" width="208" height="48" rx="6"/>
+      <text class="b" x="908" y="296">USB stick or QEMU VM</text><text class="sm" x="908" y="314">just iso-write / vm-usb</text>
+      <rect class="box" x="896" y="334" width="208" height="48" rx="6"/>
+      <text class="b" x="908" y="354">Cachix · tiborpilz</text><text class="sm" x="908" y="372">prebuilt binaries for all</text>
+      <rect class="box" x="896" y="392" width="208" height="48" rx="6"/>
+      <text class="b" x="908" y="412">klaus, with rollback</text><text class="sm" x="908" y="430">magicRollback, 60 s confirm</text>
+    </svg>
+    </div>
+    <p class="scroll-hint">Scroll sideways to see the whole diagram.</p>
+    <figcaption><b>The blue path is the one that matters most:</b> a folder under <code>hosts/nixos/</code> becomes a <code>nixosConfiguration</code> named after the folder, and <code>nixos-rebuild</code> puts it on a machine. Everything in <code>modules/</code> is imported into every one of those hosts, which is why each module ships switched off. Home Manager also rides along inside NixOS hosts; that second route is drawn in <a href="#home">Home environment</a>.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ 2. MAP ============ -->
+<section class="sec" id="map">
+  <div class="sec-head">
+    <p class="eyebrow">ls -1 .</p>
+    <h2>Repo map</h2>
+    <p class="lede">Pick a folder to see what lives there, how the flake picks it up, and what to do if you want to add one more.</p>
+  </div>
+  <div class="explorer">
+    <ul class="tree" id="tree" role="listbox" aria-label="Repository folders"></ul>
+    <div class="detail" id="detail" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ============ 3. ASSEMBLY ============ -->
+<section class="sec" id="assembly">
+  <div class="sec-head">
+    <p class="eyebrow">lib/nixos.nix › mkHostAttrs</p>
+    <h2>How a host is built</h2>
+    <p class="lede">Every NixOS host gets the same stack of modules. What makes <code>klaus</code> a media server and <code>edge</code> a VPN hub is only which switches its <code>default.nix</code> turns on. Pick a host to light up its switches.</p>
+  </div>
+
+  <div class="switchboard" id="switchboard">
+    <div class="tabs" role="group" aria-label="Choose a host" id="host-tabs"></div>
+
+    <div class="layer">
+      <header><b>1 · flake.nix hostDefaults</b><span>always on, for every host</span></header>
+      <div class="chips">
+        <span class="chip always">home-manager</span><span class="chip always">sops-nix</span><span class="chip always">determinate</span>
+        <span class="chip always">quadlet-nix</span><span class="chip always">disko</span><span class="chip always">modules/shared/nix-config</span>
+        <span class="chip always">modules/shared/options</span>
+      </div>
+    </div>
+    <div class="down" aria-hidden="true">+</div>
+    <div class="layer">
+      <header><b>2 · modules/nixos/**</b><span id="sw-count">imported on every host; each one does nothing until enabled</span></header>
+      <div class="chips" id="sw-chips"></div>
+    </div>
+    <div class="down" aria-hidden="true">+</div>
+    <div class="layer">
+      <header><b id="sw-file">3 · hosts/nixos/klaus/default.nix</b><span>hardware, users, and the switches above</span></header>
+      <pre class="code" id="sw-code" aria-label="Excerpt from the host file"></pre>
+    </div>
+    <div class="down" aria-hidden="true">↓ lib.nixosSystem</div>
+    <div class="result"><span>config.system.build.toplevel</span><span class="arrow">→</span><span class="store" id="sw-store">/nix/store/…-nixos-system-klaus-26.05</span></div>
+  </div>
+
+  <div class="pair">
+    <div>
+      <p class="cap">A typical module (condensed from <code>modules/nixos/services/linkding.nix</code>)</p>
+<pre class="code"><span class="k">options</span>.modules.services.linkding = {
+  enable     = mkBoolOpt <span class="s">false</span>;  <span class="c"># off by default</span>
+  publicPort = mkOption { default = <span class="s">9090</span>; };
+};
+<span class="k">config</span> = mkIf cfg.enable {
+  virtualisation.oci-containers.containers.linkding = {
+    image = <span class="s">"sissbruecker/linkding:latest"</span>;
+    ports = [ <span class="s">"9090:9090"</span> ];
+  };
+  <span class="c"># ask the front door for linkding.tiborpilz.xyz</span>
+  modules.services.reverseProxy.proxies.linkding = {
+    publicPort = cfg.publicPort; auth = <span class="s">false</span>;
+  };
+};</pre>
+    </div>
+    <div>
+      <p class="cap">What <code>mkHostAttrs</code> adds for each folder (<code>lib/nixos.nix</code>)</p>
+<pre class="code">{
+  <span class="c"># the folder name becomes the hostname</span>
+  networking.hostName = mkDefault <span class="s">"klaus"</span>;
+  specialArgs = { inherit lib inputs system; };
+  modules = [
+    ../default.nix                 <span class="c"># repo-root defaults</span>
+    ./hosts/nixos/klaus            <span class="c"># the host itself</span>
+  ] ++ mapModulesRec' ./modules/nixos import
+    ++ [ quadlet-nix.nixosModules.quadlet ];
+}
+<span class="c"># ...and flake-utils-plus adds hostDefaults,</span>
+<span class="c"># then calls lib.nixosSystem on the lot.</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. MACHINES ============ -->
+<section class="sec" id="machines">
+  <div class="sec-head">
+    <p class="eyebrow">hosts/nixos/* · servers.env</p>
+    <h2>The machines</h2>
+    <p class="lede">Two servers, three desktops and a WSL guest. A seventh folder, <code>hosts/darwin/bigmac</code>, describes a Mac but is not wired into the flake; the Mac only uses the Home Manager config.</p>
+  </div>
+
+  <figure class="diagram">
+    <div class="scroll">
+    <svg class="dg" viewBox="0 0 1080 516" role="img" aria-label="Network diagram: web requests go from a browser to Cloudflare, then down an outbound tunnel into klaus, where cloudflared hands them to Caddy on port 80 and on to 42 services. edge, a public VPS, runs the Netmaker server and meshes with klaus. The laptop and GitHub Actions deploy to klaus over the LAN, Tailscale or the tunnel. klaus streams audio to couchthink, proxies Home Assistant on a Pi, and reads the Gaggiuino espresso machine.">
+      <defs>
+        <marker id="n-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="n-ah-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah acc" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="n-ah-sky" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah sky" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <!-- zones -->
+      <rect class="zone" x="16" y="16" width="1048" height="160" rx="10"/>
+      <text class="hd" x="30" y="38">INTERNET</text>
+      <rect class="zone" x="16" y="206" width="790" height="300" rx="10"/>
+      <text class="hd" x="30" y="228">HOME LAN · 192.168.1.0/24</text>
+
+      <!-- internet nodes -->
+      <rect class="box" x="40" y="60" width="160" height="56" rx="6"/>
+      <text class="b" x="54" y="83">Browser or phone</text><text class="sm" x="54" y="102">*.tiborpilz.xyz</text>
+      <rect class="box" x="300" y="60" width="220" height="56" rx="6"/>
+      <text class="b" x="314" y="83">Cloudflare</text><text class="sm" x="314" y="102">DNS · Access, Authentik login</text>
+      <rect class="box" x="640" y="44" width="200" height="92" rx="6"/>
+      <text class="mono b" x="654" y="68">edge</text><text class="sm" x="654" y="88">public VPS · SSH on :2222</text><text class="sm" x="654" y="106">Netmaker server, UI, MQTT</text><text class="sm" x="654" y="124">quadlet containers + Caddy</text>
+      <rect class="box" x="880" y="60" width="170" height="56" rx="6"/>
+      <text class="b" x="894" y="83">GitHub Actions</text><text class="sm" x="894" y="102">Deploy workflow, manual</text>
+
+      <!-- klaus -->
+      <rect class="box acc" x="200" y="244" width="420" height="152" rx="8"/>
+      <text class="mono b" x="604" y="268" text-anchor="end">klaus · 192.168.1.51</text>
+      <rect class="pill" x="214" y="254" width="62" height="18" rx="9"/><text class="pill-t" x="245" y="267" text-anchor="middle">tailscale</text>
+      <rect class="pill" x="282" y="254" width="62" height="18" rx="9"/><text class="pill-t" x="313" y="267" text-anchor="middle">netclient</text>
+      <rect class="box" x="220" y="296" width="114" height="46" rx="6"/>
+      <text class="mono" x="232" y="315">cloudflared</text><text class="xs" x="232" y="332">*. → localhost:80</text>
+      <rect class="box" x="356" y="296" width="114" height="46" rx="6"/>
+      <text class="mono" x="368" y="315">Caddy :80</text><text class="xs" x="368" y="332">a vhost per proxy</text>
+      <rect class="box" x="492" y="296" width="112" height="46" rx="6"/>
+      <text class="b" x="504" y="315">42 services</text><text class="xs" x="504" y="332">pods + native</text>
+      <path class="edge acc" d="M334,319 H352" marker-end="url(#n-ah-acc)"/>
+      <path class="edge acc" d="M470,319 H488" marker-end="url(#n-ah-acc)"/>
+      <text class="xs" x="220" y="372">Public names resolve to 127.0.0.1 on klaus,</text>
+      <text class="xs" x="220" y="387">so calls between its own services skip Cloudflare.</text>
+
+      <!-- request path -->
+      <path class="edge acc" d="M200,88 H296" marker-end="url(#n-ah-acc)"/>
+      <text class="xs" x="248" y="80" text-anchor="middle">HTTPS</text>
+      <path class="edge acc" d="M410,116 V196 H277 V292" marker-end="url(#n-ah-acc)"/>
+      <text class="xs" x="418" y="148">tunnel klaus dials out to;</text>
+      <text class="xs" x="418" y="162">no inbound ports open</text>
+
+      <!-- edge mesh -->
+      <path class="edge sky" d="M740,136 V262 H624" marker-end="url(#n-ah-sky)"/>
+      <text class="xs" x="748" y="184">Netmaker</text>
+      <text class="xs" x="748" y="198">WireGuard mesh</text>
+
+      <!-- github deploy -->
+      <path class="edge sky" d="M965,116 V282 H624" marker-end="url(#n-ah-sky)"/>
+      <text class="xs" x="957" y="232" text-anchor="end">deploy-rs over Tailscale</text>
+      <text class="xs" x="957" y="246" text-anchor="end">or the ssh. tunnel</text>
+
+      <!-- laptop -->
+      <rect class="box" x="840" y="306" width="210" height="56" rx="6"/>
+      <text class="mono b" x="854" y="329">thinkyMcThinkpad</text><text class="sm" x="854" y="348">laptop, goes anywhere</text>
+      <rect class="pill" x="978" y="316" width="62" height="18" rx="9"/><text class="pill-t" x="1009" y="329" text-anchor="middle">tailscale</text>
+      <path class="edge" d="M840,334 H624" marker-end="url(#n-ah)"/>
+      <text class="xs" x="732" y="326" text-anchor="middle">just deploy · deploy-rs</text>
+
+      <!-- LAN devices -->
+      <rect class="box" x="40" y="436" width="200" height="56" rx="6"/>
+      <text class="mono b" x="54" y="459">couchthink · .104</text><text class="sm" x="54" y="478">TV box, Plasma Bigscreen</text>
+      <rect class="box" x="320" y="436" width="200" height="56" rx="6"/>
+      <text class="b" x="334" y="459">Home Assistant Pi</text><text class="sm" x="334" y="478">192.168.1.175</text>
+      <rect class="box" x="580" y="436" width="200" height="56" rx="6"/>
+      <text class="b" x="594" y="459">Gaggiuino</text><text class="sm" x="594" y="478">espresso machine · .81</text>
+      <path class="edge" d="M220,396 V432" marker-end="url(#n-ah)"/><text class="xs" x="228" y="420">snapcast audio</text>
+      <path class="edge" d="M410,396 V432" marker-end="url(#n-ah)"/><text class="xs" x="418" y="420">proxied as homeassistant.</text>
+      <path class="edge" d="M600,396 V432" marker-end="url(#n-ah)"/><text class="xs" x="608" y="420">shot profiler reads it</text>
+    </svg>
+    </div>
+    <p class="scroll-hint">Scroll sideways to see the whole diagram.</p>
+    <div class="legend"><span><i class="acc"></i>a web request</span><span><i class="sky"></i>overlay network (Netmaker, Tailscale)</span><span><i></i>LAN or SSH</span></div>
+    <figcaption><b>klaus never opens a port to the internet.</b> <code>cloudflared</code> keeps an outbound tunnel to Cloudflare, which sends every <code>*.tiborpilz.xyz</code> request down it to Caddy on port 80. <code>edge</code> does not carry web traffic for klaus; it hosts the Netmaker control plane that both machines join. A second domain, <code>tibor.pics</code>, serves only public Immich photo shares.</figcaption>
+  </figure>
+
+  <div class="hosts" id="hosts"></div>
+</section>
+
+<!-- ============ 5. SERVICES ============ -->
+<section class="sec" id="services">
+  <div class="sec-head">
+    <p class="eyebrow">modules/nixos/services/** · reverseProxy.nix</p>
+    <h2>Services on klaus</h2>
+    <p class="lede">51 service modules, almost all aimed at <code>klaus</code>. Each one runs its app (a native NixOS service, a plain OCI container, or a Podman quadlet pod with its own database), then registers a subdomain with the reverse proxy module.</p>
+  </div>
+
+  <div class="pair">
+    <div>
+      <p class="cap">One line in a module…</p>
+<pre class="code">modules.services.reverseProxy.proxies.<span class="s">paperless</span> = {
+  publicPort = <span class="s">8013</span>;
+  auth = <span class="s">false</span>;   <span class="c"># true = Caddy basic auth in front</span>
+};</pre>
+    </div>
+    <div>
+      <p class="cap">…produces all of this in <code>reverseProxy.nix</code></p>
+<pre class="code"><span class="c"># Caddy virtual host, plain HTTP on :80</span>
+<span class="k">paperless.tiborpilz.xyz</span>  → reverse_proxy localhost:8013
+  <span class="c"># aliases for the LAN</span>
+  http://paperless.klaus.tbr.gg
+<span class="c"># /etc/hosts on klaus</span>
+127.0.0.1  paperless.tiborpilz.xyz
+<span class="c"># cloudflared: one wildcard rule covers it</span>
+*.tiborpilz.xyz → http://localhost:80</pre>
+    </div>
+  </div>
+
+  <div class="filters">
+    <input id="svc-q" type="search" placeholder="Filter by name or purpose" aria-label="Filter services">
+    <div class="tabs" id="svc-cats" role="group" aria-label="Filter by category"></div>
+  </div>
+  <p class="count-line" id="svc-count"></p>
+  <div class="svc-grid" id="svc-grid"></div>
+  <div class="cards3">
+    <div class="card"><h4>Single sign-on</h4><p>Authentik is the identity provider. Declaring <code>modules.services.authentik.applications.&lt;app&gt;</code> on the host creates the OIDC client, its sops secrets and an Authentik blueprint. Paperless, Forgejo, Tandoor, Grafana, Karakeep, BookOrbit and Shelfarr log in this way.</p></div>
+    <div class="card"><h4>Monitoring</h4><p>Prometheus with the node exporter (systemd and ZFS collectors) feeds Grafana, which only accepts Authentik logins. Dashboards are provisioned from JSON: an overview of memory, CPU and both drives, plus one for Soulseek downloads. unifi-poller adds the UniFi network.</p></div>
+    <div class="card"><h4>Containers</h4><p>Podman is the backend. Older modules use <code>virtualisation.oci-containers</code>; newer ones use quadlet pods, where the app, its Postgres and its Redis share one pod and talk over localhost. Renovate bumps the <code>image = "…"</code> tags.</p></div>
+  </div>
+</section>
+
+<!-- ============ 6. HOME ============ -->
+<section class="sec" id="home">
+  <div class="sec-head">
+    <p class="eyebrow">home/default.nix · modules/nixos/home.nix</p>
+    <h2>Home environment</h2>
+    <p class="lede">The user side (shell, editors, terminal, browser, mail, dev toolchains) is one Home Manager configuration in <code>home/</code>. It reaches a machine by one of two routes, and both end in the same file.</p>
+  </div>
+
+  <figure class="diagram">
+    <div class="scroll">
+    <svg class="dg" viewBox="0 0 1080 286" role="img" aria-label="Diagram: route A, a NixOS host with home.enable, goes through modules/nixos/home.nix during nixos-rebuild. Route B, the standalone homeConfigurations output, is applied with nh home switch. Both import home/default.nix, which imports every home module and produces the home directory. Raw config files in home/config are symlinked into the home directory outside the Nix store.">
+      <defs>
+        <marker id="h-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="h-ah-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah acc" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="h-ah-amb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah amb" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <text class="hd" x="16" y="22">ROUTE A · INSIDE A NIXOS HOST</text>
+      <rect class="box" x="16" y="36" width="250" height="64" rx="6"/>
+      <text class="b" x="30" y="60">NixOS host, home.enable</text><text class="sm" x="30" y="80">thinkyMcThinkpad, minithink, wsl</text>
+      <path class="edge" d="M266,68 H326" marker-end="url(#h-ah)"/><text class="xs" x="296" y="60" text-anchor="middle">rebuild</text>
+      <rect class="box" x="330" y="36" width="240" height="64" rx="6"/>
+      <text class="mono" x="344" y="60">modules/nixos/home.nix</text><text class="sm" x="344" y="80">home-manager.users.tibor</text>
+
+      <text class="hd" x="16" y="152">ROUTE B · STANDALONE</text>
+      <rect class="box" x="16" y="166" width="250" height="64" rx="6"/>
+      <text class="mono" x="30" y="190">homeConfigurations</text><text class="sm" x="30" y="210">tibor on Linux, tiborpilz on macOS</text>
+      <path class="edge" d="M266,198 H326" marker-end="url(#h-ah)"/><text class="xs" x="296" y="190" text-anchor="middle">apply</text>
+      <rect class="box" x="330" y="166" width="240" height="64" rx="6"/>
+      <text class="mono" x="344" y="190">nh home switch</text><text class="sm" x="344" y="210">no root needed, any distro</text>
+
+      <path class="edge acc" d="M570,68 C612,68 612,118 650,118" marker-end="url(#h-ah-acc)"/>
+      <path class="edge acc" d="M570,198 C612,198 612,148 650,148" marker-end="url(#h-ah-acc)"/>
+      <rect class="box acc" x="654" y="96" width="210" height="74" rx="6"/>
+      <text class="mono b" x="668" y="120">home/default.nix</text><text class="sm" x="668" y="140">imports all of home/modules/**</text><text class="sm" x="668" y="158">then flips modules.*.enable</text>
+      <path class="edge acc" d="M864,133 H912" marker-end="url(#h-ah-acc)"/><text class="xs" x="888" y="125" text-anchor="middle">builds</text>
+      <rect class="box acc" x="916" y="96" width="148" height="74" rx="6"/>
+      <text class="b" x="930" y="120">~/</text><text class="sm" x="930" y="140">packages, dotfiles,</text><text class="sm" x="930" y="158">user services</text>
+
+      <rect class="box amb" x="654" y="216" width="210" height="54" rx="6"/>
+      <text class="mono" x="668" y="238">home/config/*</text><text class="sm" x="668" y="256">nvim, doom, zsh, firefox…</text>
+      <path class="edge amb dash" d="M864,243 H1040 V174" marker-end="url(#h-ah-amb)"/>
+      <text class="xs t-amb" x="882" y="236">symlinked out of store:</text>
+      <text class="xs t-amb" x="882" y="262">edit, no rebuild</text>
+    </svg>
+    </div>
+    <p class="scroll-hint">Scroll sideways to see the whole diagram.</p>
+    <figcaption><b>Both routes run the same <code>home/default.nix</code>.</b> On NixOS, <code>home.graphical</code> from the host decides whether Plasma, KMail and Claude Desktop come along. The amber path is a shortcut: editor and shell configs are symlinked straight to the checkout at <code>~/Code/nixos/home/config</code>, so an edit there takes effect immediately, but the repo has to live at that path.</figcaption>
+  </figure>
+
+  <div class="sub">
+    <h3>What is switched on <small>home/modules/** · 53 files</small></h3>
+    <div class="legend"><span><i style="width:10px;height:10px;border:0;border-radius:50%;background:var(--on)"></i>enabled in home/default.nix</span><span><i style="width:10px;height:10px;border:1.5px solid var(--on);border-radius:50%;background:linear-gradient(90deg,var(--on) 50%,transparent 50%)"></i>conditional</span><span><i style="width:10px;height:10px;border:1.5px solid var(--off);border-radius:50%"></i>off</span></div>
+    <div class="hm-groups" id="hm-groups"></div>
+  </div>
+
+  <div class="sub">
+    <h3>Doom Emacs, built by Nix <small>packages/emacs/default.nix</small></h3>
+    <div class="flow">
+      <div class="st"><b>config.org</b><span>2,781-line literate config in home/config/doom</span></div>
+      <div class="st"><b>doomConfig</b><span>copied to the store and patched (copilot, pcre2el, tree-sitter path)</span></div>
+      <div class="st"><b>emacsWrapped</b><span>emacs-git, native compilation, -O3</span></div>
+      <div class="st"><b>emacsWithDoom</b><span>nix-doom-emacs-unstraightened, no straight.el at runtime</span></div>
+      <div class="st"><b>doom-emacs</b><span>built in CI for Linux and macOS, pushed to Cachix</span></div>
+    </div>
+  </div>
+
+  <div class="cards3">
+    <div class="card"><h4>Neovim</h4><p>lazy.nvim with 37 plugin spec files and 107 pinned plugins. Two plugins are written in this repo: <code>neotree-lsp-symbols</code> (LSP symbols inline in the file tree, with 34 tests) and <code>hovercraft-ts-type</code> (expand TypeScript types in the hover).</p></div>
+    <div class="card"><h4>Shell</h4><p>zsh with a hand-written async prompt that shows jj or git state. tmux with <code>wtmux</code>, which keeps one session per git worktree. atuin, zoxide, direnv, mise and a <code>heck</code> alias for pay-respects.</p></div>
+    <div class="card"><h4>Jujutsu</h4><p>The newest work. Custom log templates, revset aliases like <code>stack</code> and <code>retrunk</code>, Neovim as diff editor, and three Deno views: <code>jj pretty</code>, <code>jj dag</code> (a Graphviz graph in kitty) and <code>jj pulse</code>.</p></div>
+    <div class="card"><h4>Desktop and browser</h4><p>Plasma via plasma-manager with a Nordic theme and a floating top panel. Firefox profiles with addons from rycee's NUR, a minimal tridactyl profile and a 423-line <code>userChrome.css</code>. Kitty with FiraCode Nerd Font.</p></div>
+  </div>
+</section>
+
+<!-- ============ 7. SHIP ============ -->
+<section class="sec" id="ship">
+  <div class="sec-head">
+    <p class="eyebrow">.github/workflows · .woodpecker.yml · Justfile</p>
+    <h2>Build, cache, deploy</h2>
+    <p class="lede">CI exists mainly to fill a binary cache, so no machine has to compile the heavy parts (Emacs above all) itself. Deploying is a separate, deliberate step.</p>
+  </div>
+
+  <figure class="diagram">
+    <div class="scroll">
+    <svg class="dg" viewBox="0 0 1080 214" role="img" aria-label="Diagram: a push to main triggers GitHub Actions, which builds three Emacs variants on Linux and macOS and pushes them to the tiborpilz Cachix cache. Woodpecker on klaus also pushes doom-emacs-standalone. Every host and home configuration pulls from that cache. A weekly workflow opens a flake.lock update pull request.">
+      <defs>
+        <marker id="c-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="c-ah-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah acc" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <rect class="box" x="16" y="30" width="170" height="60" rx="6"/>
+      <text class="b" x="30" y="55">push to main</text><text class="sm" x="30" y="74">github.com/tiborpilz</text>
+      <rect class="box" x="246" y="30" width="270" height="60" rx="6"/>
+      <text class="b" x="260" y="55">GitHub Actions · Build Emacs</text><text class="sm" x="260" y="74">x86_64-linux + aarch64-darwin</text>
+      <rect class="box acc" x="576" y="30" width="200" height="60" rx="6"/>
+      <text class="b" x="590" y="55">Cachix · tiborpilz</text><text class="sm" x="590" y="74">tiborpilz.cachix.org</text>
+      <rect class="box" x="836" y="30" width="228" height="60" rx="6"/>
+      <text class="b" x="850" y="55">Every host and $HOME</text><text class="sm" x="850" y="74">listed as a substituter</text>
+
+      <path class="edge acc" d="M186,60 H242" marker-end="url(#c-ah-acc)"/><text class="xs" x="214" y="52" text-anchor="middle">triggers</text>
+      <path class="edge acc" d="M516,60 H572" marker-end="url(#c-ah-acc)"/><text class="xs" x="544" y="52" text-anchor="middle">pushes</text>
+      <path class="edge acc" d="M776,60 H832" marker-end="url(#c-ah-acc)"/><text class="xs" x="804" y="52" text-anchor="middle">pulls</text>
+
+      <rect class="box dash" x="16" y="134" width="170" height="60" rx="6"/>
+      <text class="mono" x="30" y="159">update-flake-lock</text><text class="sm" x="30" y="178">Sundays, 00:00 UTC</text>
+      <path class="edge" d="M101,134 V94" marker-end="url(#c-ah)"/><text class="xs" x="109" y="118">opens a PR</text>
+
+      <rect class="box" x="246" y="134" width="270" height="60" rx="6"/>
+      <text class="b" x="260" y="159">Woodpecker on klaus</text><text class="sm" x="260" y="178">self-hosted, builds doom-emacs-standalone</text>
+      <path class="edge" d="M516,164 H676 V94" marker-end="url(#c-ah)"/><text class="xs" x="596" y="156" text-anchor="middle">watch-exec push</text>
+
+      <text class="xs" x="260" y="120">nix-fast-build --skip-cached</text>
+    </svg>
+    </div>
+    <p class="scroll-hint">Scroll sideways to see the whole diagram.</p>
+    <figcaption><b>Only Emacs is built automatically today.</b> The flake's <code>checks</code> also list four host systems, the standalone home config and two upgrade tests, but the GitHub job that built them is commented out. Other workflows publish the Pages site, render terminal screenshots, build a WSL tarball release, run SonarQube and lint the workflows with zizmor.</figcaption>
+  </figure>
+
+  <div class="sub">
+    <h3>Three ways to deploy <small>Justfile · flake.nix deploy.nodes</small></h3>
+    <div class="routes">
+      <div class="route">
+        <div class="cmd">just deploy klaus</div>
+        <div class="cell"><small>Builds on</small>the target (<code>--build-host</code>)</div>
+        <div class="cell"><small>Reaches it via</small>the address in <code>servers.env</code>; <code>klaus.tailscale</code> picks the Tailscale IP, <code>EDGE_PORT</code> sets 2222</div>
+        <div class="cell"><small>Safety net</small><code>just deploy klaus dry</code> for a dry run</div>
+      </div>
+      <div class="route">
+        <div class="cmd">just deploy-push couchthink</div>
+        <div class="cell"><small>Builds on</small>your machine, then copies the closure</div>
+        <div class="cell"><small>Reaches it via</small>SSH with <code>~/.ssh/id</code></div>
+        <div class="cell"><small>Use it for</small>slow targets like the old ThinkPad under the TV</div>
+      </div>
+      <div class="route">
+        <div class="cmd">just deploy-rs klaus</div>
+        <div class="cell"><small>Builds on</small>klaus (<code>remoteBuild = true</code>)</div>
+        <div class="cell"><small>Reaches it via</small><code>ssh.tiborpilz.xyz</code> through the Cloudflare tunnel; the manual GitHub workflow can use Tailscale instead</div>
+        <div class="cell"><small>Safety net</small><code>magicRollback</code>: if deploy-rs cannot reconnect within 60 s, klaus rolls back</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. SECRETS ============ -->
+<section class="sec" id="secrets">
+  <div class="sec-head">
+    <p class="eyebrow">.sops.yaml · hosts/nixos/*/secrets</p>
+    <h2>Secrets</h2>
+    <p class="lede">Passwords, API keys and tunnel credentials are committed, but only encrypted. sops-nix decrypts them on the machine that needs them, at activation time.</p>
+  </div>
+  <figure class="diagram">
+    <div class="scroll">
+    <svg class="dg" viewBox="0 0 1080 200" role="img" aria-label="Diagram: .sops.yaml lists five recipients. sops encrypts each host's secrets.yaml to all of them and the ciphertext is committed. On activation, sops-nix on the host decrypts it with the host's SSH key and writes files like /run/secrets/caddyEnv, which modules read through options such as envFile.">
+      <defs>
+        <marker id="s-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="s-ah-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah acc" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <rect class="box" x="16" y="20" width="220" height="160" rx="6"/>
+      <text class="mono b" x="30" y="44">.sops.yaml recipients</text>
+      <text class="mono" x="30" y="72">tibor</text><text class="xs" x="222" y="72" text-anchor="end">age</text>
+      <text class="mono" x="30" y="96">server_klaus</text><text class="xs" x="222" y="96" text-anchor="end">age</text>
+      <text class="mono" x="30" y="120">server_edge</text><text class="xs" x="222" y="120" text-anchor="end">age</text>
+      <text class="mono" x="30" y="144">server_homeserver</text><text class="xs" x="222" y="144" text-anchor="end">age</text>
+      <text class="mono" x="30" y="168">0374…509B</text><text class="xs" x="222" y="168" text-anchor="end">PGP</text>
+
+      <path class="edge" d="M236,100 H292" marker-end="url(#s-ah)"/><text class="xs" x="264" y="92" text-anchor="middle">encrypt</text>
+      <rect class="box" x="296" y="68" width="250" height="64" rx="6"/>
+      <text class="mono" x="310" y="92">klaus/secrets/secrets.yaml</text><text class="sm" x="310" y="112">committed, ciphertext only</text>
+      <path class="edge" d="M546,100 H602" marker-end="url(#s-ah)"/><text class="xs" x="574" y="92" text-anchor="middle">deploy</text>
+      <rect class="box" x="606" y="68" width="220" height="64" rx="6"/>
+      <text class="b" x="620" y="92">sops-nix, on activation</text><text class="sm" x="620" y="112">key: ssh_host_ed25519_key</text>
+      <path class="edge acc" d="M826,100 H882" marker-end="url(#s-ah-acc)"/><text class="xs" x="854" y="92" text-anchor="middle">writes</text>
+      <rect class="box acc" x="886" y="68" width="178" height="64" rx="6"/>
+      <text class="mono" x="900" y="92">/run/secrets/caddyEnv</text><text class="sm" x="900" y="112">read via envFile = …</text>
+    </svg>
+    </div>
+    <p class="scroll-hint">Scroll sideways to see the whole diagram.</p>
+    <figcaption><b>Every secret file is readable by you and by each server key</b>, so you can edit with <code>sops hosts/nixos/klaus/secrets/secrets.yaml</code> and any server can decrypt its own. klaus declares about 25 secrets (tunnel credentials, VPN configs, OIDC clients, app env files); edge has one, for Netmaker. Modules can also build env files from secrets with <code>sops.templates</code>, which is how each app gets its Authentik client ID and secret.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ 9. ISOS ============ -->
+<section class="sec" id="isos">
+  <div class="sec-head">
+    <p class="eyebrow">isos/* · lib/installer.nix · lib/live.nix · tests/upgrade</p>
+    <h2>ISOs and tests</h2>
+    <p class="lede">A file in <code>isos/</code> becomes a bootable image. The two kinds look alike on a USB stick but do opposite jobs.</p>
+  </div>
+  <div class="compare">
+    <div class="h"></div><div class="h a">isos/couchthink.nix · mkIso</div><div class="h b">isos/amnesiac · mkLiveIso</div>
+    <div class="rl">The spec</div><div><code>{ host = "couchthink"; offline = true; }</code></div><div><code>{ kind = "live"; modules = [ ./system.nix ]; }</code></div>
+    <div class="rl">What boots</div><div>A minimal console with <code>nmtui</code> and one command, <code>install-couchthink</code></div><div>A full LXQt desktop, logged in as <code>amnesia</code></div>
+    <div class="rl">What it does</div><div>Wipes the disks from the host's disko layout (you type ERASE), then runs <code>nixos-install</code>. Offline mode embeds the whole system, so no network is needed.</div><div>Sends all TCP and DNS through Tor with an nftables kill switch, randomises MAC addresses, and runs from a read-only image with a RAM overlay.</div>
+    <div class="rl">Afterwards</div><div>The machine is <code>couchthink</code>; the stick is no longer needed</div><div>Nothing survives power-off, unless you set up the optional encrypted persistence partition on the same stick</div>
+  </div>
+
+  <div class="sub">
+    <h3>Upgrade tests <small>tests/upgrade/tandoor.nix · paperless.nix</small></h3>
+    <div class="prose"><p>Renovate bumps container images, and a new image can break a database migration. These NixOS VM tests catch that before it reaches klaus:</p></div>
+    <ol class="steps">
+      <li>Boot a VM on the <code>old</code> specialisation, which pins the previous image (Tandoor 2.4.0, Paperless 2.13.5), and let it create its Postgres database.</li>
+      <li>Switch the same VM to the module's current image, against the same data.</li>
+      <li>Request an API endpoint that touches the database. 200, 401 or 403 pass; a 500 means the migration broke.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 10. CHEATS ============ -->
+<section class="sec" id="cheats">
+  <div class="sec-head">
+    <p class="eyebrow">Justfile · nix</p>
+    <h2>Cheat sheet</h2>
+    <p class="lede">Run these from the repo root. <code>nix develop</code> (or <code>direnv allow</code>) gives you <code>just</code>, <code>sops</code>, <code>nh</code> and <code>cachix</code>.</p>
+  </div>
+  <div class="cheats" id="cheats-list"></div>
+</section>
+
+<!-- ============ 11. LOOSE ============ -->
+<section class="sec" id="loose">
+  <div class="sec-head">
+    <p class="eyebrow">grep -L enable</p>
+    <h2>Dormant code</h2>
+    <p class="lede">Files that exist but don't currently affect any machine. Good to know before you go looking for why something isn't happening.</p>
+  </div>
+  <ul class="loose">
+    <li><code>hosts/darwin/bigmac</code>, <code>modules/darwin/</code><span>The <code>darwinHosts</code> block in <code>flake.nix</code> is commented out. The Mac gets only the standalone Home Manager config (<code>tiborpilz</code>).</span></li>
+    <li><code>hosts/nixos/minithink</code><span>Still uses Plasma 5 and old xserver option names, and is not in <code>checks</code>, so nothing confirms it still evaluates on 26.05.</span></li>
+    <li><code>modules/nixos/desktop/bspwm.nix</code><span>No host enables it. <code>home/config/bspwm</code> and <code>sxhkd</code> are its leftover dotfiles.</span></li>
+    <li><code>home/modules/gui/hyprland.nix</code><span>Guarded by <code>options.programs.hyprland</code>, which Home Manager doesn't define, so the block never applies (it also has a <code>home.packagzs</code> typo). Hyprland itself is enabled system-wide on the laptop.</span></li>
+    <li><code>home/modules/gui/terminal/alacritty.nix</code><span>Entirely commented out; kitty is the terminal.</span></li>
+    <li><code>hosts/nixos/klaus/wireguard.nix</code><span>Not imported. Netmaker and Tailscale replaced it.</span></li>
+    <li><code>plex</code>, <code>readarr</code>, <code>openhab</code>, <code>bitmagnet</code><span>Service modules no host enables. <code>nextcloud</code>, <code>sonarqube</code> and <code>gitea-sonarqube-bot</code> are explicitly set to false on klaus.</span></li>
+    <li><code>tests/tandoor.nix</code>, <code>tests/paperless.nix</code><span>Older smoke tests; only the <code>tests/upgrade/</code> versions are wired into the flake.</span></li>
+    <li><code>docs/deploy-rs.md</code><span>Referenced from comments in <code>flake.nix</code> and <code>deploy.yml</code>, but not in the repo.</span></li>
+    <li><code>home/config/zed/*.json</code><span>Committed as symlinks into <code>/nix/store</code>, so the files in git have no content.</span></li>
+  </ul>
+</section>
+
+<footer class="end">
+  <span>Generated from the repository at commit 2cefb6f (flake.lock bump), October 2026.</span>
+  <span>Counts come from the files themselves; nothing here was evaluated with <code>nix</code>.</span>
+</footer>
+</main>
+</div>
+<script>
+(function () {
+  "use strict";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+
+  /* ------------------------------------------------------------------ repo map */
+  var TREE = [
+    { id: "flake", label: "flake.nix", file: true, d: 0,
+      title: "flake.nix", crumb: "repo root",
+      desc: "The entry point. It pins 20 inputs and hands most of the work to <code>flake-utils-plus</code>'s <code>mkFlake</code>, which builds the hosts. <code>deploy</code>, <code>isos</code> and <code>checks</code> are merged in by hand afterwards. It also defines the overlays every host sees: <code>pkgs.unstable</code>, <code>pkgs.my</code> (this repo's packages), <code>codex</code>, <code>claude-code</code>, the Emacs overlay and Doom.",
+      rule: [["Picked up by", "Nix itself"], ["Produces", "every output: hosts, home configs, packages, apps, dev shells, formatter, ISOs, checks, the deploy node"]],
+      files: [["flake.lock", "exact revisions of all 44 lock nodes; a weekly workflow opens a PR to bump them"], ["default.nix", "a repo-root module added to every host (currently empty)"]] },
+    { id: "lib", label: "lib/", d: 0, n: "8",
+      title: "lib/", crumb: "repo root",
+      desc: "A small helper library exposed as <code>lib.my</code>. <code>lib/default.nix</code> runs <code>mapModules</code> over its own folder, so even the helpers are discovered automatically.",
+      rule: [["Picked up by", "<code>flake.nix</code>, which extends nixpkgs' lib with <code>lib.my</code>"], ["Add one", "drop <code>foo.nix</code> returning an attrset of functions; they appear as <code>lib.my.*</code>"]],
+      files: [["modules.nix", "<code>mapModules</code>, <code>mapModulesRec</code>, <code>mapModulesRec'</code>: the folder scanners behind all auto-discovery"], ["nixos.nix", "<code>mkHostAttrs</code>: per-host arguments; the hostname comes from the folder name"], ["installer.nix", "<code>mkIso</code>: an installer ISO for any host"], ["live.nix", "<code>mkLiveIso</code>: an ISO that is the system itself"], ["options.nix", "<code>mkOpt</code>, <code>mkBoolOpt</code>: option shorthands used by about 100 modules"], ["attrs.nix", "attrset utilities such as <code>mergeAttrs</code>"], ["flake.nix", "<code>mkApp</code>: exposes every package as <code>nix run .#name</code>"]] },
+    { id: "hosts", label: "hosts/nixos/", d: 0, n: "6",
+      title: "hosts/nixos/", crumb: "hosts/",
+      desc: "One folder per NixOS machine. The folder name is both the hostname and the output name: <code>hosts/nixos/klaus/</code> becomes <code>nixosConfigurations.klaus</code> with <code>networking.hostName = \"klaus\"</code>.",
+      rule: [["Picked up by", "<code>mapModules ./hosts/nixos</code> in <code>flake.nix</code>"], ["Produces", "<code>nixosConfigurations.&lt;name&gt;</code> for x86_64-linux"], ["Add one", "create <code>hosts/nixos/newbox/default.nix</code> (plus its hardware config), then <code>nixos-rebuild switch --flake .#newbox</code>"]],
+      files: [["klaus/", "home server: 42 services, ZFS, GTX 1080, Cloudflare tunnel"], ["edge/", "public VPS running the Netmaker control plane"], ["thinkyMcThinkpad/", "daily laptop: Plasma 6, Hyprland, fingerprint reader"], ["couchthink/", "ThinkPad X240 under the TV: Plasma Bigscreen, Steam, Spotify Connect"], ["minithink/", "older laptop on ZFS with Plasma 5"], ["wsl/", "NixOS inside WSL2, released as a tarball"]] },
+    { id: "darwin", label: "hosts/darwin/", d: 0, n: "1",
+      title: "hosts/darwin/", crumb: "hosts/",
+      desc: "A nix-darwin config for a work MacBook: Homebrew casks, yabai, skhd and Karabiner. It is not built: the <code>darwinHosts</code> block in <code>flake.nix</code> is commented out.",
+      rule: [["Picked up by", "nothing at the moment"], ["Instead", "the Mac uses the standalone Home Manager config <code>homeConfigurations.tiborpilz</code>"]],
+      files: [["bigmac/default.nix", "Homebrew taps, casks and brews, and a script that copies Nix apps into ~/Applications"]] },
+    { id: "shared", label: "modules/shared/", d: 0, n: "2",
+      title: "modules/shared/", crumb: "modules/",
+      desc: "Modules for every host, added through <code>hostDefaults</code> in <code>flake.nix</code>.",
+      rule: [["Picked up by", "<code>mapModulesRec'</code> in <code>hostDefaults</code>"], ["Add one", "drop a <code>.nix</code> file. It lands on every host immediately, so make it harmless by default."]],
+      files: [["nix-config.nix", "flakes on, trusted users, and the binary caches: cache.nixos.org, nix-community, tiborpilz, codex-cli"], ["options.nix", "<code>user</code> and <code>env</code> options; <code>env</code> entries become exported variables"]] },
+    { id: "modnixos", label: "modules/nixos/", d: 0, n: "57",
+      title: "modules/nixos/", crumb: "modules/",
+      desc: "The NixOS module library: 51 service modules, desktop and hardware modules, and the bridge that embeds Home Manager. Every one is imported into every host and does nothing until a host sets <code>enable = true</code>.",
+      rule: [["Picked up by", "<code>mapModulesRec' ./modules/nixos</code>; also exported as <code>nixosModules</code>"], ["Options", "<code>modules.services.*</code>, <code>modules.services.media.*</code>, <code>modules.desktop.*</code>, <code>modules.hardware.*</code>, <code>home.*</code>"], ["Add one", "declare <code>options.modules.services.foo.enable = mkBoolOpt false</code>, wrap the rest in <code>mkIf cfg.enable</code>, then enable it in a host"]],
+      files: [["services/", "51 self-hosted apps; see Services on klaus"], ["services/reverseProxy.nix", "the Caddy and cloudflared front door every service registers with"], ["desktop/", "bspwm (unused), keyd (AltGr+hjkl as arrows), and a guard that allows one desktop"], ["hardware/dp-link-guard.nix", "switches off a flapping DisplayPort output so the desktop doesn't stall"], ["home.nix", "embeds <code>home/</code> as <code>home-manager.users.tibor</code>; controlled by <code>home.enable</code> and <code>home.graphical</code>"]] },
+    { id: "moddarwin", label: "modules/darwin/", d: 0, n: "1",
+      title: "modules/darwin/", crumb: "modules/",
+      desc: "The Home Manager bridge for nix-darwin. It is a stub: its user config is empty, and no darwin host is built.",
+      rule: [["Picked up by", "nothing at the moment"]],
+      files: [["home.nix", "imports home-manager's darwin module; the <code>../../home</code> import is commented out"]] },
+    { id: "home", label: "home/", d: 0,
+      title: "home/", crumb: "repo root",
+      desc: "Everything about the user environment. <code>default.nix</code> lists packages and switches modules on; <code>modules/</code> holds the logic; <code>config/</code> holds raw dotfiles; <code>scripts/</code> go to <code>~/bin</code>.",
+      rule: [["Picked up by", "<code>modules/nixos/home.nix</code> on NixOS hosts, or <code>homeConfigurations</code> standalone"], ["Produces", "<code>homeConfigurations.tibor</code>, <code>.tiborpilz</code> and a <code>tibor@&lt;host&gt;</code> alias per host"]],
+      files: [["default.nix", "about 280 lines: packages (AI tools, CLI replacements, languages), module switches, Nix settings"], ["modules/", "53 Home Manager modules"], ["config/", "plain config files, symlinked into place"], ["scripts/", "shell helpers for ~/bin"]] },
+    { id: "hmods", label: "modules/", d: 1, n: "53",
+      title: "home/modules/", crumb: "home/",
+      desc: "Home Manager modules in folders: shell, editors, dev, gui, terminal, tools, mail, firefox, util. Each declares <code>modules.&lt;folder&gt;.&lt;name&gt;.enable</code>. Modules also feed each other: anything can append to <code>modules.shell.zsh.rcInit</code>.",
+      rule: [["Picked up by", "<code>mapModulesRec'</code> at the top of <code>home/default.nix</code>"], ["Add one", "create <code>home/modules/tools/foo.nix</code> with <code>options.modules.tools.foo.enable</code>, then set it to true in <code>home/default.nix</code>"]],
+      files: [["shell/zsh.nix", "gathers <code>rcInit</code>, <code>envInit</code> and aliases from other modules into one zshrc"], ["shell/jujutsu.nix", "jj settings, log templates, aliases and the Deno log views"], ["shell/tmux.nix", "tmux, plugins and worktree key bindings"], ["editors/emacs.nix", "installs <code>pkgs.my.doom-emacs</code> and links <code>~/.config/doom</code>"], ["firefox/default.nix", "profiles, addons, tridactyl and userChrome"]] },
+    { id: "hconfig", label: "config/", d: 1,
+      title: "home/config/", crumb: "home/",
+      desc: "Plain config files, not Nix: Doom Emacs, Neovim, the zsh theme, jj templates and Deno scripts, Firefox CSS, tridactyl, Zed, git and worktrunk. Most are symlinked out of the store to <code>~/Code/nixos/home/config</code>, so edits apply without a rebuild.",
+      rule: [["Picked up by", "<code>mkOutOfStoreSymlink</code> in the matching home module"], ["Catch", "the repo has to be checked out at <code>~/Code/nixos</code>"]],
+      files: [["doom/config.org", "2,781 lines of literate config, tangled to config.el"], ["neovim/lua/plugins/", "37 lazy.nvim spec files; 107 plugins pinned in lazy-lock.json"], ["neovim/lua/neotree-lsp-symbols/", "an in-repo Neovim plugin with plenary tests"], ["jj/jj-pretty.ts", "the Deno script behind <code>jj pretty</code>"], ["firefox/chrome/userChrome.css", "423 lines: hidden tab bar, auto-hiding Sidebery"]] },
+    { id: "hscripts", label: "scripts/", d: 1, n: "4",
+      title: "home/scripts/", crumb: "home/",
+      desc: "Shell scripts installed to <code>~/bin</code> by <code>modules.scripts</code>, with zsh completions.",
+      rule: [["Picked up by", "<code>home/modules/scripts.nix</code>"]],
+      files: [["codedirs", "pick a repo under ~/Code with fzf and cd there (alias <code>ccd</code>)"], ["gotoworkspace", "pick a repo and open or attach its tmux or smug session (alias <code>gw</code>)"], ["wtmux", "keeps one tmux session per git worktree"], ["npr", "fzf over package.json scripts, then run one"]] },
+    { id: "packages", label: "packages/", d: 0, n: "7",
+      title: "packages/", crumb: "repo root",
+      desc: "Custom packages. Each subfolder's <code>default.nix</code> returns an attrset; they are merged into <code>packages.&lt;system&gt;</code>, offered to every host as <code>pkgs.my.*</code>, and runnable as <code>nix run .#&lt;name&gt;</code>.",
+      rule: [["Picked up by", "<code>mapModules ./packages</code> in <code>outputsBuilder</code>"], ["Add one", "create <code>packages/foo/default.nix</code> returning <code>{ foo = pkgs.callPackage ./foo.nix { }; }</code>"]],
+      files: [["emacs/", "emacsWrapped, doom-emacs, doom-emacs-standalone"], ["claude-desktop/", "Anthropic's official Linux .deb, repackaged, with an update script"], ["pie/", "the language from <em>The Little Typer</em>, built from source"], ["third-party/", "diffx, difit and wtp"], ["scripts/", "ansi2tmux, bw2pass, git-utils"], ["site/", "the GitHub Pages site: README plus screenshots, via pandoc"], ["utils/", "flakeRepl (the default <code>nix run</code>) and generateTaskfile"]] },
+    { id: "isos", label: "isos/", d: 0, n: "2",
+      title: "isos/", crumb: "repo root",
+      desc: "Bootable images. A spec with <code>kind = \"live\"</code> goes to <code>mkLiveIso</code>; anything else is an installer for the named host via <code>mkIso</code>.",
+      rule: [["Picked up by", "<code>mapModules ./isos</code>"], ["Produces", "<code>isos.&lt;name&gt;</code> (not per-system)"], ["Add one", "<code>isos/edge.nix</code> containing <code>{ host = \"edge\"; }</code> gives you <code>nix build .#isos.edge</code>"]],
+      files: [["couchthink.nix", "offline installer for the TV box"], ["amnesiac/", "a Tails-like Tor live system with optional encrypted persistence"]] },
+    { id: "tests", label: "tests/", d: 0, n: "4",
+      title: "tests/", crumb: "repo root",
+      desc: "NixOS VM tests that make sure a container image upgrade doesn't break the app's database. They are listed by hand in <code>flake.nix</code> as packages and checks.",
+      rule: [["Picked up by", "explicit imports in <code>flake.nix</code>"]],
+      files: [["upgrade/tandoor.nix", "Tandoor 2.4.0 → current"], ["upgrade/paperless.nix", "Paperless 2.13.5 → current"], ["tandoor.nix, paperless.nix", "older smoke tests, not referenced"]] },
+    { id: "ci", label: ".github/workflows/", d: 0, n: "8",
+      title: ".github/workflows/", crumb: "repo root",
+      desc: "GitHub Actions, every action pinned by commit SHA. Woodpecker (self-hosted on klaus, <code>.woodpecker.yml</code>) and Tangled (<code>.tangled/</code>) run extra Emacs builds.",
+      rule: [["Secrets used", "CACHIX_AUTH_TOKEN, DEPLOY_SSH_KEY, Cloudflare Access and Tailscale OAuth credentials, SONAR_TOKEN"]],
+      files: [["build.yml", "three Emacs builds on Linux and macOS, pushed to Cachix"], ["deploy.yml", "manual deploy-rs to klaus over Cloudflare or Tailscale"], ["pages.yml", "<code>nix build .#site</code>, then GitHub Pages"], ["update-flake-lock.yml", "weekly flake.lock PR"], ["wsl.yml", "builds and releases nixos.wsl"], ["screenshots.yml", "renders terminal screenshots with kitty under Xvfb"], ["sonar.yml, zizmor…yml", "code quality and workflow security scans"]] },
+    { id: "just", label: "Justfile", file: true, d: 0,
+      title: "Justfile + servers.env", crumb: "repo root",
+      desc: "Day-to-day commands. <code>servers.env</code> maps host names to addresses (LAN IPs, a Tailscale IP, edge's SSH port) and <code>just</code> loads it automatically.",
+      rule: [["Name tricks", "<code>klaus.tailscale</code> reads <code>KLAUS_TAILSCALE</code>; <code>EDGE_PORT</code> sets the SSH port"]],
+      files: [["deploy · deploy-push · deploy-rs", "three ways to update a server"], ["switch · homemanager", "update the machine you are on"], ["iso · iso-write · vm-iso · vm-usb", "build, write and test ISOs"], ["screenshots", "regenerate the showcase images"]] },
+    { id: "sops", label: ".sops.yaml", file: true, d: 0,
+      title: ".sops.yaml", crumb: "repo root",
+      desc: "Lists who can decrypt secrets: your age key, an age key per server and a PGP key. The single rule covers every file directly inside a <code>secrets/</code> folder.",
+      rule: [["Used by", "the <code>sops</code> CLI when you edit, and sops-nix on each host"]],
+      files: [["hosts/nixos/klaus/secrets/secrets.yaml", "about 25 secrets for klaus"], ["hosts/nixos/edge/secrets/secrets.yaml", "the Netmaker env file"]] },
+    { id: "shell", label: "shell.nix", file: true, d: 0,
+      title: "shell.nix + .envrc", crumb: "repo root",
+      desc: "The dev shell (<code>.envrc</code> says <code>use flake</code>). <code>default</code> has git, just, sops, nh, cachix, home-manager and Node; <code>screenshots</code> has the tools for rendering terminal screenshots.",
+      rule: [["Enter it", "<code>direnv allow</code> or <code>nix develop</code>"]],
+      files: [["renovate.json", "Renovate bumps flake inputs and container <code>image = \"…\"</code> tags"]] },
+    { id: "screens", label: "screenshots/", d: 0,
+      title: "screenshots/ + site/", crumb: "repo root",
+      desc: "<code>generate.sh</code> builds a mock git repo, renders terminal scenes with termshot or with kitty under Xvfb, and frames each shot. <code>packages/site</code> turns README.md plus these PNGs into the GitHub Pages site.",
+      rule: [["Run", "<code>just screenshots</code>"]],
+      files: [["output/*.png", "bat, fzf, git diff and graph, Neovim, tmux, zsh prompt"], ["site/styles.css", "the Pages site's stylesheet"]] }
+  ];
+
+  var tree = $("#tree"), detail = $("#detail");
+  TREE.forEach(function (t, i) {
+    var li = document.createElement("li");
+    var b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("role", "option");
+    b.setAttribute("data-depth", t.d);
+    b.setAttribute("data-id", t.id);
+    b.id = "tree-" + t.id;
+    b.innerHTML = '<span class="' + (t.file ? "file" : "dir") + '">' + t.label + "</span>" + (t.n ? '<span class="n">' + t.n + "</span>" : "");
+    b.addEventListener("click", function () { select(i, true); });
+    li.appendChild(b);
+    tree.appendChild(li);
+  });
+  var buttons = tree.querySelectorAll("button");
+  function select(i, focus) {
+    var t = TREE[i];
+    buttons.forEach(function (b, j) {
+      b.setAttribute("aria-selected", j === i ? "true" : "false");
+      b.tabIndex = j === i ? 0 : -1;
+    });
+    if (focus) buttons[i].focus();
+    var rules = t.rule.map(function (r) { return "<dt>" + r[0] + "</dt><dd>" + r[1] + "</dd>"; }).join("");
+    var files = t.files.map(function (f) { return "<li><code>" + f[0] + "</code><span>" + f[1] + "</span></li>"; }).join("");
+    detail.innerHTML = '<span class="crumb">' + t.crumb + "</span><h3>" + t.title + "</h3><p>" + t.desc + '</p><dl class="rule">' + rules + '</dl><ul class="keyfiles">' + files + "</ul>";
+    try { localStorage.setItem("atlas-tree", t.id); } catch (e) {}
+  }
+  tree.addEventListener("keydown", function (e) {
+    var cur = Array.prototype.indexOf.call(buttons, document.activeElement);
+    if (cur < 0) return;
+    if (e.key === "ArrowDown") { e.preventDefault(); select(Math.min(cur + 1, buttons.length - 1), true); }
+    if (e.key === "ArrowUp") { e.preventDefault(); select(Math.max(cur - 1, 0), true); }
+  });
+  var startTree = 0;
+  try { var saved = localStorage.getItem("atlas-tree"); TREE.forEach(function (t, i) { if (t.id === saved) startTree = i; }); } catch (e) {}
+  select(startTree, false);
+
+  /* ------------------------------------------------------------------ switchboard */
+  var SW_GROUPS = [
+    ["modules.services", ["attic", "authentik", "bitmagnet", "excalidraw", "firefly-iii", "forgejo", "frigate", "gaggiuino-local-profiler", "gitea-sonarqube-bot", "homepage", "karakeep", "linkding", "linkwarden", "monitoring", "monitoring.netdata", "mosquitto", "netmaker", "nextcloud", "openhab", "paperless", "penpot", "reverseProxy", "sonarqube", "syncthing", "tandoor", "voice", "woodpecker"]],
+    ["modules.services.media", ["audiobookshelf", "bookorbit", "calibre", "deluge", "flaresolverr", "immich", "immich-public-proxy", "jackett", "jellyfin", "komga", "music-assistant", "pinchflat", "plex", "prowlarr", "radarr", "readarr", "shelfarr", "shelfmark", "sonarr"]],
+    ["modules.services.media.music", ["aurral", "lidarr", "navidrome", "slskd", "soularr"]],
+    ["modules.desktop · modules.hardware", ["desktop.bspwm", "desktop.keyd", "hardware.dpLinkGuard"]],
+    ["home-manager bridge (default on)", ["home.enable"]]
+  ];
+  var klausOff = ["bitmagnet", "gitea-sonarqube-bot", "netmaker", "nextcloud", "openhab", "sonarqube", "monitoring.netdata", "plex", "readarr", "desktop.bspwm", "desktop.keyd", "hardware.dpLinkGuard", "home.enable"];
+  var HOSTS_SW = {
+    klaus: { on: function (m) { return klausOff.indexOf(m) < 0; },
+      code: 'imports = [ ./hardware-configuration.nix ./samba.nix ];\nsops.defaultSopsFile = ./secrets/secrets.yaml;\nhome.enable = <span class="s">false</span>;\n\nmodules.services = {\n  reverseProxy.enable = <span class="s">true</span>;   <span class="c"># hostname = "tiborpilz.xyz"</span>\n  homepage.enable     = <span class="s">true</span>;\n  paperless.enable    = <span class="s">true</span>;\n  authentik.enable    = <span class="s">true</span>;\n  media.immich.enable   = <span class="s">true</span>;\n  media.jellyfin.enable = <span class="s">true</span>;\n  media.music.navidrome.enable = <span class="s">true</span>;\n  <span class="c"># …and 35 more</span>\n};' },
+    edge: { on: function (m) { return m === "netmaker"; },
+      code: 'imports = [ ./hardware-configuration.nix ./disko.nix ];\nboot.loader.grub.enable = <span class="s">true</span>;\nservices.openssh.ports = [ <span class="s">2222</span> ];\nhome.enable = <span class="s">false</span>;\n\nmodules.services.netmaker = {\n  enable  = <span class="s">true</span>;\n  domain  = <span class="s">"netmaker.tiborpilz.xyz"</span>;\n  envFile = config.sops.secrets.netmakerEnv.path;\n};' },
+    thinkyMcThinkpad: { on: function (m) { return ["desktop.keyd", "hardware.dpLinkGuard", "home.enable"].indexOf(m) >= 0; },
+      code: 'services.desktopManager.plasma6.enable = <span class="s">true</span>;\nprograms.hyprland.enable = <span class="s">true</span>;\nservices.fprintd.enable  = <span class="s">true</span>;\n\nmodules.desktop.keyd.enable = <span class="s">true</span>;\nmodules.hardware.dpLinkGuard.enable = <span class="s">true</span>;  <span class="c"># flaky Thunderbolt dock</span>\n\nhome.enable    = <span class="s">true</span>;\nhome.graphical = <span class="s">true</span>;' },
+    couchthink: { on: function () { return false; },
+      code: 'imports = [ ./hardware-configuration.nix ./disko.nix ];\nservices.displayManager.defaultSession = <span class="s">"plasma-bigscreen-wayland"</span>;\nservices.displayManager.autoLogin.user = <span class="s">"media"</span>;\nprograms.steam.enable = <span class="s">true</span>;\nsystemd.user.services.snapclient = { … };  <span class="c"># audio from klaus</span>\nsystemd.user.services.librespot  = { … };  <span class="c"># Spotify Connect "Couch"</span>\nhome.enable = <span class="s">false</span>;  <span class="c"># no custom modules at all</span>' },
+    minithink: { on: function (m) { return m === "home.enable"; },
+      code: 'imports = [ ./hardware-configuration.nix ];  <span class="c"># root on ZFS</span>\nservices.xserver.desktopManager.plasma5.enable = <span class="s">true</span>;\nhome.enable = <span class="s">true</span>;' },
+    wsl: { on: function (m) { return m === "home.enable"; },
+      code: 'imports = [ inputs.nixos-wsl.nixosModules.default ];\nwsl.enable = <span class="s">true</span>;\nwsl.defaultUser = <span class="s">"tibor"</span>;\nhome.enable    = <span class="s">true</span>;\nhome.graphical = <span class="s">false</span>;' }
+  };
+  var chipsEl = $("#sw-chips"), tabsEl = $("#host-tabs");
+  var chipNodes = [];
+  SW_GROUPS.forEach(function (g) {
+    var lab = document.createElement("span");
+    lab.className = "group";
+    lab.textContent = g[0];
+    chipsEl.appendChild(lab);
+    g[1].forEach(function (m) {
+      var c = document.createElement("span");
+      c.className = "chip";
+      c.textContent = m;
+      c.setAttribute("data-m", m);
+      chipsEl.appendChild(c);
+      chipNodes.push(c);
+    });
+  });
+  var totalMods = chipNodes.length;
+  Object.keys(HOSTS_SW).forEach(function (h) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = h;
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", function () { showHost(h); });
+    tabsEl.appendChild(b);
+  });
+  function showHost(h) {
+    var spec = HOSTS_SW[h], n = 0;
+    chipNodes.forEach(function (c) {
+      var on = spec.on(c.getAttribute("data-m"));
+      c.classList.toggle("on", on);
+      if (on) n++;
+    });
+    tabsEl.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", b.textContent === h ? "true" : "false"); });
+    $("#sw-count").textContent = n + " of " + totalMods + " switches on for " + h + "; the rest are imported but inert";
+    $("#sw-file").textContent = "3 · hosts/nixos/" + h + "/default.nix";
+    $("#sw-code").innerHTML = spec.code;
+    $("#sw-store").textContent = "/nix/store/…-nixos-system-" + h + "-26.05.…";
+  }
+  showHost("klaus");
+
+  /* ------------------------------------------------------------------ host cards */
+  var HOSTS = [
+    { name: "klaus", tag: ["server", "server"], role: "Home server. Runs nearly every service in this repo.",
+      facts: [["Hardware", "AMD CPU, GTX 1080 for transcoding and local AI, ZFS pool at /data, CPU capped at 1.2 GHz to keep it cool"], ["Network", "LAN .51, Cloudflare tunnel, Tailscale, Netmaker mesh"], ["Runs", "42 service modules, Samba and NFS shares, Vikunja"], ["Deploy", "<code>just deploy klaus</code> or deploy-rs with rollback"]] },
+    { name: "edge", tag: ["server", "server"], role: "Public VPS. Control plane for the Netmaker WireGuard mesh.",
+      facts: [["Hardware", "KVM virtual machine, GRUB, disks laid out by disko"], ["Network", "public IP, SSH on 2222, forwards port 22 into the mesh"], ["Runs", "Netmaker server, UI and MQTT broker as quadlet containers behind Caddy"], ["Deploy", "<code>just deploy edge</code>"]] },
+    { name: "thinkyMcThinkpad", tag: ["desktop", "desk"], role: "Daily laptop, a ThinkPad X13.",
+      facts: [["Hardware", "AMD, btrfs subvolumes, Goodix fingerprint reader (skipped when the lid is closed)"], ["Desktop", "Plasma 6 and Hyprland; SDDM themed to match the Plasma wallpaper"], ["Network", "Tailscale with a tray icon, KDE Connect, snapcast client"], ["Deploy", "<code>just switch</code> on the laptop itself"]] },
+    { name: "couchthink", tag: ["desktop", "desk"], role: "ThinkPad X240 with its lid shut, under the TV.",
+      facts: [["Hardware", "Haswell graphics, no HEVC decoding, so Jellyfin and Moonlight stick to H.264 and klaus transcodes"], ["Desktop", "Plasma Bigscreen, autologin, Steam Big Picture, Xbox controller"], ["Audio", "snapcast from klaus; Spotify Connect endpoint called “Couch”"], ["Deploy", "<code>just deploy-push couchthink</code>, or the offline installer ISO"]] },
+    { name: "minithink", tag: ["desktop", "desk"], role: "Older Intel laptop.",
+      facts: [["Hardware", "root on ZFS, split into rpool/local and rpool/safe datasets"], ["Desktop", "Plasma 5 on X11"], ["Status", "not in <code>checks</code>; may not evaluate on 26.05"], ["Deploy", "locally"]] },
+    { name: "wsl", tag: ["guest", ""], role: "NixOS inside WSL2 on Windows.",
+      facts: [["Hardware", "none of its own: Windows supplies the kernel and the GUI"], ["Home", "the full Home Manager config, without GUI parts"], ["Ships as", "<code>nixos.wsl</code>, rebuilt by <code>wsl.yml</code> and released as <code>wsl-latest</code>"], ["Install", "<code>wsl --install --from-file nixos.wsl</code>"]] },
+    { name: "bigmac", tag: ["not built", ""], dormant: true, role: "Work MacBook, described with nix-darwin.",
+      facts: [["Status", "folder exists, but the flake doesn't build darwin hosts"], ["Gets", "the standalone Home Manager config <code>tiborpilz</code>, checked for aarch64-darwin"], ["Would add", "Homebrew casks, yabai, skhd, Karabiner"]] }
+  ];
+  $("#hosts").innerHTML = HOSTS.map(function (h) {
+    return '<article class="host' + (h.dormant ? " dormant" : "") + '"><header><h3>' + h.name + '</h3><span class="tag ' + h.tag[1] + '">' + h.tag[0] + '</span></header><p class="role">' + h.role + '</p><dl class="facts">' +
+      h.facts.map(function (f) { return "<dt>" + f[0] + "</dt><dd>" + f[1] + "</dd>"; }).join("") + "</dl></article>";
+  }).join("");
+
+  /* ------------------------------------------------------------------ services */
+  // [option path, what it is, how it runs, address, category, state]  state: k = on klaus, e = on edge, f = set false, - = unused
+  var SVC = [
+    ["reverseProxy", "Caddy plus Cloudflare tunnel: the front door", "native", "*.tiborpilz.xyz", "Infra", "k"],
+    ["netmaker", "WireGuard mesh VPN control plane", "quadlet", "netmaker.tiborpilz.xyz", "Infra", "e"],
+    ["homepage", "dashboard with an up/down tile per service", "native", "dashboard.", "Infra", "k"],
+    ["authentik", "identity provider for single sign-on (OIDC)", "quadlet", "auth.", "Auth", "k"],
+    ["monitoring", "Prometheus, Grafana and unifi-poller", "native + containers", "grafana.", "Monitoring", "k"],
+    ["monitoring.netdata", "real-time metrics kept in RAM", "native", "", "Monitoring", "f"],
+    ["forgejo", "Git forge with Actions", "native", "forgejo.", "Dev & CI", "k"],
+    ["woodpecker", "CI server and agent, signs in with Forgejo", "native", "ci.", "Dev & CI", "k"],
+    ["attic", "self-hosted Nix binary cache", "native", "cache.", "Dev & CI", "k"],
+    ["sonarqube", "code quality analysis", "quadlet", "sonarqube.", "Dev & CI", "f"],
+    ["gitea-sonarqube-bot", "posts SonarQube results on Forgejo PRs", "quadlet", "sonarbot.", "Dev & CI", "f"],
+    ["paperless", "document archive with OCR (paperless-ngx)", "quadlet", "paperless.", "Docs & notes", "k"],
+    ["tandoor", "recipe manager", "quadlet", "tandoor.", "Docs & notes", "k"],
+    ["linkding", "bookmark manager", "OCI", "linkding.", "Docs & notes", "k"],
+    ["linkwarden", "bookmarks with page archiving", "quadlet", "linkwarden.", "Docs & notes", "k"],
+    ["karakeep", "bookmarks with AI tagging", "quadlet", "karakeep.", "Docs & notes", "k"],
+    ["excalidraw", "whiteboard", "OCI", "excalidraw.", "Docs & notes", "k"],
+    ["penpot", "design and prototyping", "quadlet", "penpot.", "Docs & notes", "k"],
+    ["syncthing", "file sync", "native", "syncthing.", "Docs & notes", "k"],
+    ["nextcloud", "files and groupware", "NixOS container", "nextcloud.", "Docs & notes", "f"],
+    ["firefly-iii", "personal finance, with a FinTS bank importer", "OCI", "firefly.", "Finance", "k"],
+    ["frigate", "camera recorder with object detection on the GPU", "quadlet", "frigate.", "Home", "k"],
+    ["mosquitto", "MQTT broker for Frigate and Home Assistant", "native + OCI", "mqttx.", "Home", "k"],
+    ["voice", "local voice assistant: Whisper, Piper, Ollama", "native", "ollama. (LAN only)", "Home", "k"],
+    ["gaggiuino-local-profiler", "espresso shot profiler", "OCI", "coffee.", "Home", "k"],
+    ["openhab", "home automation hub", "OCI", "", "Home", "-"],
+    ["media.immich", "photo library, a Google Photos alternative", "quadlet", "immich.", "Media", "k"],
+    ["media.immich-public-proxy", "public share links for Immich", "quadlet", "tibor.pics", "Media", "k"],
+    ["media.jellyfin", "movie and TV streaming", "native", "jellyfin.", "Media", "k"],
+    ["media.plex", "media server", "OCI", "plex.", "Media", "-"],
+    ["media.audiobookshelf", "audiobooks and podcasts", "OCI", "audiobookshelf.", "Media", "k"],
+    ["media.bookorbit", "e-book and comic reader", "quadlet", "bookorbit.", "Media", "k"],
+    ["media.calibre", "e-book library and Calibre-Web", "OCI", "calibre-web.", "Media", "k"],
+    ["media.komga", "comics and manga", "OCI", "komga.", "Media", "k"],
+    ["media.music-assistant", "music library, players and the snapcast server", "quadlet", "music-assistant.", "Media", "k"],
+    ["media.music.navidrome", "music streaming (Subsonic API)", "quadlet", "navidrome.", "Media", "k"],
+    ["media.sonarr", "TV show automation", "OCI", "sonarr.", "Downloads", "k"],
+    ["media.radarr", "movie automation", "OCI", "radarr.", "Downloads", "k"],
+    ["media.readarr", "book automation", "OCI", "readarr.", "Downloads", "-"],
+    ["media.prowlarr", "indexer manager for the *arr apps", "quadlet", "prowlarr.", "Downloads", "k"],
+    ["media.jackett", "torrent indexer proxy", "OCI", "jackett.", "Downloads", "k"],
+    ["media.flaresolverr", "solves Cloudflare challenges for indexers", "OCI", "", "Downloads", "k"],
+    ["media.deluge", "torrent client behind a PIA VPN", "OCI + gluetun", "deluge.", "Downloads", "k"],
+    ["media.pinchflat", "YouTube archiver", "quadlet", "pinchflat.", "Downloads", "k"],
+    ["media.shelfmark", "book search and download", "OCI", "shelfmark.", "Downloads", "k"],
+    ["media.shelfarr", "book requests", "OCI", "shelfarr.", "Downloads", "k"],
+    ["bitmagnet", "DHT torrent crawler and indexer", "quadlet", "bitmagnet.", "Downloads", "-"],
+    ["media.music.lidarr", "music acquisition", "quadlet", "lidarr.", "Downloads", "k"],
+    ["media.music.slskd", "Soulseek client behind its own VPN", "quadlet", "slskd.", "Downloads", "k"],
+    ["media.music.soularr", "connects Lidarr to slskd", "quadlet", "soularr.", "Downloads", "k"],
+    ["media.music.aurral", "music requests and discovery", "quadlet", "aurral.", "Downloads", "k"]
+  ];
+  var CATS = ["All", "Media", "Downloads", "Docs & notes", "Dev & CI", "Home", "Infra", "Monitoring", "Auth", "Finance"];
+  var STATE = { k: ["on klaus", "on"], e: ["on edge", "on"], f: ["set to false", "off"], "-": ["not enabled", "off"] };
+  var cat = "All", q = "";
+  var catsEl = $("#svc-cats");
+  CATS.forEach(function (c) {
+    var n = c === "All" ? SVC.length : SVC.filter(function (s) { return s[4] === c; }).length;
+    var b = document.createElement("button");
+    b.type = "button";
+    b.innerHTML = c + '<span class="n">' + n + "</span>";
+    b.setAttribute("data-c", c);
+    b.setAttribute("aria-pressed", c === cat ? "true" : "false");
+    b.addEventListener("click", function () { cat = c; renderSvc(); });
+    catsEl.appendChild(b);
+  });
+  $("#svc-q").addEventListener("input", function (e) { q = e.target.value.trim().toLowerCase(); renderSvc(); });
+  function renderSvc() {
+    catsEl.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-c") === cat ? "true" : "false"); });
+    var list = SVC.filter(function (s) {
+      return (cat === "All" || s[4] === cat) && (!q || (s[0] + " " + s[1] + " " + s[2]).toLowerCase().indexOf(q) >= 0);
+    });
+    var on = list.filter(function (s) { return s[5] === "k" || s[5] === "e"; }).length;
+    $("#svc-count").textContent = list.length ? list.length + " modules shown, " + on + " of them running" : "No module matches that filter.";
+    $("#svc-grid").innerHTML = list.map(function (s) {
+      var st = STATE[s[5]];
+      var url = s[3] ? (s[3].slice(-1) === "." ? s[3] + "tiborpilz.xyz" : s[3]) : "no public address";
+      return '<article class="svc' + (st[1] === "off" ? " idle" : "") + '"><header><h4>' + s[0] + '</h4><span class="state ' + st[1] + '">' + st[0] + "</span></header><p>" + s[1] +
+        '</p><div class="meta"><span>' + s[2] + '</span><span class="url">' + url + "</span></div></article>";
+    }).join("");
+  }
+  renderSvc();
+
+  /* ------------------------------------------------------------------ home modules */
+  // state: 1 on, 0 off, 2 conditional
+  var HM = [
+    ["shell", [["zsh", 1, "hooks, aliases and the .zshrc"], ["atuin", 1, "searchable shell history"], ["zoxide", 1, "jump to frequent directories"], ["direnv", 1, "per-project env with nix-direnv"], ["devenv", 1, "devenv, without the shell hook"], ["mise", 1, "tool version manager"], ["git", 1, "signed commits, worktree tools"], ["gnupg", 1, "gpg-agent for SSH, YubiKey"], ["jujutsu", 1, "jj config, templates, log views"], ["tmux", 1, "tmux, plugins, worktree sessions"], ["zk", 1, "plain-text notes, daily templates"], ["manix", 1, "search Nix docs with fzf"], ["pay-respects", 1, "fix the last command: heck"]]],
+    ["editors", [["emacs", 1, "Doom Emacs from pkgs.my"], ["neovim", 1, "Neovim plus symlinked config"], ["zed", 1, "Zed editor"], ["lsp", 1, "marksman for Markdown"]]],
+    ["dev", [["rust", 1, "rustup"], ["web", 1, "node, bun, deno, pnpm, TypeScript"], ["cloud", 1, "kubectl, helm, terraform, gcloud"], ["nix", 1, "nh, nil"], ["python", 1, "python3, uv"], ["gleam", 1, "gleam and erlang"], ["lean", 1, "elan"], ["pie", 1, "Pie REPL"], ["lua", 1, "lua 5.1, luarocks"], ["jsonnet", 1, "jsonnet"], ["dhall", 1, "dhall"], ["docker", 1, "docker CLI"], ["colima", 2, "macOS only"], ["sage", 0, "SageMath"]]],
+    ["tools", [["container", 1, "podman and podman-compose"], ["podman", 1, "podman TUI and compose"], ["aws", 1, "awscli2 with SSM"], ["graphify", 1, "code graph CLI and MCP server"], ["pi", 1, "pi coding agent"], ["mermaid", 2, "pulled in by emacs"], ["vagrant", 0, "vagrant and VirtualBox"]]],
+    ["gui · terminal", [["gui.plasma", 2, "when graphical, via plasma-manager"], ["gui.kmail", 2, "when graphical, on Linux"], ["gui.hyprland", 2, "never active, see Dormant code"], ["terminal.kitty", 1, "Nord theme, FiraCode Nerd Font"]]],
+    ["top level", [["firefox", 1, "profiles, addons, tridactyl"], ["mail", 1, "mbsync, msmtp, mu, aerc, neomutt"], ["scripts", 1, "home/scripts into ~/bin"], ["password-store", 1, "pass, with extra GPG ids"], ["tailTray", 2, "the laptop turns it on"], ["snapclient", 2, "on the Mac, for klaus"], ["syncthing", 0, "unused; services.syncthing is set directly"], ["bitwarden", 0, "replaced by pass"]]]
+  ];
+  $("#hm-groups").innerHTML = HM.map(function (g) {
+    return '<div class="hm-group"><h4>' + g[0] + "</h4><ul>" + g[1].map(function (m) {
+      var cls = m[1] === 1 ? "on" : m[1] === 2 ? "cond" : "";
+      return '<li class="' + cls + '"><span class="dot"></span><div><b>' + m[0] + "</b> <span>" + m[2] + "</span></div></li>";
+    }).join("") + "</ul></div>";
+  }).join("");
+
+  /* ------------------------------------------------------------------ cheat sheet */
+  var CHEATS = [
+    ["Every day", [["just switch", "Rebuild this machine (NixOS) or your home (anywhere else)"], ["just homemanager", "Apply only the home config, with nh"], ["nix develop", "Shell with just, sops, nh and cachix"], ["nix run", "Open a nix repl on this flake"], ["nix fmt", "Format with nixpkgs-fmt"]]],
+    ["Servers", [["just deploy klaus", "Build and switch on klaus over the LAN"], ["just deploy klaus dry", "The same, as a dry run"], ["just deploy klaus.tailscale", "Use klaus's Tailscale address"], ["just deploy edge", "Deploy the VPS (SSH port 2222)"], ["just deploy-push couchthink", "Build here, copy to the target"], ["just deploy-rs klaus", "deploy-rs through the tunnel, with rollback"]]],
+    ["Build and check", [["nix build .#nixosConfigurations.klaus.config.system.build.toplevel", "Build a host without switching to it"], ["nix build .#checks.x86_64-linux.doom-emacs", "Build what CI builds"], ["nix build .#testTandoorUpgrade", "Run an upgrade VM test"], ["nix build .#site", "Build the Pages site into ./result"]]],
+    ["ISOs and secrets", [["just iso amnesiac", "Build an ISO into ./result"], ["just vm-usb amnesiac", "Boot it from a simulated USB stick in QEMU"], ["just iso-write couchthink /dev/sdX", "Write the installer to a stick; erases it"], ["sops hosts/nixos/klaus/secrets/secrets.yaml", "Edit klaus's secrets"]]]
+  ];
+  $("#cheats-list").innerHTML = CHEATS.map(function (g) {
+    return '<div class="cheat"><h4>' + g[0] + "</h4>" + g[1].map(function (c) {
+      return '<div class="cmdrow"><code>' + c[0] + "</code><span>" + c[1] + '</span><button type="button" data-cmd="' + c[0] + '">Copy</button></div>';
+    }).join("") + "</div>";
+  }).join("");
+  $("#cheats-list").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-cmd]");
+    if (!b) return;
+    var cmd = b.getAttribute("data-cmd");
+    var done = function () { b.textContent = "Copied"; setTimeout(function () { b.textContent = "Copy"; }, 1400); };
+    var fallback = function () {
+      var code = b.parentNode.querySelector("code");
+      var r = document.createRange(); r.selectNodeContents(code);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      b.textContent = "Selected";
+      setTimeout(function () { b.textContent = "Copy"; }, 1400);
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(cmd).then(done, fallback);
+      else fallback();
+    } catch (err) { fallback(); }
+  });
+
+  /* ------------------------------------------------------------------ nav highlight */
+  var links = document.querySelectorAll(".rail a[href^='#']");
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        links.forEach(function (a) { a.classList.toggle("active", a.getAttribute("href") === "#" + en.target.id); });
+      });
+    }, { rootMargin: "-30% 0px -60% 0px" });
+    document.querySelectorAll("section.sec").forEach(function (s) { io.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>
