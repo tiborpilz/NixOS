@@ -77,7 +77,7 @@ assert lib.assertMsg (builtins.elem sabotage sabotages)
 
     virtualisation = {
       diskSize = 20480;
-      memorySize = 6144;
+      memorySize = 4096;
       cores = 2;
     };
 
