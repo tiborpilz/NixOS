@@ -75,7 +75,7 @@ assert lib.assertMsg (builtins.elem sabotage sabotages)
     virtualisation = {
       diskSize = 20480;
       memorySize = 6144;
-      cores = 4;
+      cores = 2;
     };
 
     environment.systemPackages = [ e2e pkgs.curl ];
@@ -86,7 +86,11 @@ assert lib.assertMsg (builtins.elem sabotage sabotages)
       inherit dbImage;
     };
 
+    # Started by the test script once the system bus is up (see below), not at boot.
+    virtualisation.quadlet.pods.tandoor-pod.autoStart = false;
     virtualisation.quadlet.containers = {
+      tandoor.autoStart = false;
+      tandoor-db.autoStart = false;
       # Everything comes from the preloaded archives; never reach for a registry.
       tandoor.containerConfig.pull = lib.mkForce "never";
       tandoor-db.containerConfig.pull = lib.mkForce "never";
@@ -137,6 +141,17 @@ assert lib.assertMsg (builtins.elem sabotage sabotages)
         return out
 
 
+    def ensure_pid1_on_bus():
+        # Without KVM, PID 1 occasionally loses the race to connect to the freshly
+        # started dbus-broker during boot and never gets back on the system bus;
+        # podman then cannot create the pod's cgroup. Re-exec reconnects it.
+        machine.wait_for_unit("dbus.service")
+        if machine.execute("busctl status org.freedesktop.systemd1")[0] != 0:
+            print("PID 1 is not on the system bus, re-executing systemd")
+            machine.succeed("systemctl daemon-reexec")
+            machine.wait_until_succeeds("busctl status org.freedesktop.systemd1", timeout=300)
+
+
     def container_id():
         return machine.succeed("podman inspect tandoor --format '{{.Id}}'").strip()
 
@@ -144,6 +159,9 @@ assert lib.assertMsg (builtins.elem sabotage sabotages)
     machine.start()
 
     with subtest(f"baseline {baseline} creates the database"):
+        machine.wait_for_unit("multi-user.target", timeout=3600)
+        ensure_pid1_on_bus()
+        machine.succeed("systemctl start --no-block tandoor-pod-pod.service")
         machine.wait_for_unit("tandoor-test-load-images.service", timeout=3600)
         machine.wait_for_unit("tandoor-db.service", timeout=1800)
         machine.wait_for_unit("tandoor.service", timeout=1800)
