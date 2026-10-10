@@ -9,6 +9,12 @@ let
   cfg = config.modules.services.tandoor;
   pg_data = "tandoor-pgdata";
 
+  # Kept as plain `image = "..."` bindings so renovate's regex manager finds them.
+  images = {
+    app.image = "docker.io/vabene1111/recipes:2.4.2";
+    db.image = "docker.io/postgres:14";
+  };
+
   oidcApp = config.modules.services.authentik.applications.tandoor or null;
   oidcEnabled = oidcApp != null;
   oidcProviderId = "authentik";
@@ -31,6 +37,8 @@ in
 {
   options.modules.services.tandoor = {
     enable = mkBoolOpt false;
+    image = mkOpt types.str images.app.image;
+    dbImage = mkOpt types.str images.db.image;
   };
 
   config = mkIf cfg.enable (mkMerge [
@@ -42,7 +50,7 @@ in
       system.activationScripts.backupTandoor = stringAfter [ "var" ] ''
         if ${pkgs.podman}/bin/podman volume exists tandoor-pgdata; then
           mkdir -p /data/backups
-          version=$(echo "${config.virtualisation.quadlet.containers.tandoor.containerConfig.image}" | rev | cut -d"/" -f1 | rev)
+          version=$(echo "${cfg.image}" | rev | cut -d"/" -f1 | rev)
           backup_suffix="$version-$(date +%Y-%m-%d_%H%M%S)"
           db_backup_name="tandoor-pgdata-$version-$(date +%Y-%m-%d_%H%M%S).tar"
           staticfiles_backup_name="tandoor-staticfiles-$version-$(date +%Y-%m-%d_%H%M%S)"
@@ -61,7 +69,7 @@ in
         {
           containers = {
             tandoor-db.containerConfig = {
-              image = "docker.io/postgres:14";
+              image = cfg.dbImage;
               volumes = [
                 "${pg_data}:/var/lib/postgresql/data"
               ];
@@ -74,7 +82,7 @@ in
             };
 
             tandoor.containerConfig = {
-              image = "docker.io/vabene1111/recipes:2.4.2";
+              image = cfg.image;
               volumes = [
                 "/var/lib/tandoor/staticfiles:/opt/recipes/staticfiles"
                 "/var/lib/tandoor/mediafiles:/opt/recipes/mediafiles"
