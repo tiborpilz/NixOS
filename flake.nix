@@ -231,7 +231,7 @@
           emacs = self.packages.x86_64-linux.emacsWrapped;
           doom-emacs = self.packages.x86_64-linux.doom-emacs;
           doom-emacs-standalone = self.packages.x86_64-linux.doom-emacs-standalone;
-          tandoor-upgrade = self.packages.x86_64-linux.testTandoorUpgrade;
+          testTandoorUpgrade = self.packages.x86_64-linux.testTandoorUpgrade;
           testPaperlessUpgrade = self.packages.x86_64-linux.testPaperlessUpgrade;
         } // inputs.deploy-rs.lib.x86_64-linux.deployChecks self.deploy;
         aarch64-darwin = {

@@ -107,6 +107,18 @@ vm-usb name size="16G" mem="4G":
     -vga virtio -display gtk \
     -netdev user,id=net0 -device virtio-net-pci,netdev=net0
 
+# Tandoor upgrade test: baseline -> module image, or -> a pinned VERSION
+test-tandoor version="":
+  nix build -L --no-link .#{{ if version == "" { "testTandoorUpgrade" } else { "testTandoorUpgradeTo_" + replace(version, ".", "_") } }}
+
+# Check that the tandoor upgrade test catches broken upgrades (slow, one VM each)
+test-tandoor-negative:
+  nix build -L --no-link .#testTandoorUpgradeSabotageMigration .#testTandoorUpgradeSabotageWeb
+
+# Re-pin the tandoor test images after bumping the module (extra refs become test targets)
+pin-tandoor-images *refs:
+  tests/tandoor/update-images.sh {{refs}}
+
 # Generate showcase screenshots
 screenshots:
   bash screenshots/generate.sh
