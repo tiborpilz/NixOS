@@ -19,6 +19,7 @@
   --line: #d2dae5;
   --nix: #3a5fa8;          /* NixOS dark blue, deepened for contrast on light paper */
   --nix-soft: #e1e9f7;
+  --nix-mid: #9db4df;
   --sky: #2f86b8;          /* NixOS light blue, used for overlay networks */
   --amber: #9a5800;        /* things you run: commands, the active path */
   --amber-soft: #fbeedb;
@@ -40,14 +41,14 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0b121d; --surface: #121b2a; --sunken: #0f1724; --ink: #e2e9f3; --muted: #95a3b8; --line: #243149;
-    --nix: #8fb1ee; --nix-soft: #1a2945; --sky: #7ebae4; --amber: #f0a440; --amber-soft: #3a2a14;
+    --nix: #8fb1ee; --nix-soft: #1a2945; --nix-mid: #3d5a8f; --sky: #7ebae4; --amber: #f0a440; --amber-soft: #3a2a14;
     --on: #62c48f; --on-soft: #143524; --off: #66738a;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0b121d; --surface: #121b2a; --sunken: #0f1724; --ink: #e2e9f3; --muted: #95a3b8; --line: #243149;
-  --nix: #8fb1ee; --nix-soft: #1a2945; --sky: #7ebae4; --amber: #f0a440; --amber-soft: #3a2a14;
+  --nix: #8fb1ee; --nix-soft: #1a2945; --nix-mid: #3d5a8f; --sky: #7ebae4; --amber: #f0a440; --amber-soft: #3a2a14;
   --on: #62c48f; --on-soft: #143524; --off: #66738a;
   color-scheme: dark;
 }
@@ -389,6 +390,39 @@ ol.steps li::before { content: counter(s); font-family: var(--font-mono); font-s
 .loose li span { color: var(--muted); }
 @media (max-width: 760px) { .loose li { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
 
+/* ---------- editors ---------- */
+.cards3.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 700px) { .cards3.two { grid-template-columns: minmax(0, 1fr); } }
+.bars { display: grid; gap: 4px; }
+.bar-row { display: grid; grid-template-columns: minmax(150px, 330px) minmax(0, 1fr) 52px; gap: 12px; align-items: center; font-size: 0.875rem; }
+.bar-row .bn { font-weight: 600; min-width: 0; }
+.bar-row .bt { height: 14px; background: var(--sunken); border-radius: 3px; overflow: hidden; }
+.bar-row .bt i { display: block; height: 100%; background: var(--nix); border-radius: 3px; }
+.bar-row .bv { font-family: var(--font-mono); font-size: 0.75rem; text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+.bar-row.sub .bn { font-weight: 400; color: var(--muted); padding-left: 16px; font-size: 0.8125rem; }
+.bar-row.sub .bt { height: 9px; background: transparent; }
+.bar-row.sub .bt i { background: var(--nix-mid); }
+.bar-row:not(.sub) { margin-top: 6px; }
+.bar-row:first-child { margin-top: 0; }
+@media (max-width: 640px) {
+  .bar-row { grid-template-columns: minmax(0, 1fr) 44px; gap: 2px 10px; }
+  .bar-row .bn { grid-column: 1 / -1; }
+}
+.mods { display: grid; gap: 8px; }
+.mods .mrow { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.mods .mrow > b { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 500; color: var(--muted); }
+.chip.plain { color: var(--ink); }
+.chip.plain em { font-style: normal; color: var(--muted); }
+@media (max-width: 640px) { .mods .mrow { grid-template-columns: minmax(0, 1fr); gap: 4px; } }
+.kbd-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+table.kbd { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+table.kbd th { text-align: left; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 500; padding: 10px 14px; background: var(--sunken); }
+table.kbd td { padding: 8px 14px; border-top: 1px solid var(--line); vertical-align: baseline; }
+table.kbd td:first-child { white-space: nowrap; }
+kbd { font-family: var(--font-mono); font-size: 0.75rem; padding: 1px 6px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; background: var(--bg); color: var(--ink); }
+.editor-split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 860px) { .editor-split { grid-template-columns: minmax(0, 1fr); } }
+
 footer.end { margin-top: 80px; padding-top: 18px; border-top: 1px solid var(--line); font-size: var(--step--1); color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
 </style>
 </head>
@@ -403,6 +437,7 @@ footer.end { margin-top: 80px; padding-top: 18px; border-top: 1px solid var(--li
     <li><a href="#machines">The machines</a></li>
     <li><a href="#services">Services on klaus</a></li>
     <li><a href="#home">Home environment</a></li>
+    <li><a href="#editors">Emacs and Neovim</a></li>
     <li><a href="#ship">Build, cache, deploy</a></li>
     <li><a href="#secrets">Secrets</a></li>
     <li><a href="#isos">ISOs and tests</a></li>
@@ -414,7 +449,7 @@ footer.end { margin-top: 80px; padding-top: 18px; border-top: 1px solid var(--li
 <main id="top">
 <nav class="topnav" aria-label="Sections">
   <a href="#flow">Overview</a><a href="#map">Repo map</a><a href="#assembly">Host build</a><a href="#machines">Machines</a>
-  <a href="#services">Services</a><a href="#home">Home</a><a href="#ship">Deploy</a><a href="#secrets">Secrets</a>
+  <a href="#services">Services</a><a href="#home">Home</a><a href="#editors">Editors</a><a href="#ship">Deploy</a><a href="#secrets">Secrets</a>
   <a href="#isos">ISOs</a><a href="#cheats">Commands</a><a href="#loose">Dormant</a>
 </nav>
 
@@ -804,22 +839,182 @@ footer.end { margin-top: 80px; padding-top: 18px; border-top: 1px solid var(--li
     <div class="hm-groups" id="hm-groups"></div>
   </div>
 
-  <div class="sub">
-    <h3>Doom Emacs, built by Nix <small>packages/emacs/default.nix</small></h3>
-    <div class="flow">
-      <div class="st"><b>config.org</b><span>2,781-line literate config in home/config/doom</span></div>
-      <div class="st"><b>doomConfig</b><span>copied to the store and patched (copilot, pcre2el, tree-sitter path)</span></div>
-      <div class="st"><b>emacsWrapped</b><span>emacs-git, native compilation, -O3</span></div>
-      <div class="st"><b>emacsWithDoom</b><span>nix-doom-emacs-unstraightened, no straight.el at runtime</span></div>
-      <div class="st"><b>doom-emacs</b><span>built in CI for Linux and macOS, pushed to Cachix</span></div>
-    </div>
-  </div>
-
   <div class="cards3">
-    <div class="card"><h4>Neovim</h4><p>lazy.nvim with 37 plugin spec files and 107 pinned plugins. Two plugins are written in this repo: <code>neotree-lsp-symbols</code> (LSP symbols inline in the file tree, with 34 tests) and <code>hovercraft-ts-type</code> (expand TypeScript types in the hover).</p></div>
     <div class="card"><h4>Shell</h4><p>zsh with a hand-written async prompt that shows jj or git state. tmux with <code>wtmux</code>, which keeps one session per git worktree. atuin, zoxide, direnv, mise and a <code>heck</code> alias for pay-respects.</p></div>
     <div class="card"><h4>Jujutsu</h4><p>The newest work. Custom log templates, revset aliases like <code>stack</code> and <code>retrunk</code>, Neovim as diff editor, and three Deno views: <code>jj pretty</code>, <code>jj dag</code> (a Graphviz graph in kitty) and <code>jj pulse</code>.</p></div>
     <div class="card"><h4>Desktop and browser</h4><p>Plasma via plasma-manager with a Nordic theme and a floating top panel. Firefox profiles with addons from rycee's NUR, a minimal tridactyl profile and a 423-line <code>userChrome.css</code>. Kitty with FiraCode Nerd Font.</p></div>
+  </div>
+</section>
+
+<!-- ============ 6b. EDITORS ============ -->
+<section class="sec" id="editors">
+  <div class="sec-head">
+    <p class="eyebrow">home/config/doom · home/config/neovim</p>
+    <h2>Emacs and Neovim</h2>
+    <p class="lede">Two complete editor setups live side by side, and they reach your machine in opposite ways. Emacs is compiled by Nix with its packages built in. Neovim is a plain binary from Nix, and its plugin manager fetches everything else the first time it starts.</p>
+  </div>
+
+  <figure class="diagram">
+    <div class="scroll">
+    <svg class="dg" viewBox="0 0 1080 286" role="img" aria-label="Diagram comparing the two editors. Doom Emacs: home/config/doom is copied into packages/emacs, built with emacsWithDoom so every package is a Nix derivation, and installed as pkgs.my.doom-emacs from Cachix. Neovim: home/config/neovim is symlinked to ~/.config/nvim, lazy.nvim clones 107 pinned plugins on startup into ~/.local/share/nvim, and Nix only supplies the nvim binary and the tree-sitter CLI.">
+      <defs>
+        <marker id="e-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="e-ah-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah acc" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="e-ah-amb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah amb" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+      <text class="hd" x="16" y="22">DOOM EMACS · BUILT BY NIX</text>
+      <rect class="box" x="16" y="36" width="200" height="64" rx="6"/>
+      <text class="mono" x="30" y="60">home/config/doom</text><text class="sm" x="30" y="80">config.org, init.el, packages.el</text>
+      <path class="edge acc" d="M216,68 H262" marker-end="url(#e-ah-acc)"/><text class="xs" x="239" y="60" text-anchor="middle">copied</text>
+      <rect class="box" x="266" y="36" width="230" height="64" rx="6"/>
+      <text class="mono" x="280" y="60">packages/emacs</text><text class="sm" x="280" y="80">store snapshot, patched, tangled</text>
+      <path class="edge acc" d="M496,68 H542" marker-end="url(#e-ah-acc)"/><text class="xs" x="519" y="60" text-anchor="middle">builds</text>
+      <rect class="box" x="546" y="36" width="230" height="64" rx="6"/>
+      <text class="mono" x="560" y="60">emacsWithDoom</text><text class="sm" x="560" y="80">every package a Nix derivation</text>
+      <path class="edge acc" d="M776,68 H822" marker-end="url(#e-ah-acc)"/><text class="xs" x="799" y="60" text-anchor="middle">CI, Cachix</text>
+      <rect class="box acc" x="826" y="36" width="238" height="64" rx="6"/>
+      <text class="mono b" x="840" y="60">pkgs.my.doom-emacs</text><text class="sm" x="840" y="80">installed by editors/emacs.nix</text>
+      <text class="xs" x="16" y="124">A change to config.org or a new package reaches Emacs after a rebuild. CI usually has the result in Cachix already, so nothing compiles locally.</text>
+
+      <text class="hd" x="16" y="166">NEOVIM · FETCHED AT STARTUP</text>
+      <rect class="box" x="16" y="180" width="200" height="64" rx="6"/>
+      <text class="mono" x="30" y="204">home/config/neovim</text><text class="sm" x="30" y="224">init.lua, lua/plugins/*.lua</text>
+      <path class="edge amb" d="M216,212 H262" marker-end="url(#e-ah-amb)"/><text class="xs" x="239" y="204" text-anchor="middle">symlink</text>
+      <rect class="box" x="266" y="180" width="230" height="64" rx="6"/>
+      <text class="mono" x="280" y="204">~/.config/nvim</text><text class="sm" x="280" y="224">points at the live checkout</text>
+      <path class="edge amb" d="M496,212 H542" marker-end="url(#e-ah-amb)"/><text class="xs" x="519" y="204" text-anchor="middle">loads</text>
+      <rect class="box" x="546" y="180" width="230" height="64" rx="6"/>
+      <text class="mono" x="560" y="204">lazy.nvim</text><text class="sm" x="560" y="224">reads lazy-lock.json (107 pins)</text>
+      <path class="edge amb" d="M776,212 H822" marker-end="url(#e-ah-amb)"/><text class="xs" x="799" y="204" text-anchor="middle">git clone</text>
+      <rect class="box amb" x="826" y="180" width="238" height="64" rx="6"/>
+      <text class="mono b" x="840" y="204">~/.local/share/nvim</text><text class="sm" x="840" y="224">plugins, plus Mason's LSP tools</text>
+      <text class="xs" x="16" y="268">Nix supplies only the nvim binary and the tree-sitter CLI. Edit a Lua file, restart nvim, and the change is live; plugins update when you run :Lazy.</text>
+    </svg>
+    </div>
+    <p class="scroll-hint">Scroll sideways to see the whole diagram.</p>
+    <figcaption><b>The trade-off:</b> Emacs is fully pinned and reproducible down to every package, at the cost of a build step. Neovim is quicker to tinker with, and <code>lazy-lock.json</code> keeps its plugin versions pinned anyway, but the plugins themselves come from GitHub, outside Nix.</figcaption>
+  </figure>
+  <div class="sub" id="emacs">
+    <h3>Doom Emacs <small>home/config/doom · packages/emacs</small></h3>
+    <div class="prose">
+      <p>The Emacs config is a literate Org document. <code>config.org</code> holds 212 source blocks with prose between them; tangling writes them out to <code>config.el</code>, and 57 of those blocks tangle into <code>packages.el</code> instead, so each package is declared right next to the code that configures it. <code>init.el</code> picks the Doom modules and is the one file edited by hand.</p>
+    </div>
+
+    <figure class="diagram">
+      <div class="bars" role="img" aria-label="Chart of config.org sections by line count. Development is the largest at 1,403 lines, then Org Mode at 974, AI at 212, Base Settings at 67, Mail at 42, Performance at 25, Unsorted at 22, Workspaces at 18 and Utils at 15.">
+        <div class="bar-row"><span class="bn">Development</span><span class="bt"><i style="width:100%"></i></span><span class="bv">1,403</span></div>
+        <div class="bar-row sub"><span class="bn">Tools: completion, Copilot, debugger, LSP, task runners, diagrams</span><span class="bt"><i style="width:42.8%"></i></span><span class="bv">601</span></div>
+        <div class="bar-row sub"><span class="bn">Language settings: web, Nix, Python, Rust, Gleam, Lean, Agda, Pie…</span><span class="bt"><i style="width:35.3%"></i></span><span class="bv">495</span></div>
+        <div class="bar-row sub"><span class="bn">UI: modeline, padding, error display</span><span class="bt"><i style="width:11%"></i></span><span class="bv">154</span></div>
+        <div class="bar-row sub"><span class="bn">Theming</span><span class="bt"><i style="width:8.1%"></i></span><span class="bv">114</span></div>
+        <div class="bar-row sub"><span class="bn">Vertico, Kubernetes</span><span class="bt"><i style="width:2.7%"></i></span><span class="bv">38</span></div>
+        <div class="bar-row"><span class="bn">Org Mode</span><span class="bt"><i style="width:69.4%"></i></span><span class="bv">974</span></div>
+        <div class="bar-row sub"><span class="bn">Querying and combined views (org-ql)</span><span class="bt"><i style="width:20.7%"></i></span><span class="bv">291</span></div>
+        <div class="bar-row sub"><span class="bn">Visual improvements, org-modern</span><span class="bt"><i style="width:13.6%"></i></span><span class="bv">191</span></div>
+        <div class="bar-row sub"><span class="bn">Babel: HTTP, TypeScript, Mermaid, auto-tangle</span><span class="bt"><i style="width:10%"></i></span><span class="bv">140</span></div>
+        <div class="bar-row sub"><span class="bn">Roam: notes graph, roam UI, Logseq</span><span class="bt"><i style="width:9.1%"></i></span><span class="bv">128</span></div>
+        <div class="bar-row sub"><span class="bn">Capture templates</span><span class="bt"><i style="width:5%"></i></span><span class="bv">70</span></div>
+        <div class="bar-row sub"><span class="bn">Agenda and time (Khal calendar)</span><span class="bt"><i style="width:2.2%"></i></span><span class="bv">31</span></div>
+        <div class="bar-row sub"><span class="bn">Base settings, export, Excalidraw, fixes</span><span class="bt"><i style="width:8.7%"></i></span><span class="bv">122</span></div>
+        <div class="bar-row"><span class="bn">AI</span><span class="bt"><i style="width:15.1%"></i></span><span class="bv">212</span></div>
+        <div class="bar-row"><span class="bn">Base Settings</span><span class="bt"><i style="width:4.8%"></i></span><span class="bv">67</span></div>
+        <div class="bar-row"><span class="bn">Mail</span><span class="bt"><i style="width:3%"></i></span><span class="bv">42</span></div>
+        <div class="bar-row"><span class="bn">Performance</span><span class="bt"><i style="width:1.8%"></i></span><span class="bv">25</span></div>
+        <div class="bar-row"><span class="bn">Unsorted, Workspaces, Utils</span><span class="bt"><i style="width:3.9%"></i></span><span class="bv">55</span></div>
+      </div>
+      <figcaption><b>Where the 2,781 lines of <code>config.org</code> go</b>, measured from heading to heading. All bars share one scale. Half the file is development tooling and a third is Org, which is used here as a task manager, a notebook and a calendar rather than just a markup format.</figcaption>
+    </figure>
+
+    <div class="sub">
+      <h3>Doom modules switched on <small>init.el</small></h3>
+      <div class="mods" id="doom-mods"></div>
+      <p class="count-line">Plus 52 packages declared from <code>config.org</code>: 14 themes and UI tweaks, 13 for Org (org-modern, org-ql, org-roam-ui, ox-hugo, khalel…), 11 for languages, 10 tools (GitLab via <code>lab</code>, devdocs, justl, k8s-mode…), 3 for AI, and one that shows Emacs in your Discord status. Copilot is supplied by Nix instead.</p>
+    </div>
+
+    <div class="cards3 two">
+      <div class="card"><h4>Org as the hub</h4><p>Everything lives under <code>~/org</code>: agenda, capture templates, org-roam notes in <code>~/org/roam</code> with a graph UI, a calendar imported from Khal, and org-ql dashboards for tasks (<code>SPC n q</code>). Babel runs HTTP requests, TypeScript and Mermaid inline.</p></div>
+      <div class="card"><h4>AI in Org blocks</h4><p>gptel chats are Org documents with branching context, with Kagi as one backend. A hand-written babel backend, <code>ob-claude-code</code>, sends a source block to <code>claude -p</code>, with <code>:dir</code>, <code>:session</code> and <code>:tools</code> header arguments. Plus MCP servers via <code>mcp.el</code>, and <code>bin/emacs-mcp</code> to run Emacs itself as one.</p></div>
+      <div class="card"><h4>Languages and LSP</h4><p>27 Doom language modules, plus Gleam, Lean 4, SageMath and Pie configured by hand. lsp-mode with plists and <code>emacs-lsp-booster</code> for speed, dap-mode for debugging, and tree-sitter grammars supplied by Nix.</p></div>
+      <div class="card"><h4>Look and speed</h4><p>Theme <code>doom-nord-aurora</code>, FiraCode Nerd Font at 14 with DejaVu Serif for prose. Incremental package loading stays lazy, which the config says saves about five seconds when the daemon starts.</p></div>
+    </div>
+
+    <div class="sub">
+      <h3>Custom key bindings <small>map! calls in config.org</small></h3>
+      <div class="kbd-wrap"><table class="kbd">
+        <thead><tr><th>Keys</th><th>Does</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>SPC n q d</kbd> · <kbd>SPC o A</kbd></td><td>org-ql task dashboard</td></tr>
+          <tr><td><kbd>SPC n q s</kbd> / <kbd>w</kbd> / <kbd>r</kbd></td><td>stale tasks, week review, completed-tasks review</td></tr>
+          <tr><td><kbd>SPC n q p</kbd></td><td>tasks for the current project, from org-roam</td></tr>
+          <tr><td><kbd>SPC d d</kbd> · <kbd>n</kbd> <kbd>i</kbd> <kbd>o</kbd> <kbd>c</kbd></td><td>debugger: start, next, step in, step out, continue</td></tr>
+          <tr><td><kbd>SPC c g</kbd></td><td>glance at LSP documentation</td></tr>
+          <tr><td><kbd>SPC c m</kbd></td><td>run a <code>just</code> recipe</td></tr>
+          <tr><td><kbd>SPC i g c</kbd> · <kbd>SPC t p</kbd></td><td>accept a Copilot completion · toggle Copilot</td></tr>
+          <tr><td><kbd>SPC D l</kbd> · <kbd>SPC D o</kbd></td><td>search devdocs · browse devdocs</td></tr>
+          <tr><td><kbd>SPC g l p</kbd> / <kbd>m</kbd></td><td>GitLab pipelines · merge requests</td></tr>
+          <tr><td><kbd>SPC m p</kbd> · <kbd>SPC m s</kbd></td><td>start · stop live Markdown preview</td></tr>
+          <tr><td><kbd>C-c m</kbd> in a gptel chat</td><td>pick MCP tools for the conversation</td></tr>
+        </tbody>
+      </table></div>
+      <p class="count-line">Everything else is Doom's default evil bindings (<code>:config default +bindings</code>).</p>
+    </div>
+  </div>
+  <div class="sub" id="neovim">
+    <h3>Neovim <small>home/config/neovim · 37 spec files, 3,536 lines of Lua</small></h3>
+    <div class="prose">
+      <p><code>init.lua</code> sets the options (two-space indent, system clipboard, persistent undo, hybrid line numbers), makes <kbd>Space</kbd> the leader and <kbd>m</kbd> the local leader (both borrowed from Doom), bootstraps lazy.nvim and applies the Nord theme. lazy.nvim then imports every file in <code>lua/plugins/</code>; each file returns a list of plugin specs with their settings and key bindings. The config targets Neovim 0.12 and its built-in <code>vim.lsp.config</code>.</p>
+    </div>
+
+    <figure class="diagram">
+      <div class="bars" role="img" aria-label="Chart of the 107 plugins in lazy-lock.json by purpose: 22 for LSP, completion and formatting; 19 for UI and theme; 12 for Git and Jujutsu; 12 language-specific; 9 for navigation; 4 editing helpers; 3 tree-sitter; 3 AI assistants; and 23 other tools.">
+        <div class="bar-row"><span class="bn">LSP, completion, formatting</span><span class="bt"><i style="width:95.7%"></i></span><span class="bv">22</span></div>
+        <div class="bar-row sub"><span class="bn">mason, nvim-lspconfig, nvim-cmp, conform, none-ls, glance, trouble</span><span class="bt"></span><span class="bv"></span></div>
+        <div class="bar-row"><span class="bn">UI and theme</span><span class="bt"><i style="width:82.6%"></i></span><span class="bv">19</span></div>
+        <div class="bar-row sub"><span class="bn">nord, lualine, noice, snacks, which-key, edgy, statuscol</span><span class="bt"></span><span class="bv"></span></div>
+        <div class="bar-row"><span class="bn">Git and Jujutsu</span><span class="bt"><i style="width:52.2%"></i></span><span class="bv">12</span></div>
+        <div class="bar-row sub"><span class="bn">neogit, gitsigns, diffview, jj.nvim, jjsigns, codediff, review.nvim</span><span class="bt"></span><span class="bv"></span></div>
+        <div class="bar-row"><span class="bn">Language-specific</span><span class="bt"><i style="width:52.2%"></i></span><span class="bv">12</span></div>
+        <div class="bar-row sub"><span class="bn">rustaceanvim, lean.nvim, lazydev, markdown-preview, vim-nix, likec4</span><span class="bt"></span><span class="bv"></span></div>
+        <div class="bar-row"><span class="bn">Navigation and search</span><span class="bt"><i style="width:39.1%"></i></span><span class="bv">9</span></div>
+        <div class="bar-row sub"><span class="bn">telescope (+ frecency, fzf), neo-tree, harpoon, projectionist</span><span class="bt"></span><span class="bv"></span></div>
+        <div class="bar-row"><span class="bn">Editing helpers</span><span class="bt"><i style="width:17.4%"></i></span><span class="bv">4</span></div>
+        <div class="bar-row"><span class="bn">Tree-sitter</span><span class="bt"><i style="width:13%"></i></span><span class="bv">3</span></div>
+        <div class="bar-row"><span class="bn">AI assistants</span><span class="bt"><i style="width:13%"></i></span><span class="bv">3</span></div>
+        <div class="bar-row"><span class="bn">Other tools</span><span class="bt"><i style="width:100%"></i></span><span class="bv">23</span></div>
+        <div class="bar-row sub"><span class="bn">neotest, nvim-dap, overseer, orgmode, org-roam, zk, dadbod, sniprun, strudel, typr, libraries</span><span class="bt"></span><span class="bv"></span></div>
+      </div>
+      <figcaption><b>The 107 plugins pinned in <code>lazy-lock.json</code>, grouped by purpose.</b> All bars share one scale. Language servers are not plugins: Mason installs them at runtime, and <code>mason-lock.json</code> pins 10 tools, including lua-language-server, nil, typescript-language-server and yaml-language-server.</figcaption>
+    </figure>
+
+    <div class="cards3 two">
+      <div class="card"><h4>Written in this repo</h4><p><code>neotree-lsp-symbols</code> (533 lines) lists a file's LSP symbols right under it in neo-tree: <kbd>Tab</kbd> expands, <kbd>Enter</kbd> jumps, and it follows the cursor. It has 34 plenary tests; run <code>lua/neotree-lsp-symbols/tests/run.sh</code>. <code>hovercraft-ts-type</code> (164 lines) lets <kbd>+</kbd> and <kbd>-</kbd> expand a TypeScript type inside the hover popup.</p></div>
+      <div class="card"><h4>Code review with jj</h4><p><code>:ReviewChange</code>, <code>:ReviewStack</code> and <code>:ReviewTrunk</code> diff the current change, the whole stack, or everything since trunk. Review comments are keyed by jj change ID and can be exported as Markdown for an AI agent. hunk.nvim is jj's diff editor, so <code>jj split</code> opens Neovim.</p></div>
+      <div class="card"><h4>AI, three ways</h4><p>claudecode.nvim runs Claude Code with diffs you accept or reject (<kbd>SPC a</kbd>). sidekick.nvim runs AI command-line tools in tmux and offers next-edit suggestions on <kbd>Tab</kbd> (<kbd>SPC k</kbd>). copilot.vim gives inline completions on <kbd>Ctrl Space</kbd>.</p></div>
+      <div class="card"><h4>A patched plugin</h4><p><code>patches/pr31-focus.patch</code> is applied to review.nvim every time lazy builds it. It carries an unmerged upstream fix for focus stealing and keymaps leaking into the file explorer.</p></div>
+    </div>
+
+    <div class="sub">
+      <h3>Key bindings worth knowing <small>which-key shows the rest after SPC</small></h3>
+      <div class="kbd-wrap"><table class="kbd">
+        <thead><tr><th>Keys</th><th>Does</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>SPC SPC</kbd></td><td>command palette</td></tr>
+          <tr><td><kbd>SPC p f</kbd> · <kbd>SPC s p</kbd> · <kbd>SPC b b</kbd></td><td>find files (most-used first) · live grep · buffers</td></tr>
+          <tr><td><kbd>SPC o p</kbd></td><td>file tree, with LSP symbols under each file</td></tr>
+          <tr><td><kbd>g d</kbd> · <kbd>SPC c a</kbd> · <kbd>SPC c r</kbd> · <kbd>SPC c f</kbd></td><td>definition · code actions · rename · format</td></tr>
+          <tr><td><kbd>SPC c g</kbd> · <kbd>SPC c s</kbd></td><td>hover from several sources · symbol outline</td></tr>
+          <tr><td><kbd>SPC x x</kbd></td><td>diagnostics list (Trouble)</td></tr>
+          <tr><td><kbd>SPC g g</kbd></td><td>Neogit</td></tr>
+          <tr><td><kbd>SPC g j s</kbd> · <kbd>SPC g j l</kbd></td><td>jj status · jj log</td></tr>
+          <tr><td><kbd>SPC g j r</kbd> / <kbd>R</kbd> / <kbd>d</kbd></td><td>review this change · the stack · everything since trunk</td></tr>
+          <tr><td><kbd>SPC g c c</kbd> · <kbd>SPC g c k</kbd></td><td>add a review comment · send the comments to sidekick</td></tr>
+          <tr><td><kbd>SPC a c</kbd> · <kbd>SPC a s</kbd> · <kbd>SPC a a</kbd> / <kbd>d</kbd></td><td>toggle Claude Code · send selection · accept / deny its diff</td></tr>
+          <tr><td><kbd>SPC k k</kbd> · <kbd>Tab</kbd></td><td>sidekick CLI · apply the next edit suggestion</td></tr>
+          <tr><td><kbd>SPC t r</kbd> · <kbd>SPC d b</kbd></td><td>run nearest test · toggle breakpoint</td></tr>
+          <tr><td><kbd>SPC n a</kbd> · <kbd>SPC n x</kbd> · <kbd>SPC n r</kbd></td><td>org agenda · capture · org-roam (same layout as Doom)</td></tr>
+        </tbody>
+      </table></div>
+    </div>
   </div>
 </section>
 
@@ -981,6 +1176,9 @@ footer.end { margin-top: 80px; padding-top: 18px; border-top: 1px solid var(--li
     <li><code>hosts/nixos/klaus/wireguard.nix</code><span>Not imported. Netmaker and Tailscale replaced it.</span></li>
     <li><code>plex</code>, <code>readarr</code>, <code>openhab</code>, <code>bitmagnet</code><span>Service modules no host enables. <code>nextcloud</code>, <code>sonarqube</code> and <code>gitea-sonarqube-bot</code> are explicitly set to false on klaus.</span></li>
     <li><code>tests/tandoor.nix</code>, <code>tests/paperless.nix</code><span>Older smoke tests; only the <code>tests/upgrade/</code> versions are wired into the flake.</span></li>
+    <li><code>neovim/lua/plugins/harpoon.lua</code><span>Uses <code>setup = function()</code>, a key lazy.nvim ignores (it runs <code>config</code> or <code>opts</code>), so harpoon's key bindings are probably never registered. The diffview spec in <code>vcs/git.lua</code> has the same issue.</span></li>
+    <li><code>neovim/autoload/plug.vim</code>, <code>neovim/dashboard/*.txt</code><span>A vendored copy of vim-plug and ASCII logos that nothing loads. <code>hunk.nvim</code> is declared but missing from <code>lazy-lock.json</code>.</span></li>
+    <li><code>doom/default.nix</code>, <code>doom/none</code>, <code>doom/packages.</code><span>An old tangle derivation and two stray files; nothing references them. The Doom build lives in <code>packages/emacs</code>.</span></li>
     <li><code>docs/deploy-rs.md</code><span>Referenced from comments in <code>flake.nix</code> and <code>deploy.yml</code>, but not in the repo.</span></li>
     <li><code>home/config/zed/*.json</code><span>Committed as symlinks into <code>/nix/store</code>, so the files in git have no content.</span></li>
   </ul>
@@ -1319,6 +1517,28 @@ footer.end { margin-top: 80px; padding-top: 18px; border-top: 1px solid var(--li
       var cls = m[1] === 1 ? "on" : m[1] === 2 ? "cond" : "";
       return '<li class="' + cls + '"><span class="dot"></span><div><b>' + m[0] + "</b> <span>" + m[2] + "</span></div></li>";
     }).join("") + "</ul></div>";
+  }).join("");
+
+
+  /* ------------------------------------------------------------------ doom modules */
+  var DOOM = [
+    [":completion", ["company", "vertico +icons"]],
+    [":ui", ["doom", "doom-dashboard", "hl-todo", "ligatures +fira", "minimap", "modeline", "nav-flash", "ophints", "popup", "treemacs +lsp", "vc-gutter +pretty", "window-select +numbers", "workspaces", "zen"]],
+    [":editor", ["evil +everywhere", "file-templates", "fold", "format", "rotate-text", "word-wrap"]],
+    [":emacs", ["dired +icons", "electric", "ibuffer +icons", "undo", "vc"]],
+    [":term", ["eshell", "shell", "vterm"]],
+    [":checkers", ["syntax +childframe"]],
+    [":tools", ["llm", "debugger +lsp", "direnv", "docker +lsp", "eval +overlay", "lookup +docsets", "lsp +peek", "magit +forge", "make", "pass +auth", "pdf", "terraform", "tmux", "tree-sitter"]],
+    [":lang", ["agda", "data", "dhall", "emacs-lisp", "go", "graphviz", "haskell", "hy", "javascript", "json", "julia", "latex +cdlatex", "lua", "markdown", "nix", "org +roam2 +jupyter +hugo +noter …", "php", "plantuml", "purescript", "python +poetry", "racket", "rest", "rust", "sh", "web", "yaml", "zig"]],
+    [":email :app", ["mu4e +org +gmail +mbsync", "calendar", "emms", "everywhere", "rss +org"]],
+    [":os :config", ["macos", "tty +osc", "literate", "default +bindings"]]
+  ];
+  var dm = document.getElementById("doom-mods");
+  if (dm) dm.innerHTML = DOOM.map(function (g) {
+    return '<div class="mrow"><b>' + g[0] + '</b><div class="chips">' + g[1].map(function (m) {
+      var i = m.indexOf(" ");
+      return '<span class="chip plain">' + (i < 0 ? m : m.slice(0, i) + " <em>" + m.slice(i + 1) + "</em>") + "</span>";
+    }).join("") + "</div></div>";
   }).join("");
 
   /* ------------------------------------------------------------------ cheat sheet */
