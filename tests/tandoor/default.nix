@@ -7,7 +7,7 @@
 #
 # `sabotage` deliberately breaks the upgrade; those variants must fail, which
 # proves the checks are able to catch a broken upgrade.
-{ inputs, lib, pkgs, target ? null, sabotage ? null }:
+{ inputs, lib, pkgs, target ? null, targetDb ? null, extraPins ? { }, sabotage ? null }:
 
 let
   port = 8285;
@@ -24,7 +24,10 @@ let
 
   baseline = pinned.baseline;
   targetImage = if target == null then moduleOptions.image.default else target;
-  dbImage = moduleOptions.dbImage.default;
+  # The database image changes with the upgrade as well (a major postgres bump
+  # would not start on the old data directory).
+  baselineDb = pinned.baselineDb;
+  dbImage = if targetDb == null then moduleOptions.dbImage.default else targetDb;
   isUpgrade = baseline != targetImage;
 
   splitRef = ref:
@@ -36,7 +39,7 @@ let
 
   pull = ref:
     let
-      pin = pinned.pins.${ref} or (throw ''
+      pin = (pinned.pins // extraPins).${ref} or (throw ''
         tandoor test: no pinned image for ${ref}.
         Run tests/tandoor/update-images.sh to pin it in tests/tandoor/images.nix.
       '');
@@ -48,7 +51,7 @@ let
       arch = "amd64";
     });
 
-  imageTars = map pull (lib.unique [ dbImage baseline targetImage ]);
+  imageTars = map pull (lib.unique [ baselineDb dbImage baseline targetImage ]);
 
   e2e = pkgs.writeShellScriptBin "tandoor-e2e" ''
     exec ${pkgs.python3}/bin/python3 ${./e2e.py} "$@"
@@ -83,7 +86,7 @@ assert lib.assertMsg (builtins.elem sabotage sabotages)
     modules.services.tandoor = {
       enable = true;
       image = baseline;
-      inherit dbImage;
+      dbImage = baselineDb;
     };
 
     # Started by the test script once the system bus is up (see below), not at boot.
@@ -112,6 +115,7 @@ assert lib.assertMsg (builtins.elem sabotage sabotages)
 
     specialisation.target.configuration = {
       modules.services.tandoor.image = lib.mkForce targetImage;
+      modules.services.tandoor.dbImage = lib.mkForce dbImage;
       virtualisation.quadlet.containers.tandoor.containerConfig.environments =
         lib.mkIf (sabotage == "web") {
           # The app can never reach its database: nginx answers, gunicorn never does.
@@ -165,7 +169,7 @@ assert lib.assertMsg (builtins.elem sabotage sabotages)
         machine.wait_for_unit("tandoor-test-load-images.service", timeout=3600)
         machine.wait_for_unit("tandoor-db.service", timeout=1800)
         machine.wait_for_unit("tandoor.service", timeout=1800)
-        e2e("wait-ready --timeout 7200", timeout=7500)
+        e2e("wait-ready --db-container tandoor-db --timeout 7200", timeout=7500)
         e2e("seed")
         e2e(f"verify --expect-image {baseline}")
 
@@ -192,7 +196,7 @@ assert lib.assertMsg (builtins.elem sabotage sabotages)
 
     with subtest(f"{target} runs on the migrated database"):
         ready_timeout = 1800 if sabotage == "web" else 7200
-        e2e(f"wait-ready --timeout {ready_timeout}", timeout=ready_timeout + 300)
+        e2e(f"wait-ready --db-container tandoor-db --timeout {ready_timeout}", timeout=ready_timeout + 300)
         e2e(f"verify --expect-image {target}")
   '';
 }

@@ -5,7 +5,8 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: update-images.sh [--baseline REF] [--refresh] [EXTRA_REF...]
+Usage: update-images.sh [--baseline REF] [--baseline-db REF] [--refresh]
+                        [EXTRA_REF...]
        update-images.sh -h | --help
 
 Regenerates tests/tandoor/images.nix. The pinned set is the union of:
@@ -13,6 +14,8 @@ Regenerates tests/tandoor/images.nix. The pinned set is the union of:
   baseline   the currently deployed app image: the app image of
              modules/nixos/services/tandoor.nix on ${BASE_REF:-origin/main}
              (override with --baseline REF)
+  baselineDb the currently deployed database image: the db image of the same
+             module revision (override with --baseline-db REF)
   target     the default of modules.services.tandoor.image in the working tree
   db         the default of modules.services.tandoor.dbImage in the working tree
   extras     every EXTRA_REF given on the command line, e.g.
@@ -25,6 +28,9 @@ are prefetched with nix-prefetch-docker (needs network access).
 Options:
   --baseline REF   use REF as the baseline instead of the app image found on
                    ${BASE_REF:-origin/main}
+  --baseline-db REF
+                   use REF as the baseline database image instead of the db
+                   image found on ${BASE_REF:-origin/main}
   --refresh        prefetch every ref again instead of reusing existing pins
                    (useful for floating tags such as postgres:14)
   -h, --help       show this help
@@ -40,6 +46,7 @@ die() { echo "update-images.sh: $*" >&2; exit 1; }
 log() { echo "update-images.sh: $*" >&2; }
 
 baseline_override=""
+baseline_db_override=""
 refresh=0
 extras=()
 while [ $# -gt 0 ]; do
@@ -49,6 +56,10 @@ while [ $# -gt 0 ]; do
       [ $# -ge 2 ] || die "--baseline needs a REF argument"
       baseline_override="$2"; shift 2 ;;
     --baseline=*) baseline_override="${1#--baseline=}"; shift ;;
+    --baseline-db)
+      [ $# -ge 2 ] || die "--baseline-db needs a REF argument"
+      baseline_db_override="$2"; shift 2 ;;
+    --baseline-db=*) baseline_db_override="${1#--baseline-db=}"; shift ;;
     --refresh) refresh=1; shift ;;
     --) shift; extras+=("$@"); break ;;
     -*) usage >&2; die "unknown option: $1" ;;
@@ -112,14 +123,31 @@ grep_image() {
   echo "$matches"
 }
 
-# App image of an older module revision that predates the `images` block: all
-# `image = "..."` literals, minus the database image, must leave exactly one.
-legacy_app_image() {
-  local text="$1" db="$2" matches n
-  matches=$(printf '%s\n' "$text" | sed -nE 's/^[[:space:]]*image[[:space:]]*=[[:space:]]*"([^"]+)"[[:space:]]*;.*/\1/p' | grep -vxF -e "$db" -e "${db#docker.io/}" | sort -u || true)
+# App or db image of an older module revision that predates the `images` block:
+# the `image = "..."` literals are the app image and the database image (the
+# one containing "postgres"). Fails unless exactly one literal matches.
+legacy_image() {
+  local kind="$1" text="$2" all matches n
+  all=$(printf '%s\n' "$text" | sed -nE 's/^[[:space:]]*image[[:space:]]*=[[:space:]]*"([^"]+)"[[:space:]]*;.*/\1/p' | sort -u)
+  if [ "$kind" = db ]; then
+    matches=$(printf '%s\n' "$all" | grep -i postgres || true)
+  else
+    matches=$(printf '%s\n' "$all" | grep -vi postgres || true)
+  fi
   n=$(printf '%s' "$matches" | grep -c . || true)
-  [ "$n" -eq 1 ] || die "cannot determine the app image of $module on $base_ref (found $n candidates)"
+  [ "$n" -eq 1 ] || die "expected exactly one $kind image literal in $module on $base_ref, found $n"
   echo "$matches"
+}
+
+# Image of the given kind (app or db) from the deployed module text, in either
+# layout.
+base_image() {
+  local kind="$1" text="$2"
+  if printf '%s\n' "$text" | grep -qE "^[[:space:]]*${kind}\\.image[[:space:]]*="; then
+    grep_image "$kind" "$text"
+  else
+    legacy_image "$kind" "$text"
+  fi
 }
 
 # --- target, db, baseline -----------------------------------------------------
@@ -135,20 +163,24 @@ fi
 target=$(normalize_ref "$target")
 db=$(normalize_ref "$db")
 
-if [ -n "$baseline_override" ]; then
-  baseline=$(normalize_ref "$baseline_override")
-else
+if [ -z "$baseline_override" ] || [ -z "$baseline_db_override" ]; then
   base_text=$(git show "$base_ref:$module") \
-    || die "cannot read $module from $base_ref (set BASE_REF or pass --baseline)"
-  if printf '%s\n' "$base_text" | grep -qE '^[[:space:]]*app\.image[[:space:]]*='; then
-    baseline=$(grep_image app "$base_text")
-  else
-    baseline=$(legacy_app_image "$base_text" "$db")
-  fi
-  baseline=$(normalize_ref "$baseline")
+    || die "cannot read $module from $base_ref (set BASE_REF or pass --baseline and --baseline-db)"
 fi
+if [ -n "$baseline_override" ]; then
+  baseline="$baseline_override"
+else
+  baseline=$(base_image app "$base_text")
+fi
+if [ -n "$baseline_db_override" ]; then
+  baseline_db="$baseline_db_override"
+else
+  baseline_db=$(base_image db "$base_text")
+fi
+baseline=$(normalize_ref "$baseline")
+baseline_db=$(normalize_ref "$baseline_db")
 
-refs=("$baseline" "$target" "$db")
+refs=("$baseline" "$baseline_db" "$target" "$db")
 for e in ${extras[@]+"${extras[@]}"}; do refs+=("$(normalize_ref "$e")"); done
 mapfile -t refs < <(printf '%s\n' "${refs[@]}" | sort -u)
 
@@ -196,6 +228,7 @@ trap 'rm -f "$tmp"' EXIT
 # Regenerate with tests/tandoor/update-images.sh after bumping the module.
 {
   baseline = "$baseline";
+  baselineDb = "$baseline_db";
 
   pins = {
 EOF
@@ -233,9 +266,10 @@ cat "$tmp" >"$images_nix"
 nix eval --file "$images_nix" --json >/dev/null || die "$images_nix does not evaluate"
 
 echo "Wrote $images_nix"
-echo "  baseline: $baseline"
-echo "  target:   $target"
-echo "  db:       $db"
+echo "  baseline:   $baseline"
+echo "  baselineDb: $baseline_db"
+echo "  target:     $target"
+echo "  db:         $db"
 echo "  pinned:"
 for ref in "${refs[@]}"; do
   state=reused

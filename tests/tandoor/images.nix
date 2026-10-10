@@ -6,6 +6,7 @@
 # Regenerate with tests/tandoor/update-images.sh after bumping the module.
 {
   baseline = "docker.io/vabene1111/recipes:2.4.2";
+  baselineDb = "docker.io/postgres:14";
 
   pins = {
     "docker.io/postgres:14" = {

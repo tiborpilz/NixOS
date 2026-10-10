@@ -113,7 +113,7 @@ test-tandoor version="":
 
 # Check that the tandoor upgrade test catches broken upgrades (slow, one VM each)
 test-tandoor-negative:
-  nix build -L --no-link .#testTandoorUpgradeSabotageMigration .#testTandoorUpgradeSabotageWeb
+  nix build -L --no-link .#testTandoorUpgradeSabotageMigration .#testTandoorUpgradeSabotageWeb .#testTandoorUpgradeSabotageDbMajor
 
 # Re-pin the tandoor test images after bumping the module (extra refs become test targets)
 pin-tandoor-images *refs:

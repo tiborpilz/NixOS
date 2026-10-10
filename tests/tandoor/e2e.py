@@ -7,7 +7,8 @@ an upgrade from one Tandoor version to another.
     e2e.py [--url URL] [--state DIR] [--container NAME] [--http-timeout S] CMD
 
 Commands:
-    wait-ready [--timeout S]       poll /accounts/login/ until the web app is up
+    wait-ready [--timeout S] [--db-container NAME]
+                                   poll /accounts/login/ until the web app is up
     seed                           create superuser + a canary recipe (via API)
     verify --expect-image REF      version / migrations / web / login / data
     control-pending --image REF    one-off run of REF must report pending migrations
@@ -270,14 +271,41 @@ def results_of(payload):
 # commands
 # --------------------------------------------------------------------------
 
+def db_running(name):
+    try:
+        p = subprocess.run(["podman", "container", "inspect", name, "--format", "{{.State.Running}}"],
+                           capture_output=True, text=True, timeout=120)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return p.returncode == 0 and p.stdout.strip() == "true"
+
+
+def check_db_running(args, down_since):
+    """A database that stays down will never let the app come up; say so instead of timing out."""
+    if down_since is None or time.monotonic() - down_since < args.db_grace:
+        return
+    try:
+        logs = subprocess.run(["podman", "logs", "--tail", "5", args.db_container],
+                              capture_output=True, text=True, errors="replace", timeout=120)
+        tail = tail_text(logs.stdout + logs.stderr)
+    except (OSError, subprocess.TimeoutExpired) as e:
+        tail = "(no logs: %s)" % e
+    fail("db", "database container %s has not been running for %ds: %s" % (args.db_container, args.db_grace, tail))
+
+
 def cmd_wait_ready(args):
     http = Http(args.url, args.http_timeout)
     deadline = time.monotonic() + args.timeout
     log("waiting for %s/accounts/login/ (timeout %ds)" % (http.base, args.timeout))
     last = "no attempt yet"
     attempt = 0
+    db_down_since = None
     while True:
         attempt += 1
+        if args.db_container:
+            check_db_running(args, db_down_since)
+            running = db_running(args.db_container)
+            db_down_since = None if running else (db_down_since or time.monotonic())
         try:
             r = http.get("/accounts/login/")
             if r.status == 200:
@@ -559,16 +587,19 @@ def cmd_control_pending(args):
     log("\n".join(shown))
     log("(%d applied '[X]' migration lines omitted)" % (len(out.splitlines()) - len(shown)))
     log("---- end ----")
-    if rc == 0:
-        fail(tag, "migrate --check with %s exited 0: no pending migrations, so the upgrade test would be vacuous" % args.image)
     if "MIGRATE_CHECK_EXIT=" not in out:
         fail(tag, "one-off container exited %d before running migrate --check (not a migration result): %s" % (rc, tail_text(out)))
     plan = [l for l in out.splitlines() if re.match(r"\s*\[.\]", l)]
     if not any("[X]" in l for l in plan):
         fail(tag, "could not read applied migrations from the live DB (DB unreachable?): %s" % tail_text(out))
-    if not any("[ ]" in l for l in plan):
-        fail(tag, "migrate --check exited %d but showmigrations lists no pending migration: %s" % (rc, tail_text(out)))
-    log("%d migration(s) pending as expected" % sum(1 for l in plan if "[ ]" in l))
+    pending = sum(1 for l in plan if "[ ]" in l)
+    if rc == 0 and pending == 0:
+        # Legitimate for releases that ship no migrations; the restart still runs.
+        log("no new migrations between the baseline database and %s" % args.image)
+        return
+    if rc == 0 or pending == 0:
+        fail(tag, "migrate --check exited %d but showmigrations lists %d pending migration(s): %s" % (rc, pending, tail_text(out)))
+    log("%d migration(s) pending, as expected for an upgrade" % pending)
 
 
 # --------------------------------------------------------------------------
@@ -583,6 +614,10 @@ def build_parser():
 
     s = sub.add_parser("wait-ready", help="wait until /accounts/login/ answers")
     s.add_argument("--timeout", type=int, default=3600)
+    s.add_argument("--db-container", default="", metavar="NAME",
+                   help="fail early if this database container stays down")
+    s.add_argument("--db-grace", type=int, default=300, metavar="S",
+                   help="how long the database container may be down (default %(default)s)")
     s.set_defaults(fn=cmd_wait_ready)
 
     s = sub.add_parser("seed", help="create user and canary recipe")
