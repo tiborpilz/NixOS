@@ -146,10 +146,9 @@
             (lib.attrValues (mapModules ./packages (p: import p {
               inherit lib inputs;
               pkgs = channels.nixpkgs;
-            }))) // {
-            testTandoorUpgrade = channels.nixpkgs.testers.runNixOSTest (import ./tests/upgrade/tandoor.nix {
-              inherit inputs lib; pkgs = channels.nixpkgs;
-            });
+            }))) // (import ./tests/tandoor/packages.nix {
+            inherit inputs lib; pkgs = channels.nixpkgs;
+          }) // {
             testPaperlessUpgrade = channels.nixpkgs.testers.runNixOSTest (import ./tests/upgrade/paperless.nix {
               inherit inputs lib; pkgs = channels.nixpkgs;
             });
@@ -232,7 +231,7 @@
           emacs = self.packages.x86_64-linux.emacsWrapped;
           doom-emacs = self.packages.x86_64-linux.doom-emacs;
           doom-emacs-standalone = self.packages.x86_64-linux.doom-emacs-standalone;
-          testTandoorUpgrade = self.packages.x86_64-linux.testTandoorUpgrade;
+          tandoor-upgrade = self.packages.x86_64-linux.testTandoorUpgrade;
           testPaperlessUpgrade = self.packages.x86_64-linux.testPaperlessUpgrade;
         } // inputs.deploy-rs.lib.x86_64-linux.deployChecks self.deploy;
         aarch64-darwin = {
