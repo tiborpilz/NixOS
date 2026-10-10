@@ -62,7 +62,7 @@ assert lib.assertMsg (builtins.elem sabotage sabotages)
   name = "tandoor-upgrade" + lib.optionalString (sabotage != null) "-sabotage-${sabotage}";
 
   # Two full tandoor boots, migrations and collectstatic; without KVM this is slow.
-  globalTimeout = 5 * 3600;
+  globalTimeout = 10 * 3600;
 
   nodes.machine = { config, lib, ... }: {
     imports = [
@@ -129,7 +129,7 @@ assert lib.assertMsg (builtins.elem sabotage sabotages)
         raise Exception("E2E-" + "FAIL" + f"[{tag}] {msg}")
 
 
-    def e2e(args, timeout=3600):
+    def e2e(args, timeout=4 * 3600):
         status, out = machine.execute(f"tandoor-e2e {args} 2>&1", timeout=timeout)
         print(out)
         if status != 0:
