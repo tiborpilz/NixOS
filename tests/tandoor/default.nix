@@ -156,8 +156,15 @@ assert lib.assertMsg (builtins.elem sabotage sabotages)
             machine.wait_until_succeeds("busctl status org.freedesktop.systemd1", timeout=300)
 
 
+    def run(cmd):
+        status, out = machine.execute(f"{cmd} 2>&1", timeout=1800)
+        print(out)
+        if status != 0:
+            print(f"{cmd} exited with {status}")
+
+
     def container_id():
-        return machine.succeed("podman inspect tandoor --format '{{.Id}}'").strip()
+        return machine.execute("podman inspect tandoor --format '{{.Id}}'")[1].strip()
 
 
     machine.start()
@@ -186,17 +193,17 @@ assert lib.assertMsg (builtins.elem sabotage sabotages)
 
     with subtest(f"switch to {target}"):
         before = container_id()
-        machine.succeed("/run/booted-system/specialisation/target/bin/switch-to-configuration test")
+        # A broken upgrade may make these fail; the checks below say why.
+        run("/run/booted-system/specialisation/target/bin/switch-to-configuration test")
         if not is_upgrade:
             # Same version: still restart it against the existing database.
-            machine.succeed("systemctl restart tandoor.service")
-        machine.wait_for_unit("tandoor.service", timeout=1800)
-        if container_id() == before:
-            fail("switch", "tandoor container was not recreated")
+            run("systemctl restart tandoor.service")
 
     with subtest(f"{target} runs on the migrated database"):
         ready_timeout = 1800 if sabotage == "web" else 7200
         e2e(f"wait-ready --db-container tandoor-db --timeout {ready_timeout}", timeout=ready_timeout + 300)
+        if container_id() == before:
+            fail("switch", "tandoor container was not recreated")
         e2e(f"verify --expect-image {target}")
   '';
 }

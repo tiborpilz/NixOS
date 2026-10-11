@@ -271,13 +271,17 @@ def results_of(payload):
 # commands
 # --------------------------------------------------------------------------
 
-def db_running(name):
+def db_state(name):
+    """(running, start time) of a container; (False, None) if it does not exist."""
     try:
-        p = subprocess.run(["podman", "container", "inspect", name, "--format", "{{.State.Running}}"],
+        p = subprocess.run(["podman", "container", "inspect", name, "--format", "{{.State.Running}} {{.State.StartedAt}}"],
                            capture_output=True, text=True, timeout=120)
     except (OSError, subprocess.TimeoutExpired):
-        return False
-    return p.returncode == 0 and p.stdout.strip() == "true"
+        return False, None
+    if p.returncode != 0:
+        return False, None
+    running, _, started = p.stdout.strip().partition(" ")
+    return running == "true", started
 
 
 def check_db_running(args, down_since):
@@ -300,12 +304,16 @@ def cmd_wait_ready(args):
     last = "no attempt yet"
     attempt = 0
     db_down_since = None
+    db_started = None
     while True:
         attempt += 1
         if args.db_container:
             check_db_running(args, db_down_since)
-            running = db_running(args.db_container)
-            db_down_since = None if running else (db_down_since or time.monotonic())
+            running, started = db_state(args.db_container)
+            # A container that restarted since the last poll is crash-looping, not up.
+            up = running and (db_started is None or started == db_started)
+            db_started = started if running else None
+            db_down_since = None if up else (db_down_since or time.monotonic())
         try:
             r = http.get("/accounts/login/")
             if r.status == 200:
