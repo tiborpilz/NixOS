@@ -19,7 +19,7 @@ with mylib;
       deno
 
       # Package Managers
-      pnpm
+      unstable.pnpm
       yarn
 
       # Linting

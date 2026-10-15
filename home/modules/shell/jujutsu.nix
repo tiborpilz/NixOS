@@ -16,7 +16,7 @@ let
   difftPreview = ''merge-tools.difft.diff-args=["--color=always","--width=$preview_width","$left","$right"]'';
 in
 {
-  options.modules.shell.jujutsu = with types; {
+  options.modules.shell.jujutsu = {
     enable = mylib.mkBoolOpt false;
   };
 
@@ -24,8 +24,6 @@ in
     home.packages = with pkgs; [
       unstable.jjui
       unstable.gg-jj # desktop GUI
-      unstable.radicle-node
-      radicle-explorer
       difftastic
       (jjScript "jj-pretty" [ "--allow-run" "--allow-env" "--allow-read" "--allow-write" ] [ less ])
       (jjScript "jj-dag" [ "--allow-run" "--allow-env" "--allow-write" ] [ graphviz ])

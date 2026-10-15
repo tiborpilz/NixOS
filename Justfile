@@ -43,7 +43,7 @@ homemanager:
 
 # Automatically switch the local configuration based on the system type
 switch:
-  {{ if is_nixos == "true" { "sudo nixos-rebuild switch --flake ." } else { "nh home switch ." } }}
+  {{ if is_nixos == "true" { "nh os switch" } else { "nh home switch ." } }}
 
 # Build an ISO (installer or live) into ./result
 iso name:

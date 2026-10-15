@@ -134,15 +134,6 @@ in
     (if (hasAttr "konsole" options.programs) then {
       programs.konsole = {
         enable = true;
-        profiles.main = {
-          colorScheme = "Nordic";
-          extraConfig = {
-            General = {
-              TerminalMargin = 20;
-            };
-          };
-        };
-        defaultProfile = "main";
       };
     } else { })
   ]);
