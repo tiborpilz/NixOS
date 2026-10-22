@@ -1,7 +1,7 @@
 {
-  # jj log      -> two-line "pretty" (compact header + description)
-  # jj lo       -> one line per commit
-  # jj ll       -> header, description, per-file diffstat
+  # jj log: two-line "pretty" (compact header + description)
+  # jj lo: one line per commit
+  # jj ll: header, description, per-file diffstat
   templates.log = "pretty";
   templates.log_node = "pretty_node";
 
@@ -17,16 +17,6 @@
         .replace(regex:" weeks? ago$", "w")
         .replace(regex:" months? ago$", "mo")
         .replace(regex:" years? ago$", "y")
-    '';
-
-    # Colour the conventional-commit type and scope, e.g. "feat(nvim)!:".
-    "conv(s)" = ''
-      replace(regex:"^([a-z]+)(\\([^)]*\\))?(!)?:", s, |c|
-        label("conv " ++ c.get(1), c.get(1))
-        ++ label("conv_scope", c.get(2))
-        ++ label("conv_breaking", c.get(3))
-        ++ label("conv " ++ c.get(1), ":")
-      )
     '';
 
     # Links commit ids to the origin remote's web page (OSC 8). Only immutable commits:

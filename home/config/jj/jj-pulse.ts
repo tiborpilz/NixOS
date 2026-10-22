@@ -37,7 +37,7 @@ const LEVELS = [DIM + "·" + R, E + "32m▪" + R, E + "32m■" + R, E + "92m■"
 const cell = (n: number) => LEVELS[n === 0 ? 0 : n === 1 ? 1 : n <= 3 ? 2 : n <= 6 ? 3 : 4];
 
 const cols = Array.from({ length: weeks }, (_, w) => Array.from({ length: 7 }, (_, d) => addDays(start, 7 * w + d)));
-const months = Array<string>(weeks * 2 + 3).fill(" ");
+const months = new Array<string>(weeks * 2 + 3).fill(" ");
 cols.forEach((col, w) => {
   if (col[0].getDate() <= 7) {
     months.splice(w * 2, 3, ...col[0].toLocaleDateString("en-GB", { month: "short" }).slice(0, 3));
