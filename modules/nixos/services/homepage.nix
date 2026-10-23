@@ -86,10 +86,10 @@ let
   nonEmptyGroups = filter (g: head (attrValues g) != [ ]) groups;
 
   allowedHosts = concatStringsSep "," ([
-    "${cfg.subdomain}.${hostname}"
+    "homepage.${hostname}"
     "localhost:${toString cfg.publicPort}"
     "127.0.0.1:${toString cfg.publicPort}"
-  ] ++ optional (localDomain != null && localDomain != "") "${cfg.subdomain}.${localDomain}");
+  ] ++ optional (localDomain != null && localDomain != "") "homepage.${localDomain}");
 in
 {
   options.modules.services.homepage = {

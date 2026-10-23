@@ -299,6 +299,11 @@ with lib;
 
     users.groups.remotebuild = {};
 
+    # Remote builders receive derivations and their input closures unsigned, so
+    # the SSH user has to be trusted or every copy is rejected for lacking a
+    # signature.
+    nix.settings.trusted-users = [ "remotebuild" ];
+
     virtualisation.oci-containers.backend = "podman";
     virtualisation.quadlet.autoEscape = true;
 

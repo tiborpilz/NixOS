@@ -83,6 +83,27 @@ in
 
     programs.nix-ld.enable = true;
 
+    nix = {
+      distributedBuilds = true;
+
+      # Let klaus pull dependencies from the binary caches itself instead of
+      # routing every path through this machine.
+      settings.builders-use-substitutes = true;
+
+      buildMachines = [{
+        hostName = "klaus.local";
+        sshUser = "remotebuild";
+        sshKey = "/root/.ssh/remotebuild";
+        # base64 of klaus' /etc/ssh/ssh_host_ed25519_key.pub; nix checks it
+        # instead of consulting root's known_hosts.
+        publicHostKey = "c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSU45Y2t6czRxQ21GYnRJSSsxUC9FbzBIR0NOd1BWQ1lKUzRjalo2ZS9DOUEgcm9vdEBrbGF1cwo=";
+        systems = [ "x86_64-linux" ];
+        maxJobs = 12;
+        speedFactor = 2;
+        supportedFeatures = [ "big-parallel" "kvm" "nixos-test" "recursive-nix" ];
+      }];
+    };
+
     # Fix thunderbolt issues
     modules.hardware.dpLinkGuard.enable = true;
 

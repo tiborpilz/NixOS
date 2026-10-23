@@ -19,6 +19,16 @@
         .replace(regex:" years? ago$", "y")
     '';
 
+    # Colour the conventional-commit type and scope, e.g. "feat(nvim)!:".
+    "conv(s)" = ''
+      replace(regex:"^([a-z]+)(\\([^)]*\\))?(!)?:", s, |c|
+        label("conv " ++ c.get(1), c.get(1))
+        ++ label("conv_scope", c.get(2))
+        ++ label("conv_breaking", c.get(3))
+        ++ label("conv " ++ c.get(1), ":")
+      )
+    '';
+
     # Links commit ids to the origin remote's web page (OSC 8). Only immutable commits:
     # mutable ones are mostly unpushed and would 404.
     "commit_link(c)" = ''

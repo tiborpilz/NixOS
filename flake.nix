@@ -112,7 +112,7 @@
           modules = [
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
-            determinate.nixosModules.default
+            # determinate.nixosModules.default
             quadlet-nix.nixosModules.quadlet
             inputs.disko.nixosModules.disko
           ] ++ lib.my.mapModulesRec' (toString ./modules/shared) import;
