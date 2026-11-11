@@ -62,7 +62,7 @@ in
     in {
       containers = {
         penpot-backend.containerConfig = {
-          image = "penpotapp/backend:2.7.1";
+          image = "penpotapp/backend:2.19.1";
           environments = penpotEnv;
           volumes = [
             "${penpotAssetsDir}:/assets"
