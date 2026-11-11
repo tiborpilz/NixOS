@@ -71,7 +71,7 @@ in
         };
 
         penpot-frontend.containerConfig = {
-          image = "penpotapp/frontend:2.7.1";
+          image = "penpotapp/frontend:2.19.1";
           environments = penpotEnv;
           pod = pods.${podName}.ref;
         };
